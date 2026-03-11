@@ -3,6 +3,106 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 1048658,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Crosshair2 (Copy)",
+                        "Tag": "Killhair"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12912823500286067657",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            20.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "18100970271016879053",
+                        "ScriptClassName": "Game.KillMarker"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Crosshair_KillMark.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 2,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 99901,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DebugCheatsEntity",
+                        "Tag": "DebugCheats"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9182736455463728192",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9182736455463728194",
+                        "ScriptClassName": "Game.DebugCheats"
+                    }
+                }
+            ]
+        },
+        {
             "ID": 81,
             "Components": [
                 {
@@ -64,7 +164,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -442,7 +542,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -529,7 +629,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1045,63 +1145,206 @@
             ]
         },
         {
-            "ID": 82,
+            "ID": 5243106,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "BGM_VO",
-                        "Tag": "BGM_VO"
+                        "Name": "NormalTurretBullet",
+                        "Tag": "NormalTurretBullet"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6351712145694469037",
+                        "PrefabAssetGuid": "12161355632987439315",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: NormalTurretBullet.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8204732253400765361\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.15000000596046448,0.15000000596046448,0.15000000596046448],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18004565042558964655\",\"Name\":\"NormalTurretBullet\",\"Tag\":\"NormalTurretBullet\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7051810748794426311\",\"Mesh\":\"Temp_PrimarySecondaryBullet.fbx\",\"Material\":\"NormalTurretBullet.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710742473456669635\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8204732253401207749\",\"FilePath\":\"Player_Primary_Fire.wav\",\"Type\":1,\"State\":0,\"Volume\":0.4880000054836273,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":18.8439998626709,\"MaxDistance\":256.2539978027344,\"RolloffMode\":0,\"DopplerLevel\":1.4780000448226929,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15122261281046205391\",\"ScriptClassName\":\"Game.NormalTurretBullet\",\"Started\":false,\"GCHandle\":0}}"
+                            },
+                            {
+                                "componentType": 16,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7628271501097948105\",\"Material Type\":\"\",\"Max Segments\":50,\"Segment Lifetime\":1.0,\"Min Distance\":0.10000000149011612,\"Sample Interval\":0.01600000075995922,\"Sample Accumulator\":0.0,\"Start Color\":[1.0,1.0,1.0,1.0],\"End Color\":[1.0,1.0,1.0,0.0],\"Start Width\":0.10000000149011612,\"End Width\":0.05000000074505806,\"Last Position\":[0.0,0.0,0.0],\"Local Offset\":[0.0,0.0,0.0],\"Has Last Position\":false,\"Active\":true,\"Emit Trail\":true}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11299514486553002939",
+                        "ComponentGUID": "8204732253400765361",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            -352.8543395996094,
+                            317.7951965332031,
+                            93.68208312988281
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            -55.095943450927734,
+                            62.75425720214844,
+                            0.000003974593255406944
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            0.10000000149011612,
+                            0.10000000149011612,
+                            0.10000000149011612
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "7051810748794426311",
+                        "Mesh": "Temp_PrimarySecondaryBullet.fbx",
+                        "Material": "NormalTurretBullet.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "710742473456669635",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            232.02447509765625,
+                            374.04937744140625,
+                            119.47874450683594
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "4381985458912183229",
-                        "FilePath": "System AI_VO_Defence BGM.wav",
-                        "Type": 4,
+                        "ComponentGUID": "8204732253401207749",
+                        "FilePath": "Player_Primary_Fire.wav",
+                        "Type": 5,
                         "State": 2,
-                        "Volume": 0.6439999938011169,
+                        "Volume": 0.4880000054836273,
                         "Pitch": 1.0,
-                        "Loop": true,
+                        "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
+                        "Is3D": true,
+                        "MinDistance": 18.8439998626709,
+                        "MaxDistance": 256.2539978027344,
                         "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
+                        "DopplerLevel": 1.4780000448226929,
                         "Pan2D": 0.0
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "8993671477349598809",
-                        "ScriptClassName": "Game.AudioPause"
+                        "ComponentGUID": "15122261281046205391",
+                        "ScriptClassName": "Game.NormalTurretBullet"
+                    }
+                },
+                {
+                    "Type": "TrailComponent",
+                    "Properties": {
+                        "ComponentGUID": "7628271501097948105",
+                        "Material Type": "",
+                        "Max Segments": 50,
+                        "Segment Lifetime": 1.0,
+                        "Min Distance": 0.10000000149011612,
+                        "Sample Interval": 0.01600000075995922,
+                        "Sample Accumulator": 0.015777587890625,
+                        "Start Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "End Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            0.0
+                        ],
+                        "Start Width": 0.10000000149011612,
+                        "End Width": 0.05000000074505806,
+                        "Last Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Local Offset": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Has Last Position": false,
+                        "Active": true,
+                        "Emit Trail": true
                     }
                 }
             ]
@@ -1260,23 +1503,73 @@
             ]
         },
         {
-            "ID": 83,
+            "ID": 6291655,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "VOHealthCore",
-                        "Tag": "VOHealthCore"
+                        "Name": "botnet",
+                        "Tag": "botnet"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "2892947631873928045",
+                        "PrefabAssetGuid": "16570608366664106185",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: Enemy_Botnet.prefab",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16742114490130125945\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.009999999776482582,0.009999999776482582,0.009999999776482582],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16742114490130125945\",\"Name\":\"botnet\",\"Tag\":\"botnet\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16742114490130125945\",\"Mesh\":\"E004_botnet_v003.fbx\",\"Material\":\"BotnetM4.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"601213425638908771\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,20.0,20.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"601213425638908771\",\"FilePath\":\"Botnet_Ambient.wav\",\"Type\":1,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":31.780000686645508,\"MaxDistance\":276.7699890136719,\"RolloffMode\":0,\"DopplerLevel\":1.003999948501587,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11007352189747626285\",\"ScriptClassName\":\"Game.Botnet\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "902541330492901671",
+                        "ComponentGUID": "16742114490130125945",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            126.87886047363281,
+                            -24.48712921142578,
+                            1112.513427734375
                         ],
                         "Rotation": [
                             0.0,
@@ -1284,39 +1577,87 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            0.009999999776482582,
+                            0.009999999776482582,
+                            0.009999999776482582
                         ],
                         "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "16742114490130125945",
+                        "Mesh": "E004_botnet_v003.fbx",
+                        "Material": "BotnetM4.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "601213425638908771",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            -14.340852737426758,
+                            2.7677290439605713,
+                            -125.74507141113281
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            30.0,
+                            20.0,
+                            20.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "11278834871954721065",
-                        "FilePath": "System AI_VO_Core Damage 1.wav",
-                        "Type": 4,
-                        "State": 2,
+                        "ComponentGUID": "601213425638908771",
+                        "FilePath": "Botnet_Ambient.wav",
+                        "Type": 5,
+                        "State": 0,
                         "Volume": 1.0,
                         "Pitch": 1.0,
-                        "Loop": false,
+                        "Loop": true,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
+                        "Is3D": true,
+                        "MinDistance": 31.780000686645508,
+                        "MaxDistance": 276.7699890136719,
                         "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
+                        "DopplerLevel": 1.003999948501587,
                         "Pan2D": 0.0
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "2631923587403548971",
-                        "ScriptClassName": "Game.AudioVOHealthCore"
+                        "ComponentGUID": "11007352189747626285",
+                        "ScriptClassName": "Game.Botnet"
                     }
                 }
             ]
@@ -4533,7 +4874,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4640,7 +4981,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "18059364695356834353",
-                        "ScriptClassName": "Game.ScoreBoard1"
+                        "ScriptClassName": "Game.ScoreBoard2"
                     }
                 },
                 {
@@ -5763,7 +6104,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5915,6 +6256,13 @@
                         ],
                         "Parent": 4294967295,
                         "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "10606980491072259009",
+                        "ScriptClassName": "Game.Crosshair"
                     }
                 },
                 {
@@ -6089,7 +6437,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.9028741121292114,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -6759,7 +7107,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -0.0,
+                            -1.0177775099486433e-13,
                             90.0
                         ],
                         "Scale": [
@@ -6859,7 +7207,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7006,7 +7354,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
