@@ -51,12 +51,12 @@ namespace Engine {
 			return false;
 		}
 
-		m_MixerBusSettings[AudioType::MASTER] = { 1.0f, 100 };
-		m_MixerBusSettings[AudioType::SFX] = { 1.0f, 100 };
-		m_MixerBusSettings[AudioType::BGM] = { 1.0f, 100 };
-		m_MixerBusSettings[AudioType::UI] = { 1.0f, 100 };
-		m_MixerBusSettings[AudioType::VO] = { 1.0f, 100 };
-		m_MixerBusSettings[AudioType::GAMESFX] = { 1.0f, 100 };
+		m_MixerBusSettings[AudioType::MASTER] = { 1.0f, 1.0f };
+		m_MixerBusSettings[AudioType::SFX] = { 1.0f, 1.0f };
+		m_MixerBusSettings[AudioType::BGM] = { 1.0f, 1.0f };
+		m_MixerBusSettings[AudioType::UI] = { 1.0f, 1.0f };
+		m_MixerBusSettings[AudioType::VO] = { 1.0f, 1.0f };
+		m_MixerBusSettings[AudioType::GAMESFX] = { 1.0f, 1.0f };
 
 		initialized = true;
 
@@ -751,7 +751,7 @@ namespace Engine {
 		case AudioType::MASTER:
 			return mastergroup;
 		case AudioType::SFX:
-			return gamesfxgroup;
+			return sfxgroup;
 		case AudioType::BGM:
 			return bgmgroup;
 		case AudioType::UI:
@@ -830,6 +830,7 @@ namespace Engine {
 		);
 
 		FMOD_RESULT result = group->setVolume(finalVolume);
+		LOG_DEBUG("Applied volume for ", (int)type, " - Editor Cap: ", it->second.editorCap, ", Player Volume: ", it->second.playerVolume, ", Final Volume: ", finalVolume);
 		LogFMODError(result, "AudioManager::ApplyBusVolume - setVolume");
 	}
 

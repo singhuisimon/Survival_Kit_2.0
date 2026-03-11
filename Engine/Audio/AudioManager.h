@@ -20,7 +20,7 @@ namespace Engine {
 
 	struct MixerBusSettings {
 		float editorCap = 1.0f; // Slider value from 0 to 2 for designers
-		float playerVolume = 1.0f; // Slider value from 0 to 100
+		float playerVolume = 1.0f; // Slider value from 0 to 1
 	};
 
     /**
