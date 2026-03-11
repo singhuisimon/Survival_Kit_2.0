@@ -413,7 +413,7 @@ namespace Game
             Vector3 forward = Vector3.Forward;
             Quat spawnRot = QuaternionFromTo(forward, directionNorm);
 
-            Vector3 spawnscale = new Vector3(1.0f, 1.0f, 1.0f);
+            Vector3 spawnscale = new Vector3(5.0f, 5.0f, 5.0f);
 
             uint wormBulletID = PrefabInstantiateWithTransform(wormBulletPrefab, ref spawnPosition, ref spawnRot, ref spawnscale, false);
             if(wormBulletID == 0){
@@ -446,8 +446,8 @@ namespace Game
             RigidbodyAddForce(wormBulletID, ref force);
 
             // Set collision box
-            //Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
-            //RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
+            Vector3 extents = new Vector3(2.5f, 2.5f, 2.5f);
+            RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
 
             // Add visuals and script
             //EntityAddMeshRenderer(wormBulletID);
