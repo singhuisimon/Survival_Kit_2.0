@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: WormHost.prefab",
-    "Prefab GUID": 16316647606544781161,
-    "version": 4,
+    "Prefab GUID": 10425015715901227181,
+    "version": 1,
     "entities": [
         {
             "Name": "WormHost",
@@ -51,7 +51,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "407206890034530587",
-                            "Mesh": "E001_worm_host_v004.fbx",
+                            "Mesh": "E001_worm_host_v006.fbx",
                             "Material": "WormHost.mat",
                             "Texture": "",
                             "Visible": true,
@@ -73,9 +73,9 @@
                         "Properties": {
                             "ComponentGUID": "15971647202226424089",
                             "Mass": 1.0,
-                            "IsKinematic": true,
+                            "IsKinematic": false,
                             "IsTrigger": false,
-                            "UseGravity": false,
+                            "UseGravity": true,
                             "Velocity": [
                                 0.0,
                                 0.0,
@@ -106,7 +106,7 @@
                         "Properties": {
                             "ComponentGUID": "17014943003178271835",
                             "FilePath": "Worm_Host_Ambient.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
@@ -130,7 +130,7 @@
                             "ComponentGUID": "3289510651551910173",
                             "ScriptClassName": "Game.WormHost",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
                         }
                     }
                 }
