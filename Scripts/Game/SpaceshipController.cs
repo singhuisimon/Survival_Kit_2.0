@@ -125,7 +125,7 @@ namespace Game
         private float hitSparksTimer = 0.1f;
         private bool isHitSparks = false;
         string playerHitSparksPrefabPath = "Sources/Prefabs/HitSparksPlayer.prefab";
-        string VFX_PlayerDeathExplosionPrefab = "Sources/Prefabs/MainExplosion1.prefab";
+        string VFX_PlayerDeathExplosionPrefab = "Sources/Prefabs/VFX_PlayerDeathExplosion.prefab";
 
         // ===== Audio =====
         string playerHealAudioPrefab = "Sources/Prefabs/Audio_PlayerHeal.prefab";
