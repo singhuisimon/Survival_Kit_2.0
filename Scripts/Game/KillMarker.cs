@@ -6,23 +6,14 @@ using static Engine.Event;
 
 namespace Game
 {
-    /// <summary>
-    /// KillMarker - Flashes kill marker sprite when any enemy is killed
-    /// Attach this to the kill marker sprite entity
-    /// Listens to: "BotnetDeath", "LoveLetterDestroyed", "WormHostDead"
-    /// Same flash pattern as Hitmarker
-    /// </summary>
     public class KillMarker : ScriptBehaviour
     {
-        // ===== Event Names =====
         private const string EVENT_BOTNET_DEAD = "BotnetDeath";
-        private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
+        private const string EVENT_LOVELETTER_DEAD = "LoveLetterDeath";
         private const string EVENT_WORMHOST_DEAD = "WormHostDead";
 
-        // ===== Settings =====
         private float displayTime = 0.15f;
 
-        // ===== State =====
         private bool isShowing = false;
         private float currentDisplayTimer = 0.0f;
 
@@ -31,15 +22,13 @@ namespace Game
             LogMessage("=== KillMarker OnStart ===");
             LogMessage("KillMarker EntityID: " + EntityID);
 
-            // Subscribe to all enemy death events
             Event.Subscribe(EVENT_BOTNET_DEAD, OnEnemyKilled);
             Event.Subscribe(EVENT_LOVELETTER_DEAD, OnEnemyKilled);
             Event.Subscribe(EVENT_WORMHOST_DEAD, OnEnemyKilled);
 
-            // Start hidden
             SetIsVisible((uint)EntityID, false);
 
-            LogMessage("[KillMarker] Initialized - listening for enemy kills");
+            LogMessage("[KillMarker] Initialized");
         }
 
         public override void OnFixedUpdate(float deltaTime)
@@ -47,23 +36,26 @@ namespace Game
             if (!isShowing)
                 return;
 
-            // Timer countdown
             currentDisplayTimer -= deltaTime;
             if (currentDisplayTimer <= 0.0f)
-            {
                 HideKillMarker();
-            }
         }
-
-        // ===== EVENT HANDLER =====
 
         private void OnEnemyKilled(string eventName, string payload)
         {
-            LogMessage("[KillMarker] Enemy killed! Event: " + eventName);
+            LogMessage("[KillMarker] Death event received: " + eventName + " | payload: " + payload);
+
+            // Only show if the killing blow came from a player bullet
+            // Botnet publishes "killer=PrimaryBullet" or "killer=PrimaryUltBullet"
+            if (!payload.Contains("PrimaryBullet") && !payload.Contains("PrimaryUltBullet"))
+            {
+                LogMessage("[KillMarker] Not a player kill - ignoring");
+                return;
+            }
+
+            LogMessage("[KillMarker] Player kill confirmed - showing marker");
             ShowKillMarker();
         }
-
-        // ===== HELPERS =====
 
         private void ShowKillMarker()
         {

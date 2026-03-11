@@ -7,6 +7,7 @@ using static Engine.Scene;
 using static Engine.Audio;
 using static Engine.AudioManager;
 using static Engine.Transform;
+using static Engine.Prefab;
 
 namespace Game
 {
@@ -23,6 +24,14 @@ namespace Game
         private const string PlayerDeadName = "PlayerDeath";
         private const string CoreDestructionName = "CoreDestruction";
         private const string core = "SEMICONDUCTOR";
+
+        private const string GameOverVOPrefab = "Sources/Prefabs/Audio_Lose_VO.prefab";
+
+        private const float countdowntimer = 0.5f;
+        private float countdown = 0.0f;
+
+        private bool countdownstart = false;
+        private bool voInstantiated = false;
 
         private uint playerdeadID = 0;
         private uint coredestructionID = 0;
@@ -70,29 +79,42 @@ namespace Game
         }
 
         public override void OnUpdate(float deltaTime){
-            if(!playaudio){
-                return;
+            if(playaudio){
+                if(currEvent == EVENT_PLAYER_DEAD){
+                    AudioPlay(playerdeadID);
+                    LogMessage("[GameOverScreen] player dead audio is playing");
+                }
+
+                if(currEvent == EVENT_CORE_DESTROYED){
+                    AudioPlay(coredestructionID);
+                    LogMessage("[GameOverScreen] core destruction audio is playing");
+                }
+
+                playaudio = false;
             }
 
-            if(currEvent == EVENT_PLAYER_DEAD){
-                AudioPlay(playerdeadID);
-                LogMessage("[GameOverScreen] player dead audio is playing");
+            if(countdownstart){
+                countdown -= deltaTime;
+                if(countdown <= 0.0f && !voInstantiated){
+                    uint loseVOID = 0;
+                    loseVOID = PrefabInstantiate(GameOverVOPrefab);
+                    if(loseVOID == 0){
+                        LogMessage("[GameOverScreen] failure to spawn gameover VO");
+                        return;
+                    }
+                    voInstantiated = true;
+                }
             }
 
-            if(currEvent == EVENT_CORE_DESTROYED){
-                AudioPlay(coredestructionID);
-                LogMessage("[GameOverScreen] core destruction audio is playing");
-            }
-
-            playaudio = false;
         }
 
         private void OnGameOver(string eventName, string payload)
         {
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
 
-            StopGroup(AudioType.BGM);
-            StopGroup(AudioType.SFX);
+            StopGroup(AudioType.MASTER);
+            countdownstart = true;
+            countdown = countdowntimer;
 
             SetIsVisible((uint)EntityID, true);
             Input.SetCursorVisible(true);
