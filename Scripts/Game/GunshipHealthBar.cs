@@ -45,11 +45,11 @@ namespace Game
                 return;
 
             // DEBUG: Press 9 to send damage event
-            if (Input.IsKeyPressed(KeyCode.D9))
+       /*     if (Input.IsKeyPressed(KeyCode.D9))
             {
                 LogMessage("[GunshipHealthBar] DEBUG - sending damage event for allyIndex " + allyIndex);
                 Publish("DebugDamageGunship:" + allyIndex, "10");
-            }
+            }*/
         }
 
         private void OnHealthChanged(string eventName, string payload)

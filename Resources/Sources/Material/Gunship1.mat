@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": true,
     "castShadows": true,
-    "treatBlacksAsTransparent": true
+    "treatBlacksAsTransparent": false
 }
