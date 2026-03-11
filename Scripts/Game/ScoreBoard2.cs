@@ -115,7 +115,12 @@ namespace Game
             LogMessage("[ScoreBoard2] Game over event: " + eventName);
             SaveScore();
             Text.SetIsVisible((uint)EntityID, false);
+
+            // Publish final score for end screen display
+            Publish("ShowFinalScore", score.ToString());
+            LogMessage("[ScoreBoard2] Published final score: " + score);
         }
+
 
         private void OnGameWin(string eventName, string payload)
         {

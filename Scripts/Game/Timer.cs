@@ -96,7 +96,13 @@ namespace Game
             LogMessage("[TimerUI] Game over triggered by: " + eventName + " - Timer stopped");
             gameOver = true;
             Text.SetIsVisible((uint)EntityID, false);
+
+            // Publish time survived (startingTime - remainingTime)
+            float timeSurvived = startingTime - remainingTime;
+            Publish("ShowTimeSurvived", timeSurvived.ToString());
+            LogMessage("[TimerUI] Time survived: " + timeSurvived);
         }
+
 
         private void UpdateTimerDisplay()
         {

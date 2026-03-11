@@ -24,6 +24,7 @@ namespace Game
         private const string PlayerDeadName = "PlayerDeath";
         private const string CoreDestructionName = "CoreDestruction";
         private const string core = "SEMICONDUCTOR";
+        private const string LOSE_SCREEN_SHOW = "LoseScreenShow";
 
         private const string GameOverVOPrefab = "Sources/Prefabs/Audio_Lose_VO.prefab";
 
@@ -42,6 +43,19 @@ namespace Game
 
         private string currEvent = "";
 
+        // Button fade delay
+        private bool pendingShow = false;
+        private float showDelay = 2.0f;
+        private float showDelayTimer = 0.0f;
+
+        // Texture fade
+        private bool isFading = false;
+        private bool fadeDone = false;
+        private float fadeElapsed = 0.0f;
+
+        [SerializeField] private float fadeUpTime = 1.0f;
+        [SerializeField] private float uiStartFadePos = 360.0f;
+
         public override void OnStart()
         {
             LogMessage("=== GameOverScreen OnStart ===");
@@ -51,24 +65,13 @@ namespace Game
             coredestructionID = SceneFindEntityByName(CoreDestructionName);
             coreID = SceneFindEntityByName(core);
 
-            if (playerdeadID == 0){
-                LogMessage("[GameOverScreen] playerdead entity cannot be found");
-            }
+            if (playerdeadID == 0) LogMessage("[GameOverScreen] playerdead entity cannot be found");
+            if (coredestructionID == 0) LogMessage("[GameOverScreen] coredestruction entity cannot be found");
+            if (coreID == 0) LogMessage("[GameOverScreen] core entity cannot be found");
 
-            if (coredestructionID == 0)
-            {
-                LogMessage("[GameOverScreen] coredestruction entity cannot be found");
-            }
-            if (coreID == 0)
-            {
-                LogMessage("[GameOverScreen] core entity cannot be found");
-            }
-
-            // Subscribe to both lose conditions
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
 
-            // Start hidden
             SetIsVisible((uint)EntityID, false);
 
             initialized = true;
@@ -78,14 +81,38 @@ namespace Game
             LogMessage("SEMICONDUCTOR IS AT x: " + corepos.X.ToString() + ", y: " + corepos.Y.ToString() + ", z: " + corepos.Z.ToString());
         }
 
-        public override void OnUpdate(float deltaTime){
-            if(playaudio){
-                if(currEvent == EVENT_PLAYER_DEAD){
+        public override void OnUpdate(float deltaTime)
+        {
+            // Fade in the lose screen texture
+            if (isFading && !fadeDone)
+            {
+                fadeElapsed += deltaTime;
+
+                FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
+
+                Vector3 pos = GetPosition((uint)EntityID);
+                pos.Y = uiStartFadePos - (10.0f * fadeElapsed / fadeUpTime);
+                SetPosition((uint)EntityID, ref pos);
+
+                if (fadeElapsed >= fadeUpTime)
+                {
+                    fadeDone = true;
+                    isFading = false;
+                    LogMessage("[GameOverScreen] Texture fade complete");
+                }
+            }
+
+            // Play audio
+            if (playaudio)
+            {
+                if (currEvent == EVENT_PLAYER_DEAD)
+                {
                     AudioPlay(playerdeadID);
                     LogMessage("[GameOverScreen] player dead audio is playing");
                 }
 
-                if(currEvent == EVENT_CORE_DESTROYED){
+                if (currEvent == EVENT_CORE_DESTROYED)
+                {
                     AudioPlay(coredestructionID);
                     LogMessage("[GameOverScreen] core destruction audio is playing");
                 }
@@ -93,12 +120,15 @@ namespace Game
                 playaudio = false;
             }
 
-            if(countdownstart){
+            // VO countdown
+            if (countdownstart)
+            {
                 countdown -= deltaTime;
-                if(countdown <= 0.0f && !voInstantiated){
-                    uint loseVOID = 0;
-                    loseVOID = PrefabInstantiate(GameOverVOPrefab);
-                    if(loseVOID == 0){
+                if (countdown <= 0.0f && !voInstantiated)
+                {
+                    uint loseVOID = PrefabInstantiate(GameOverVOPrefab);
+                    if (loseVOID == 0)
+                    {
                         LogMessage("[GameOverScreen] failure to spawn gameover VO");
                         return;
                     }
@@ -106,6 +136,17 @@ namespace Game
                 }
             }
 
+            // Wait 2 seconds after texture appears, then fade in buttons
+            if (pendingShow)
+            {
+                showDelayTimer -= deltaTime;
+                if (showDelayTimer <= 0.0f)
+                {
+                    pendingShow = false;
+                    LogMessage("[GameOverScreen] Delay done - publishing LoseScreenShow");
+                    Publish(LOSE_SCREEN_SHOW, "");
+                }
+            }
         }
 
         private void OnGameOver(string eventName, string payload)
@@ -116,11 +157,20 @@ namespace Game
             countdownstart = true;
             countdown = countdowntimer;
 
+            // Start fading in texture
+            isFading = true;
+            fadeElapsed = 0.0f;
+            fadeDone = false;
             SetIsVisible((uint)EntityID, true);
+
             Input.SetCursorVisible(true);
             currEvent = eventName;
             playaudio = true;
             Publish(GAMEOVER, "");
+
+            // Start 2 second delay before fading in buttons
+            pendingShow = true;
+            showDelayTimer = showDelay;
         }
 
         public override void OnDestroy()
