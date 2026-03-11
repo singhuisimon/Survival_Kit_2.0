@@ -4,7 +4,7 @@
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "",
+    "emissionMap": "DreadnoughtLabel.png",
     "occlusionMap": "",
     "baseColor": [
         1.0,
