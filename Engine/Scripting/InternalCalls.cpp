@@ -41,6 +41,11 @@
 
 #include "../Transform/TransformSystem.h"
 
+#include "../Asset/AssetManager.h"
+#include "../Asset/ResourceManager.h"
+#include "../Asset/ResourceHelpers.h"
+#include "../Asset/ResourceData.h"
+
 // Mono
 #include <mono/jit/jit.h>
 #include <mono/metadata/class.h>
@@ -1934,6 +1939,49 @@ namespace Engine
 			e.GetComponent<MeshRendererComponent>().GlobalIlluminate = gi;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets the emissive texture on the entity's material by filename.
+		 * Looks up the texture GUID from the asset database, then updates
+		 * the material's emissionMap in the loaded resource cache.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param textureName
+		 * Managed string with the texture filename (e.g., "PlayerModel_Blue_v003_Emissive.png").
+		***************************************************************************/
+		void MeshRenderer_SetEmissiveTexture(uint64_t entityID, MonoString* textureName)
+		{
+			if (!textureName) return;
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
+
+			char* utf8 = mono_string_to_utf8(textureName);
+			if (!utf8) return;
+
+			// Look up texture GUID by filename
+			xresource::instance_guid textureGuid = AM.getGuidFromName(utf8);
+			if (textureGuid == 0) {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetEmissiveTexture: Texture not found: ", utf8);
+				mono_free(utf8);
+				return;
+			}
+
+			// Load the material and update its emissive texture
+			auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+			MaterialResource* material =
+				RM.loadResource<MaterialResource>(convertToMaterialGuid(meshRenderer.MaterialGuid));
+
+			if (material) {
+				material->emissionMap = textureGuid;
+				material->enableEmission = true;
+				LOG_INFO("[InternalCalls] MeshRenderer_SetEmissiveTexture: Set emissive to '", utf8, "' on entity ", entityID);
+			} else {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetEmissiveTexture: Material not found for entity ", entityID);
+			}
+
+			mono_free(utf8);
+		}
+
 		// =====================================================================
 		// AudioComponent
 		// =====================================================================
@@ -3191,6 +3239,38 @@ namespace Engine
 			Entity e = GetEntityOrNull(entityID);
 			if (!e || !e.HasComponent<ParticleComponent>()) return;
 			e.GetComponent<ParticleComponent>().EmissionRate = rate;
+		}
+
+		void ParticleSystem_SetColorMin(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<ParticleComponent>() || !color) return;
+			e.GetComponent<ParticleComponent>().ColorMin = *color;
+		}
+
+		void ParticleSystem_SetColorMax(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<ParticleComponent>() || !color) return;
+			e.GetComponent<ParticleComponent>().ColorMax = *color;
+		}
+
+		// =====================================================================
+		// TrailComponent
+		// =====================================================================
+
+		void Trail_SetStartColor(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TrailComponent>() || !color) return;
+			e.GetComponent<TrailComponent>().StartColor = *color;
+		}
+
+		void Trail_SetEndColor(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TrailComponent>() || !color) return;
+			e.GetComponent<TrailComponent>().EndColor = *color;
 		}
 
 		void Text_SetText(uint32_t entityID, MonoString *text)

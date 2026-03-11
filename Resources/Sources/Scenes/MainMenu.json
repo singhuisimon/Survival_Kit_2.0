@@ -1003,7 +1003,7 @@
                         "Position": [
                             805.5,
                             445.0,
-                            -0.10000000149011612
+                            -0.5
                         ],
                         "Rotation": [
                             0.0,
@@ -1030,7 +1030,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 1,
+                        "Sprite Layer": 2,
                         "IsActive": true,
                         "IsVisible": true
                     }
