@@ -457,7 +457,7 @@ namespace Game
                 Quat    playerRot = GetRotation(playerEntityID);
 
                 SceneDestroyEntity(playerEntityID);
-                Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
+                //Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
                 // Spawn explosion VFX at player position
                 uint playerDeathExplosion = PrefabInstantiate(VFX_PlayerDeathExplosionPrefab);
                 if (playerDeathExplosion == INVALID_ENTITY)
@@ -467,7 +467,7 @@ namespace Game
                 else
                 {
                     Transform.SetPosition(playerDeathExplosion, ref playerPos);
-                    Vector3 explosionPlayerScale = new Vector3(20.0f, 20.0f, 20.0f);
+                    Vector3 explosionPlayerScale = new Vector3(3.0f, 3.0f, 3.0f);
                     Transform.SetScale(playerDeathExplosion, ref explosionPlayerScale);
                     LogMessage("[SpaceshipController] Player destroyed, explosion spawned. Waiting 3s...");
                 }
