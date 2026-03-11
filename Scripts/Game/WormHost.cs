@@ -57,8 +57,8 @@ namespace Game
         private const string GAMEWIN = "GameWin";
 
         // Thresholds to prevent state flickering
-        private const float STOP_RANGE  = 300.0f; // enters stationary when closer than this
-        private const float START_RANGE = 500.0f; // resumes moving when farther than this
+        private const float STOP_RANGE  = 500.0f; // enters stationary when closer than this
+        private const float START_RANGE = 800.0f; // resumes moving when farther than this
 
         // Lifecycle
         public override void OnStart()
