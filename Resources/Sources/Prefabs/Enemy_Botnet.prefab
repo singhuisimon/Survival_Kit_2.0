@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 8822657826591230863,
+    "Prefab GUID": 15036701734329761987,
     "version": 1,
     "entities": [
         {
@@ -51,7 +51,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16742114490130125945",
-                            "Mesh": "E004_botnet_v003.fbx",
+                            "Mesh": "E004_botnet_v006.fbx",
                             "Material": "BotnetM4.mat",
                             "Texture": "",
                             "Visible": true,
@@ -106,7 +106,7 @@
                         "Properties": {
                             "ComponentGUID": "601213425638908771",
                             "FilePath": "Botnet_Ambient.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
                             "Volume": 1.0329999923706057,
                             "Pitch": 1.0,
@@ -130,7 +130,7 @@
                             "ComponentGUID": "11007352189747626285",
                             "ScriptClassName": "Game.Botnet",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
                         }
                     }
                 }
