@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "EnemyTurretBullet",
-    "Prefab GUID": 13036127089097572517,
-    "version": 2,
+    "Prefab Name": "WormBullet",
+    "Prefab GUID": 12178965460342412067,
+    "version": 1,
     "entities": [
         {
-            "Name": "EnemyTurretBullet",
+            "Name": "WormBullet",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9688597958291261995",
+                            "ComponentGUID": "17943572983371371287",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,8 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "17182587738235767337",
-                            "Tag": "EnemyTurretBullet"
+                            "ComponentGUID": "4684975680392631061",
+                            "Name": "WormBullet",
+                            "Tag": "WormBullet"
                         }
                     }
                 },
@@ -49,13 +50,14 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2194608178346805805",
+                            "ComponentGUID": "6990818689606980377",
                             "Mesh": "",
-                            "Material": "EnemyTurretBullet.mat",
+                            "Material": "WormBullet.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -69,7 +71,7 @@
                     "typeName": "RigidBodyComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "14055312795390967969",
+                            "ComponentGUID": "9296661698821624603",
                             "Mass": 1.0,
                             "IsKinematic": false,
                             "IsTrigger": false,
@@ -89,9 +91,9 @@
                             "Restitution": 0.10000000149011612,
                             "CollideType": 1,
                             "BoxHalfExtent": [
-                                0.5,
-                                0.5,
-                                0.5
+                                2.0,
+                                2.0,
+                                2.0
                             ],
                             "SphereRadius": 0.5
                         }
@@ -102,21 +104,33 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "18379146660872716859",
+                            "ComponentGUID": "11026043955733582621",
                             "FilePath": "Worm Shoot.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.9319999814033508,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 1.0,
-                            "MaxDistance": 100.0,
+                            "MinDistance": 50.0,
+                            "MaxDistance": 200.10000610351565,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2955593423487013663",
+                            "ScriptClassName": "Game.WormBullet",
+                            "Started": false,
+                            "GCHandle": 1779
                         }
                     }
                 }

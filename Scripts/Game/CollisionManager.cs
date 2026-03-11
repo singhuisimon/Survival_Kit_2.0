@@ -92,6 +92,8 @@ namespace Game
             { "obstacle_wall_destructable", CollisionCategory.ENVIRONMENT },
             { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT },
             { "destructablewall", CollisionCategory.ENVIRONMENT },
+            { "trench_vo_wall_trigger", CollisionCategory.ENVIRONMENT },
+            { "trench_vo_core_trigger", CollisionCategory.ENVIRONMENT },
 
             // Payload
             { "payload", CollisionCategory.PAYLOAD}
@@ -116,6 +118,9 @@ namespace Game
 
         // Environment collisions (everything that hit environment)
         private Dictionary<uint, List<uint>> environmentCollisions = new Dictionary<uint, List<uint>>();
+
+        // Reverse lookup: environment object -> entities that hit it
+private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, List<uint>>();
 
         // ============================================================
         // COLLISION RULES - Define what can collide with what
@@ -227,6 +232,7 @@ namespace Game
             barrierCollisions.Clear();
             payloadCollisions.Clear();
             environmentCollisions.Clear();
+            environmentHitBy.Clear();
         }
 
         private CollisionCategory GetCategory(string tag)
@@ -352,6 +358,20 @@ namespace Game
             {
                 RecordHit(environmentCollisions, entityA, entityB);
             }
+
+            // ENVIRONMENT COLLISIONS
+            if (catA == CollisionCategory.ENVIRONMENT)
+            {
+                // entityB hit environment entityA
+                RecordHit(environmentCollisions, entityB, entityA);
+                RecordHit(environmentHitBy, entityA, entityB);
+            }
+            else if (catB == CollisionCategory.ENVIRONMENT)
+            {
+                // entityA hit environment entityB
+                RecordHit(environmentCollisions, entityA, entityB);
+                RecordHit(environmentHitBy, entityB, entityA);
+            }
         }
 
         private void RecordHit(Dictionary<uint, List<uint>> storage, uint source, uint target)
@@ -445,6 +465,14 @@ namespace Game
         public static List<uint> GetEnvironmentCollisions(uint entityId)
         {
             return GetFromDictionary(instance?.environmentCollisions, entityId);
+        }
+
+        /// <summary>
+        /// Get all entities that hit this environment object this frame
+        /// </summary>
+        public static List<uint> GetEnvironmentHitBy(uint environmentEntityId)
+        {
+            return GetFromDictionary(instance?.environmentHitBy, environmentEntityId);
         }
 
         // ============================================================

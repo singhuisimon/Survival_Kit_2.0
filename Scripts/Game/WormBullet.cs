@@ -14,7 +14,7 @@ namespace Game
     public class WormBullet : ScriptBehaviour
     {
         [SerializeField]
-        public float ProjectileLifetime = 6.0f;
+        public float ProjectileLifetime = 2.0f;
 
         [SerializeField]
         public float Damage = 1.0f;

@@ -4,23 +4,23 @@
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "PlayerHPBar.png",
+    "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
         1.0,
-        1.0,
-        1.0
-    ],
-    "emissionColor": [
-        0.0,
         0.0,
         0.0
     ],
-    "metallic": 0.0,
-    "roughness": 0.6000000238418579,
+    "emissionColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "metallic": 0.029999999329447746,
+    "roughness": 0.07000000029802322,
     "opacity": 1.0,
-    "emissionStrength": 3.890000104904175,
-    "alphaThreshold": 0.5,
+    "emissionStrength": 100.0,
+    "alphaThreshold": 0.5120000243186951,
     "ambientOcclusion": 0.5,
     "tiling": [
         1.0,
@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": true,
     "castShadows": true,
-    "treatBlacksAsTransparent": false
+    "treatBlacksAsTransparent": true
 }
