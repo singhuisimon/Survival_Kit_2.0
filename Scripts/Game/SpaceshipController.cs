@@ -74,6 +74,8 @@ namespace Game
         private const float VAMPIRISM_KEYLOGGER   = 2.0f;
         private const float HEAL_VFX_DURATION     = 2.0f;
         private float       HEAL_VFX_ACCUMULATOR  = 0.0f;
+        private float       DEATH_TIMER = 0.0f;
+        private const float DEATH_DELAY = 3.0f;      
 
         private const string HEAL_VFX_ENTITY_NAME = "HealingVFX";
 
@@ -82,6 +84,8 @@ namespace Game
 
         private bool endscene          = false;
         private bool startHealVFXTimer = false;
+
+        
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -112,6 +116,7 @@ namespace Game
         private bool initialized = false;
         private bool cursorWasVisible = false;
         private bool camFollowInit = false;
+        private bool isPlayerDead = false;
 
         // ===== VFX =====
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -120,6 +125,7 @@ namespace Game
         private float hitSparksTimer = 0.1f;
         private bool isHitSparks = false;
         string playerHitSparksPrefabPath = "Sources/Prefabs/HitSparksPlayer.prefab";
+        string VFX_PlayerDeathExplosionPrefab = "Sources/Prefabs/VFX_PlayerDeathExplosion.prefab";
 
         // ===== Audio =====
         string playerHealAudioPrefab = "Sources/Prefabs/Audio_PlayerHeal.prefab";
@@ -191,6 +197,16 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (isPlayerDead)
+            {
+                DEATH_TIMER += deltaTime;
+                if (DEATH_TIMER >= DEATH_DELAY)
+                {
+                    isPlayerDead = false;
+                    Publish("PlayerDead", "");
+                }
+            }
+
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
@@ -217,10 +233,14 @@ namespace Game
 
             // For hit sparks VFX
             hitSparksTimer -= deltaTime;
+
+            
         }
 
         public override void OnFixedUpdate(float deltaTime)
         {
+            if (isPlayerDead) return;
+            
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
@@ -425,9 +445,32 @@ namespace Game
 
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
 
-            if (playerHP <= 0)
+            // if (playerHP <= 0)
+            // {
+            //     Publish("PlayerDead", "");
+            // }
+            if (playerHP <= 0 && !isPlayerDead)
             {
-                Publish("PlayerDead", "");
+                isPlayerDead = true;
+                DEATH_TIMER   = 0.0f;
+                Vector3 playerPos = GetPosition(playerEntityID);
+                Quat    playerRot = GetRotation(playerEntityID);
+
+                SceneDestroyEntity(playerEntityID);
+                Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
+                // Spawn explosion VFX at player position
+                uint playerDeathExplosion = PrefabInstantiate(VFX_PlayerDeathExplosionPrefab);
+                if (playerDeathExplosion == INVALID_ENTITY)
+                {
+                    LogMessage("[SpaceshipController] Death explosion failed to instantiate");
+                }
+                else
+                {
+                    Transform.SetPosition(playerDeathExplosion, ref playerPos);
+                    Vector3 explosionPlayerScale = new Vector3(20.0f, 20.0f, 20.0f);
+                    Transform.SetScale(playerDeathExplosion, ref explosionPlayerScale);
+                    LogMessage("[SpaceshipController] Player destroyed, explosion spawned. Waiting 3s...");
+                }
             }
         }
 
