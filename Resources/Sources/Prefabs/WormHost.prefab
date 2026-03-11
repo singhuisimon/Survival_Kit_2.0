@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: WormHost.prefab",
     "Prefab GUID": 16316647606544781161,
-    "version": 1,
+    "version": 4,
     "entities": [
         {
             "Name": "WormHost",
@@ -73,9 +73,9 @@
                         "Properties": {
                             "ComponentGUID": "15971647202226424089",
                             "Mass": 1.0,
-                            "IsKinematic": false,
+                            "IsKinematic": true,
                             "IsTrigger": false,
-                            "UseGravity": true,
+                            "UseGravity": false,
                             "Velocity": [
                                 0.0,
                                 0.0,

@@ -78,7 +78,6 @@ namespace Game
             hasSplit = false;
             timer = 0.0f;
 
-            RigidbodySetIsKinematic(EntityID, true);
             Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
             RigidbodySetBoxHalfExtents(EntityID, ref extents);
 
