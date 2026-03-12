@@ -53,6 +53,8 @@ namespace Game
                     isFading = false;
                     isButtonActive = true;
                     LogMessage("[MainMenuButtonWin] Fade complete");
+                    Event.Publish("WinButtonsFaded", "");
+
                 }
             }
 

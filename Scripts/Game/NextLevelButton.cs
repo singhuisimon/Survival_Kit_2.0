@@ -58,6 +58,8 @@ namespace Game
                     isFading = false;
                     isButtonActive = true;
                     Event.Publish(EVENT_BUTTONS_FADED, "");
+                    Event.Publish("WinButtonsFaded", "");
+
                     LogMessage("[NextLevelButton] Fade complete");
                 }
             }
