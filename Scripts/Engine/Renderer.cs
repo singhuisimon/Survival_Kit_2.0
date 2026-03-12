@@ -21,6 +21,8 @@ namespace Engine
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern bool MeshRenderer_GetGlobalIlluminate(uint entityID);
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetGlobalIlluminate(uint entityID, bool gi);
 
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetEmissiveTexture(uint entityID, string textureName);
+
         public static bool GetVisible(uint entityID) => MeshRenderer_GetVisible(entityID);
         public static void SetVisible(uint entityID, bool visible) => MeshRenderer_SetVisible(entityID, visible);
 
@@ -32,6 +34,8 @@ namespace Engine
 
         public static bool GetGlobalIlluminate(uint entityID) => MeshRenderer_GetGlobalIlluminate(entityID);
         public static void SetGlobalIlluminate(uint entityID, bool gi) => MeshRenderer_SetGlobalIlluminate(entityID, gi);
+
+        public static void SetEmissiveTexture(uint entityID, string textureName) => MeshRenderer_SetEmissiveTexture(entityID, textureName);
 
         private uint ID => Entity.EntityID;
 

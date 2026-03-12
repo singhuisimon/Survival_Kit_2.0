@@ -107,6 +107,8 @@ namespace Game
 
             if(elapsedTimer <= 0.0f){
                 elapsedTimer = timerCooldown;
+            } else {
+                elapsedTimer = timerCooldown;
             }
 
             LogMessage("[AudioVOHealthCore] Detect core damage setting timer start true and timer");

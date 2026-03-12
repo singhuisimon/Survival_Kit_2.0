@@ -31,6 +31,8 @@ namespace Game
 
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
+        private string wormBulletPrefab = "Sources/Prefabs/WormBullet.prefab";
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
@@ -57,8 +59,8 @@ namespace Game
         private const string GAMEWIN = "GameWin";
 
         // Thresholds to prevent state flickering
-        private const float STOP_RANGE  = 300.0f; // enters stationary when closer than this
-        private const float START_RANGE = 500.0f; // resumes moving when farther than this
+        private const float STOP_RANGE  = 500.0f; // enters stationary when closer than this
+        private const float START_RANGE = 800.0f; // resumes moving when farther than this
 
         // Lifecycle
         public override void OnStart()
@@ -76,7 +78,6 @@ namespace Game
             hasSplit = false;
             timer = 0.0f;
 
-            RigidbodySetIsKinematic(EntityID, true);
             Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
             RigidbodySetBoxHalfExtents(EntityID, ref extents);
 
@@ -402,28 +403,31 @@ namespace Game
             );
 
             // Create bullet
-            uint wormBulletID = SceneCreateEntity("WormBullet");
-            if (wormBulletID == 0)
-                return;
+            // uint wormBulletID = SceneCreateEntity("WormBullet");
+            // if (wormBulletID == 0)
+            //     return;
 
-            Transform.SetPosition(wormBulletID, ref spawnPosition);
+            // Transform.SetPosition(wormBulletID, ref spawnPosition);
 
-            // Set rotation to face the direction (optional, for visual)
             Vector3 forward = Vector3.Forward;
-            Quat bulletRot = QuaternionFromTo(forward, directionNorm);
-            Transform.SetRotation(wormBulletID, ref bulletRot);
+            Quat spawnRot = QuaternionFromTo(forward, directionNorm);
 
+            Vector3 spawnscale = new Vector3(5.0f, 5.0f, 5.0f);
+
+            uint wormBulletID = PrefabInstantiateWithTransform(wormBulletPrefab, ref spawnPosition, ref spawnRot, ref spawnscale, false);
+            if(wormBulletID == 0){
+                return; 
+            }
             // Setup rigidbody
-            EntityAddRigidBody(wormBulletID);
             RigidbodySetIsKinematic(wormBulletID, false);
             RigidbodySetUseGravity(wormBulletID, false);
 
             // Set tag
-            TagSetTag(wormBulletID, "WormBullet");
+            //TagSetTag(wormBulletID, "WormBullet");
 
             // Setup Audio
-            EntityAddAudio(wormBulletID);
-            AudioSetFile(wormBulletID, "Worm Shoot.wav");
+            //EntityAddAudio(wormBulletID);
+            //AudioSetFile(wormBulletID, "Worm Shoot.wav");
             AudioSetLoop(wormBulletID, false);
             AudioSetIs3D(wormBulletID, true);
             AudioSetMinDistance(wormBulletID, 50.0f);
@@ -441,12 +445,12 @@ namespace Game
             RigidbodyAddForce(wormBulletID, ref force);
 
             // Set collision box
-            Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
+            Vector3 extents = new Vector3(2.5f, 2.5f, 2.5f);
             RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
 
             // Add visuals and script
-            EntityAddMeshRenderer(wormBulletID);
-            EntityAddScript(wormBulletID, "Game.WormBullet");
+            //EntityAddMeshRenderer(wormBulletID);
+            //EntityAddScript(wormBulletID, "Game.WormBullet");
         }
 
         private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
