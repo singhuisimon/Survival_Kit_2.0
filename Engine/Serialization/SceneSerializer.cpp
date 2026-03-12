@@ -19,6 +19,7 @@
 #include "../Component/SpriteRendererComponent.h"
 #include "../Component/TextComponent.h"
 #include "../Component/TrailComponent.h"
+#include "../Component/BeamComponent.h"
 
 #include "../Scripting/ScriptSerializer.h"
 #include "../Scripting/MonoScriptEngine.h"
@@ -883,6 +884,76 @@ namespace Engine {
 				componentObj.AddMember("Properties", propertiesObj, allocator);
 				componentsArray.PushBack(componentObj, allocator);
 			}
+			// Serialize BeamComponent
+			if (entity.HasComponent<BeamComponent>()) {
+				LOG_TRACE("  - Serializing Beam Component");
+				const auto& beam = entity.GetComponent<BeamComponent>();
+				rapidjson::Value componentObj(kObjectType);
+				componentObj.AddMember("Type", "BeamComponent", allocator);
+				rapidjson::Value propertiesObj(kObjectType);
+
+				// Material
+				std::string materialTypeName = AM.getNameFromGuid(beam.MaterialGuid);
+				propertiesObj.AddMember("Material Type",
+					Value(materialTypeName.empty() ? "" : materialTypeName.c_str(), allocator),
+					allocator);
+
+				// Geometry
+				propertiesObj.AddMember("Num Segments", beam.NumSegments, allocator);
+				propertiesObj.AddMember("Start Width", beam.StartWidth, allocator);
+				propertiesObj.AddMember("End Width", beam.EndWidth, allocator);
+
+				// Start Color
+				rapidjson::Value startColorArray(kArrayType);
+				startColorArray.PushBack(beam.StartColor.x, allocator);
+				startColorArray.PushBack(beam.StartColor.y, allocator);
+				startColorArray.PushBack(beam.StartColor.z, allocator);
+				startColorArray.PushBack(beam.StartColor.w, allocator);
+				propertiesObj.AddMember("Start Color", startColorArray, allocator);
+
+				// End Color
+				rapidjson::Value endColorArray(kArrayType);
+				endColorArray.PushBack(beam.EndColor.x, allocator);
+				endColorArray.PushBack(beam.EndColor.y, allocator);
+				endColorArray.PushBack(beam.EndColor.z, allocator);
+				endColorArray.PushBack(beam.EndColor.w, allocator);
+				propertiesObj.AddMember("End Color", endColorArray, allocator);
+
+				// Noise
+				propertiesObj.AddMember("Noise Amplitude", beam.NoiseAmplitude, allocator);
+				propertiesObj.AddMember("Noise Speed", beam.NoiseSpeed, allocator);
+
+				// UV Scroll
+				propertiesObj.AddMember("UV Scroll Speed", beam.UVScrollSpeed, allocator);
+
+				// Start Offset
+				rapidjson::Value startOffsetArray(kArrayType);
+				startOffsetArray.PushBack(beam.StartOffset.x, allocator);
+				startOffsetArray.PushBack(beam.StartOffset.y, allocator);
+				startOffsetArray.PushBack(beam.StartOffset.z, allocator);
+				propertiesObj.AddMember("Start Offset", startOffsetArray, allocator);
+
+				// End Point Offset
+				rapidjson::Value endOffsetArray(kArrayType);
+				endOffsetArray.PushBack(beam.EndPointOffset.x, allocator);
+				endOffsetArray.PushBack(beam.EndPointOffset.y, allocator);
+				endOffsetArray.PushBack(beam.EndPointOffset.z, allocator);
+				propertiesObj.AddMember("End Point Offset", endOffsetArray, allocator);
+
+				// Control
+				propertiesObj.AddMember("Active", beam.Active, allocator);
+
+				// Only serialize Target Entity ID if one is assigned
+				if (beam.TargetEntity != entt::null)
+				{
+					propertiesObj.AddMember("Target Entity ID",
+						static_cast<uint32_t>(beam.TargetEntity), allocator);
+				}
+
+				componentObj.AddMember("Properties", propertiesObj, allocator);
+				componentsArray.PushBack(componentObj, allocator);
+			}
+
 
 			entityObj.AddMember("Components", componentsArray, allocator);
 			entitiesArray.PushBack(entityObj, allocator);
@@ -1931,6 +2002,83 @@ namespace Engine {
 
 						if (properties.HasMember("Emit Trail"))
 							trail.EmitTrail = properties["Emit Trail"].GetBool();
+					}
+					else if (componentType == "BeamComponent") {
+						auto& beam = entity.AddComponent<BeamComponent>();
+
+						// Material GUID
+						if (properties.HasMember("Material Type") && properties["Material Type"].IsString()) {
+							std::string materialName = properties["Material Type"].GetString();
+							beam.MaterialGuid = AM.getGuidFromName(materialName);
+						}
+
+						// Geometry
+						if (properties.HasMember("Num Segments"))
+							beam.NumSegments = properties["Num Segments"].GetUint();
+						if (properties.HasMember("Start Width"))
+							beam.StartWidth = properties["Start Width"].GetFloat();
+						if (properties.HasMember("End Width"))
+							beam.EndWidth = properties["End Width"].GetFloat();
+
+						// Start Color
+						if (properties.HasMember("Start Color") && properties["Start Color"].IsArray()) {
+							const auto& arr = properties["Start Color"].GetArray();
+							if (arr.Size() >= 4) {
+								beam.StartColor.x = arr[0].GetFloat();
+								beam.StartColor.y = arr[1].GetFloat();
+								beam.StartColor.z = arr[2].GetFloat();
+								beam.StartColor.w = arr[3].GetFloat();
+							}
+						}
+
+						// End Color
+						if (properties.HasMember("End Color") && properties["End Color"].IsArray()) {
+							const auto& arr = properties["End Color"].GetArray();
+							if (arr.Size() >= 4) {
+								beam.EndColor.x = arr[0].GetFloat();
+								beam.EndColor.y = arr[1].GetFloat();
+								beam.EndColor.z = arr[2].GetFloat();
+								beam.EndColor.w = arr[3].GetFloat();
+							}
+						}
+
+						// Noise
+						if (properties.HasMember("Noise Amplitude"))
+							beam.NoiseAmplitude = properties["Noise Amplitude"].GetFloat();
+						if (properties.HasMember("Noise Speed"))
+							beam.NoiseSpeed = properties["Noise Speed"].GetFloat();
+
+						// UV Scroll
+						if (properties.HasMember("UV Scroll Speed"))
+							beam.UVScrollSpeed = properties["UV Scroll Speed"].GetFloat();
+
+						// Start Offset
+						if (properties.HasMember("Start Offset") && properties["Start Offset"].IsArray()) {
+							const auto& arr = properties["Start Offset"].GetArray();
+							if (arr.Size() >= 3) {
+								beam.StartOffset.x = arr[0].GetFloat();
+								beam.StartOffset.y = arr[1].GetFloat();
+								beam.StartOffset.z = arr[2].GetFloat();
+							}
+						}
+
+						// End Point Offset
+						if (properties.HasMember("End Point Offset") && properties["End Point Offset"].IsArray()) {
+							const auto& arr = properties["End Point Offset"].GetArray();
+							if (arr.Size() >= 3) {
+								beam.EndPointOffset.x = arr[0].GetFloat();
+								beam.EndPointOffset.y = arr[1].GetFloat();
+								beam.EndPointOffset.z = arr[2].GetFloat();
+							}
+						}
+
+						// Control
+						if (properties.HasMember("Active"))
+							beam.Active = properties["Active"].GetBool();
+
+						// Target Entity — only present if it was non-null at serialize time
+						if (properties.HasMember("Target Entity ID"))
+							beam.TargetEntity = static_cast<entt::entity>(properties["Target Entity ID"].GetUint());
 					}
 				}
 			}

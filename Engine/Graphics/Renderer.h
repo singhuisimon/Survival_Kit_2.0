@@ -286,7 +286,8 @@ namespace Engine {
 		  BLOOM_UPSAMPLE   = 7,
 		  SHADOW		   = 8,
 		  FONT			   = 9,
-		  TRAIL			   = 10
+		  TRAIL			   = 10,
+		  BEAM = 11
 		};
 
 		/**
@@ -512,6 +513,8 @@ namespace Engine {
 			float Age;           // Normalized age [0, 1]
 		};
 
+		void UploadMaterialUniforms(ShaderProgram& shader, MaterialResource* mat);
+
 		GLuint m_TrailVAO;
 		GLuint m_TrailVBO;
 		GLuint m_TrailEBO;
@@ -519,6 +522,16 @@ namespace Engine {
 		void InitTrailResources();
 		void RenderTrails(std::span<const DrawItem> trailItems, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camPos);
 		void BuildTrailGeometry(const TrailComponent& trail, std::vector<TrailVertex>& vertices, std::vector<u32>& indices);
+
+		// In private members, alongside m_TrailVAO etc.
+		GLuint m_BeamVAO = 0;
+		GLuint m_BeamVBO = 0;
+		GLuint m_BeamEBO = 0;
+
+		// Private methods
+		void InitBeamResources();
+		void RenderBeams(std::span<const DrawItem> beamItems, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camPos);
+		void BuildBeamGeometry(const BeamComponent& beam, std::vector<TrailVertex>& vertices, std::vector<u32>& indices);
 
 		// -------- Jolt Debug Draw state --------
 		JPH::PhysicsSystem* m_joltPhysicsSystem = nullptr;
