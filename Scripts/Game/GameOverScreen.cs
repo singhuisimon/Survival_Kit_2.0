@@ -25,7 +25,6 @@ namespace Game
         private const string CoreDestructionName = "CoreDestruction";
         private const string core = "SEMICONDUCTOR";
         private const string LOSE_SCREEN_SHOW = "LoseScreenShow";
-
         private const string GameOverVOPrefab = "Sources/Prefabs/Audio_Lose_VO.prefab";
 
         private const float countdowntimer = 0.5f;
@@ -40,7 +39,6 @@ namespace Game
 
         private bool initialized = false;
         private bool playaudio = false;
-
         private string currEvent = "";
 
         // Button fade delay
@@ -54,7 +52,6 @@ namespace Game
         private float fadeElapsed = 0.0f;
 
         [SerializeField] private float fadeUpTime = 1.0f;
-        [SerializeField] private float uiStartFadePos = 360.0f;
 
         public override void OnStart()
         {
@@ -83,16 +80,12 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // Fade in the lose screen texture
+            // Fade in the lose screen texture (alpha only, no position movement)
             if (isFading && !fadeDone)
             {
                 fadeElapsed += deltaTime;
 
                 FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
-
-                Vector3 pos = GetPosition((uint)EntityID);
-                pos.Y = uiStartFadePos - (10.0f * fadeElapsed / fadeUpTime);
-                SetPosition((uint)EntityID, ref pos);
 
                 if (fadeElapsed >= fadeUpTime)
                 {
@@ -110,13 +103,11 @@ namespace Game
                     AudioPlay(playerdeadID);
                     LogMessage("[GameOverScreen] player dead audio is playing");
                 }
-
                 if (currEvent == EVENT_CORE_DESTROYED)
                 {
                     AudioPlay(coredestructionID);
                     LogMessage("[GameOverScreen] core destruction audio is playing");
                 }
-
                 playaudio = false;
             }
 
@@ -156,6 +147,9 @@ namespace Game
             StopGroup(AudioType.MASTER);
             countdownstart = true;
             countdown = countdowntimer;
+
+            // Reset alpha to 0 before fading in
+            SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
 
             // Start fading in texture
             isFading = true;
