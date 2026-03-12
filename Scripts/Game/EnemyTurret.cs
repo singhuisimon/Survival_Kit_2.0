@@ -165,7 +165,8 @@ namespace Game
             RigidbodySetVelocity(EntityID, ref emptyVec);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
 
-            health -= 1.0f;
+            float damage = DamageSystem.ParseAmount(payload);
+            health -= damage;
             LogMessage("EnemyTurret hit! Health: " + health);
 
             // Reset hit sparks timer and begin new cycle of hit sparks
