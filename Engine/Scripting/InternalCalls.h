@@ -1487,6 +1487,30 @@ namespace Engine {
 		***************************************************************************/
 		void Trail_SetEndColor(uint64_t entityID, glm::vec4* color);
 
+		// ===== BeamComponent =====
+		void Beam_SetActive(uint64_t entityID, bool active);
+		bool Beam_GetActive(uint64_t entityID);
+		void Beam_SetStartColor(uint64_t entityID, glm::vec4* color);
+		void Beam_GetStartColor(uint64_t entityID, glm::vec4* outColor);
+		void Beam_SetEndColor(uint64_t entityID, glm::vec4* color);
+		void Beam_GetEndColor(uint64_t entityID, glm::vec4* outColor);
+		void Beam_SetStartWidth(uint64_t entityID, float width);
+		float Beam_GetStartWidth(uint64_t entityID);
+		void Beam_SetEndWidth(uint64_t entityID, float width);
+		float Beam_GetEndWidth(uint64_t entityID);
+		void Beam_SetNoiseAmplitude(uint64_t entityID, float amplitude);
+		float Beam_GetNoiseAmplitude(uint64_t entityID);
+		void Beam_SetNoiseSpeed(uint64_t entityID, float speed);
+		float Beam_GetNoiseSpeed(uint64_t entityID);
+		void Beam_SetUVScrollSpeed(uint64_t entityID, float speed);
+		float Beam_GetUVScrollSpeed(uint64_t entityID);
+		void Beam_SetEndPointOffset(uint64_t entityID, glm::vec3* offset);
+		void Beam_GetEndPointOffset(uint64_t entityID, glm::vec3* outOffset);
+		void Beam_SetStartOffset(uint64_t entityID, glm::vec3* offset);
+		void Beam_GetStartOffset(uint64_t entityID, glm::vec3* outOffset);
+		void Beam_SetTargetEntity(uint64_t entityID, uint64_t targetID);
+		uint64_t Beam_GetTargetEntity(uint64_t entityID);
+
 		void  RNG_Seed(std::uint32_t seed);
 		int   RNG_RandInt(int min, int max);
 		float RNG_RandFloat(float min, float max);

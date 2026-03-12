@@ -1622,6 +1622,52 @@ namespace Engine {
 		BindInternalCall("Engine.Text::Text_SetIsVisible", reinterpret_cast<void*>(InternalCalls::Text_SetIsVisible));
 		BindInternalCall("Engine.Text::Text_GetIsVisible", reinterpret_cast<void*>(InternalCalls::Text_GetIsVisible));
 
+		// BeamComponent
+		BindInternalCall("Engine.BeamRenderer::Beam_SetActive",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetActive));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetActive",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetActive));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetStartColor",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetStartColor));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetStartColor",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetStartColor));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetEndColor",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetEndColor));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetEndColor",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetEndColor));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetStartWidth",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetStartWidth));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetStartWidth",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetStartWidth));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetEndWidth",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetEndWidth));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetEndWidth",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetEndWidth));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetNoiseAmplitude",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetNoiseAmplitude));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetNoiseAmplitude",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetNoiseAmplitude));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetNoiseSpeed",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetNoiseSpeed));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetNoiseSpeed",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetNoiseSpeed));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetUVScrollSpeed",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetUVScrollSpeed));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetUVScrollSpeed",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetUVScrollSpeed));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetEndPointOffset",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetEndPointOffset));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetEndPointOffset",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetEndPointOffset));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetStartOffset",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetStartOffset));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetStartOffset",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetStartOffset));
+		BindInternalCall("Engine.BeamRenderer::Beam_SetTargetEntity",
+			reinterpret_cast<void*>(InternalCalls::Beam_SetTargetEntity));
+		BindInternalCall("Engine.BeamRenderer::Beam_GetTargetEntity",
+			reinterpret_cast<void*>(InternalCalls::Beam_GetTargetEntity));
+
 		LOG_INFO("Internal calls registered");
 	}
 } // namespace Engine

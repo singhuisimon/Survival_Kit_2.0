@@ -17,6 +17,7 @@
 #include "../Component/AnimatorComponent.h"
 #include "../Component/SpriteRendererComponent.h"
 #include "../Component/TrailComponent.h"
+#include "../Component/BeamComponent.h"
 #include "../Prefab/PrefabHelpers.h"
 #include "../Component/TextComponent.h"
 #include "../Utility/Logger.h"
@@ -516,7 +517,8 @@ namespace Engine
             ComponentTypeID::BehaviourTree,
             ComponentTypeID::SpriteRenderer,
             ComponentTypeID::Trail,
-            ComponentTypeID::Text
+            ComponentTypeID::Text,
+            ComponentTypeID::Beam
         };
 
         for (const auto& prefabEntity : prefab.entities) {
@@ -600,6 +602,9 @@ namespace Engine
                     break;
                 case ComponentTypeID::Text:
                     existsOnEntity = sceneEntity.HasComponent<TextComponent>();
+                    break;
+                case ComponentTypeID::Beam:
+                    existsOnEntity = sceneEntity.HasComponent<BeamComponent>();
                     break;
                 default:
                     break;
@@ -991,6 +996,10 @@ namespace Engine
                     newEntityData.components.push_back(
                         PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Text));
                 }
+                if (childEntity.HasComponent<BeamComponent>()) {
+                    newEntityData.components.push_back(
+                        PrefabSerializer::SerializeEntityComponent(childEntity, ComponentTypeID::Beam));
+                }
                 prefab.entities.push_back(newEntityData);
                 sceneHandleToPrefabLocalID[childID] = newEntityData.localID;
 
@@ -1111,6 +1120,10 @@ namespace Engine
         case ComponentTypeID::Text:
             if (entity.HasComponent<TextComponent>())
                 entity.RemoveComponent<TextComponent>();
+            break;
+        case ComponentTypeID::Beam:
+            if (entity.HasComponent<BeamComponent>())
+                entity.RemoveComponent<BeamComponent>();
             break;
         default:
             LOG_WARNING("Unknown component type for removal: ", static_cast<u32>(type));
