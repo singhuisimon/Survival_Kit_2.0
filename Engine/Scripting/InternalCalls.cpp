@@ -41,6 +41,11 @@
 
 #include "../Transform/TransformSystem.h"
 
+#include "../Asset/AssetManager.h"
+#include "../Asset/ResourceManager.h"
+#include "../Asset/ResourceHelpers.h"
+#include "../Asset/ResourceData.h"
+
 // Mono
 #include <mono/jit/jit.h>
 #include <mono/metadata/class.h>
@@ -1934,6 +1939,49 @@ namespace Engine
 			e.GetComponent<MeshRendererComponent>().GlobalIlluminate = gi;
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Sets the emissive texture on the entity's material by filename.
+		 * Looks up the texture GUID from the asset database, then updates
+		 * the material's emissionMap in the loaded resource cache.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param textureName
+		 * Managed string with the texture filename (e.g., "PlayerModel_Blue_v003_Emissive.png").
+		***************************************************************************/
+		void MeshRenderer_SetEmissiveTexture(uint64_t entityID, MonoString* textureName)
+		{
+			if (!textureName) return;
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
+
+			char* utf8 = mono_string_to_utf8(textureName);
+			if (!utf8) return;
+
+			// Look up texture GUID by filename
+			xresource::instance_guid textureGuid = AM.getGuidFromName(utf8);
+			if (textureGuid == 0) {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetEmissiveTexture: Texture not found: ", utf8);
+				mono_free(utf8);
+				return;
+			}
+
+			// Load the material and update its emissive texture
+			auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+			MaterialResource* material =
+				RM.loadResource<MaterialResource>(convertToMaterialGuid(meshRenderer.MaterialGuid));
+
+			if (material) {
+				material->emissionMap = textureGuid;
+				material->enableEmission = true;
+				LOG_INFO("[InternalCalls] MeshRenderer_SetEmissiveTexture: Set emissive to '", utf8, "' on entity ", entityID);
+			} else {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetEmissiveTexture: Material not found for entity ", entityID);
+			}
+
+			mono_free(utf8);
+		}
+
 		// =====================================================================
 		// AudioComponent
 		// =====================================================================
@@ -3193,6 +3241,38 @@ namespace Engine
 			e.GetComponent<ParticleComponent>().EmissionRate = rate;
 		}
 
+		void ParticleSystem_SetColorMin(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<ParticleComponent>() || !color) return;
+			e.GetComponent<ParticleComponent>().ColorMin = *color;
+		}
+
+		void ParticleSystem_SetColorMax(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<ParticleComponent>() || !color) return;
+			e.GetComponent<ParticleComponent>().ColorMax = *color;
+		}
+
+		// =====================================================================
+		// TrailComponent
+		// =====================================================================
+
+		void Trail_SetStartColor(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TrailComponent>() || !color) return;
+			e.GetComponent<TrailComponent>().StartColor = *color;
+		}
+
+		void Trail_SetEndColor(uint64_t entityID, glm::vec4* color)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<TrailComponent>() || !color) return;
+			e.GetComponent<TrailComponent>().EndColor = *color;
+		}
+
 		void Text_SetText(uint32_t entityID, MonoString *text)
 		{
 			if (!s_CurrentScene)
@@ -3328,5 +3408,163 @@ namespace Engine
 			}
 			return false;
 		}
+
+		// ===== BeamComponent =====
+		void Beam_SetActive(uint64_t entityID, bool active)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().Active = active;
+		}
+
+		bool Beam_GetActive(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return false;
+			return e.GetComponent<BeamComponent>().Active;
+		}
+
+		void Beam_SetStartColor(uint64_t entityID, glm::vec4* color)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !color) return;
+			e.GetComponent<BeamComponent>().StartColor = *color;
+		}
+
+		void Beam_GetStartColor(uint64_t entityID, glm::vec4* outColor)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outColor) return;
+			*outColor = e.GetComponent<BeamComponent>().StartColor;
+		}
+
+		void Beam_SetEndColor(uint64_t entityID, glm::vec4* color)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !color) return;
+			e.GetComponent<BeamComponent>().EndColor = *color;
+		}
+
+		void Beam_GetEndColor(uint64_t entityID, glm::vec4* outColor)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outColor) return;
+			*outColor = e.GetComponent<BeamComponent>().EndColor;
+		}
+
+		void Beam_SetStartWidth(uint64_t entityID, float width)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().StartWidth = width;
+		}
+
+		float Beam_GetStartWidth(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().StartWidth;
+		}
+
+		void Beam_SetEndWidth(uint64_t entityID, float width)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().EndWidth = width;
+		}
+
+		float Beam_GetEndWidth(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().EndWidth;
+		}
+
+		void Beam_SetNoiseAmplitude(uint64_t entityID, float amplitude)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().NoiseAmplitude = amplitude;
+		}
+
+		float Beam_GetNoiseAmplitude(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().NoiseAmplitude;
+		}
+
+		void Beam_SetNoiseSpeed(uint64_t entityID, float speed)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().NoiseSpeed = speed;
+		}
+
+		float Beam_GetNoiseSpeed(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().NoiseSpeed;
+		}
+
+		void Beam_SetUVScrollSpeed(uint64_t entityID, float speed)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().UVScrollSpeed = speed;
+		}
+
+		float Beam_GetUVScrollSpeed(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().UVScrollSpeed;
+		}
+
+		void Beam_SetEndPointOffset(uint64_t entityID, glm::vec3* offset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !offset) return;
+			e.GetComponent<BeamComponent>().EndPointOffset = *offset;
+		}
+
+		void Beam_GetEndPointOffset(uint64_t entityID, glm::vec3* outOffset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outOffset) return;
+			*outOffset = e.GetComponent<BeamComponent>().EndPointOffset;
+		}
+
+		void Beam_SetStartOffset(uint64_t entityID, glm::vec3* offset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !offset) return;
+			e.GetComponent<BeamComponent>().StartOffset = *offset;
+		}
+
+		void Beam_GetStartOffset(uint64_t entityID, glm::vec3* outOffset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outOffset) return;
+			*outOffset = e.GetComponent<BeamComponent>().StartOffset;
+		}
+
+		void Beam_SetTargetEntity(uint64_t entityID, uint64_t targetID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().TargetEntity =
+				targetID == 0 ? entt::null : static_cast<entt::entity>(targetID);
+		}
+
+		uint64_t Beam_GetTargetEntity(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0;
+			auto target = e.GetComponent<BeamComponent>().TargetEntity;
+			return target == entt::null ? 0 : static_cast<uint64_t>(target);
+		}
+
 	} // namespace InternalCalls
 } // namespace Engine

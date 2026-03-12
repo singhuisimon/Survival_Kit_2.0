@@ -303,7 +303,7 @@ namespace Game
             }
             spawnedPayloadID = payload;
             RigidbodySetIsKinematic(payload, false);
-            Vector3 halfboxExtend = new Vector3(15f, 15f, 15f);
+            Vector3 halfboxExtend = new Vector3(20f, 25f, 20f);
             RigidbodySetBoxHalfExtents(payload, ref halfboxExtend);
 
             // Spawn label AFTER payload so it renders on top.

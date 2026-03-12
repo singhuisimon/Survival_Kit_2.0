@@ -52,12 +52,12 @@ namespace Game
             if (GameState.IsPaused || isDestroyed) return;
             if (playerID == INVALID_ENTITY) return;
 
-            Vector3 playerPos = Transform.GetPosition(playerID);
-            if (playerPos.X <= wallPos.X + 4.0f)
-            {
-                playerPos.X = wallPos.X + 4.0f;
-                Transform.SetPosition(playerID, ref playerPos);
-            }
+            // Vector3 playerPos = Transform.GetPosition(playerID);
+            // if (playerPos.X <= wallPos.X + 4.0f)
+            // {
+            //     playerPos.X = wallPos.X + 4.0f;
+            //     Transform.SetPosition(playerID, ref playerPos);
+            // }
         }
 
         public override void OnDestroy()

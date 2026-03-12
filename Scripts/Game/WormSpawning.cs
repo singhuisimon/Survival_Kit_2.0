@@ -9,8 +9,8 @@ namespace Game {
 
     public class WormSpawning : ScriptBehaviour{
 
-        [SerializeField] private float interval = 10.0f;
-        [SerializeField] private int maxWorms = 6;
+        [SerializeField] private float interval = 20.0f;
+        [SerializeField] private int maxWorms = 5;
 
         private string wall1Name = "Wall1";
         private string wall2Name = "Wall2";

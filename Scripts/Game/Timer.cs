@@ -24,6 +24,7 @@ namespace Game
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
         private const string GAMEWIN = "GameWin";
+        private const string EVENT_DEBUG_SET_TIMER = "DebugSetTimer";
 
         // ===== State =====
         private bool initialized = false;
@@ -42,6 +43,7 @@ namespace Game
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
             Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
             Event.Subscribe(GAMEWIN, OnGameOver);
+            Event.Subscribe(EVENT_DEBUG_SET_TIMER, OnDebugSetTimer);
 
             // Initialize with starting time
             remainingTime = startingTime;
@@ -81,12 +83,28 @@ namespace Game
             UpdateTimerDisplay();
         }
 
+        private void OnDebugSetTimer(string eventName, string payload)
+        {
+            float.TryParse(payload, out float newTime);
+            remainingTime = newTime;
+            LogMessage("[TimerUI] Debug: timer set to " + newTime + " seconds");
+            UpdateTimerDisplay();
+        }
+
         private void OnGameOver(string eventName, string payload)
         {
+            if (gameOver) return; // prevent double-firing
             LogMessage("[TimerUI] Game over triggered by: " + eventName + " - Timer stopped");
             gameOver = true;
             Text.SetIsVisible((uint)EntityID, false);
+
+            float timeSurvived = startingTime - remainingTime;
+            if (timeSurvived < 0.0f) timeSurvived = 0.0f;
+            Publish("ShowTimeSurvived", timeSurvived.ToString("F2"));
+            LogMessage("[TimerUI] Time survived: " + timeSurvived);
         }
+
+
 
         private void UpdateTimerDisplay()
         {
@@ -99,10 +117,15 @@ namespace Game
             SetText((uint)EntityID, timeText);
         }
 
+
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
+            Event.Unsubscribe(ENEMY_CORE_DEATH, OnGameOver);
+            Event.Unsubscribe(GAMEWIN, OnGameOver);
+            Event.Unsubscribe(EVENT_DEBUG_SET_TIMER, OnDebugSetTimer);
             LogMessage("=== TimerUI Destroyed ===");
         }
     }

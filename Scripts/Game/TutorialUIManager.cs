@@ -40,7 +40,7 @@ namespace Game
         [SerializeField] private string pressWASDName = "UI_PressWASD";
         [SerializeField] private string pressFlyTunnelName = "UI_FlyTunnel";
         [SerializeField] private string playerName = "Player";
-        [SerializeField] private string wallName = "DestructableWall";
+        [SerializeField] private string wallName = "DestructableWall1";
         [SerializeField] private string pressShootName = "UI_Shoot";
         [SerializeField] private string destroyTurretName = "UI_DestroyTurret";
         [SerializeField] private string destroyEnemiesName = "UI_DestroyEnemies";
@@ -72,6 +72,9 @@ namespace Game
         private bool ultCharged = false;
         private bool altUsed = false;
         private bool altFireShown = false;
+
+
+        private bool wallDestroyedPublished = false;
 
         public override void OnStart()
         {
@@ -229,10 +232,15 @@ namespace Game
             altUsed = false;
 
             // Fade out shoot UI after destroying wall
-            if (currentPos.X < (wallPos.X - 2)) {
+            if (currentPos.X < (wallPos.X - 2) && !wallDestroyedPublished) {
+                LogMessage("[TutorialUIManager] Detect wall is destroyed");
+                wallDestroyedPublished = true;
                 Publish("DestructableWallDestroyed", true.ToString());
                 ShowUI(pressShootID, false, dt);
+            } else if(wallDestroyedPublished){
+                ShowUI(pressShootID, false, dt);
             }
+
             // Fade up destroy turret UI
             if (fadeOutElapsed > switchTime) ShowUI(destroyTurretID, true, dt);
 
@@ -316,6 +324,11 @@ namespace Game
             if (fadeUpElapsed > fadeUpTime) {
 
                 // Reset fade up elapsed time and set up for the next state
+                fadeUpElapsed = 0.0f;
+                altFireShown = true;
+                currentState = TutorialState.AltFire;
+            } else if (altUsed && !altFireShown){
+                //Alt was used before tooltip finished fading in - Skip to altfire to clean up
                 fadeUpElapsed = 0.0f;
                 altFireShown = true;
                 currentState = TutorialState.AltFire;

@@ -11,8 +11,8 @@ namespace Game
     /// <summary>
     /// Handles the shop popup in the main menu.
     /// Two tabs: Packs (default) and ByteChips.
-    /// Packs tab: 3 Exchange buttons + 1 Equipped button
-    /// ByteChips tab: 4 Exchange buttons (Equipped becomes Exchange)
+    /// Packs tab: Skin slots with Exchange/Equip/Equipped button states.
+    /// ByteChips tab: Exchange buttons, clicking shows Label_PackOwned.
     /// </summary>
     public class ShopPopup : ScriptBehaviour
     {
@@ -28,6 +28,23 @@ namespace Game
         private const string EXCHANGE_BUTTON_3_NAME = "Shop Exchange Button 3";
         private const string EXCHANGE_BUTTON_4_NAME = "Shop Exchange Button 4";
         private const string EQUIPPED_BUTTON_NAME = "Shop Equipped Button";
+        private const string EQUIP_BUTTON_1_NAME = "Shop Equip Button 1";
+        private const string EQUIPPED_BUTTON_1_NAME = "Shop Equipped Button 1";
+        private const string EQUIP_BUTTON_2_NAME = "Shop Equip Button 2";
+        private const string EQUIPPED_BUTTON_2_NAME = "Shop Equipped Button 2";
+        private const string EQUIP_BUTTON_3_NAME = "Shop Equip Button 3";
+        private const string EQUIPPED_BUTTON_3_NAME = "Shop Equipped Button 3";
+        private const string EQUIP_BUTTON_DEFAULT_NAME = "Shop Equip Button Default";
+        private const string LABEL_PACK_OWNED_1_NAME = "Label_PackOwned_1";
+        private const string LABEL_PACK_OWNED_2_NAME = "Label_PackOwned_2";
+        private const string LABEL_PACK_OWNED_3_NAME = "Label_PackOwned_3";
+        private const string LABEL_PACK_OWNED_4_NAME = "Label_PackOwned_4";
+        private const string SCORE_TEXT_1_NAME = "Shop Score Text 1";
+        private const string SCORE_TEXT_2_NAME = "Shop Score Text 2";
+
+        // Skin costs
+        private const int SKIN_COST = 10000;          // Skin 1 & 2 (research points)
+        private const int SKIN3_BYTECHIP_COST = 50;   // Skin 3 (ByteChips)
 
         // Positions
         private const float HIDDEN_Y = -500.0f;
@@ -44,18 +61,37 @@ namespace Game
         private uint exchangeButton2Id;
         private uint exchangeButton3Id;
         private uint exchangeButton4Id;
-        private uint equippedButtonId;
+        private uint equippedButtonId;       // Default skin - Equipped state
+        private uint equipButton1Id;         // Skin 1 - Equip state
+        private uint equippedButton1Id;      // Skin 1 - Equipped state
+        private uint equipButton2Id;         // Skin 2 - Equip state
+        private uint equippedButton2Id;      // Skin 2 - Equipped state
+        private uint equipButton3Id;         // Skin 3 - Equip state
+        private uint equippedButton3Id;      // Skin 3 - Equipped state
+        private uint equipButtonDefaultId;   // Default skin - Equip state
+        private uint labelPackOwned1Id;
+        private uint labelPackOwned2Id;
+        private uint labelPackOwned3Id;
+        private uint labelPackOwned4Id;
+        private uint scoreText1Id;
+        private uint scoreText2Id;
 
         // Visible positions
         private Vector3 popupVisiblePos = new Vector3(640.0f, 360.0f, -0.5f);
         private Vector3 closeButtonVisiblePos = new Vector3(1115.0f, 112.0f, -0.6f);
         private Vector3 packsButtonVisiblePos = new Vector3(192.0f, 147.0f, -0.6f);
         private Vector3 byteChipsButtonVisiblePos = new Vector3(254.0f, 147.0f, -0.6f);
-        private Vector3 exchangeButton1VisiblePos = new Vector3(573.0f, 550.0f, -0.6f);
-        private Vector3 exchangeButton2VisiblePos = new Vector3(815.0f, 550.0f, -0.6f);
+        private Vector3 slot1VisiblePos = new Vector3(573.0f, 550.0f, -0.6f);
+        private Vector3 slot2VisiblePos = new Vector3(815.0f, 550.0f, -0.6f);
         private Vector3 exchangeButton3VisiblePos = new Vector3(1057.0f, 550.0f, -0.6f);
         private Vector3 exchangeButton4VisiblePos = new Vector3(330.0f, 550.0f, -0.6f);
-        private Vector3 equippedButtonVisiblePos = new Vector3(330.0f, 550.0f, -0.6f);
+        private Vector3 slotDefaultVisiblePos = new Vector3(330.0f, 550.0f, -0.6f);
+        private Vector3 labelPackOwned1VisiblePos = new Vector3(276.0f, 536.0f, -0.6f);
+        private Vector3 labelPackOwned2VisiblePos = new Vector3(519.0f, 536.0f, -0.6f);
+        private Vector3 labelPackOwned3VisiblePos = new Vector3(761.0f, 536.0f, -0.6f);
+        private Vector3 labelPackOwned4VisiblePos = new Vector3(1003.0f, 536.0f, -0.6f);
+        private Vector3 scoreText1VisiblePos = new Vector3(280.0f, 537.0f, -0.6f);
+        private Vector3 scoreText2VisiblePos = new Vector3(470.0f, 537.0f, -0.6f);
 
         // Event names for popup coordination
         private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
@@ -66,7 +102,9 @@ namespace Game
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
-        private bool isPacksTab = true; // true = Packs tab, false = ByteChips tab
+        private bool isPacksTab = true;
+        private bool wasSemicolonPressed = false;
+        private bool wasApostrophePressed = false;
 
         public override void OnStart()
         {
@@ -89,10 +127,26 @@ namespace Game
             exchangeButton3Id = SceneFindEntityByName(EXCHANGE_BUTTON_3_NAME);
             exchangeButton4Id = SceneFindEntityByName(EXCHANGE_BUTTON_4_NAME);
             equippedButtonId = SceneFindEntityByName(EQUIPPED_BUTTON_NAME);
+            equipButton1Id = SceneFindEntityByName(EQUIP_BUTTON_1_NAME);
+            equippedButton1Id = SceneFindEntityByName(EQUIPPED_BUTTON_1_NAME);
+            equipButton2Id = SceneFindEntityByName(EQUIP_BUTTON_2_NAME);
+            equippedButton2Id = SceneFindEntityByName(EQUIPPED_BUTTON_2_NAME);
+            equipButton3Id = SceneFindEntityByName(EQUIP_BUTTON_3_NAME);
+            equippedButton3Id = SceneFindEntityByName(EQUIPPED_BUTTON_3_NAME);
+            equipButtonDefaultId = SceneFindEntityByName(EQUIP_BUTTON_DEFAULT_NAME);
+            labelPackOwned1Id = SceneFindEntityByName(LABEL_PACK_OWNED_1_NAME);
+            labelPackOwned2Id = SceneFindEntityByName(LABEL_PACK_OWNED_2_NAME);
+            labelPackOwned3Id = SceneFindEntityByName(LABEL_PACK_OWNED_3_NAME);
+            labelPackOwned4Id = SceneFindEntityByName(LABEL_PACK_OWNED_4_NAME);
+            scoreText1Id = SceneFindEntityByName(SCORE_TEXT_1_NAME);
+            scoreText2Id = SceneFindEntityByName(SCORE_TEXT_2_NAME);
 
             if (packsPopupId == 0) LogError("ShopPopup: Could not find: " + SHOP_PACKS_POPUP_NAME);
             if (byteChipsPopupId == 0) LogError("ShopPopup: Could not find: " + SHOP_BYTECHIPS_POPUP_NAME);
             if (closeButtonId == 0) LogError("ShopPopup: Could not find: " + SHOP_CLOSE_BUTTON_NAME);
+
+            // Load shop state
+            ProgressTracker.LoadProgress();
 
             entitiesFound = true;
             isPopupVisible = false;
@@ -105,7 +159,9 @@ namespace Game
             // Hide all popup elements initially
             HidePopup();
 
-            LogMessage("ShopPopup: Ready!");
+            LogMessage("ShopPopup: Ready! Skin1Purchased=" + ProgressTracker.Skin1Purchased +
+                " Skin2Purchased=" + ProgressTracker.Skin2Purchased +
+                " EquippedSkin=" + ProgressTracker.EquippedSkin);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -121,6 +177,30 @@ namespace Game
             {
                 HandleMouseClick();
             }
+
+            // Debug: Semicolon = Add 10,000 research points
+            bool semiPressed = Input.IsKeyPressed(KeyCode.Semicolon);
+            if (semiPressed && !wasSemicolonPressed)
+            {
+                ProgressTracker.AddCumulativeScore(10000);
+                if (isPopupVisible) UpdateScoreDisplay();
+            }
+            wasSemicolonPressed = semiPressed;
+
+            // Debug: Apostrophe = Reset all progress
+            bool apostrophePressed = Input.IsKeyPressed(KeyCode.Apostrophe);
+            if (apostrophePressed && !wasApostrophePressed)
+            {
+                ProgressTracker.ResetAllProgress();
+                if (isPopupVisible)
+                {
+                    UpdateScoreDisplay();
+                    UpdateByteChipsDisplay();
+                    if (isPacksTab) UpdatePacksButtonStates();
+                    else ShowByteChipsTab();
+                }
+            }
+            wasApostrophePressed = apostrophePressed;
         }
 
         private void HandleMouseClick()
@@ -151,6 +231,16 @@ namespace Game
                     return;
                 }
 
+                // Handle button clicks based on active tab
+                if (isPacksTab)
+                {
+                    if (HandlePacksTabClick()) return;
+                }
+                else
+                {
+                    if (HandleByteChipsTabClick()) return;
+                }
+
                 // Check if clicked outside popup to close
                 bool overPacksPopup = packsPopupId != 0 && Collision2D.IsMouseCollidingWithEntity(packsPopupId);
                 bool overByteChipsPopup = byteChipsPopupId != 0 && Collision2D.IsMouseCollidingWithEntity(byteChipsPopupId);
@@ -171,6 +261,182 @@ namespace Game
             }
         }
 
+        private bool HandlePacksTabClick()
+        {
+            // === Slot 1: Skin 1 ===
+            if (!ProgressTracker.Skin1Purchased)
+            {
+                if (exchangeButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton1Id))
+                {
+                    TryPurchaseSkin(1);
+                    return true;
+                }
+            }
+            else if (ProgressTracker.EquippedSkin != 1)
+            {
+                if (equipButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(equipButton1Id))
+                {
+                    EquipSkin(1);
+                    return true;
+                }
+            }
+
+            // === Slot 2: Skin 2 ===
+            if (!ProgressTracker.Skin2Purchased)
+            {
+                if (exchangeButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton2Id))
+                {
+                    TryPurchaseSkin(2);
+                    return true;
+                }
+            }
+            else if (ProgressTracker.EquippedSkin != 2)
+            {
+                if (equipButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(equipButton2Id))
+                {
+                    EquipSkin(2);
+                    return true;
+                }
+            }
+
+            // === Slot 3: Skin 3 (costs ByteChips) ===
+            if (!ProgressTracker.Skin3Purchased)
+            {
+                if (exchangeButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton3Id))
+                {
+                    TryPurchaseSkin3();
+                    return true;
+                }
+            }
+            else if (ProgressTracker.EquippedSkin != 3)
+            {
+                if (equipButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(equipButton3Id))
+                {
+                    EquipSkin(3);
+                    return true;
+                }
+            }
+
+            // === Default skin slot ===
+            if (ProgressTracker.EquippedSkin != 0)
+            {
+                if (equipButtonDefaultId != 0 && Collision2D.IsMouseCollidingWithEntity(equipButtonDefaultId))
+                {
+                    EquipSkin(0);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool HandleByteChipsTabClick()
+        {
+            // ByteChips tab: clicking exchange buttons awards ByteChips + research points (repeatable)
+            if (exchangeButton4Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton4Id))
+            {
+                AwardByteChipsAndResearch(60, 60);
+                LogMessage("ShopPopup: ByteChips pack 1 bought - +60 ByteChips +60 Research");
+                return true;
+            }
+            if (exchangeButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton1Id))
+            {
+                AwardByteChipsAndResearch(180, 180);
+                LogMessage("ShopPopup: ByteChips pack 2 bought - +180 ByteChips +180 Research");
+                return true;
+            }
+            if (exchangeButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton2Id))
+            {
+                AwardByteChipsAndResearch(300, 300);
+                LogMessage("ShopPopup: ByteChips pack 3 bought - +300 ByteChips +300 Research");
+                return true;
+            }
+            if (exchangeButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton3Id))
+            {
+                AwardByteChipsAndResearch(600, 600);
+                LogMessage("ShopPopup: ByteChips pack 4 bought - +600 ByteChips +600 Research");
+                return true;
+            }
+
+            return false;
+        }
+
+        private void AwardByteChipsAndResearch(int byteChips, int research)
+        {
+            ProgressTracker.ByteChips += byteChips;
+            ProgressTracker.CumulativeScore += research;
+            ProgressTracker.SaveProgress();
+
+            // Update both score displays
+            UpdateScoreDisplay();
+            UpdateByteChipsDisplay();
+        }
+
+        private void TryPurchaseSkin(int skinIndex)
+        {
+            ProgressTracker.LoadProgress();
+
+            if (ProgressTracker.CumulativeScore < SKIN_COST)
+            {
+                LogMessage("ShopPopup: Not enough points to purchase skin " + skinIndex +
+                    " (have " + ProgressTracker.CumulativeScore + ", need " + SKIN_COST + ")");
+                return;
+            }
+
+            // Deduct points
+            ProgressTracker.CumulativeScore -= SKIN_COST;
+
+            // Mark skin as purchased
+            if (skinIndex == 1)
+                ProgressTracker.Skin1Purchased = true;
+            else if (skinIndex == 2)
+                ProgressTracker.Skin2Purchased = true;
+
+            // Save
+            ProgressTracker.SaveProgress();
+
+            LogMessage("ShopPopup: Purchased skin " + skinIndex + "! Remaining points: " + ProgressTracker.CumulativeScore);
+
+            // Update score display
+            UpdateScoreDisplay();
+
+            // Refresh button states
+            UpdatePacksButtonStates();
+        }
+
+        private void TryPurchaseSkin3()
+        {
+            ProgressTracker.LoadProgress();
+
+            if (ProgressTracker.ByteChips < SKIN3_BYTECHIP_COST)
+            {
+                LogMessage("ShopPopup: Not enough ByteChips to purchase skin 3 (have " +
+                    ProgressTracker.ByteChips + ", need " + SKIN3_BYTECHIP_COST + ")");
+                return;
+            }
+
+            ProgressTracker.ByteChips -= SKIN3_BYTECHIP_COST;
+            ProgressTracker.Skin3Purchased = true;
+            ProgressTracker.SaveProgress();
+
+            LogMessage("ShopPopup: Purchased skin 3! Remaining ByteChips: " + ProgressTracker.ByteChips);
+
+            UpdateByteChipsDisplay();
+            UpdatePacksButtonStates();
+        }
+
+        private void EquipSkin(int skinIndex)
+        {
+            ProgressTracker.LoadProgress();
+            ProgressTracker.EquippedSkin = skinIndex;
+            ProgressTracker.SaveProgress();
+
+            LogMessage("ShopPopup: Equipped skin " + skinIndex);
+
+            // Refresh button states
+            UpdatePacksButtonStates();
+        }
+
         private void OnOtherPopupOpened(string eventName, string payload)
         {
             if (payload != POPUP_ID && isPopupVisible)
@@ -189,18 +455,42 @@ namespace Game
             isPacksTab = true;
             Event.Publish(EVENT_POPUP_OPENED, POPUP_ID);
 
+            // Load latest state
+            ProgressTracker.LoadProgress();
+
             // Show shared elements
             if (closeButtonId != 0) SetPosition(closeButtonId, ref closeButtonVisiblePos);
             if (packsButtonId != 0) SetPosition(packsButtonId, ref packsButtonVisiblePos);
             if (byteChipsButtonId != 0) SetPosition(byteChipsButtonId, ref byteChipsButtonVisiblePos);
-            if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref exchangeButton1VisiblePos);
-            if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref exchangeButton2VisiblePos);
-            if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref exchangeButton3VisiblePos);
+
+            // Show score texts
+            UpdateScoreDisplay();
+            UpdateByteChipsDisplay();
 
             // Default to Packs tab
             ShowPacksTab();
 
             LogMessage("ShopPopup: Popup shown (Packs tab)");
+        }
+
+        private void UpdateScoreDisplay()
+        {
+            if (scoreText1Id != 0)
+            {
+                SetPosition(scoreText1Id, ref scoreText1VisiblePos);
+                Text.SetText(scoreText1Id, ProgressTracker.CumulativeScore.ToString("D6"));
+                Text.SetFontSize(scoreText1Id, 20.0f);
+            }
+        }
+
+        private void UpdateByteChipsDisplay()
+        {
+            if (scoreText2Id != 0)
+            {
+                SetPosition(scoreText2Id, ref scoreText2VisiblePos);
+                Text.SetText(scoreText2Id, ProgressTracker.ByteChips.ToString("D6"));
+                Text.SetFontSize(scoreText2Id, 20.0f);
+            }
         }
 
         private void SwitchToPacksTab()
@@ -226,9 +516,126 @@ namespace Game
             if (packsPopupId != 0) SetPosition(packsPopupId, ref popupVisiblePos);
             if (byteChipsPopupId != 0) SetPosition(byteChipsPopupId, ref hidePos);
 
-            // Show Equipped button, hide Exchange Button 4
-            if (equippedButtonId != 0) SetPosition(equippedButtonId, ref equippedButtonVisiblePos);
+            // Hide ByteChips-only elements
             if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref hidePos2);
+
+            // Update skin button states (including slot 3) and Pack Owned labels
+            UpdatePacksButtonStates();
+        }
+
+        private void UpdatePacksButtonStates()
+        {
+            Vector3 hidePos2 = new Vector3(CENTER_X, HIDDEN_Y, -0.6f);
+
+            // === Slot 1 (position 573, 550) ===
+            // Hide all slot 1 buttons first
+            if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref hidePos2);
+            if (equipButton1Id != 0) SetPosition(equipButton1Id, ref hidePos2);
+            if (equippedButton1Id != 0) SetPosition(equippedButton1Id, ref hidePos2);
+
+            if (!ProgressTracker.Skin1Purchased)
+            {
+                // Not purchased - show Exchange
+                if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref slot1VisiblePos);
+            }
+            else if (ProgressTracker.EquippedSkin == 1)
+            {
+                // Purchased and equipped - show Equipped
+                if (equippedButton1Id != 0) SetPosition(equippedButton1Id, ref slot1VisiblePos);
+            }
+            else
+            {
+                // Purchased but not equipped - show Equip
+                if (equipButton1Id != 0) SetPosition(equipButton1Id, ref slot1VisiblePos);
+            }
+
+            // === Slot 2 (position 815, 550) ===
+            if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref hidePos2);
+            if (equipButton2Id != 0) SetPosition(equipButton2Id, ref hidePos2);
+            if (equippedButton2Id != 0) SetPosition(equippedButton2Id, ref hidePos2);
+
+            if (!ProgressTracker.Skin2Purchased)
+            {
+                // Not purchased - show Exchange
+                if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref slot2VisiblePos);
+            }
+            else if (ProgressTracker.EquippedSkin == 2)
+            {
+                // Purchased and equipped - show Equipped
+                if (equippedButton2Id != 0) SetPosition(equippedButton2Id, ref slot2VisiblePos);
+            }
+            else
+            {
+                // Purchased but not equipped - show Equip
+                if (equipButton2Id != 0) SetPosition(equipButton2Id, ref slot2VisiblePos);
+            }
+
+            // === Slot 3 (position 1057, 550) ===
+            if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref hidePos2);
+            if (equipButton3Id != 0) SetPosition(equipButton3Id, ref hidePos2);
+            if (equippedButton3Id != 0) SetPosition(equippedButton3Id, ref hidePos2);
+
+            if (!ProgressTracker.Skin3Purchased)
+            {
+                // Not purchased - show Exchange
+                if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref exchangeButton3VisiblePos);
+            }
+            else if (ProgressTracker.EquippedSkin == 3)
+            {
+                // Purchased and equipped - show Equipped
+                if (equippedButton3Id != 0) SetPosition(equippedButton3Id, ref exchangeButton3VisiblePos);
+            }
+            else
+            {
+                // Purchased but not equipped - show Equip
+                if (equipButton3Id != 0) SetPosition(equipButton3Id, ref exchangeButton3VisiblePos);
+            }
+
+            // === Default skin slot (position 330, 550) ===
+            if (equippedButtonId != 0) SetPosition(equippedButtonId, ref hidePos2);
+            if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref hidePos2);
+
+            if (ProgressTracker.EquippedSkin == 0)
+            {
+                // Default is equipped - show Equipped
+                if (equippedButtonId != 0) SetPosition(equippedButtonId, ref slotDefaultVisiblePos);
+            }
+            else
+            {
+                // Default is not equipped - show Equip
+                if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref slotDefaultVisiblePos);
+            }
+
+            // === Pack Owned labels on skin slots ===
+            // Default slot - always owned
+            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref labelPackOwned1VisiblePos);
+
+            // Skin 1 - show if purchased
+            if (labelPackOwned2Id != 0)
+            {
+                if (ProgressTracker.Skin1Purchased)
+                    SetPosition(labelPackOwned2Id, ref labelPackOwned2VisiblePos);
+                else
+                    SetPosition(labelPackOwned2Id, ref hidePos2);
+            }
+
+            // Skin 2 - show if purchased
+            if (labelPackOwned3Id != 0)
+            {
+                if (ProgressTracker.Skin2Purchased)
+                    SetPosition(labelPackOwned3Id, ref labelPackOwned3VisiblePos);
+                else
+                    SetPosition(labelPackOwned3Id, ref hidePos2);
+            }
+
+            // Skin 3 - show if purchased
+            if (labelPackOwned4Id != 0)
+            {
+                if (ProgressTracker.Skin3Purchased)
+                    SetPosition(labelPackOwned4Id, ref labelPackOwned4VisiblePos);
+                else
+                    SetPosition(labelPackOwned4Id, ref hidePos2);
+            }
         }
 
         private void ShowByteChipsTab()
@@ -240,9 +647,27 @@ namespace Game
             if (byteChipsPopupId != 0) SetPosition(byteChipsPopupId, ref popupVisiblePos);
             if (packsPopupId != 0) SetPosition(packsPopupId, ref hidePos);
 
-            // Show Exchange Button 4, hide Equipped button
-            if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref exchangeButton4VisiblePos);
+            // Hide all Packs-tab skin buttons
+            if (equipButton1Id != 0) SetPosition(equipButton1Id, ref hidePos2);
+            if (equippedButton1Id != 0) SetPosition(equippedButton1Id, ref hidePos2);
+            if (equipButton2Id != 0) SetPosition(equipButton2Id, ref hidePos2);
+            if (equippedButton2Id != 0) SetPosition(equippedButton2Id, ref hidePos2);
+            if (equipButton3Id != 0) SetPosition(equipButton3Id, ref hidePos2);
+            if (equippedButton3Id != 0) SetPosition(equippedButton3Id, ref hidePos2);
             if (equippedButtonId != 0) SetPosition(equippedButtonId, ref hidePos2);
+            if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref hidePos2);
+
+            // Hide all Pack Owned labels (they belong to the Packs tab now)
+            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
+            if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
+            if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
+            if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
+
+            // Always show all exchange buttons (packs are repeatable)
+            if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref exchangeButton4VisiblePos);
+            if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref slot1VisiblePos);
+            if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref slot2VisiblePos);
+            if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref exchangeButton3VisiblePos);
         }
 
         private void HidePopup()
@@ -265,6 +690,19 @@ namespace Game
             if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref hidePos2);
             if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref hidePos2);
             if (equippedButtonId != 0) SetPosition(equippedButtonId, ref hidePos2);
+            if (equipButton1Id != 0) SetPosition(equipButton1Id, ref hidePos2);
+            if (equippedButton1Id != 0) SetPosition(equippedButton1Id, ref hidePos2);
+            if (equipButton2Id != 0) SetPosition(equipButton2Id, ref hidePos2);
+            if (equippedButton2Id != 0) SetPosition(equippedButton2Id, ref hidePos2);
+            if (equipButton3Id != 0) SetPosition(equipButton3Id, ref hidePos2);
+            if (equippedButton3Id != 0) SetPosition(equippedButton3Id, ref hidePos2);
+            if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref hidePos2);
+            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
+            if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
+            if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
+            if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
+            if (scoreText1Id != 0) SetPosition(scoreText1Id, ref hidePos2);
+            if (scoreText2Id != 0) SetPosition(scoreText2Id, ref hidePos2);
 
             LogMessage("ShopPopup: Popup hidden");
         }

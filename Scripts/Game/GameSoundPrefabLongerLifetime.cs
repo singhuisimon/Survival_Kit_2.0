@@ -1,6 +1,7 @@
 using Engine;
 using System;
 using static Engine.Scene;
+using static Engine.Audio;
 
 namespace Game
 {
@@ -29,6 +30,9 @@ namespace Game
                 if(!wasPaused){
                     savedTime = elapsedTime;
                     wasPaused = true;
+                    if(AudioIsPlaying((uint)EntityID)){
+                        AudioPause((uint)EntityID);
+                    }
                 }
                 return;
             }
@@ -37,6 +41,7 @@ namespace Game
                 // Just unpaused - restore timer
                 elapsedTime = savedTime;
                 wasPaused = false;
+                AudioPlay((uint)EntityID);
             }
 
             // Lifetime
@@ -50,6 +55,7 @@ namespace Game
 
         public override void OnDestroy()
         {
+            AudioStop((uint)EntityID);
         }
     }
 }

@@ -1,0 +1,72 @@
+{
+    "Prefab Name": "Enemy_Keylogger",
+    "Prefab GUID": 4215616158119325847,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Enemy_Keylogger",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5743796583207895221",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.004999999888241291,
+                                0.004999999888241291,
+                                0.004999999888241291
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4590875078601048243",
+                            "Name": "Enemy_Keylogger",
+                            "Tag": "Enemy_Keylogger"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13814247115456250039",
+                            "Mesh": "E009_keylogger_v005.fbx",
+                            "Material": "MAT_Enemy_Keylogger.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

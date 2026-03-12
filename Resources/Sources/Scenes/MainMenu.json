@@ -1,7 +1,49 @@
 {
-    "Scene": "MainMenu",
+    "Scene": "trench_run",
     "Version": "1.0",
     "Entities": [
+        {
+            "ID": 81,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "audiosettings",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16941161427853771579",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "14058857666336752445",
+                        "ScriptClassName": "Game.AudioSettings"
+                    }
+                }
+            ]
+        },
         {
             "ID": 78,
             "Components": [
@@ -47,7 +89,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.755027413368225,
                         "FOV": 45.0,
                         "NearPlane": 0.5,
                         "FarPlane": 1000.0,
@@ -857,23 +899,23 @@
             ]
         },
         {
-            "ID": 57,
+            "ID": 1148476,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "AudioSettings",
-                        "Tag": "AudioSettings"
+                        "Name": "MousePlus",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5471962076945360943",
+                        "ComponentGUID": "15912159279423626003",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            598.2000122070313,
+                            269.79998779296875,
+                            -0.6000000238418579
                         ],
                         "Rotation": [
                             0.0,
@@ -881,8 +923,8 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            12.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -890,10 +932,19 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "283815306214778929",
-                        "ScriptClassName": "Game.AudioSettings"
+                        "Texture": "MainMenu_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -955,8 +1006,8 @@
                     "Properties": {
                         "ComponentGUID": "8930726590765803555",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            359.3999938964844,
+                            565.0,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -966,7 +1017,7 @@
                         ],
                         "Scale": [
                             181.0,
-                            14.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1006,8 +1057,8 @@
                     "Properties": {
                         "ComponentGUID": "3166119067731568669",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            359.3999938964844,
+                            494.0,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1017,7 +1068,7 @@
                         ],
                         "Scale": [
                             181.0,
-                            14.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1057,8 +1108,8 @@
                     "Properties": {
                         "ComponentGUID": "4895501324641839127",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            359.3999938964844,
+                            423.0,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1068,7 +1119,7 @@
                         ],
                         "Scale": [
                             181.0,
-                            14.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1108,8 +1159,8 @@
                     "Properties": {
                         "ComponentGUID": "2589658315428145169",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            565.0,
+                            566.2999877929688,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1159,8 +1210,8 @@
                     "Properties": {
                         "ComponentGUID": "8930726590765803531",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            565.0,
+                            495.20001220703125,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1210,8 +1261,8 @@
                     "Properties": {
                         "ComponentGUID": "4319040572338415621",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            565.0,
+                            424.20001220703125,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1261,8 +1312,8 @@
                     "Properties": {
                         "ComponentGUID": "17577637875317155839",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            598.0,
+                            567.2999877929688,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1312,8 +1363,8 @@
                     "Properties": {
                         "ComponentGUID": "4319040572338415609",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            598.0,
+                            495.0,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1363,8 +1414,8 @@
                     "Properties": {
                         "ComponentGUID": "4895501324641839091",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            598.0,
+                            423.8999938964844,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1414,8 +1465,8 @@
                     "Properties": {
                         "ComponentGUID": "8354265838462380013",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            712.4000244140625,
+                            61.79999923706055,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -1466,7 +1517,7 @@
                         "ComponentGUID": "11236569599979497447",
                         "Position": [
                             640.0,
-                            -500.0,
+                            375.0,
                             -0.5
                         ],
                         "Rotation": [
@@ -3661,7 +3712,7 @@
                     "Properties": {
                         "ComponentGUID": "80003000000000001",
                         "Position": [
-                            1115.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3712,7 +3763,7 @@
                     "Properties": {
                         "ComponentGUID": "80004000000000001",
                         "Position": [
-                            192.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3763,7 +3814,7 @@
                     "Properties": {
                         "ComponentGUID": "80005000000000001",
                         "Position": [
-                            254.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3814,7 +3865,7 @@
                     "Properties": {
                         "ComponentGUID": "80006000000000001",
                         "Position": [
-                            573.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3865,7 +3916,7 @@
                     "Properties": {
                         "ComponentGUID": "80007000000000001",
                         "Position": [
-                            815.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3916,7 +3967,7 @@
                     "Properties": {
                         "ComponentGUID": "80008000000000001",
                         "Position": [
-                            1057.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3967,7 +4018,7 @@
                     "Properties": {
                         "ComponentGUID": "80009000000000001",
                         "Position": [
-                            330.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -3989,6 +4040,567 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "EquippedButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80020,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equip Button 1",
+                        "Tag": "Shop Equip Button 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80020000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquipButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80021,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equipped Button 1",
+                        "Tag": "Shop Equipped Button 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80021000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquippedButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80022,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equip Button 2",
+                        "Tag": "Shop Equip Button 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80022000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquipButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80023,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equipped Button 2",
+                        "Tag": "Shop Equipped Button 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80023000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquippedButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80030,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equip Button 3",
+                        "Tag": "Shop Equip Button 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80030000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquipButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80031,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equipped Button 3",
+                        "Tag": "Shop Equipped Button 3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80031000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquippedButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80024,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Equip Button Default",
+                        "Tag": "Shop Equip Button Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80024000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            60.0,
+                            18.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "EquipButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80025,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Label_PackOwned_1",
+                        "Tag": "Label_PackOwned_1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80025000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            119.0,
+                            37.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Label_PackOwned.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80026,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Label_PackOwned_2",
+                        "Tag": "Label_PackOwned_2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80026000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            119.0,
+                            37.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Label_PackOwned.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80027,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Label_PackOwned_3",
+                        "Tag": "Label_PackOwned_3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80027000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            119.0,
+                            37.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Label_PackOwned.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80028,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Label_PackOwned_4",
+                        "Tag": "Label_PackOwned_4"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80028000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            119.0,
+                            37.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Label_PackOwned.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4069,7 +4681,7 @@
                     "Properties": {
                         "ComponentGUID": "80012000000000001",
                         "Position": [
-                            330.0,
+                            640.0,
                             -500.0,
                             -0.6000000238418579
                         ],
@@ -4164,7 +4776,7 @@
                         "Position": [
                             805.5,
                             445.0,
-                            -0.10000000149011612
+                            -0.5
                         ],
                         "Rotation": [
                             0.0,
@@ -4191,7 +4803,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 1,
+                        "Sprite Layer": 2,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -4477,7 +5089,7 @@
                         "Position": [
                             640.0,
                             360.0,
-                            0.0
+                            -0.4000000059604645
                         ],
                         "Rotation": [
                             0.0,
@@ -4501,12 +5113,12 @@
                             1.0,
                             1.0,
                             1.0,
-                            0.0
+                            1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 1,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -4528,7 +5140,7 @@
                         "Position": [
                             640.0,
                             360.0,
-                            0.0
+                            -0.4000000059604645
                         ],
                         "Rotation": [
                             0.0,
@@ -4555,7 +5167,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 0,
+                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -4563,7 +5175,7 @@
             ]
         },
         {
-            "ID": 0,
+            "ID": 9437396,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -4607,8 +5219,8 @@
                         ],
                         "Quad": 3,
                         "Sprite Layer": 1,
-                        "IsActive": false,
-                        "IsVisible": false
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4659,7 +5271,7 @@
                         "Quad": 3,
                         "Sprite Layer": 1,
                         "IsActive": false,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4709,6 +5321,473 @@
                         ],
                         "Quad": 3,
                         "Sprite Layer": 9,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 90001,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Score Text 1",
+                        "Tag": "Shop Score Text 1"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "90001000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "90001000000000002",
+                        "text": "000000",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 20.0,
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "isVisible": true,
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 90002,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Score Text 2",
+                        "Tag": "Shop Score Text 2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "90002000000000001",
+                        "Position": [
+                            640.0,
+                            -500.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "90002000000000002",
+                        "text": "000000",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 20.0,
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "isVisible": true,
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 51048604,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "GammaPlus",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1500640471835679473",
+                        "Position": [
+                            598.7000122070313,
+                            161.3000030517578,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_PlusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 365953128,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "GammaMinus",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3806483481050667771",
+                        "Position": [
+                            565.2999877929688,
+                            161.3000030517578,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 51048603,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "MouseMinus",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7265247994871749383",
+                        "Position": [
+                            564.7999877929688,
+                            269.29998779296875,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_MinusButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 2097209,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "GammaDefault",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16633614829116622273",
+                        "Position": [
+                            225.89999389648438,
+                            199.5,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            48.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_Settings_DefaultButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1048576,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "MouseDefault",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6257321287656129997",
+                        "Position": [
+                            226.1999969482422,
+                            306.79998779296875,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            48.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_Settings_DefaultButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 79,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "MouseVolume",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6257321287657604569",
+                        "Position": [
+                            359.3999938964844,
+                            160.5,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            181.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_VolumeFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "GammaVolume",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7986703544568694245",
+                        "Position": [
+                            359.3999938964844,
+                            269.29998779296875,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            181.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_VolumeFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
                         "IsActive": true,
                         "IsVisible": true
                     }

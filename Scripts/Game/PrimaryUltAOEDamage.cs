@@ -12,7 +12,7 @@ namespace Game {
 
     public class PrimaryUltAOEDamage : ScriptBehaviour{
 
-        [SerializeField] private float aoeDamage = 30.0f;
+        [SerializeField] private float aoeDamage = 180.0f;
         [SerializeField] private float projectileLifetime = 2.0f;
 
         private List<uint> damagedEntities = new List<uint>();

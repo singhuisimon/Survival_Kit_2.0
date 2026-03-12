@@ -18,7 +18,7 @@ namespace Game
         [SerializeField] private bool isStationary = false;
         [SerializeField] private bool hasSplit = false;
 
-        [SerializeField] private float speed = 100f;
+        [SerializeField] private float speed = 600f;
         [SerializeField] private float stationaryTimer = 10.0f;
         private float timer = 0.0f;
 
@@ -31,6 +31,8 @@ namespace Game
 
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
+
+        private string wormBulletPrefab = "Sources/Prefabs/WormBullet.prefab";
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
@@ -56,6 +58,10 @@ namespace Game
         private const string GAMEOVER = "GameOver";
         private const string GAMEWIN = "GameWin";
 
+        // Thresholds to prevent state flickering
+        private const float STOP_RANGE  = 500.0f; // enters stationary when closer than this
+        private const float START_RANGE = 800.0f; // resumes moving when farther than this
+
         // Lifecycle
         public override void OnStart()
         {
@@ -72,7 +78,6 @@ namespace Game
             hasSplit = false;
             timer = 0.0f;
 
-            RigidbodySetIsKinematic(EntityID, true);
             Vector3 extents = new Vector3(40.0f, 40.0f, 40.0f);
             RigidbodySetBoxHalfExtents(EntityID, ref extents);
 
@@ -114,29 +119,31 @@ namespace Game
             if (magnitude < 0.001f)
                 return;
 
-            // Normalize direction
-            float invMag = 1.0f / magnitude;
-            Vector3 toTarget = new Vector3(
-                direction.X * invMag,
-                direction.Y * invMag,
-                direction.Z * invMag
-            );
+            // // Normalize direction
+            // float invMag = 1.0f / magnitude;
+            // Vector3 toTarget = new Vector3(
+            //     direction.X * invMag,
+            //     direction.Y * invMag,
+            //     direction.Z * invMag
+            // );
 
-            Vector3 forward = Vector3.Forward;
-            Quat targetRot = QuaternionFromTo(forward, toTarget);
-            SetRotation(EntityID, ref targetRot);
+            // Vector3 forward = Vector3.Forward;
+            // Quat targetRot = QuaternionFromTo(forward, toTarget);
+            // SetRotation(EntityID, ref targetRot);
 
-            if (SimpleMath.Sqrt(direction.X*direction.X + direction.Y*direction.Y + direction.Z*direction.Z) < 0.001f)
-                return;
+            // if (SimpleMath.Sqrt(direction.X*direction.X + direction.Y*direction.Y + direction.Z*direction.Z) < 0.001f)
+            //     return;
 
-            Quat lookRot = SimpleMath.LookRotation(-direction, Vector3.Up);
+            //Quat lookRot = SimpleMath.LookRotation(direction, -Vector3.Right);
+
+            Quat lookRot = LookRotationManual(-direction, Vector3.Up);
             SetRotation(EntityID, ref lookRot);
 
             // Check if close enough to become stationary and shoot
-            if (magnitude < 250.0f)
+            if (!isStationary && magnitude < STOP_RANGE)
             {
                 isStationary = true;
-            } else {
+            } else if (isStationary && magnitude > START_RANGE){
                 isStationary = false;
             }
 
@@ -155,7 +162,15 @@ namespace Game
                 // Movement logic
                 float inverseMag = 1.0f / magnitude;
                 Vector3 normDirection = direction * inverseMag;
-                Vector3 newPosition = ownPosition + normDirection * speed * deltaTime;
+
+                // Ease off speed as worm closes in (starts slowing at 2x STOP_RANGE)
+                float slowZone = STOP_RANGE * 2.0f;
+                float speedScale = magnitude < slowZone
+                    ? (magnitude - STOP_RANGE) / (slowZone - STOP_RANGE)
+                    : 1.0f;
+                speedScale = SimpleMath.Clamp(speedScale, 0.15f, 1.0f);
+
+                Vector3 newPosition = ownPosition + normDirection * speed * speedScale * deltaTime;
                 SetPosition(EntityID, ref newPosition);
             }
         }
@@ -169,7 +184,7 @@ namespace Game
         }
 
         // NEW: Update target with priority: Player first, then Gunship if player is far
-        [SerializeField] private float playerPriorityRange = 250.0f; // Range within which player is always prioritized
+        [SerializeField] private float playerPriorityRange = 1500.0f; // Range within which player is always prioritized
         
         private void UpdateTarget()
         {
@@ -388,28 +403,31 @@ namespace Game
             );
 
             // Create bullet
-            uint wormBulletID = SceneCreateEntity("WormBullet");
-            if (wormBulletID == 0)
-                return;
+            // uint wormBulletID = SceneCreateEntity("WormBullet");
+            // if (wormBulletID == 0)
+            //     return;
 
-            Transform.SetPosition(wormBulletID, ref spawnPosition);
+            // Transform.SetPosition(wormBulletID, ref spawnPosition);
 
-            // Set rotation to face the direction (optional, for visual)
             Vector3 forward = Vector3.Forward;
-            Quat bulletRot = QuaternionFromTo(forward, directionNorm);
-            Transform.SetRotation(wormBulletID, ref bulletRot);
+            Quat spawnRot = QuaternionFromTo(forward, directionNorm);
 
+            Vector3 spawnscale = new Vector3(5.0f, 5.0f, 5.0f);
+
+            uint wormBulletID = PrefabInstantiateWithTransform(wormBulletPrefab, ref spawnPosition, ref spawnRot, ref spawnscale, false);
+            if(wormBulletID == 0){
+                return; 
+            }
             // Setup rigidbody
-            EntityAddRigidBody(wormBulletID);
             RigidbodySetIsKinematic(wormBulletID, false);
             RigidbodySetUseGravity(wormBulletID, false);
 
             // Set tag
-            TagSetTag(wormBulletID, "WormBullet");
+            //TagSetTag(wormBulletID, "WormBullet");
 
             // Setup Audio
-            EntityAddAudio(wormBulletID);
-            AudioSetFile(wormBulletID, "Worm Shoot.wav");
+            //EntityAddAudio(wormBulletID);
+            //AudioSetFile(wormBulletID, "Worm Shoot.wav");
             AudioSetLoop(wormBulletID, false);
             AudioSetIs3D(wormBulletID, true);
             AudioSetMinDistance(wormBulletID, 50.0f);
@@ -418,7 +436,7 @@ namespace Game
             AudioPlay(wormBulletID);
 
             // Apply force in the direction of the target
-            float bulletForce = 100.0f;
+            float bulletForce = 600.0f;
             Vector3 force = new Vector3(
                 directionNorm.X * bulletForce,
                 directionNorm.Y * bulletForce,
@@ -427,12 +445,12 @@ namespace Game
             RigidbodyAddForce(wormBulletID, ref force);
 
             // Set collision box
-            Vector3 extents = new Vector3(2.0f, 2.0f, 2.0f);
+            Vector3 extents = new Vector3(2.5f, 2.5f, 2.5f);
             RigidbodySetBoxHalfExtents(wormBulletID, ref extents);
 
             // Add visuals and script
-            EntityAddMeshRenderer(wormBulletID);
-            EntityAddScript(wormBulletID, "Game.WormBullet");
+            //EntityAddMeshRenderer(wormBulletID);
+            //EntityAddScript(wormBulletID, "Game.WormBullet");
         }
 
         private static Quat QuaternionFromTo(Vector3 from, Vector3 to)
@@ -470,6 +488,69 @@ namespace Game
         private void OnGameOver(string eventName, string payload)
         {
             SceneDestroyEntity(EntityID);
+        }
+
+        private static Quat LookRotationManual(Vector3 forward, Vector3 worldUp)
+        {
+            // Build an orthonormal basis (right, up, forward)
+            // Step 1: normalize forward
+            float fMag = SimpleMath.Sqrt(forward.X*forward.X + forward.Y*forward.Y + forward.Z*forward.Z);
+            if (fMag < 0.001f) return new Quat { X=0, Y=0, Z=0, W=1 };
+            Vector3 f = new Vector3(forward.X/fMag, forward.Y/fMag, forward.Z/fMag);
+
+            // Step 2: right = forward cross worldUp
+            Vector3 r = new Vector3(
+                f.Y*worldUp.Z - f.Z*worldUp.Y,
+                f.Z*worldUp.X - f.X*worldUp.Z,
+                f.X*worldUp.Y - f.Y*worldUp.X
+            );
+            float rMag = SimpleMath.Sqrt(r.X*r.X + r.Y*r.Y + r.Z*r.Z);
+            if (rMag < 0.001f) return new Quat { X=0, Y=0, Z=0, W=1 };
+            r = new Vector3(r.X/rMag, r.Y/rMag, r.Z/rMag);
+
+            // Step 3: up = forward cross right
+            Vector3 u = new Vector3(
+                f.Y*r.Z - f.Z*r.Y,
+                f.Z*r.X - f.X*r.Z,
+                f.X*r.Y - f.Y*r.X
+            );
+
+            // Step 4: rotation matrix to quaternion
+            float trace = r.X + u.Y + f.Z;
+            Quat q;
+            if (trace > 0)
+            {
+                float s = 0.5f / SimpleMath.Sqrt(trace + 1.0f);
+                q.W = 0.25f / s;
+                q.X = (u.Z - f.Y) * s;
+                q.Y = (f.X - r.Z) * s;
+                q.Z = (r.Y - u.X) * s;
+            }
+            else if (r.X > u.Y && r.X > f.Z)
+            {
+                float s = 2.0f * SimpleMath.Sqrt(1.0f + r.X - u.Y - f.Z);
+                q.W = (u.Z - f.Y) / s;
+                q.X = 0.25f * s;
+                q.Y = (u.X + r.Y) / s;
+                q.Z = (f.X + r.Z) / s;
+            }
+            else if (u.Y > f.Z)
+            {
+                float s = 2.0f * SimpleMath.Sqrt(1.0f + u.Y - r.X - f.Z);
+                q.W = (f.X - r.Z) / s;
+                q.X = (u.X + r.Y) / s;
+                q.Y = 0.25f * s;
+                q.Z = (u.Z + f.Y) / s;
+            }
+            else
+            {
+                float s = 2.0f * SimpleMath.Sqrt(1.0f + f.Z - r.X - u.Y);
+                q.W = (r.Y - u.X) / s;
+                q.X = (f.X + r.Z) / s;
+                q.Y = (u.Z + f.Y) / s;
+                q.Z = 0.25f * s;
+            }
+            return q;
         }
     }
 }

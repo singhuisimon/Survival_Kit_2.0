@@ -1,0 +1,212 @@
+using Engine;
+using static Engine.Logger;
+using static Engine.Event;
+using static Engine.Input;
+
+namespace Game
+{
+    /// <summary>
+    /// Debug cheats for testing:
+    /// 
+    /// EXISTING
+    ///   Comma (,)      = Kill player instantly
+    ///   Period (.)     = Kill enemy core (win level)
+    ///   Slash (/)      = Set timer to 10 seconds
+    ///   Semicolon (;)  = Add 10,000 research points
+    ///   Apostrophe (') = Reset all progress (not high scores)
+    /// 
+    /// NEW
+    ///    H             = Add +10 Player health (publishes "PlayerHeal")
+    ///    J             = Deal -10 Player damage (publishes "PlayerDamage")
+    ///    U             = Add 1 upgrade module payload (publishes "CollectPayload")
+    ///    G             = Fully recharge alt fire (publishes "GainUlt" x30)
+    ///    Z             = Go to Main Menu (loads MainMenu.json)
+    ///    X             = Go to Level 1 (loads trench_run.json)
+    ///    C             = Go to Level 2  (loads level2.json)
+    ///    
+    /// Note: cheatcode to move to level2 is moved from PlayerWeapon.cs, was T key previously
+    /// 
+    /// Attach this script to any entity in the gameplay scene.
+    /// </summary>
+    public class DebugCheats : ScriptBehaviour
+    {
+
+        //Scene paths
+         private const string SCENE_MAIN_MENU = "Resources/Sources/Scenes/MainMenu.json";
+        private const string SCENE_LEVEL1    = "Resources/Sources/Scenes/trench_run.json";
+        private const string SCENE_LEVEL2    = "Resources/Sources/Scenes/level2.json";
+
+        // ===== Event Names =====
+        private const string EVENT_PLAYER_DEAD    = "PlayerDead";
+        private const string EVENT_ENEMY_CORE     = "EnemyCoreDeath";
+        private const string EVENT_DEBUG_TIMER    = "DebugSetTimer";
+        private const string EVENT_PLAYER_HEAL    = "PlayerHeal";
+        private const string EVENT_PLAYER_DAMAGE  = "PlayerDamage";
+        private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
+        private const string EVENT_GAIN_ULT       = "GainUlt";
+
+
+        //alt fire seting
+        private const int ALT_FIRE_MAX_CHARGE = 30;
+
+        private bool wasCommaPressed = false;
+        private bool wasPeriodPressed = false;
+        private bool wasSlashPressed = false;
+        private bool wasSemicolonPressed = false;
+        private bool wasApostrophePressed = false;
+
+        
+
+        private bool wasHPressed = false;
+        private bool wasJPressed = false;
+        private bool wasUPressed = false;
+        private bool wasGPressed = false;
+        private bool wasZPressed = false;
+        private bool wasXPressed = false;
+        private bool wasCPressed = false;
+
+        public override void OnStart()
+        {
+            LogMessage("[DebugCheats] Debug cheats active!");
+            LogMessage("[DebugCheats]  ,  = Kill player");
+            LogMessage("[DebugCheats]  .  = Kill enemy core");
+            LogMessage("[DebugCheats]  /  = Set timer to 10s");
+            LogMessage("[DebugCheats]  ;  = +10,000 research points");
+            LogMessage("[DebugCheats]  '  = Reset all progress");
+            LogMessage("[DebugCheats]  H  = +10 player health");
+            LogMessage("[DebugCheats]  J  = -10 player health (damage)");
+            LogMessage("[DebugCheats]  U  = Add 1 upgrade module");
+            LogMessage("[DebugCheats]  G  = Fully recharge alt fire");
+            LogMessage("[DebugCheats]  Z  = Go to Main Menu");
+            LogMessage("[DebugCheats]  X  = Go to Level 1");
+            LogMessage("[DebugCheats]  C  = Go to Level 2");
+        }
+
+        public override void OnUpdate(float deltaTime)
+        {
+            // Comma = Kill player
+            bool commaPressed = IsKeyPressed(KeyCode.Comma);
+            if (commaPressed && !wasCommaPressed)
+            {
+                LogMessage("[DebugCheats] Comma pressed - killing player");
+                Publish("PlayerDead", "");
+            }
+            wasCommaPressed = commaPressed;
+
+            // Period = Kill enemy core
+            bool periodPressed = IsKeyPressed(KeyCode.Period);
+            if (periodPressed && !wasPeriodPressed)
+            {
+                LogMessage("[DebugCheats] Period pressed - killing enemy core");
+                Publish("EnemyCoreDeath", "");
+            }
+            wasPeriodPressed = periodPressed;
+
+            // Slash = Set timer to 10 seconds
+            bool slashPressed = IsKeyPressed(KeyCode.Slash);
+            if (slashPressed && !wasSlashPressed)
+            {
+                LogMessage("[DebugCheats] Slash pressed - setting timer to 10 seconds");
+                Publish("DebugSetTimer", "10");
+            }
+            wasSlashPressed = slashPressed;
+
+            // Semicolon = Add 10,000 research points
+            bool semiPressed = IsKeyPressed(KeyCode.Semicolon);
+            if (semiPressed && !wasSemicolonPressed)
+            {
+                ProgressTracker.AddCumulativeScore(10000);
+                LogMessage("[DebugCheats] Semicolon pressed - added 10,000 research points. Total: " + ProgressTracker.CumulativeScore);
+            }
+            wasSemicolonPressed = semiPressed;
+
+            // Apostrophe = Reset all progress
+            bool apostrophePressed = IsKeyPressed(KeyCode.Apostrophe);
+            if (apostrophePressed && !wasApostrophePressed)
+            {
+                ProgressTracker.ResetAllProgress();
+                LogMessage("[DebugCheats] Apostrophe pressed - all progress reset");
+            }
+            wasApostrophePressed = apostrophePressed;
+
+
+        // H = Add +10 player health
+            bool hPressed = IsKeyPressed(KeyCode.H);
+            if (hPressed && !wasHPressed)
+            {
+                Publish(EVENT_PLAYER_HEAL, "10");
+                LogMessage("[DebugCheats] H - PlayerHeal +10 sent to SpaceshipController");
+            }
+            wasHPressed = hPressed;
+ 
+            // J = Deal -10 damage to player
+            bool jPressed = IsKeyPressed(KeyCode.J);
+            if (jPressed && !wasJPressed)
+            {
+                Publish(EVENT_PLAYER_DAMAGE, "10");
+                LogMessage("[DebugCheats] J - PlayerDamage -10 sent to SpaceshipController");
+            }
+            wasJPressed = jPressed;
+ 
+            // U = Add 1 upgrade module (payload)
+            bool uPressed = IsKeyPressed(KeyCode.U);
+            if (uPressed && !wasUPressed)
+            {
+                Publish(EVENT_COLLECT_PAYLOAD, "");
+                LogMessage("[DebugCheats] U - added 1 upgrade module (CollectPayload)");
+            }
+            wasUPressed = uPressed;
+ 
+            // G = Fully recharge alt fire (publish GainUlt enough times to fill bar)
+            bool gPressed = IsKeyPressed(KeyCode.G);
+            if (gPressed && !wasGPressed)
+            {
+                for (int i = 0; i < ALT_FIRE_MAX_CHARGE; i++)
+                {
+                    Publish(EVENT_GAIN_ULT, "1");
+                }
+                LogMessage("[DebugCheats] G - alt fire fully recharged (published GainUlt x" + ALT_FIRE_MAX_CHARGE + ")");
+            }
+            wasGPressed = gPressed;
+ 
+            // Z = Go to Main Menu
+            bool zPressed = IsKeyPressed(KeyCode.Z);
+            if (zPressed && !wasZPressed)
+            {
+                LogMessage("[DebugCheats] Z - loading Main Menu");
+                GameState.IsPaused = false;
+                Input.SetCursorVisible(true);
+                Scene.SceneLoadFromFile(SCENE_MAIN_MENU);
+            }
+            wasZPressed = zPressed;
+ 
+            // X = Go to Level 1
+            bool xPressed = IsKeyPressed(KeyCode.X);
+            if (xPressed && !wasXPressed)
+            {
+                LogMessage("[DebugCheats] X - loading Level 1");
+                GameState.IsPaused = false;
+                Input.SetCursorVisible(false);
+                Scene.SceneLoadFromFile(SCENE_LEVEL1);
+            }
+            wasXPressed = xPressed;
+ 
+            // C = Go to Level 2 (moved from PlayerWeapon.cs, was T key)
+            bool cPressed = IsKeyPressed(KeyCode.C);
+            if (cPressed && !wasCPressed)
+            {
+                LogMessage("[DebugCheats] C - loading Level 2");
+                GameState.IsPaused = false;
+                Input.SetCursorVisible(false);
+                Scene.SceneLoadFromFile(SCENE_LEVEL2);
+            }
+            wasCPressed = cPressed;
+
+        }
+
+        public override void OnDestroy()
+        {
+            LogMessage("[DebugCheats] Destroyed");
+        }
+    }
+}

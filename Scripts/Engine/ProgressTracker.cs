@@ -1,5 +1,6 @@
 using System;
 using static Engine.Logger;
+using static Engine.Event;
 
 namespace Engine
 {
@@ -13,6 +14,16 @@ namespace Engine
 
         public static bool HasWonTrenchRun { get; private set; } = false;
         public static bool HasWonLevel2 { get; private set; } = false;
+        public static int CumulativeScore { get; set; } = 0;
+
+        // Shop state: skin purchases and equipped skin
+        // 0 = default, 1 = skin 1, 2 = skin 2
+        public static bool Skin1Purchased { get; set; } = false;
+        public static bool Skin2Purchased { get; set; } = false;
+        public static bool Skin3Purchased { get; set; } = false;
+        public static int EquippedSkin { get; set; } = 0;
+        public static int ByteChips { get; set; } = 0;
+
 
         /// <summary>
         /// Loads progress from disk. Call on main menu load.
@@ -21,6 +32,12 @@ namespace Engine
         {
             HasWonTrenchRun = false;
             HasWonLevel2 = false;
+            CumulativeScore = 0;
+            Skin1Purchased = false;
+            Skin2Purchased = false;
+            Skin3Purchased = false;
+            EquippedSkin = 0;
+            ByteChips = 0;
 
             try
             {
@@ -40,7 +57,66 @@ namespace Engine
                 if (json.Contains("\"level2_won\":true") || json.Contains("\"level2_won\": true"))
                     HasWonLevel2 = true;
 
-                LogMessage("[ProgressTracker] HasWonTrenchRun=" + HasWonTrenchRun + " HasWonLevel2=" + HasWonLevel2);
+                // Parse cumulative_score
+                int csIdx = json.IndexOf("\"cumulative_score\"");
+                if (csIdx >= 0)
+                {
+                    int colonIdx = json.IndexOf(':', csIdx);
+                    if (colonIdx >= 0)
+                    {
+                        int start = colonIdx + 1;
+                        // Find the end of the number (next comma, brace, or end)
+                        int end = start;
+                        while (end < json.Length && json[end] != ',' && json[end] != '}')
+                            end++;
+                        string numStr = json.Substring(start, end - start).Trim();
+                        int.TryParse(numStr, out int parsed);
+                        CumulativeScore = parsed;
+                    }
+                }
+
+                // Parse shop state
+                if (json.Contains("\"skin1_purchased\":true") || json.Contains("\"skin1_purchased\": true"))
+                    Skin1Purchased = true;
+                if (json.Contains("\"skin2_purchased\":true") || json.Contains("\"skin2_purchased\": true"))
+                    Skin2Purchased = true;
+                if (json.Contains("\"skin3_purchased\":true") || json.Contains("\"skin3_purchased\": true"))
+                    Skin3Purchased = true;
+
+                int esIdx = json.IndexOf("\"equipped_skin\"");
+                if (esIdx >= 0)
+                {
+                    int eColonIdx = json.IndexOf(':', esIdx);
+                    if (eColonIdx >= 0)
+                    {
+                        int eStart = eColonIdx + 1;
+                        int eEnd = eStart;
+                        while (eEnd < json.Length && json[eEnd] != ',' && json[eEnd] != '}')
+                            eEnd++;
+                        string esStr = json.Substring(eStart, eEnd - eStart).Trim();
+                        int.TryParse(esStr, out int esParsed);
+                        EquippedSkin = esParsed;
+                    }
+                }
+
+                // Parse byte_chips
+                int bcIdx = json.IndexOf("\"byte_chips\"");
+                if (bcIdx >= 0)
+                {
+                    int bcColonIdx = json.IndexOf(':', bcIdx);
+                    if (bcColonIdx >= 0)
+                    {
+                        int bcStart = bcColonIdx + 1;
+                        int bcEnd = bcStart;
+                        while (bcEnd < json.Length && json[bcEnd] != ',' && json[bcEnd] != '}')
+                            bcEnd++;
+                        string bcStr = json.Substring(bcStart, bcEnd - bcStart).Trim();
+                        int.TryParse(bcStr, out int bcParsed);
+                        ByteChips = bcParsed;
+                    }
+                }
+
+                LogMessage("[ProgressTracker] HasWonTrenchRun=" + HasWonTrenchRun + " HasWonLevel2=" + HasWonLevel2 + " CumulativeScore=" + CumulativeScore + " ByteChips=" + ByteChips + " EquippedSkin=" + EquippedSkin);
             }
             catch (Exception e)
             {
@@ -68,13 +144,59 @@ namespace Engine
             SaveProgress();
         }
 
-        private static void SaveProgress()
+        /// <summary>
+        /// Resets cumulative score to 0 and saves to disk.
+        /// </summary>
+        public static void ResetCumulativeScore()
+        {
+            LoadProgress();
+            CumulativeScore = 0;
+            LogMessage("[ProgressTracker] Cumulative score reset to 0");
+            SaveProgress();
+        }
+
+        /// <summary>
+        /// Resets all progress (levels, scores, shop, bytechips) but not high scores.
+        /// </summary>
+        public static void ResetAllProgress()
+        {
+            HasWonTrenchRun = false;
+            HasWonLevel2 = false;
+            CumulativeScore = 0;
+            Skin1Purchased = false;
+            Skin2Purchased = false;
+            Skin3Purchased = false;
+            EquippedSkin = 0;
+            ByteChips = 0;
+            LogMessage("[ProgressTracker] All progress reset");
+            SaveProgress();
+            Publish("ProgressReset", "");
+        }
+
+        /// <summary>
+        /// Adds points to the cumulative score and saves to disk.
+        /// </summary>
+        public static void AddCumulativeScore(int amount)
+        {
+            LoadProgress();
+            CumulativeScore += amount;
+            LogMessage("[ProgressTracker] Added " + amount + " to cumulative score. Total: " + CumulativeScore);
+            SaveProgress();
+        }
+
+        public static void SaveProgress()
         {
             try
             {
                 string json = "{\n" +
                     "  \"trench_run_won\": " + (HasWonTrenchRun ? "true" : "false") + ",\n" +
-                    "  \"level2_won\": " + (HasWonLevel2 ? "true" : "false") + "\n" +
+                    "  \"level2_won\": " + (HasWonLevel2 ? "true" : "false") + ",\n" +
+                    "  \"cumulative_score\": " + CumulativeScore + ",\n" +
+                    "  \"skin1_purchased\": " + (Skin1Purchased ? "true" : "false") + ",\n" +
+                    "  \"skin2_purchased\": " + (Skin2Purchased ? "true" : "false") + ",\n" +
+                    "  \"skin3_purchased\": " + (Skin3Purchased ? "true" : "false") + ",\n" +
+                    "  \"equipped_skin\": " + EquippedSkin + ",\n" +
+                    "  \"byte_chips\": " + ByteChips + "\n" +
                     "}";
 
                 if (FileIO.WriteAllText(SAVE_FILE, json))

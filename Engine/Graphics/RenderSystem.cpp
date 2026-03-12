@@ -6,6 +6,7 @@
 #include "../Component/LightComponent.h"   
 #include "../Component/SpriteRendererComponent.h"
 #include "../Component/TrailComponent.h"
+#include "../Component/BeamComponent.h"
 #include "Asset/ResourceHelpers.h"
 
 namespace Engine {
@@ -241,6 +242,22 @@ namespace Engine {
 
 				// Store trail data pointer for rendering
 				.m_trail_data = &trail
+				});
+		}
+
+		// After the trail collection block (wherever that lives)
+		auto beamView = scene->GetRegistry().view<BeamComponent, TransformComponent>();
+		for (auto entity : beamView)
+		{
+			auto& beam = beamView.get<BeamComponent>(entity);
+			if (!beam.Active) continue;
+
+			m_drawitems.push_back({
+				.m_model_to_world_transform = glm::mat4(1.f), // Not used, beam uses StartPoint/EndPoint directly
+				.m_drawitem_type = DrawItemType::BEAM,
+				.m_entity_id = static_cast<u32>(entity),
+				.m_material_guid = beam.MaterialGuid,
+				.m_beam_data = &beam
 				});
 		}
 		

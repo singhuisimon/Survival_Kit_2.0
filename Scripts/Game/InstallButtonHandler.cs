@@ -29,7 +29,8 @@ namespace Game
         private const string BGM_ROOM_AMBIENCE_NAME = "BGM Room Ambience";
         private const string BSOD_ERROR_SOUND_NAME = "UI BSOD Error Sound";
 
-        private const string MAIN_GAME_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
+        private const string TRENCH_RUN_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
+        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
         private const int NUM_ERROR_POPUPS = 8;
 
         private const float HIDDEN_Y = -500.0f;
@@ -418,10 +419,9 @@ namespace Game
             {
                 sceneLoadTriggered = true;
                 LogMessage("InstallButtonHandler: Loading main game scene at " + bsodElapsedTime + "s");
-                LogMessage("Scene path: " + MAIN_GAME_SCENE_PATH);
-                //Publish("LoadScene", MAIN_GAME_SCENE_PATH);
-
-                bool success = Scene.SceneLoadFromFile(MAIN_GAME_SCENE_PATH);
+                string scenePath = LevelSelectController.IsLevel2Selected ? LEVEL2_SCENE_PATH : TRENCH_RUN_SCENE_PATH;
+                LogMessage("InstallButtonHandler: Loading scene: " + scenePath);
+                bool success = Scene.SceneLoadFromFile(scenePath);
                 if (success)
                 {
                     LogMessage("Main Game Level 1 loaded successfully!");
