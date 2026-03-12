@@ -4,7 +4,7 @@
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "Worldspace_Bar.png",
+    "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
         0.19607843458652496,
@@ -12,14 +12,14 @@
         0.19607843458652496
     ],
     "emissionColor": [
-        0.0,
-        0.0,
-        0.0
+        0.03529411926865578,
+        0.10196078568696976,
+        0.125490203499794
     ],
     "metallic": 0.0,
     "roughness": 0.6000000238418579,
     "opacity": 1.0,
-    "emissionStrength": 0.75,
+    "emissionStrength": 0.8500000238418579,
     "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [

@@ -9,7 +9,7 @@ namespace Game
 
     public class SummonBarSentry : ScriptBehaviour
     {
-        private const string FILL_NAME  = "SummonBarFill";
+        private const string FILL_NAME = "SummonBarFill";
         private const string BG_NAME    = "SummonBarBG";
         private const string LABEL_NAME = "SummonBarLabel";
 
@@ -18,7 +18,7 @@ namespace Game
         [SerializeField] private float heightOffset = 10.0f;
         [SerializeField] private float fullScaleX   = 20.0f;
         [SerializeField] private float barScaleY    = 2.0f;
-        [SerializeField] private float labelOffsetY = 4.0f;
+        //[SerializeField] private float labelOffsetY = 4.0f;
 
         private uint playerID = 0;
         private uint fillID   = 0;
@@ -27,44 +27,69 @@ namespace Game
 
         private float progress    = 0f;
         private bool  initialized = false;
+
+        private Vector3 fillInitialPos;
+        private bool    fillInitialPosCached = false;
+
         private const uint INVALID_ENTITY = 0xffffffffu;
 
-        private const string EVENT_PROGRESS  = "SummonBarProgress";
+        private string progressEventName = "";
+        private string killEventName     = "";
+
         private const string EVENT_GAMEOVER  = "GameOver";
-        private const string EVENT_GAMEOVER2 = "PlayerDead";
+        private const string EVENT_PLAYERDEAD = "PlayerDead";
         private const string EVENT_GAMEWIN   = "GameWin";
 
         public override void OnStart() 
         {
             playerID = SceneFindEntityByName(playerName);
-            fillID   = SceneFindEntityByName(FILL_NAME);
-            bgID     = SceneFindEntityByName(BG_NAME);
-            labelID  = SceneFindEntityByName(LABEL_NAME);
 
-            if (playerID == 0) { LogError("[SummonBar] Player not found!"); return; }
-            if (fillID   == 0) { LogError("[SummonBar] SummonBarFill not found!"); return; }
-        
-            // Set Initial fill scale
-            Vector3 fillScale = GetScale(fillID);
-            fillScale.X = fullScaleX;
-            fillScale.Y = barScaleY;
-            SetScale(fillID, ref fillScale);
+            if (playerID == 0)
+            {
+                LogError("[SummonBar] Player not found!");
+                return;
+            }
 
-            Subscribe(EVENT_PROGRESS,  OnProgressUpdate);
-            Subscribe(EVENT_GAMEOVER,  OnGameEnd);
-            Subscribe(EVENT_GAMEOVER2, OnGameEnd);
-            Subscribe(EVENT_GAMEWIN,   OnGameEnd);
+            // cache children immediately in OnStart
+            fillID  = SceneFindEntityByName(FILL_NAME);
+            bgID    = SceneFindEntityByName(BG_NAME);
+            labelID = SceneFindEntityByName(LABEL_NAME);
 
+            if (fillID == 0 || fillID == INVALID_ENTITY)
+            {
+                LogError("[SummonBar] Could not find SummonBarFill!");
+                return;
+            }
+
+            fillInitialPos = GetPosition(fillID);
+
+            progressEventName = "SummonBarProgress:" + EntityID.ToString();
+            killEventName     = "SummonBarKill:"     + EntityID.ToString();
+
+            Subscribe(progressEventName, OnProgressUpdate);
+
+            Subscribe(killEventName,     OnKill);
+            Subscribe(EVENT_GAMEOVER,    OnKill);
+            Subscribe(EVENT_PLAYERDEAD,  OnKill);
+            Subscribe(EVENT_GAMEWIN,     OnKill);
+
+            // Subscribe(EVENT_GAMEOVER, OnGameEnd);
+            // Subscribe(EVENT_PLAYERDEAD, OnGameEnd);
+            // Subscribe(EVENT_GAMEWIN, OnGameEnd);
+
+            progress = 0f; // progress bar starts empty
             initialized = true;
+
             LogMessage("[SummonBar] Initialized.");
         }
 
         public override void OnUpdate(float deltaTime) 
         {
             if (!initialized) return;
+
             if (GameState.IsPaused) return;
 
-            // Follow player with Y offset
+            // move the bar root above the player
             Vector3 playerPos = GetPosition(playerID);
             Vector3 barPos = new Vector3(
                 playerPos.X,
@@ -73,37 +98,15 @@ namespace Game
             );
             SetPosition((uint)EntityID, ref barPos);
 
-            // Position the bar BG (in full width)
-            if (bgID != 0 && bgID != INVALID_ENTITY)
-                SetPosition(bgID, ref barPos);
 
-            // Fill: Shrink from right to left
-            // Shrinking X scale by progress
             Vector3 fillScale = GetScale(fillID);
             fillScale.X = fullScaleX * progress;
             fillScale.Y = barScaleY;
             SetScale(fillID, ref fillScale);
 
-            // Shift enter left so left edge stays anchored
-            // Billboard faces camera so world X = screen horizontal
-            // float shift = fullScaleX * (1f - progress) * 0.5f;
-            // Vector3 fillPos = new Vector3(
-            //     barPos.X - shift,
-            //     barPos.Y,
-            //     barPos.Z
-            // );
-            // SetPosition(fillID, ref fillPos);
-
-            // Label floats above
-            if (labelID != 0 && labelID != INVALID_ENTITY)
-            {
-                Vector3 labelPos = new Vector3(
-                    barPos.X,
-                    barPos.Y + labelOffsetY,
-                    barPos.Z
-                );
-                SetPosition(labelID, ref labelPos);
-            }
+            Vector3 fillPos = fillInitialPos;
+            fillPos.X = fillInitialPos.X + (fullScaleX / 2f) * (1f - progress);
+            SetPosition(fillID, ref fillPos); 
         }
 
         private void OnProgressUpdate(string eventName, string payload)
@@ -112,29 +115,52 @@ namespace Game
                 progress = SimpleMath.Clamp(p, 0f, 1f);
         }
 
-        private void OnGameEnd(string eventName, string payload)
+        private void OnKill(string eventName, string payload)
         {
-            DestroyAll();
-        }
+            if (!initialized) return;
+            initialized = false; // prevent double-kill
 
-        public override void OnDestroy()
-        {
-            Unsubscribe(EVENT_PROGRESS,  OnProgressUpdate);
-            Unsubscribe(EVENT_GAMEOVER,  OnGameEnd);
-            Unsubscribe(EVENT_GAMEOVER2, OnGameEnd);
-            Unsubscribe(EVENT_GAMEWIN,   OnGameEnd);
+            Unsubscribe(progressEventName, OnProgressUpdate);
+            Unsubscribe(killEventName,     OnKill);
+            Unsubscribe(EVENT_GAMEOVER,    OnKill);
+            Unsubscribe(EVENT_PLAYERDEAD,  OnKill);
+            Unsubscribe(EVENT_GAMEWIN,     OnKill);
 
+            // Engine does NOT auto-destroy children — do it explicitly here
+            // where we are guaranteed to have the cached IDs from OnUpdate
             if (fillID  != 0 && fillID  != INVALID_ENTITY) SceneDestroyEntity(fillID);
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SceneDestroyEntity(bgID);
             if (labelID != 0 && labelID != INVALID_ENTITY) SceneDestroyEntity(labelID);
 
-            LogMessage("[SummonBar] Destroyed.");
+            SceneDestroyEntity((uint)EntityID);
+            LogMessage("[SummonBar] Killed and cleaned up.");
         }
 
-        private void DestroyAll()
+        public override void OnDestroy()
         {
-            SceneDestroyEntity((uint)EntityID); // triggers OnDestroy which cleans up children
+
         }
+
+        // private void OnGameEnd(string eventName, string payload)
+        // {
+        //     SceneDestroyEntity((uint)EntityID);
+        // }
+
+        // public override void OnDestroy()
+        // {
+        //     Unsubscribe(progressEventName, OnProgressUpdate);
+        //     Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
+        //     Unsubscribe(EVENT_PLAYERDEAD, OnGameEnd);
+        //     Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+
+        //     if (fillID  != 0 && fillID  != INVALID_ENTITY) SceneDestroyEntity(fillID);
+        //     if (bgID    != 0 && bgID    != INVALID_ENTITY) SceneDestroyEntity(bgID);
+        //     if (labelID != 0 && labelID != INVALID_ENTITY) SceneDestroyEntity(labelID);
+
+        //     LogMessage("[SummonBar] Destroyed.");
+        // }
+        
+
     }
 
 }

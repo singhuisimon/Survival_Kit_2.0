@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: SummonBarSentry.prefab",
-    "Prefab GUID": 5082506308975886625,
+    "Prefab Name": "Prefab: SentryBar.prefab",
+    "Prefab GUID": 4183026633632016499,
     "version": 1,
     "entities": [
         {
-            "Name": "SummonBarSentry",
+            "Name": "SentryBar",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "9071965497469911841",
+                            "ComponentGUID": "18026467363876422637",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -25,9 +25,9 @@
                                 0.0
                             ],
                             "Scale": [
-                                0.6000000238418579,
-                                0.6000000238418579,
-                                0.6000000238418579
+                                1.0,
+                                1.0,
+                                1.0
                             ],
                             "Parent": 4294967295,
                             "Children": []
@@ -39,9 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4167096903670730665",
-                            "Name": "SummonBarSentry",
-                            "Tag": "SummonBarSentry"
+                            "ComponentGUID": "11807031462862913705",
+                            "Name": "SentryBar",
+                            "Tag": "SentryBar"
                         }
                     }
                 },
@@ -50,17 +50,17 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2200202547457163447",
-                            "ScriptClassName": "Game.SummonBarSentry",
+                            "ComponentGUID": "13152956841223373041",
+                            "ScriptClassName": "Game.SentryLifetimeBar",
                             "Started": false,
-                            "GCHandle": 27
+                            "GCHandle": 29123
                         }
                     }
                 }
             ]
         },
         {
-            "Name": "SummonBarBG",
+            "Name": "SentryBarBG",
             "LocalID": 2,
             "ParentLocalID": 1,
             "components": [
@@ -69,7 +69,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "5613200983650173735",
+                            "ComponentGUID": "10532477583932638193",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -81,8 +81,8 @@
                                 0.0
                             ],
                             "Scale": [
-                                9.800000190734863,
-                                6.0,
+                                10.5,
+                                1.0,
                                 1.0
                             ],
                             "Parent": 4294967295,
@@ -95,9 +95,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "4167096903670730659",
-                            "Name": "SummonBarBG",
-                            "Tag": "SummonBarBG"
+                            "ComponentGUID": "13536413719773184163",
+                            "Name": "SentryBarBG",
+                            "Tag": "SentryBarBG"
                         }
                     }
                 },
@@ -106,9 +106,9 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3747408917246018407",
+                            "ComponentGUID": "9379556079328855035",
                             "Mesh": "",
-                            "Material": "SummonBarBG.mat",
+                            "Material": "SentryBarBG.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -125,7 +125,7 @@
             ]
         },
         {
-            "Name": "SummonBarFill",
+            "Name": "SentryBarFill",
             "LocalID": 3,
             "ParentLocalID": 1,
             "components": [
@@ -134,7 +134,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "10224887002079036205",
+                            "ComponentGUID": "12838320593148707829",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -146,8 +146,8 @@
                                 0.0
                             ],
                             "Scale": [
-                                50.0,
-                                6.0,
+                                10.0,
+                                0.800000011920929,
                                 1.0
                             ],
                             "Parent": 4294967295,
@@ -160,9 +160,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "11084625931311812509",
-                            "Name": "SummonBarFill",
-                            "Tag": "SummonBarFill"
+                            "ComponentGUID": "15265795976683454621",
+                            "Name": "SentryBarFill",
+                            "Tag": "SentryBarFill"
                         }
                     }
                 },
@@ -171,9 +171,9 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "15853084715621663593",
+                            "ComponentGUID": "3038487803995161597",
                             "Mesh": "",
-                            "Material": "SummonBarFill.mat",
+                            "Material": "SentryBarFill.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
@@ -190,7 +190,7 @@
             ]
         },
         {
-            "Name": "SummonBarLabel",
+            "Name": "SentryBarLabel",
             "LocalID": 4,
             "ParentLocalID": 1,
             "components": [
@@ -199,10 +199,10 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "7342583240563082035",
+                            "ComponentGUID": "7073713070114833401",
                             "Position": [
-                                0.0,
-                                12.0,
+                                5.960464477539064e-8,
+                                2.700000047683716,
                                 0.0
                             ],
                             "Rotation": [
@@ -211,8 +211,8 @@
                                 0.0
                             ],
                             "Scale": [
-                                30.0,
-                                8.5,
+                                6.0,
+                                1.399999976158142,
                                 1.0
                             ],
                             "Parent": 4294967295,
@@ -225,9 +225,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "8202322169794695063",
-                            "Name": "SummonBarLabel",
-                            "Tag": "SummonBarLabel"
+                            "ComponentGUID": "14112874472076607639",
+                            "Name": "SentryBarLabel",
+                            "Tag": "SentryBarLabel"
                         }
                     }
                 },
@@ -236,9 +236,9 @@
                     "typeName": "MeshRendererComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3747408917268251503",
+                            "ComponentGUID": "11108938336243958783",
                             "Mesh": "",
-                            "Material": "SummonBarLabel.mat",
+                            "Material": "SentryBarLabel.mat",
                             "Texture": "",
                             "Visible": true,
                             "GlobalIlluminate": true,
