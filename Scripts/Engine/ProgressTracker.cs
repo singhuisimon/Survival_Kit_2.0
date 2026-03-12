@@ -24,11 +24,6 @@ namespace Engine
         public static int EquippedSkin { get; set; } = 0;
         public static int ByteChips { get; set; } = 0;
 
-        // ByteChips pack purchase tracking
-        public static bool BytePack1Bought { get; set; } = false;
-        public static bool BytePack2Bought { get; set; } = false;
-        public static bool BytePack3Bought { get; set; } = false;
-        public static bool BytePack4Bought { get; set; } = false;
 
         /// <summary>
         /// Loads progress from disk. Call on main menu load.
@@ -43,10 +38,6 @@ namespace Engine
             Skin3Purchased = false;
             EquippedSkin = 0;
             ByteChips = 0;
-            BytePack1Bought = false;
-            BytePack2Bought = false;
-            BytePack3Bought = false;
-            BytePack4Bought = false;
 
             try
             {
@@ -125,16 +116,6 @@ namespace Engine
                     }
                 }
 
-                // Parse byte pack purchases
-                if (json.Contains("\"byte_pack1_bought\":true") || json.Contains("\"byte_pack1_bought\": true"))
-                    BytePack1Bought = true;
-                if (json.Contains("\"byte_pack2_bought\":true") || json.Contains("\"byte_pack2_bought\": true"))
-                    BytePack2Bought = true;
-                if (json.Contains("\"byte_pack3_bought\":true") || json.Contains("\"byte_pack3_bought\": true"))
-                    BytePack3Bought = true;
-                if (json.Contains("\"byte_pack4_bought\":true") || json.Contains("\"byte_pack4_bought\": true"))
-                    BytePack4Bought = true;
-
                 LogMessage("[ProgressTracker] HasWonTrenchRun=" + HasWonTrenchRun + " HasWonLevel2=" + HasWonLevel2 + " CumulativeScore=" + CumulativeScore + " ByteChips=" + ByteChips + " EquippedSkin=" + EquippedSkin);
             }
             catch (Exception e)
@@ -187,10 +168,6 @@ namespace Engine
             Skin3Purchased = false;
             EquippedSkin = 0;
             ByteChips = 0;
-            BytePack1Bought = false;
-            BytePack2Bought = false;
-            BytePack3Bought = false;
-            BytePack4Bought = false;
             LogMessage("[ProgressTracker] All progress reset");
             SaveProgress();
             Publish("ProgressReset", "");
@@ -219,11 +196,7 @@ namespace Engine
                     "  \"skin2_purchased\": " + (Skin2Purchased ? "true" : "false") + ",\n" +
                     "  \"skin3_purchased\": " + (Skin3Purchased ? "true" : "false") + ",\n" +
                     "  \"equipped_skin\": " + EquippedSkin + ",\n" +
-                    "  \"byte_chips\": " + ByteChips + ",\n" +
-                    "  \"byte_pack1_bought\": " + (BytePack1Bought ? "true" : "false") + ",\n" +
-                    "  \"byte_pack2_bought\": " + (BytePack2Bought ? "true" : "false") + ",\n" +
-                    "  \"byte_pack3_bought\": " + (BytePack3Bought ? "true" : "false") + ",\n" +
-                    "  \"byte_pack4_bought\": " + (BytePack4Bought ? "true" : "false") + "\n" +
+                    "  \"byte_chips\": " + ByteChips + "\n" +
                     "}";
 
                 if (FileIO.WriteAllText(SAVE_FILE, json))

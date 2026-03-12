@@ -332,46 +332,27 @@ namespace Game
 
         private bool HandleByteChipsTabClick()
         {
-            Vector3 hidePos2 = new Vector3(CENTER_X, HIDDEN_Y, -0.6f);
-
-            // ByteChips tab: clicking each exchange button (if not already bought)
-            // hides it, shows Label_PackOwned, and awards ByteChips + research points
-            if (!ProgressTracker.BytePack1Bought && exchangeButton4Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton4Id))
+            // ByteChips tab: clicking exchange buttons awards ByteChips + research points (repeatable)
+            if (exchangeButton4Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton4Id))
             {
-                ProgressTracker.BytePack1Bought = true;
-                SetPosition(exchangeButton4Id, ref hidePos2);
-                if (labelPackOwned1Id != 0)
-                    SetPosition(labelPackOwned1Id, ref labelPackOwned1VisiblePos);
                 AwardByteChipsAndResearch(60, 60);
                 LogMessage("ShopPopup: ByteChips pack 1 bought - +60 ByteChips +60 Research");
                 return true;
             }
-            if (!ProgressTracker.BytePack2Bought && exchangeButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton1Id))
+            if (exchangeButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton1Id))
             {
-                ProgressTracker.BytePack2Bought = true;
-                SetPosition(exchangeButton1Id, ref hidePos2);
-                if (labelPackOwned2Id != 0)
-                    SetPosition(labelPackOwned2Id, ref labelPackOwned2VisiblePos);
                 AwardByteChipsAndResearch(180, 180);
                 LogMessage("ShopPopup: ByteChips pack 2 bought - +180 ByteChips +180 Research");
                 return true;
             }
-            if (!ProgressTracker.BytePack3Bought && exchangeButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton2Id))
+            if (exchangeButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton2Id))
             {
-                ProgressTracker.BytePack3Bought = true;
-                SetPosition(exchangeButton2Id, ref hidePos2);
-                if (labelPackOwned3Id != 0)
-                    SetPosition(labelPackOwned3Id, ref labelPackOwned3VisiblePos);
                 AwardByteChipsAndResearch(300, 300);
                 LogMessage("ShopPopup: ByteChips pack 3 bought - +300 ByteChips +300 Research");
                 return true;
             }
-            if (!ProgressTracker.BytePack4Bought && exchangeButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton3Id))
+            if (exchangeButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton3Id))
             {
-                ProgressTracker.BytePack4Bought = true;
-                SetPosition(exchangeButton3Id, ref hidePos2);
-                if (labelPackOwned4Id != 0)
-                    SetPosition(labelPackOwned4Id, ref labelPackOwned4VisiblePos);
                 AwardByteChipsAndResearch(600, 600);
                 LogMessage("ShopPopup: ByteChips pack 4 bought - +600 ByteChips +600 Research");
                 return true;
@@ -537,12 +518,8 @@ namespace Game
 
             // Hide ByteChips-only elements
             if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref hidePos2);
-            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
-            if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
-            if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
-            if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
 
-            // Update skin button states (including slot 3)
+            // Update skin button states (including slot 3) and Pack Owned labels
             UpdatePacksButtonStates();
         }
 
@@ -628,6 +605,37 @@ namespace Game
                 // Default is not equipped - show Equip
                 if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref slotDefaultVisiblePos);
             }
+
+            // === Pack Owned labels on skin slots ===
+            // Default slot - always owned
+            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref labelPackOwned1VisiblePos);
+
+            // Skin 1 - show if purchased
+            if (labelPackOwned2Id != 0)
+            {
+                if (ProgressTracker.Skin1Purchased)
+                    SetPosition(labelPackOwned2Id, ref labelPackOwned2VisiblePos);
+                else
+                    SetPosition(labelPackOwned2Id, ref hidePos2);
+            }
+
+            // Skin 2 - show if purchased
+            if (labelPackOwned3Id != 0)
+            {
+                if (ProgressTracker.Skin2Purchased)
+                    SetPosition(labelPackOwned3Id, ref labelPackOwned3VisiblePos);
+                else
+                    SetPosition(labelPackOwned3Id, ref hidePos2);
+            }
+
+            // Skin 3 - show if purchased
+            if (labelPackOwned4Id != 0)
+            {
+                if (ProgressTracker.Skin3Purchased)
+                    SetPosition(labelPackOwned4Id, ref labelPackOwned4VisiblePos);
+                else
+                    SetPosition(labelPackOwned4Id, ref hidePos2);
+            }
         }
 
         private void ShowByteChipsTab()
@@ -649,54 +657,17 @@ namespace Game
             if (equippedButtonId != 0) SetPosition(equippedButtonId, ref hidePos2);
             if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref hidePos2);
 
-            // Show exchange buttons or Label_PackOwned depending on purchase state
-            // Pack 1 (Button 4, X=330)
-            if (ProgressTracker.BytePack1Bought)
-            {
-                if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref hidePos2);
-                if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref labelPackOwned1VisiblePos);
-            }
-            else
-            {
-                if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref exchangeButton4VisiblePos);
-                if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
-            }
+            // Hide all Pack Owned labels (they belong to the Packs tab now)
+            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
+            if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
+            if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
+            if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
 
-            // Pack 2 (Button 1, X=573)
-            if (ProgressTracker.BytePack2Bought)
-            {
-                if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref hidePos2);
-                if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref labelPackOwned2VisiblePos);
-            }
-            else
-            {
-                if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref slot1VisiblePos);
-                if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
-            }
-
-            // Pack 3 (Button 2, X=815)
-            if (ProgressTracker.BytePack3Bought)
-            {
-                if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref hidePos2);
-                if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref labelPackOwned3VisiblePos);
-            }
-            else
-            {
-                if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref slot2VisiblePos);
-                if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
-            }
-
-            // Pack 4 (Button 3, X=1057)
-            if (ProgressTracker.BytePack4Bought)
-            {
-                if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref hidePos2);
-                if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref labelPackOwned4VisiblePos);
-            }
-            else
-            {
-                if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref exchangeButton3VisiblePos);
-                if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
-            }
+            // Always show all exchange buttons (packs are repeatable)
+            if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref exchangeButton4VisiblePos);
+            if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref slot1VisiblePos);
+            if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref slot2VisiblePos);
+            if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref exchangeButton3VisiblePos);
         }
 
         private void HidePopup()

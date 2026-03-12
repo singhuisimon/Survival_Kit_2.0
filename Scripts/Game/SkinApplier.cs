@@ -67,16 +67,27 @@ namespace Game
             LogMessage("SkinApplier: Applying emissive texture '" + textureName + "' to Player");
             MeshRenderer.SetEmissiveTexture(playerId, textureName);
 
-            // Apply trail colors (TrailComponent StartColor/EndColor)
-            Vector4 startColor = TRAIL_START_COLOR[skinIndex];
-            Vector4 endColor = TRAIL_END_COLOR[skinIndex];
-            TrailSystem.SetStartColor(playerId, ref startColor);
-            TrailSystem.SetEndColor(playerId, ref endColor);
-            LogMessage("SkinApplier: Trail colors set - Start(" + startColor.X + "," + startColor.Y + "," + startColor.Z + "," + startColor.W + ") End(" + endColor.X + "," + endColor.Y + "," + endColor.Z + "," + endColor.W + ")");
+            // Only apply trail/particle colors in Level 2 (not trench_run)
+            uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
+            bool isLevel1 = turrets != null && turrets.Length > 0;
 
-            // Also update particle colors to match
-            ParticleSystem.SetColorMin(playerId, ref startColor);
-            ParticleSystem.SetColorMax(playerId, ref endColor);
+            if (!isLevel1)
+            {
+                // Apply trail colors (TrailComponent StartColor/EndColor)
+                Vector4 startColor = TRAIL_START_COLOR[skinIndex];
+                Vector4 endColor = TRAIL_END_COLOR[skinIndex];
+                TrailSystem.SetStartColor(playerId, ref startColor);
+                TrailSystem.SetEndColor(playerId, ref endColor);
+                LogMessage("SkinApplier: Trail colors set - Start(" + startColor.X + "," + startColor.Y + "," + startColor.Z + "," + startColor.W + ") End(" + endColor.X + "," + endColor.Y + "," + endColor.Z + "," + endColor.W + ")");
+
+                // Also update particle colors to match
+                ParticleSystem.SetColorMin(playerId, ref startColor);
+                ParticleSystem.SetColorMax(playerId, ref endColor);
+            }
+            else
+            {
+                LogMessage("SkinApplier: Level 1 detected - keeping default trail colors");
+            }
 
             LogMessage("SkinApplier: Skin applied successfully!");
         }
