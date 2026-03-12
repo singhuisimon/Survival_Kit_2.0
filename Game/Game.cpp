@@ -1689,6 +1689,13 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 	LOG_INFO("=== CreateScene: ", name, " ===");
 	if (m_ActiveScene)
 	{
+		// Stop all FMOD channels before disconnecting the on_destroy signal.
+		// ShutdownSystems() disconnects the signal first, so registry.clear()
+		// will not trigger OnAudioComponentRemoved. StopAll() covers the gap.
+		if (m_AudioManager)
+		{
+			m_AudioManager->StopAll();
+		}
 		//m_ActiveScene = nullptr;
 		m_ActiveScene->ShutdownSystems();
 		m_ActiveScene->GetRegistry().clear();

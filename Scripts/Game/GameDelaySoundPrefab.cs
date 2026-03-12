@@ -42,6 +42,9 @@ namespace Game
                 if(!wasPaused){
                     savedTime = elapsedTime;
                     wasPaused = true;
+                    if(AudioIsPlaying((uint)EntityID)){
+                        AudioPause((uint)EntityID);
+                    }
                 }
                 return;
             }
@@ -50,6 +53,9 @@ namespace Game
                 // Just unpaused - restore timer
                 elapsedTime = savedTime;
                 wasPaused = false;
+                if(played){
+                    AudioPlay((uint)EntityID);
+                }
             }
 
 

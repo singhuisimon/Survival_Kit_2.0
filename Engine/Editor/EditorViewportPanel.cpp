@@ -430,6 +430,15 @@ namespace Engine
             Scene* activeScene = m_Editor->GetActiveScene();
             if (activeScene && !m_OriginalScenePath.empty())
             {
+                // Kept comments from claude so I can remember - Amanda
+                // Stop all audio before clearing the registry.
+                // registry.clear() fires on_destroy signals, but StopSound sets Channel=nullptr
+                // without calling channel->stop(), so orphaned FMOD channels can survive.
+                if (m_Editor->GetAudioManager())
+                {
+                    m_Editor->GetAudioManager()->StopAll();
+                }
+
                 // Clear current scene
                 activeScene->GetRegistry().clear();
 
