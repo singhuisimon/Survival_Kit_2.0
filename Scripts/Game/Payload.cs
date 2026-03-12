@@ -79,6 +79,8 @@ namespace Game
                 Publish(EVENT_COLLECT_PAYLOAD, "");
                 Publish("PayloadCollected", EntityID.ToString());
 
+                ModuleRegistry.Unregister(EntityID);
+
                 //kills itself thereafter
                 SceneDestroyEntity((uint)EntityID);
             }

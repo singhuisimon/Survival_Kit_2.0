@@ -25,6 +25,11 @@ namespace Game
             s_modules.Remove(entityID);
         }
 
+        public static void Clear()
+        {
+            s_modules.Clear();
+        }
+
         public static IReadOnlyList<uint> Modules => s_modules;
     }
 
@@ -63,6 +68,9 @@ namespace Game
 
         public override void OnStart()
         {
+
+            ModuleRegistry.Clear();
+
             cameraEntityID = SceneFindEntityByName(cameraName);
             if (cameraEntityID == 0)
             {
@@ -185,5 +193,7 @@ namespace Game
                 if (indicatorPool[i] != 0)
                     SetIsVisible(indicatorPool[i], false);
         }
+
+
     }
 }

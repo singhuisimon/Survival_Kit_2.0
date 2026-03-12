@@ -25,6 +25,11 @@ namespace Game
             s_enemies.Remove(entityID);
         }
 
+        public static void Clear()
+        {
+            s_enemies.Clear();
+        }
+
         public static IReadOnlyList<uint> Enemies => s_enemies;
     }
 
@@ -70,6 +75,8 @@ namespace Game
 
         public override void OnStart()
         {
+            EnemyRegistry.Clear();
+
             cameraEntityID = SceneFindEntityByName(cameraName);
             if (cameraEntityID == 0)
             {
@@ -232,5 +239,7 @@ namespace Game
                 if (indicatorPool[i] != 0)
                     SetIsVisible(indicatorPool[i], false);
         }
+
+
     }
 }
