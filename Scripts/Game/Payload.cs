@@ -29,6 +29,8 @@ namespace Game
                 return;
             }
 
+            BeamRenderer.SetTargetEntity(EntityID, playerID);
+
             ModuleRegistry.Register(EntityID);
 
             LogMessage("Payload " + EntityID + " initialized");
@@ -76,6 +78,8 @@ namespace Game
                 //publish event that payload is collected
                 Publish(EVENT_COLLECT_PAYLOAD, "");
                 Publish("PayloadCollected", EntityID.ToString());
+
+                ModuleRegistry.Unregister(EntityID);
 
                 //kills itself thereafter
                 SceneDestroyEntity((uint)EntityID);

@@ -3408,5 +3408,163 @@ namespace Engine
 			}
 			return false;
 		}
+
+		// ===== BeamComponent =====
+		void Beam_SetActive(uint64_t entityID, bool active)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().Active = active;
+		}
+
+		bool Beam_GetActive(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return false;
+			return e.GetComponent<BeamComponent>().Active;
+		}
+
+		void Beam_SetStartColor(uint64_t entityID, glm::vec4* color)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !color) return;
+			e.GetComponent<BeamComponent>().StartColor = *color;
+		}
+
+		void Beam_GetStartColor(uint64_t entityID, glm::vec4* outColor)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outColor) return;
+			*outColor = e.GetComponent<BeamComponent>().StartColor;
+		}
+
+		void Beam_SetEndColor(uint64_t entityID, glm::vec4* color)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !color) return;
+			e.GetComponent<BeamComponent>().EndColor = *color;
+		}
+
+		void Beam_GetEndColor(uint64_t entityID, glm::vec4* outColor)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outColor) return;
+			*outColor = e.GetComponent<BeamComponent>().EndColor;
+		}
+
+		void Beam_SetStartWidth(uint64_t entityID, float width)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().StartWidth = width;
+		}
+
+		float Beam_GetStartWidth(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().StartWidth;
+		}
+
+		void Beam_SetEndWidth(uint64_t entityID, float width)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().EndWidth = width;
+		}
+
+		float Beam_GetEndWidth(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().EndWidth;
+		}
+
+		void Beam_SetNoiseAmplitude(uint64_t entityID, float amplitude)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().NoiseAmplitude = amplitude;
+		}
+
+		float Beam_GetNoiseAmplitude(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().NoiseAmplitude;
+		}
+
+		void Beam_SetNoiseSpeed(uint64_t entityID, float speed)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().NoiseSpeed = speed;
+		}
+
+		float Beam_GetNoiseSpeed(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().NoiseSpeed;
+		}
+
+		void Beam_SetUVScrollSpeed(uint64_t entityID, float speed)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().UVScrollSpeed = speed;
+		}
+
+		float Beam_GetUVScrollSpeed(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0.f;
+			return e.GetComponent<BeamComponent>().UVScrollSpeed;
+		}
+
+		void Beam_SetEndPointOffset(uint64_t entityID, glm::vec3* offset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !offset) return;
+			e.GetComponent<BeamComponent>().EndPointOffset = *offset;
+		}
+
+		void Beam_GetEndPointOffset(uint64_t entityID, glm::vec3* outOffset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outOffset) return;
+			*outOffset = e.GetComponent<BeamComponent>().EndPointOffset;
+		}
+
+		void Beam_SetStartOffset(uint64_t entityID, glm::vec3* offset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !offset) return;
+			e.GetComponent<BeamComponent>().StartOffset = *offset;
+		}
+
+		void Beam_GetStartOffset(uint64_t entityID, glm::vec3* outOffset)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>() || !outOffset) return;
+			*outOffset = e.GetComponent<BeamComponent>().StartOffset;
+		}
+
+		void Beam_SetTargetEntity(uint64_t entityID, uint64_t targetID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return;
+			e.GetComponent<BeamComponent>().TargetEntity =
+				targetID == 0 ? entt::null : static_cast<entt::entity>(targetID);
+		}
+
+		uint64_t Beam_GetTargetEntity(uint64_t entityID)
+		{
+			auto e = Entity{ static_cast<entt::entity>(entityID), &s_CurrentScene->GetRegistry() };
+			if (!e || !e.HasComponent<BeamComponent>()) return 0;
+			auto target = e.GetComponent<BeamComponent>().TargetEntity;
+			return target == entt::null ? 0 : static_cast<uint64_t>(target);
+		}
+
 	} // namespace InternalCalls
 } // namespace Engine

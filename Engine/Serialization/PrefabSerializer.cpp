@@ -15,6 +15,7 @@
 #include "../Component/SpriteRendererComponent.h"
 #include "../Component/TrailComponent.h"
 #include "../Component/TextComponent.h"
+#include "../Component/BeamComponent.h"
 
 #include "../Utility/Logger.h"
 #include "../Asset/AssetManager.h"
@@ -259,7 +260,10 @@ namespace Engine {
             LOG_DEBUG("  + TextComponent");
         }
 
-
+        if (entity.HasComponent<BeamComponent>()) {
+            entityData.components.push_back(SerializeEntityComponent(entity, ComponentTypeID::Beam));
+            LOG_DEBUG(" + BeamComponent");
+        }
        
         prefab.entities.push_back(entityData);
 

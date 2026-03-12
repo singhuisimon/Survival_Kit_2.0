@@ -34,6 +34,7 @@
 #include <glm/gtx/euler_angles.hpp>
 
 #include "Component/TrailComponent.h"
+#include "Component/BeamComponent.h"
 
 namespace Engine {
 
@@ -1051,8 +1052,85 @@ namespace Engine {
             );
         }
 
+        // Register Beam Component
+        {
+            auto& meta = REGISTER_COMPONENT(BeamComponent);
+            meta.AddProperty<BeamComponent, u32>(
+                "NumSegments",
+                PropertyType::U32,
+                [](const BeamComponent& c) { return c.NumSegments; },
+                [](BeamComponent& c, const u32& v) { c.NumSegments = v; }
+            );
+            meta.AddProperty<BeamComponent, float>(
+                "StartWidth",
+                PropertyType::Float,
+                [](const BeamComponent& c) { return c.StartWidth; },
+                [](BeamComponent& c, const float& v) { c.StartWidth = v; }
+            );
+            meta.AddProperty<BeamComponent, float>(
+                "EndWidth",
+                PropertyType::Float,
+                [](const BeamComponent& c) { return c.EndWidth; },
+                [](BeamComponent& c, const float& v) { c.EndWidth = v; }
+            );
+            meta.AddProperty<BeamComponent, glm::vec4>(
+                "StartColor",
+                PropertyType::Vec4,
+                [](const BeamComponent& c) { return c.StartColor; },
+                [](BeamComponent& c, const glm::vec4& v) { c.StartColor = v; }
+            );
+            meta.AddProperty<BeamComponent, glm::vec4>(
+                "EndColor",
+                PropertyType::Vec4,
+                [](const BeamComponent& c) { return c.EndColor; },
+                [](BeamComponent& c, const glm::vec4& v) { c.EndColor = v; }
+            );
+            meta.AddProperty<BeamComponent, float>(
+                "NoiseAmplitude",
+                PropertyType::Float,
+                [](const BeamComponent& c) { return c.NoiseAmplitude; },
+                [](BeamComponent& c, const float& v) { c.NoiseAmplitude = v; }
+            );
+            meta.AddProperty<BeamComponent, float>(
+                "NoiseSpeed",
+                PropertyType::Float,
+                [](const BeamComponent& c) { return c.NoiseSpeed; },
+                [](BeamComponent& c, const float& v) { c.NoiseSpeed = v; }
+            );
+            meta.AddProperty<BeamComponent, u64>(
+                "MaterialGuid",
+                PropertyType::U64,
+                [](const BeamComponent& c) { return static_cast<u64>(c.MaterialGuid.m_Value); },
+                [](BeamComponent& c, const u64& v) { c.MaterialGuid = xresource::instance_guid{ v }; }
+            );
+            meta.AddProperty<BeamComponent, float>(
+                "UVScrollSpeed",
+                PropertyType::Float,
+                [](const BeamComponent& c) { return c.UVScrollSpeed; },
+                [](BeamComponent& c, const float& v) { c.UVScrollSpeed = v; }
+            );
+            meta.AddProperty<BeamComponent, glm::vec3>(
+                "StartOffset",
+                PropertyType::Vec3,
+                [](const BeamComponent& c) { return c.StartOffset; },
+                [](BeamComponent& c, const glm::vec3& v) { c.StartOffset = v; }
+            );
+            meta.AddProperty<BeamComponent, glm::vec3>(
+                "EndPointOffset",
+                PropertyType::Vec3,
+                [](const BeamComponent& c) { return c.EndPointOffset; },
+                [](BeamComponent& c, const glm::vec3& v) { c.EndPointOffset = v; }
+            );
+            meta.AddProperty<BeamComponent, bool>(
+                "Active",
+                PropertyType::Bool,
+                [](const BeamComponent& c) { return c.Active; },
+                [](BeamComponent& c, const bool& v) { c.Active = v; }
+            );
+        }
+
         LOG_INFO("Component reflection registration complete");
-        LOG_INFO("  - Registered 11 component types");
+        LOG_INFO("  - Registered 12 component types");
     }
 
 } // namespace Engine

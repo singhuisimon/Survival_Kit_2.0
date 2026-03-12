@@ -36,6 +36,7 @@
 #include "Animation/AnimationSystem.h"
 #include "Physics/CollisionSystem2D.h"
 #include "ParticleSystem/TrailSystem.h"
+#include "Graphics/BeamSystem.h"
 
 #include "Event/EventSystem.h"
 
@@ -526,6 +527,7 @@ void Game::AddAllSystemsToScene(Engine::Scene* scene)
 	scene->AddSystem<Engine::AnimationSystem>();
 	scene->AddSystem<Engine::CollisionSystem2D>(m_Renderer->getMeshData2DStorage(), m_Renderer->GetUIViewport(), m_Renderer->GetUIProjection());
 	scene->AddSystem<Engine::TrailSystem>();
+	scene->AddSystem<Engine::BeamSystem>();
 }
 
 void Game::CreateDefaultScene()
