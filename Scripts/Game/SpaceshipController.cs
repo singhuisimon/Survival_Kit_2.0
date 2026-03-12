@@ -136,12 +136,15 @@ namespace Game
         [SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 100.0f;
         [SerializeField] private float CAMSHAKE_DamageTakenDuration = 0.1f;
 
+        // ===== TESTING MOUSE SENSITIVITY =====
+        [SerializeField] private float mouseSensitivity = 1.0f; // Default = 1.0f, range = [0.25 - 2.5] // Just need to save value some where (consider onboarding audio settings)
+
         public override void OnStart()
         {
             playerHP = playerOriginalHP;
             countdownOOB = originalCountdownOOB;
             inEnvironment = true;
-
+             
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
             healingVFXEntityID = SceneFindEntityByName(HEAL_VFX_ENTITY_NAME);
@@ -285,6 +288,10 @@ namespace Game
         private void UpdateCameraRotationFromMouse(float deltaTime)
         {
             GetMouseDelta(out float dx, out float dy);
+
+            // Update dx and dy with sensitivity value
+            dx *= mouseSensitivity;
+            dy *= mouseSensitivity;
 
             yawRad += -dx * yawSpeed * deltaTime;
             pitchRad += -dy * pitchSpeed * deltaTime;

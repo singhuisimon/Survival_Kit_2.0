@@ -3,7 +3,7 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 130,
+            "ID": 90,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -15,10 +15,10 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "607353247021270145",
+                        "ComponentGUID": "11867768485682744873",
                         "Position": [
                             1122.0,
-                            275.5,
+                            285.0,
                             0.0
                         ],
                         "Rotation": [
@@ -38,7 +38,7 @@
                 {
                     "Type": "TextComponent",
                     "Properties": {
-                        "ComponentGUID": "12713029045393343619",
+                        "ComponentGUID": "13020689990289870379",
                         "text": "Press \"E\" to proceed",
                         "fontName": "Quantico-Regular",
                         "fontSize": 24.0,
@@ -58,7 +58,7 @@
             ]
         },
         {
-            "ID": 129,
+            "ID": 89,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -70,7 +70,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12713029045392655483",
+                        "ComponentGUID": "16479454504109166115",
                         "Position": [
                             446.0,
                             350.0,
@@ -109,7 +109,7 @@
             ]
         },
         {
-            "ID": 128,
+            "ID": 88,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -121,7 +121,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5795500017750934645",
+                        "ComponentGUID": "915014191916387869",
                         "Position": [
                             446.0,
                             350.0,
@@ -160,7 +160,7 @@
             ]
         },
         {
-            "ID": 127,
+            "ID": 87,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -172,7 +172,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "3489657008536618095",
+                        "ComponentGUID": "9561925476466871831",
                         "Position": [
                             446.0,
                             350.0,
@@ -211,7 +211,7 @@
             ]
         },
         {
-            "ID": 126,
+            "ID": 86,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -223,7 +223,7 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "30892494714930281",
+                        "ComponentGUID": "14173611494893276689",
                         "Position": [
                             446.0,
                             350.0,
@@ -262,781 +262,36 @@
             ]
         },
         {
-            "ID": 125,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "TutorialUIManagerLevel2",
-                        "Tag": "TutorialUIManagerLevel2"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15018872054603383907",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "1183813999321515109",
-                        "ScriptClassName": "Game.TutorialUIManagerLevel2"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097252,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "endstatmanager",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "13342248763038927317",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "2965955221577419223",
-                        "ScriptClassName": "Game.EndScreenStats"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048673,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "GunshipHealthBar4",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "15665851083657544887",
-                        "PrefabAssetGuid": "14295613256857522137",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11630625817536070841\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"12207086569844622545\",\"ScriptClassName\":\"\",\"Started\":false,\"GCHandle\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "8748322056016463029",
-                        "Position": [
-                            -153.078125,
-                            206.2294921875,
-                            10.541015625
-                        ],
-                        "Rotation": [
-                            3.204196224471245e-20,
-                            0.0000011208516070837504,
-                            2.672318746496649e-13
-                        ],
-                        "Scale": [
-                            780.0,
-                            50.000003814697266,
-                            1.0000001192092896
-                        ],
-                        "Parent": 2097202,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "11630625817536070841",
-                        "Mesh": "",
-                        "Material": "Gunship1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "12207086569844622545",
-                        "ScriptClassName": "Game.GunshipHealthBar",
-                        "Fields": {
-                            "allyIndex": 4
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097247,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "gunshipName4",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3560175285282702509",
-                        "Position": [
-                            -781.2308959960938,
-                            -388.2073669433594,
-                            -131.43414306640625
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            26.0,
-                            7.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "9901243560620360881",
-                        "Mesh": "",
-                        "Material": "gunship1name.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "8171861303719150791",
-                        "ScriptClassName": "Game.GunshipNameUI",
-                        "Fields": {
-                            "allyIndex": 4
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097248,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "GunshipHealthBar3",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "8748322056011318435",
-                        "PrefabAssetGuid": "14295613256857522137",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1254332276067370149\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4136636037596447951\",\"ScriptClassName\":\"\",\"Started\":false,\"GCHandle\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "11630625817528435873",
-                        "Position": [
-                            220.005615234375,
-                            549.79296875,
-                            756.2091064453125
-                        ],
-                        "Rotation": [
-                            3.204196224471245e-20,
-                            0.0000011208516070837504,
-                            2.672318746496649e-13
-                        ],
-                        "Scale": [
-                            780.0,
-                            50.000003814697266,
-                            1.0000001192092896
-                        ],
-                        "Parent": 1048594,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "1254332276067370149",
-                        "Mesh": "",
-                        "Material": "Gunship1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4136636037596447951",
-                        "ScriptClassName": "Game.GunshipHealthBar",
-                        "Fields": {
-                            "allyIndex": 3
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048669,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "gunshipName3",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "9324782808314184825",
-                        "Position": [
-                            -177.11900329589844,
-                            -469.2136535644531,
-                            863.3368530273438
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            26.0,
-                            7.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "6442479046797067389",
-                        "Mesh": "",
-                        "Material": "gunship1name.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11054165065236120773",
-                        "ScriptClassName": "Game.GunshipNameUI",
-                        "Fields": {
-                            "allyIndex": 3
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048668,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "GunshipHealthBar2",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "101410771457115247",
-                        "PrefabAssetGuid": "14295613256857522137",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"7595400551402357873\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4136636037596267725\",\"ScriptClassName\":\"\",\"Started\":false,\"GCHandle\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4136636037581079661",
-                        "Position": [
-                            -438.916015625,
-                            315.01171875,
-                            58.95361328125
-                        ],
-                        "Rotation": [
-                            3.204196224471245e-20,
-                            0.0000011208516070837504,
-                            2.672318746496649e-13
-                        ],
-                        "Scale": [
-                            780.0,
-                            50.000003814697266,
-                            1.0000001192092896
-                        ],
-                        "Parent": 1048599,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "7595400551402357873",
-                        "Mesh": "",
-                        "Material": "Gunship1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4136636037596267725",
-                        "ScriptClassName": "Game.GunshipHealthBar",
-                        "Fields": {
-                            "allyIndex": 2
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048667,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "gunshipName2",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "8171861303703995493",
-                        "Position": [
-                            -672.4483032226563,
-                            -328.3448791503906,
-                            -689.31640625
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            26.0,
-                            7.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "17395233340558771305",
-                        "Mesh": "",
-                        "Material": "gunship1name.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "9901243560629093571",
-                        "ScriptClassName": "Game.GunshipNameUI",
-                        "Fields": {
-                            "allyIndex": 2
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 88,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "gunshipName1",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "10384210640159851477",
-                        "Position": [
-                            648.156982421875,
-                            -50.86674499511719,
-                            390.9230041503906
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            26.0,
-                            7.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "1737299355608499161",
-                        "Mesh": "",
-                        "Material": "gunship1name.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "8171861303718642881",
-                        "ScriptClassName": "Game.GunshipNameUI"
-                    }
-                }
-            ]
-        },
-        {
             "ID": 85,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "GunshipHealthBar1",
+                        "Name": "New Entity",
                         "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "6369260368431678397",
-                        "PrefabAssetGuid": "14295613256857522137",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5216338863825028031\",\"ScriptClassName\":\"\",\"Started\":false,\"GCHandle\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 9,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": true,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11557407139162817473\",\"FilePath\":\"\",\"Type\":5,\"State\":2,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":false,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":1.0,\"MaxDistance\":100.0,\"RolloffMode\":0,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8675103377646027715\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12710328643769336763",
+                        "ComponentGUID": "10714846981072539149",
                         "Position": [
-                            203.1999969482422,
-                            249.10000610351563,
-                            -30.600000381469727
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
-                            6.066426694087048e-21,
-                            0.0000017075473124350538,
-                            9.039680203925145e-29
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            780.0,
-                            50.0,
-                            1.0000001192092896
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "Parent": 1048631,
+                        "Parent": 4294967295,
                         "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "8675103377646027715",
-                        "Mesh": "",
-                        "Material": "Gunship1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "5216338863825028031",
-                        "ScriptClassName": "Game.GunshipHealthBar"
                     }
                 }
             ]
@@ -1713,7 +968,7 @@
                             0.0
                         ],
                         "Scale": [
-                            694.7000122070313,
+                            684.5999755859375,
                             400.70001220703125,
                             1.0
                         ],
@@ -1734,7 +989,7 @@
                         "Quad": 3,
                         "Sprite Layer": 1,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -2040,8 +1295,8 @@
                     "Properties": {
                         "ComponentGUID": "9710535419386708817",
                         "Position": [
-                            705.5999755859375,
-                            510.0,
+                            855.0,
+                            517.0,
                             0.0
                         ],
                         "Rotation": [
@@ -2050,8 +1305,8 @@
                             0.0
                         ],
                         "Scale": [
-                            77.30000305175781,
-                            30.0,
+                            150.0,
+                            50.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -2062,16 +1317,13 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "15475142942421287763",
-                        "ScriptClassName": "Game.RestartButton2",
-                        "Fields": {
-                            "uiStartFadePos": 486.0
-                        }
+                        "ScriptClassName": "Game.RestartButton"
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Button_RestartLevel2.png",
+                        "Texture": "DefenceFailed_RestartButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -2079,7 +1331,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -2545,8 +1797,8 @@
                         "ScriptClassName": "Game.BotnetSpawning",
                         "Fields": {
                             "interval": 2.0,
-                            "maxBotnets": 20,
                             "timer": 0.0,
+                            "maxBotnets": 20,
                             "spawnDistance": 1.5,
                             "currentBotnetCount": 0
                         }
@@ -3404,8 +2656,8 @@
                     "Properties": {
                         "ComponentGUID": "5731807458746188633",
                         "Position": [
-                            538.9000244140625,
-                            446.1000061035156,
+                            376.0,
+                            518.0,
                             0.0
                         ],
                         "Rotation": [
@@ -3414,8 +2666,8 @@
                             0.0
                         ],
                         "Scale": [
-                            77.30000305175781,
-                            30.0,
+                            150.0,
+                            50.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -3432,7 +2684,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Button_BackToMainMenu.png",
+                        "Texture": "DefenceFailed_MainMenuButton.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -3440,7 +2692,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -3586,7 +2838,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_Cutscene.png",
+                        "Texture": "DefenceFailed_Background.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -4446,7 +3698,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Gunship6",
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -4487,8 +3739,7 @@
                             }
                         ],
                         "childEntityIDs": [
-                            1048578,
-                            90
+                            1048578
                         ]
                     }
                 },
@@ -4513,8 +3764,7 @@
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            1048578,
-                            90
+                            1048578
                         ]
                     }
                 },
@@ -4686,7 +3936,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Gunship5",
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -4727,8 +3977,7 @@
                             }
                         ],
                         "childEntityIDs": [
-                            2097193,
-                            89
+                            2097193
                         ]
                     }
                 },
@@ -4753,8 +4002,7 @@
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            2097193,
-                            89
+                            2097193
                         ]
                     }
                 },
@@ -4926,7 +4174,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Gunship4",
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -4967,8 +4215,7 @@
                             }
                         ],
                         "childEntityIDs": [
-                            2097201,
-                            1048673
+                            2097201
                         ]
                     }
                 },
@@ -4993,8 +4240,7 @@
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            2097201,
-                            1048673
+                            2097201
                         ]
                     }
                 },
@@ -5166,7 +4412,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Gunship3",
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -5225,8 +4471,7 @@
                             }
                         ],
                         "childEntityIDs": [
-                            1048593,
-                            2097248
+                            1048593
                         ]
                     }
                 },
@@ -5251,8 +4496,7 @@
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            1048593,
-                            2097248
+                            1048593
                         ]
                     }
                 },
@@ -5424,7 +4668,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Gunship2",
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -5465,8 +4709,7 @@
                             }
                         ],
                         "childEntityIDs": [
-                            1048598,
-                            1048668
+                            1048598
                         ]
                     }
                 },
@@ -5491,8 +4734,7 @@
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            1048598,
-                            1048668
+                            1048598
                         ]
                     }
                 },
@@ -5664,7 +4906,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Gunship1",
+                        "Name": "Gunship",
                         "Tag": "Gunship"
                     }
                 },
@@ -5705,8 +4947,7 @@
                             }
                         ],
                         "childEntityIDs": [
-                            1048600,
-                            85
+                            1048600
                         ]
                     }
                 },
@@ -5731,8 +4972,7 @@
                         ],
                         "Parent": 4294967295,
                         "Children": [
-                            1048600,
-                            85
+                            1048600
                         ]
                     }
                 },
@@ -8469,7 +7709,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 2,
+                        "Sprite Layer": 3,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -8793,7 +8033,7 @@
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Killhair",
+                        "Name": "Crosshair2 (Copy)",
                         "Tag": "Killhair"
                     }
                 },
@@ -8846,428 +8086,22 @@
             ]
         },
         {
-            "ID": 2097238,
+            "ID": 51048583,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "gunshipName6",
-                        "Tag": "Default"
+                        "Name": "TutorialUIManagerLevel2",
+                        "Tag": "TutorialUIManagerLevel2"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5792799616132947725",
+                        "ComponentGUID": "6471277454980581839",
                         "Position": [
-                            795.0,
-                            -360.0,
-                            -952.1729736328125
-                        ],
-                        "Rotation": [
                             0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            26.0,
-                            7.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "6945721120741170959",
-                        "Mesh": "",
-                        "Material": "gunship1name.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "10477704312933287113",
-                        "ScriptClassName": "Game.GunshipNameUI",
-                        "Fields": {
-                            "allyIndex": 6
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2097239,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "gunshipName5",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16745553909902450455",
-                        "Position": [
-                            167.27699279785156,
-                            -158.7239990234375,
-                            406.1310119628906
-                        ],
-                        "Rotation": [
                             0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            26.0,
-                            7.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "9828024882261368603",
-                        "Mesh": "",
-                        "Material": "gunship1name.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "14512929579057497291",
-                        "ScriptClassName": "Game.GunshipNameUI",
-                        "Fields": {
-                            "allyIndex": 5
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 89,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "GunshipHealthBar5",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "11630625817509069785",
-                        "PrefabAssetGuid": "14295613256857522137",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"9901243560599356379\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10477704312908153827\",\"ScriptClassName\":\"\",\"Started\":false,\"GCHandle\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4713096789867987927",
-                        "Position": [
-                            166.57699584960938,
-                            267.8760070800781,
-                            406.1310119628906
-                        ],
-                        "Rotation": [
-                            -2.426570516076106e-20,
-                            0.0000034150946248701075,
-                            -2.0355550198972866e-13
-                        ],
-                        "Scale": [
-                            780.0,
-                            50.0,
-                            1.0000001192092896
-                        ],
-                        "Parent": 1048622,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "9901243560599356379",
-                        "Mesh": "",
-                        "Material": "Gunship1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "10477704312908153827",
-                        "ScriptClassName": "Game.GunshipHealthBar",
-                        "Fields": {
-                            "allyIndex": 5
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 90,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "GunshipHealthBar6",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "16818772588245615585",
-                        "PrefabAssetGuid": "14295613256857522137",
-                        "isPrefabRoot": false,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: Gunship.prefab",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13936468826729595877\",\"Mesh\":\"\",\"Material\":\"\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5289557542203868371\",\"ScriptClassName\":\"\",\"Started\":false,\"GCHandle\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5866018294480569311",
-                        "Position": [
-                            75.103515625,
-                            294.3609924316406,
-                            -478.20849609375
-                        ],
-                        "Rotation": [
-                            -3.204196224471245e-20,
-                            0.0000011208516070837504,
-                            -2.672318746496649e-13
-                        ],
-                        "Scale": [
-                            780.0,
-                            50.000003814697266,
-                            1.0000001192092896
-                        ],
-                        "Parent": 1048588,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "13936468826729595877",
-                        "Mesh": "",
-                        "Material": "Gunship1.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "5289557542203868371",
-                        "ScriptClassName": "Game.GunshipHealthBar",
-                        "Fields": {
-                            "allyIndex": 6
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 99,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "DefensePopUp",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "2442015940620928055",
-                        "Position": [
-                            623.4000244140625,
-                            380.3999938964844,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            650.0,
-                            450.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "8808205857659913259",
-                        "ScriptClassName": "Game.LoseScreenPopup"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "DefenceFailed_PopUpWindow.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 98,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "UI_EndScore",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16801013276857435183",
-                        "Position": [
-                            619.9000244140625,
-                            336.70001220703125,
                             0.0
                         ],
                         "Rotation": [
@@ -9285,78 +8119,10 @@
                     }
                 },
                 {
-                    "Type": "TextComponent",
+                    "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "8154101992306410545",
-                        "text": "endscore\n",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 18.0,
-                        "color": [
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "isVisible": false,
-                        "align": 0,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 124,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "UI_EndTimeSurvived",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5848258983093650493",
-                        "Position": [
-                            644.2999877929688,
-                            301.20001220703125,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "TextComponent",
-                    "Properties": {
-                        "ComponentGUID": "1813033716969686081",
-                        "text": "time survied\n",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 18.0,
-                        "color": [
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "isVisible": false,
-                        "align": 0,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
+                        "ComponentGUID": "5894816702677387729",
+                        "ScriptClassName": "Game.TutorialUIManagerLevel2"
                     }
                 }
             ]
@@ -9371,7 +8137,7 @@
             "GlobalBias": 0.004999999888241291,
             "MasterVolume": 1.0,
             "SFXVolume": 1.0,
-            "BGMVolume": 2.0,
+            "BGMVolume": 1.0,
             "VOVolume": 1.0,
             "UIVolume": 1.0,
             "GameSFXVolume": 1.0
