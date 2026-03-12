@@ -3,6 +3,174 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 124,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI_EndTimeSurvived",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5848258983093650493",
+                        "Position": [
+                            644.2999877929688,
+                            301.20001220703125,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "1813033716969686081",
+                        "text": "time survied\n",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 18.0,
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "isVisible": false,
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 98,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI_EndScore",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16801013276857435183",
+                        "Position": [
+                            619.9000244140625,
+                            336.70001220703125,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "8154101992306410545",
+                        "text": "endscore\n",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 18.0,
+                        "color": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "isVisible": false,
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 99,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "DefensePopUp",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2442015940620928055",
+                        "Position": [
+                            623.4000244140625,
+                            380.3999938964844,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            650.0,
+                            450.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8808205857659913259",
+                        "ScriptClassName": "Game.LoseScreenPopup"
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "DefenceFailed_PopUpWindow.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
             "ID": 90,
             "Components": [
                 {
@@ -512,7 +680,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -763,7 +931,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 3,
+                        "Sprite Layer": 2,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -890,7 +1058,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -977,7 +1145,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1532,7 +1700,7 @@
                         "FilePath": "System AI_VO_Defence BGM.wav",
                         "Type": 4,
                         "State": 2,
-                        "Volume": 0.2029999941587448,
+                        "Volume": 0.6439999938011169,
                         "Pitch": 1.0,
                         "Loop": true,
                         "Mute": false,
@@ -1747,7 +1915,7 @@
                         "FilePath": "System AI_VO_Core Damage 1.wav",
                         "Type": 4,
                         "State": 2,
-                        "Volume": 0.5,
+                        "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
                         "Mute": false,
@@ -4993,7 +5161,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5640,7 +5808,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_Background.png",
+                        "Texture": "DefenceFailed_Cutscene.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -5763,8 +5931,8 @@
                     "Properties": {
                         "ComponentGUID": "5731807458746188633",
                         "Position": [
-                            376.0,
-                            518.0,
+                            538.9000244140625,
+                            446.1000061035156,
                             0.0
                         ],
                         "Rotation": [
@@ -5773,8 +5941,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            77.30000305175781,
+                            30.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -5791,7 +5959,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_MainMenuButton.png",
+                        "Texture": "Button_BackToMainMenu.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -5799,7 +5967,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 4,
+                        "Sprite Layer": 5,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -6223,7 +6391,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6556,7 +6724,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.9028741121292114,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -6681,8 +6849,8 @@
                         "ScriptClassName": "Game.BotnetSpawning",
                         "Fields": {
                             "interval": 2.0,
-                            "maxBotnets": 20,
                             "timer": 0.0,
+                            "maxBotnets": 20,
                             "spawnDistance": 1.5,
                             "currentBotnetCount": 0
                         }
@@ -7124,8 +7292,8 @@
                     "Properties": {
                         "ComponentGUID": "9710535419386708817",
                         "Position": [
-                            855.0,
-                            517.0,
+                            705.5999755859375,
+                            510.0,
                             0.0
                         ],
                         "Rotation": [
@@ -7134,8 +7302,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            50.0,
+                            77.30000305175781,
+                            30.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -7146,13 +7314,16 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "15475142942421287763",
-                        "ScriptClassName": "Game.RestartButton"
+                        "ScriptClassName": "Game.RestartButton2",
+                        "Fields": {
+                            "uiStartFadePos": 486.0
+                        }
                     }
                 },
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceFailed_RestartButton.png",
+                        "Texture": "Button_RestartLevel2.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -7160,7 +7331,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 4,
+                        "Sprite Layer": 5,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -7226,7 +7397,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -0.0,
+                            -1.0177775099486433e-13,
                             90.0
                         ],
                         "Scale": [
@@ -7326,7 +7497,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7473,7 +7644,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8848,22 +9019,34 @@
             ]
         },
         {
-            "ID": 9999901,
+            "ID": 2097252,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "SkinApplier",
-                        "Tag": "SkinApplier"
+                        "Name": "endstatmanager",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "9999902000000000001",
-                        "Position": [0.0, 0.0, 0.0],
-                        "Rotation": [0.0, 0.0, 0.0],
-                        "Scale": [1.0, 1.0, 1.0],
+                        "ComponentGUID": "13342248763038927317",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -8871,8 +9054,8 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "9999902000000000002",
-                        "ScriptClassName": "Game.SkinApplier"
+                        "ComponentGUID": "2965955221577419223",
+                        "ScriptClassName": "Game.EndScreenStats"
                     }
                 }
             ]
