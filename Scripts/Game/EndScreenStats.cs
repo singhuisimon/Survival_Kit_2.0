@@ -53,7 +53,7 @@ namespace Game
             Event.Subscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Subscribe(EVENT_WIN_BUTTONS, OnButtonsFaded);
             Event.Subscribe(EVENT_LOSE_BUTTONS, OnButtonsFaded);
-            Event.Subscribe(EVENT_GAMEOVER, OnGameReset);
+            //Event.Subscribe(EVENT_GAMEOVER, OnGameReset);
 
             LogMessage("[EndScreenStats] Initialized");
         }
@@ -139,7 +139,7 @@ namespace Game
             Event.Unsubscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Unsubscribe(EVENT_WIN_BUTTONS, OnButtonsFaded);
             Event.Unsubscribe(EVENT_LOSE_BUTTONS, OnButtonsFaded);
-            Event.Unsubscribe(EVENT_GAMEOVER, OnGameReset);
+           //Event.Unsubscribe(EVENT_GAMEOVER, OnGameReset);
             LogMessage("=== EndScreenStats Destroyed ===");
         }
     }

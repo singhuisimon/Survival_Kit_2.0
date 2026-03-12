@@ -12,13 +12,9 @@ using static Game.AudioSettings;
 
 namespace Game
 {
-    /// <summary>
-    /// Handles the settings popup in the main menu.
-    /// Shows popup when settings button is clicked, handles close button.
-    /// </summary>
     public class SettingsPopup : ScriptBehaviour
     {
-        // Entity names
+        // Entity names — unchanged
         private const string SETTINGS_BUTTON_NAME = "Settings Button";
         private const string SETTINGS_POPUP_NAME = "Settings Popup";
         private const string CLOSE_BUTTON_NAME = "Settings Close Button";
@@ -32,12 +28,10 @@ namespace Game
         private const string VOLUME_FILL_2_NAME = "Settings Volume Fill 2";
         private const string VOLUME_FILL_3_NAME = "Settings Volume Fill 3";
 
-        // Positions
         private const float HIDDEN_Y = -500.0f;
         private const float VISIBLE_Y = 360.0f;
         private const float CENTER_X = 640.0f;
 
-        // Entity IDs
         private uint settingsButtonId;
         private uint settingsPopupId;
         private uint closeButtonId;
@@ -59,9 +53,8 @@ namespace Game
         private uint gammaDefaultId;
         private uint mouseDefaultId;
 
-        // Visible positions
         private Vector3 popupVisiblePos = new Vector3(640.0f, 375.0f, -0.5f);
-        private Vector3 closeButtonVisiblePos = new Vector3(712.4f, 61.8f, -0.6f);
+        private Vector3 closeButtonVisiblePos = new Vector3(801.4f, 63.6f, -0.6f);
         private Vector3 plusButton1VisiblePos = new Vector3(598.0f, 423.9f, -0.6f);
         private Vector3 plusButton2VisiblePos = new Vector3(598.0f, 495.0f, -0.6f);
         private Vector3 plusButton3VisiblePos = new Vector3(598.0f, 567.3f, -0.6f);
@@ -80,12 +73,10 @@ namespace Game
         private Vector3 MouseVolume = new Vector3(359.4f, 269.3f, -0.6f);
         private Vector3 MouseDefault = new Vector3(226.2f, 306.8f, -0.6f);
 
-        // Event names for popup coordination
         private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
         private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
         private const string POPUP_ID = "Settings";
 
-        // State
         private bool isPopupVisible = false;
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
@@ -106,11 +97,7 @@ namespace Game
             LogMessage("SettingsPopup: Initializing...");
 
             settingsButtonId = SceneFindEntityByName(SETTINGS_BUTTON_NAME);
-            if (settingsButtonId == 0)
-            {
-                LogError("SettingsPopup: Could not find entity: " + SETTINGS_BUTTON_NAME);
-                return;
-            }
+            if (settingsButtonId == 0) { LogError("SettingsPopup: Could not find entity: " + SETTINGS_BUTTON_NAME); return; }
 
             settingsPopupId = SceneFindEntityByName(SETTINGS_POPUP_NAME);
             closeButtonId = SceneFindEntityByName(CLOSE_BUTTON_NAME);
@@ -135,64 +122,36 @@ namespace Game
             if (settingsPopupId == 0) LogError("SettingsPopup: Could not find: " + SETTINGS_POPUP_NAME);
             if (closeButtonId == 0) LogError("SettingsPopup: Could not find: " + CLOSE_BUTTON_NAME);
 
-            if (volumeFill1Id != 0)
-            {
-                volumeFill1InitialWidth = GetScale(volumeFill1Id).X;
-                volumeFill1InitialPosition = volumeFill1VisiblePos;
-                LogMessage("SettingsPopup: Volume Fill 1 initial width = " + volumeFill1InitialWidth);
-            }
-            if (volumeFill2Id != 0)
-            {
-                volumeFill2InitialWidth = GetScale(volumeFill2Id).X;
-                volumeFill2InitialPosition = volumeFill2VisiblePos;
-                LogMessage("SettingsPopup: Volume Fill 2 initial width = " + volumeFill2InitialWidth);
-            }
-            if (volumeFill3Id != 0)
-            {
-                volumeFill3InitialWidth = GetScale(volumeFill3Id).X;
-                volumeFill3InitialPosition = volumeFill3VisiblePos;
-                LogMessage("SettingsPopup: Volume Fill 3 initial width = " + volumeFill3InitialWidth);
-            }
-            if (gammaVolumeId != 0)
-            {
-                gammaVolumeInitialWidth = GetScale(gammaVolumeId).X;
-                gammaVolumeInitialPosition = GammaVolume;
-            }
-            if (mouseVolumeId != 0)
-            {
-                mouseVolumeInitialWidth = GetScale(mouseVolumeId).X;
-                mouseVolumeInitialPosition = MouseVolume;
-            }
+            if (volumeFill1Id != 0) { volumeFill1InitialWidth = GetScale(volumeFill1Id).X; volumeFill1InitialPosition = volumeFill1VisiblePos; LogMessage("SettingsPopup: Volume Fill 1 initial width = " + volumeFill1InitialWidth); }
+            if (volumeFill2Id != 0) { volumeFill2InitialWidth = GetScale(volumeFill2Id).X; volumeFill2InitialPosition = volumeFill2VisiblePos; LogMessage("SettingsPopup: Volume Fill 2 initial width = " + volumeFill2InitialWidth); }
+            if (volumeFill3Id != 0) { volumeFill3InitialWidth = GetScale(volumeFill3Id).X; volumeFill3InitialPosition = volumeFill3VisiblePos; LogMessage("SettingsPopup: Volume Fill 3 initial width = " + volumeFill3InitialWidth); }
+            if (gammaVolumeId != 0) { gammaVolumeInitialWidth = GetScale(gammaVolumeId).X; gammaVolumeInitialPosition = GammaVolume; }
+            if (mouseVolumeId != 0) { mouseVolumeInitialWidth = GetScale(mouseVolumeId).X; mouseVolumeInitialPosition = MouseVolume; }
 
             entitiesFound = true;
             isPopupVisible = false;
             wasMousePressed = false;
 
             Event.Subscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
-
             HidePopup();
-
             LogMessage("SettingsPopup: Ready!");
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            if (!entitiesFound)
-                return;
+            if (!entitiesFound) return;
 
             bool isMousePressed = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
 
-            if (mouseJustPressed)
-                HandleMouseClick();
+            if (mouseJustPressed) HandleMouseClick();
         }
 
         private void HandleMouseClick()
         {
             if (isPopupVisible)
             {
-                // Check close button - always works regardless of AudioSettings
                 if (closeButtonId != 0 && Collision2D.IsMouseCollidingWithEntity(closeButtonId))
                 {
                     LogMessage("SettingsPopup: Close button clicked");
@@ -200,15 +159,11 @@ namespace Game
                     return;
                 }
 
-                // Guard AudioSettings here, NOT in OnUpdate
                 if (AudioSettings.Instance == null)
                 {
                     LogMessage("SettingsPopup: AudioSettings not ready yet");
                     if (settingsPopupId != 0 && !Collision2D.IsMouseCollidingWithEntity(settingsPopupId))
-                    {
-                        LogMessage("SettingsPopup: Clicked outside - closing");
                         HidePopup();
-                    }
                     return;
                 }
 
@@ -216,15 +171,15 @@ namespace Game
                 if (plusButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(plusButton1Id))
                 {
                     AudioSettings.Instance.SetMasterVolume(AudioSettings.Instance.GetMasterVolume() + 0.1f);
-                    LogMessage("SettingsPopup: Master Volume + (Now: " + AudioSettings.Instance.GetMasterVolume().ToString("F2") + ")");
                     UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(), volumeFill1InitialWidth, volumeFill1InitialPosition);
+                    LogMessage("SettingsPopup: Master Volume + (Now: " + AudioSettings.Instance.GetMasterVolume().ToString("F2") + ")");
                     return;
                 }
                 if (minusButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(minusButton1Id))
                 {
                     AudioSettings.Instance.SetMasterVolume(AudioSettings.Instance.GetMasterVolume() - 0.1f);
-                    LogMessage("SettingsPopup: Master Volume - (Now: " + AudioSettings.Instance.GetMasterVolume().ToString("F2") + ")");
                     UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(), volumeFill1InitialWidth, volumeFill1InitialPosition);
+                    LogMessage("SettingsPopup: Master Volume - (Now: " + AudioSettings.Instance.GetMasterVolume().ToString("F2") + ")");
                     return;
                 }
 
@@ -232,15 +187,15 @@ namespace Game
                 if (plusButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(plusButton2Id))
                 {
                     AudioSettings.Instance.SetBGMVolume(AudioSettings.Instance.GetBGMVolume() + 0.1f);
-                    LogMessage("SettingsPopup: BGM Volume + (Now: " + AudioSettings.Instance.GetBGMVolume().ToString("F2") + ")");
                     UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(), volumeFill2InitialWidth, volumeFill2InitialPosition);
+                    LogMessage("SettingsPopup: BGM Volume + (Now: " + AudioSettings.Instance.GetBGMVolume().ToString("F2") + ")");
                     return;
                 }
                 if (minusButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(minusButton2Id))
                 {
                     AudioSettings.Instance.SetBGMVolume(AudioSettings.Instance.GetBGMVolume() - 0.1f);
-                    LogMessage("SettingsPopup: BGM Volume - (Now: " + AudioSettings.Instance.GetBGMVolume().ToString("F2") + ")");
                     UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(), volumeFill2InitialWidth, volumeFill2InitialPosition);
+                    LogMessage("SettingsPopup: BGM Volume - (Now: " + AudioSettings.Instance.GetBGMVolume().ToString("F2") + ")");
                     return;
                 }
 
@@ -248,32 +203,38 @@ namespace Game
                 if (plusButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(plusButton3Id))
                 {
                     AudioSettings.Instance.SetSFXVolume(AudioSettings.Instance.GetSFXVolume() + 0.1f);
-                    LogMessage("SettingsPopup: SFX Volume + (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
                     UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(), volumeFill3InitialWidth, volumeFill3InitialPosition);
+                    LogMessage("SettingsPopup: SFX Volume + (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
                     return;
                 }
                 if (minusButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(minusButton3Id))
                 {
                     AudioSettings.Instance.SetSFXVolume(AudioSettings.Instance.GetSFXVolume() - 0.1f);
-                    LogMessage("SettingsPopup: SFX Volume - (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
                     UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(), volumeFill3InitialWidth, volumeFill3InitialPosition);
+                    LogMessage("SettingsPopup: SFX Volume - (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
                     return;
                 }
 
                 // ===== Gamma =====
                 if (gammaPlusId != 0 && Collision2D.IsMouseCollidingWithEntity(gammaPlusId))
                 {
-                    LogMessage("SettingsPopup: Gamma + (TODO)");
+                    AudioSettings.Instance.IncrementGamma();
+                    UpdateVolumeFillVisual(gammaVolumeId, AudioSettings.Instance.GetGammaNormalized(), gammaVolumeInitialWidth, gammaVolumeInitialPosition);
+                    LogMessage("SettingsPopup: Gamma + (Now: " + AudioSettings.Instance.GetGamma().ToString("F1") + ")");
                     return;
                 }
                 if (gammaMinusId != 0 && Collision2D.IsMouseCollidingWithEntity(gammaMinusId))
                 {
-                    LogMessage("SettingsPopup: Gamma - (TODO)");
+                    AudioSettings.Instance.DecrementGamma();
+                    UpdateVolumeFillVisual(gammaVolumeId, AudioSettings.Instance.GetGammaNormalized(), gammaVolumeInitialWidth, gammaVolumeInitialPosition);
+                    LogMessage("SettingsPopup: Gamma - (Now: " + AudioSettings.Instance.GetGamma().ToString("F1") + ")");
                     return;
                 }
                 if (gammaDefaultId != 0 && Collision2D.IsMouseCollidingWithEntity(gammaDefaultId))
                 {
-                    LogMessage("SettingsPopup: Gamma Default (TODO)");
+                    AudioSettings.Instance.ResetGamma();
+                    UpdateVolumeFillVisual(gammaVolumeId, AudioSettings.Instance.GetGammaNormalized(), gammaVolumeInitialWidth, gammaVolumeInitialPosition);
+                    LogMessage("SettingsPopup: Gamma reset to default");
                     return;
                 }
 
@@ -281,22 +242,22 @@ namespace Game
                 if (mousePlusId != 0 && Collision2D.IsMouseCollidingWithEntity(mousePlusId))
                 {
                     AudioSettings.Instance.SetMouseSensitivityUp();
-                    LogMessage("SettingsPopup: Mouse Sensitivity + (Now: " + AudioSettings.Instance.GetMouseSensitivity().ToString("F2") + ")");
                     UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(), mouseVolumeInitialWidth, mouseVolumeInitialPosition);
+                    LogMessage("SettingsPopup: Mouse Sensitivity + (Now: " + AudioSettings.Instance.GetMouseSensitivity().ToString("F2") + ")");
                     return;
                 }
                 if (mouseMinusId != 0 && Collision2D.IsMouseCollidingWithEntity(mouseMinusId))
                 {
                     AudioSettings.Instance.SetMouseSensitivityDown();
-                    LogMessage("SettingsPopup: Mouse Sensitivity - (Now: " + AudioSettings.Instance.GetMouseSensitivity().ToString("F2") + ")");
                     UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(), mouseVolumeInitialWidth, mouseVolumeInitialPosition);
+                    LogMessage("SettingsPopup: Mouse Sensitivity - (Now: " + AudioSettings.Instance.GetMouseSensitivity().ToString("F2") + ")");
                     return;
                 }
                 if (mouseDefaultId != 0 && Collision2D.IsMouseCollidingWithEntity(mouseDefaultId))
                 {
                     AudioSettings.Instance.ResetMouseSensitivity();
-                    LogMessage("SettingsPopup: Mouse Sensitivity reset to default");
                     UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(), mouseVolumeInitialWidth, mouseVolumeInitialPosition);
+                    LogMessage("SettingsPopup: Mouse Sensitivity reset to default");
                     return;
                 }
 
@@ -309,7 +270,6 @@ namespace Game
             }
             else
             {
-                // Always works - no AudioSettings dependency
                 if (Collision2D.IsMouseCollidingWithEntity(settingsButtonId))
                 {
                     LogMessage("SettingsPopup: Settings button clicked - showing popup");
@@ -354,12 +314,12 @@ namespace Game
             if (gammaDefaultId != 0) SetPosition(gammaDefaultId, ref GammaDefault);
             if (mouseDefaultId != 0) SetPosition(mouseDefaultId, ref MouseDefault);
 
-            // Only refresh fills if AudioSettings is available
             if (AudioSettings.Instance != null)
             {
                 UpdateVolumeFillVisual(volumeFill1Id, AudioSettings.Instance.GetMasterVolume(), volumeFill1InitialWidth, volumeFill1InitialPosition);
                 UpdateVolumeFillVisual(volumeFill2Id, AudioSettings.Instance.GetBGMVolume(), volumeFill2InitialWidth, volumeFill2InitialPosition);
                 UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(), volumeFill3InitialWidth, volumeFill3InitialPosition);
+                UpdateVolumeFillVisual(gammaVolumeId, AudioSettings.Instance.GetGammaNormalized(), gammaVolumeInitialWidth, gammaVolumeInitialPosition);
                 UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(), mouseVolumeInitialWidth, mouseVolumeInitialPosition);
             }
 
@@ -370,8 +330,7 @@ namespace Game
         {
             bool wasVisible = isPopupVisible;
             isPopupVisible = false;
-            if (wasVisible)
-                Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
+            if (wasVisible) Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
 
             Vector3 hidePos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
             Vector3 hidePos2 = new Vector3(CENTER_X, HIDDEN_Y, -0.6f);
@@ -403,11 +362,7 @@ namespace Game
         {
             LogMessage("UpdateVolumeFillVisual called: volumeFillId=" + volumeFillId + " volume=" + volume + " initialWidth=" + initialWidth);
 
-            if (volumeFillId == 0)
-            {
-                LogMessage("UpdateVolumeFillVisual: volumeFillId is 0, returning");
-                return;
-            }
+            if (volumeFillId == 0) { LogMessage("UpdateVolumeFillVisual: volumeFillId is 0, returning"); return; }
 
             if (volume < 0.0f) volume = 0.0f;
             if (volume > 1.0f) volume = 1.0f;
@@ -418,11 +373,7 @@ namespace Game
             SetScale(volumeFillId, ref newScale);
 
             float widthDiff = initialWidth - newWidth;
-            Vector3 newPosition = new Vector3(
-                initialPosition.X - widthDiff,
-                initialPosition.Y,
-                initialPosition.Z
-            );
+            Vector3 newPosition = new Vector3(initialPosition.X - widthDiff, initialPosition.Y, initialPosition.Z);
             SetPosition(volumeFillId, ref newPosition);
 
             LogMessage("UpdateVolumeFillVisual: width=" + newWidth + " posX=" + newPosition.X);

@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "NormalSentry",
-    "Prefab GUID": 7690028908616369405,
+    "Prefab Name": "Prefab: NormalSentry.prefab",
+    "Prefab GUID": 17571638985905734825,
     "version": 1,
     "entities": [
         {
@@ -39,7 +39,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "8266489660919333595",
+                            "ComponentGUID": "9355243674401542029",
                             "Name": "NormalSentry",
                             "Tag": "Sentry"
                         }
@@ -73,7 +73,7 @@
                         "Properties": {
                             "ComponentGUID": "3899335027540345533",
                             "FilePath": "Sentry Ambient.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
@@ -127,7 +127,7 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "772499880974828243",
+                            "ComponentGUID": "4167096903670730627",
                             "Name": "SentryHelper",
                             "Tag": "Default"
                         }
@@ -140,7 +140,7 @@
                         "Properties": {
                             "ComponentGUID": "18008611278202521013",
                             "FilePath": "Sentry Ambient.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
@@ -164,7 +164,7 @@
                             "ComponentGUID": "18008611278202062259",
                             "ScriptClassName": "Game.SentriesNormal",
                             "Started": false,
-                            "GCHandle": 499
+                            "GCHandle": 331
                         }
                     }
                 }
