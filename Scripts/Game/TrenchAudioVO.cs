@@ -168,6 +168,9 @@ namespace Game
                 LogMessage("[TrenchAudioVO] Trench guide audio failed to instantiate");
                 return;
             }
+
+            LogMessage("[TrenchAudioVO] Trench guide audio is playing");
+
             audiostarted = true;
             elapsedTime = audiotimer;
             hasPlayedSpawnGuide = true;
@@ -186,6 +189,9 @@ namespace Game
                 LogMessage("[TrenchAudioVO] Trench wall warning audio failed to instantiate");
                 return;
             }
+
+            LogMessage("[TrenchAudioVO] Trench wall warning audio is playing");
+
             audiostarted = true;
             elapsedTime = audiotimer;
             hasPlayedWallWarn = true;
@@ -204,6 +210,9 @@ namespace Game
                 LogMessage("[TrenchAudioVO] Trench enemies warning audio failed to instantiate");
                 return;
             }
+
+            LogMessage("[TrenchAudioVO] Trench enemies warning audio is playing");
+
             audiostarted = true;
             elapsedTime = audiotimer;
             hasPlayedEnemiesWarn = true;
@@ -232,6 +241,8 @@ namespace Game
             //stop the active entity audio from playing
             if(activeVOID != 0 && AudioIsPlaying(activeVOID)){
                 AudioStop(activeVOID);
+                LogMessage("[TrenchAudioVO] ResetActiveAudio: Stopping active VO that is playing");
+                LogMessage("[TrenchAudioVO] ResetActiveAudio: ElapsedTime is at: " + elapsedTime.ToString());
             }
 
             //reset the activeVOID to 0

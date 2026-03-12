@@ -439,7 +439,11 @@ namespace Engine {
 
 		bool isPlaying = false;
 		audio->Channel->isPlaying(&isPlaying);
-		if (isPlaying) {
+
+		bool isPaused = false;
+		audio->Channel->getPaused(&isPaused);
+
+		if (isPlaying && !isPaused) {
 			float current_volume;
 			audio->Channel->getVolume(&current_volume);
 
@@ -447,17 +451,22 @@ namespace Engine {
 			audio->Channel->getDSPClock(nullptr, &dspClock);
 			audio->Channel->addFadePoint(dspClock, current_volume);
 			audio->Channel->addFadePoint(dspClock + 44100, 0.0f); // 1 second fade
-			
-			//add a way where i can immediate stop or not i think.
-			//thinking of using script for this
 
-			//audio->Channel->setVolume(0.0f);
-			//audio->Channel->stop();
-			LOG_INFO("AudioManager::StopSound - Stopped sound: ", audio->AudioFilePath);
+			// Schedule FMOD to stop the channel automatically when the fade ends.
+			// Without this, the channel pointer is cleared below but the FMOD channel
+			// keeps looping at volume 0 with no owner left to stop it.
+			audio->Channel->setDelay(0, dspClock + 44100, true);
+
+			LOG_INFO("AudioManager::StopSound - Fading out: ", audio->AudioFilePath);
+		}
+		else {
+			// Channel is paused or idle â€” stop it immediately so it isn't orphaned in FMOD.
+			audio->Channel->stop();
+			LOG_INFO("AudioManager::StopSound - Immediate stop (paused/idle): ", audio->AudioFilePath);
 		}
 
 		audio->Channel = nullptr;
-		LOG_INFO("AudioManager::StopSound - Set State to STOP: ", audio->AudioFilePath);
+		LOG_INFO("AudioManager::StopSound - Channel pointer cleared: ", audio->AudioFilePath);
 		audio->PreviousPath = "";
 	}
 
@@ -848,7 +857,7 @@ namespace Engine {
 		return engineDefault * playerSlider;
 	}
 
-	// AudioManager.cpp — NEW HELPER
+	// AudioManager.cpp ï¿½ NEW HELPER
 	void AudioManager::ApplyDirtySettings(AudioComponent* audio) {
 		if (!audio || !audio->Channel) return;
 

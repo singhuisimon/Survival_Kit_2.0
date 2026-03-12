@@ -26,6 +26,7 @@ namespace Game
         private bool initialized = false;
         private bool firstchange = false;
         private bool gameend = false;
+        private bool paused = false;
         [SerializeField] private bool timerstart = false;
 
         // ===== Timer Values =====
@@ -55,6 +56,22 @@ namespace Game
         {
             if(!initialized)
                 return;
+
+            if(GameState.IsPaused){
+                if(AudioIsPlaying((uint)EntityID) && !paused){
+                    LogMessage("AudioVOHealthCore is paused, pausing timer countodwn and stopping audio");
+                    AudioPause((uint)EntityID);
+                    paused = true;
+                }
+
+                return;
+            }
+
+            if(paused){
+                //should audio be paused resume
+                AudioPlay((uint)EntityID);
+                paused = false;
+            }
             
             if(timerstart){
                 if(AudioIsPlaying((uint)EntityID)){

@@ -23,6 +23,7 @@ namespace Game
         private bool initialized = false;
         [SerializeField] private bool audiostarted = false;
         private bool disabled = false;
+        private bool isPaused = false;
 
         // ===== Timer =====
         private float startaudio = 5.0f;
@@ -40,6 +41,8 @@ namespace Game
 
             audiostarted = false;
 
+            isPaused = false;
+
             disabled = false;
 
             LogMessage("AudioPause initialized:");
@@ -52,11 +55,18 @@ namespace Game
 
             if (GameState.IsPaused){
 
-                if(AudioIsPlaying((uint)EntityID)){
+                if(!isPaused && AudioIsPlaying((uint)EntityID)){
                     LogMessage("[AudioPause] Pausing audio on entity");
                     AudioPause((uint)EntityID);
+                    isPaused = true;
                 }
                 return;
+            }
+
+            if(isPaused && audiostarted){
+                AudioPlay((uint)EntityID);
+                LogMessage("[AudioPause] Resuming audio after unpause");
+                isPaused = false;
             }
 
             if(!audiostarted){
@@ -80,6 +90,9 @@ namespace Game
         // ===== EVENT HANDLERS =====
         public override void OnDestroy()
         {
+            // Stop audio so paused channels don't leak into the next scene
+            AudioStop((uint)EntityID);
+
             // Clean up event subscriptions
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);

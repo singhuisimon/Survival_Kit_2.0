@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryUltBullet.prefab",
-    "Prefab GUID": 14010804597330169677,
+    "Prefab GUID": 10011062783140806857,
     "version": 1,
     "entities": [
         {
@@ -106,9 +106,9 @@
                         "Properties": {
                             "ComponentGUID": "14945521384552923333",
                             "FilePath": "Player_Secondary_Fire.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
-                            "Volume": 0.7509999871253967,
+                            "Volume": 0.6010000109672546,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
