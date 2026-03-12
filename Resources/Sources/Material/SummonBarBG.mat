@@ -1,15 +1,15 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "Worldspace_Bar.png",
+    "baseMap": "Worldspace_BarBackground.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "Worldspace_Bar.png",
+    "emissionMap": "Worldspace_BarBackground.png",
     "occlusionMap": "",
     "baseColor": [
-        0.19607843458652496,
-        0.19607843458652496,
-        0.19607843458652496
+        1.0,
+        1.0,
+        1.0
     ],
     "emissionColor": [
         0.0,

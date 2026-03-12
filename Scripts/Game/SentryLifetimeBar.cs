@@ -15,8 +15,8 @@ namespace Game
 
         [SerializeField] private float maxDuration = 200.0f; // original is 90.0f for 90 seconds
         [SerializeField] private float heightOffset = 10.0f;
-        [SerializeField] private float fullScaleX  = 20.0f;
-        [SerializeField] private float barScaleY   = 2.0f;
+        //[SerializeField] private float fullScaleX  = 20.0f;
+        [SerializeField] private float barScaleY   = 0.9f;
 
         private float countdown   = 0f;
         private uint  sentryID    = 0;
@@ -24,8 +24,8 @@ namespace Game
         private uint  bgID       = 0;
         private uint  labelID    = 0;
 
+        private float   fullScaleX  = 0f;
         private Vector3 fillInitialPos;
-        private bool    fillInitialPosCached = false;
 
         private bool  initialized = false;
         private bool  gameEnded   = false;
@@ -56,6 +56,7 @@ namespace Game
                 return;
             }
 
+            fullScaleX     = GetScale(fillID).X;
             fillInitialPos = GetPosition(fillID);
 
             Subscribe(GAMEOVEREVENT, OnGameEnd);
@@ -111,9 +112,23 @@ namespace Game
             fillScale.Y = barScaleY;
             SetScale(fillID, ref fillScale);
 
-            Vector3 fillPos = fillInitialPos;
-            fillPos.X = fillInitialPos.X + (fullScaleX / 2f) * (1f - progress);
+            Vector3 fillPos = new Vector3(
+                (fullScaleX / 2f) - (fullScaleX * progress / 2f),
+                0f,
+                -0.1f
+            );
             SetPosition(fillID, ref fillPos);
+
+            // Vector3 fillPos = new Vector3(
+            //     barPos.X + (fullScaleX / 2f) - (fullScaleX * progress / 2f),
+            //     barPos.Y,
+            //     barPos.Z - 0.1f  // slight Z offset so fill renders in front of BG
+            // );
+            // SetPosition(fillID, ref fillPos);
+
+            // Vector3 fillPos = fillInitialPos;
+            // fillPos.X = fillInitialPos.X + (fullScaleX / 2f) * (1f - progress);
+            // SetPosition(fillID, ref fillPos);
         }
 
         // when game ends, bar should disappear immediately

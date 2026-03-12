@@ -3,284 +3,6 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 78,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "HealingVFX",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "1125214420395951023",
-                        "PrefabAssetGuid": "8629926637709377695",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Prefab: HealingVFX.prefab",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3975043005382721689\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[60.000003814697266,3.5622213187015694e-13,0.0000019221624825149775],\"Scale\":[50.0,50.0,50.0],\"Parent\":2097180,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10892572033023803543\",\"Name\":\"HealingVFX\",\"Tag\":\"Default\"}}"
-                            },
-                            {
-                                "componentType": 5,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"vampirismVFX.mat\",\"Initial Velocity\":[0.0,1.2000000476837158,-1.5],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[2.5,1.0,1.0],\"Color Min\":[0.0,1.0,0.07748222351074219],\"Color Max\":[0.2857140302658081,1.0,0.0],\"Emitter Shape\":1,\"Max Particles\":1000,\"Particle Type\":1,\"Emission Rate\":15.0,\"Particle Lifetime\":1.0,\"Emission Accumulator\":0.7715435028076172,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":10.0,\"Min Speed\":0.5,\"Max Speed\":1.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":false,\"Loop\":false,\"Active\":true,\"World Space\":false,\"Burst Mode\":false}}"
-                            }
-                        ]
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3975043005382721689",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            60.000003814697266,
-                            3.5622213187015694e-13,
-                            0.0000019221624825149775
-                        ],
-                        "Scale": [
-                            50.0,
-                            50.0,
-                            50.0
-                        ],
-                        "Parent": 2097180,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "Particle Type Advanced": "",
-                        "Material Type": "vampirismVFX.mat",
-                        "Initial Velocity": [
-                            0.0,
-                            1.2000000476837158,
-                            -1.5
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            2.5,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            0.0,
-                            1.0,
-                            0.07748222351074219
-                        ],
-                        "Color Max": [
-                            0.2857140302658081,
-                            1.0,
-                            0.0
-                        ],
-                        "Emitter Shape": 1,
-                        "Max Particles": 1000,
-                        "Particle Type": 1,
-                        "Emission Rate": 15.0,
-                        "Particle Lifetime": 1.0,
-                        "Emission Accumulator": 0.7715435028076172,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.699999988079071,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 10.0,
-                        "Min Speed": 0.5,
-                        "Max Speed": 1.0,
-                        "Rotation Speed": 0.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": false,
-                        "Loop": false,
-                        "Active": true,
-                        "World Space": false,
-                        "Burst Mode": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 68,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "AudioSettings",
-                        "Tag": "AudioSettings"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "200000000000000001",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "200000000000000002",
-                        "ScriptClassName": "Game.AudioSettings"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 79,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "AltFireReadyIndicator",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4462891906853111173",
-                        "Position": [
-                            1212.699951171875,
-                            568.4000244140625,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            45.0,
-                            29.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "AlternateFire_FillActive.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 2,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048608,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "AltFireIcon",
-                        "Tag": "AltFireIcon"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "2316486879571602767",
-                        "Position": [
-                            694.0,
-                            249.39999389648438,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            600.0,
-                            500.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "AlternateFire_Icon.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 3,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
-                }
-            ]
-        },
-        {
             "ID": 3145780,
             "Components": [
                 {
@@ -5446,19 +5168,19 @@
             ]
         },
         {
-            "ID": 51,
+            "ID": 68,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "WormSpawner",
-                        "Tag": "WormSpawner"
+                        "Name": "AudioSettings",
+                        "Tag": "AudioSettings"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "7427052072261616357",
+                        "ComponentGUID": "200000000000000001",
                         "Position": [
                             0.0,
                             0.0,
@@ -5481,8 +5203,8 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "3968287558441419495",
-                        "ScriptClassName": "Game.WormSpawning"
+                        "ComponentGUID": "200000000000000002",
+                        "ScriptClassName": "Game.AudioSettings"
                     }
                 }
             ]
@@ -7877,22 +7599,156 @@
             ]
         },
         {
-            "ID": 82,
+            "ID": 78,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "SentryBar",
-                        "Tag": "SentryBar"
+                        "Name": "HealingVFX",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1125214420395951023",
+                        "PrefabAssetGuid": "8629926637709377695",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: HealingVFX.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3975043005382721689\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[60.000003814697266,3.5622213187015694e-13,0.0000019221624825149775],\"Scale\":[50.0,50.0,50.0],\"Parent\":2097180,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10892572033023803543\",\"Name\":\"HealingVFX\",\"Tag\":\"Default\"}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"vampirismVFX.mat\",\"Initial Velocity\":[0.0,1.2000000476837158,-1.5],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[2.5,1.0,1.0],\"Color Min\":[0.0,1.0,0.07748222351074219],\"Color Max\":[0.2857140302658081,1.0,0.0],\"Emitter Shape\":1,\"Max Particles\":1000,\"Particle Type\":1,\"Emission Rate\":15.0,\"Particle Lifetime\":1.0,\"Emission Accumulator\":0.7715435028076172,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":10.0,\"Min Speed\":0.5,\"Max Speed\":1.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":false,\"Loop\":false,\"Active\":true,\"World Space\":false,\"Burst Mode\":false}}"
+                            }
+                        ]
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "18026467363876422637",
+                        "ComponentGUID": "3975043005382721689",
                         "Position": [
                             0.0,
                             0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            60.000003814697266,
+                            3.5622213187015694e-13,
+                            0.0000019221624825149775
+                        ],
+                        "Scale": [
+                            50.0,
+                            50.0,
+                            50.0
+                        ],
+                        "Parent": 2097180,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "vampirismVFX.mat",
+                        "Initial Velocity": [
+                            0.0,
+                            1.2000000476837158,
+                            -1.5
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "End Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emission Box Size": [
+                            2.5,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            0.0,
+                            1.0,
+                            0.07748222351074219
+                        ],
+                        "Color Max": [
+                            0.2857140302658081,
+                            1.0,
+                            0.0
+                        ],
+                        "Emitter Shape": 1,
+                        "Max Particles": 1000,
+                        "Particle Type": 1,
+                        "Emission Rate": 15.0,
+                        "Particle Lifetime": 1.0,
+                        "Emission Accumulator": 0.7715435028076172,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.30000001192092896,
+                        "Shrink Phase Start": 0.699999988079071,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.5,
+                        "Lifetime Randomness": 0.20000000298023224,
+                        "Spread Angle": 10.0,
+                        "Min Speed": 0.5,
+                        "Max Speed": 1.0,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": false,
+                        "Loop": false,
+                        "Active": true,
+                        "World Space": false,
+                        "Burst Mode": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 79,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "AltFireReadyIndicator",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4462891906853111173",
+                        "Position": [
+                            1212.699951171875,
+                            568.4000244140625,
                             0.0
                         ],
                         "Rotation": [
@@ -7901,37 +7757,49 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            45.0,
+                            29.0,
                             1.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            83,
-                            84,
-                            85
-                        ]
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "AlternateFire_FillActive.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 2,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
         },
         {
-            "ID": 83,
+            "ID": 1048608,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "SentryBarBG",
-                        "Tag": "SentryBarBG"
+                        "Name": "AltFireIcon",
+                        "Tag": "AltFireIcon"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "10532477583932638193",
+                        "ComponentGUID": "2316486879571602767",
                         "Position": [
-                            0.0,
-                            0.0,
+                            694.0,
+                            249.39999389648438,
                             0.0
                         ],
                         "Rotation": [
@@ -7940,136 +7808,28 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            600.0,
+                            500.0,
                             1.0
                         ],
-                        "Parent": 82,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "9379556079328855035",
-                        "Mesh": "",
-                        "Material": "SentryBarBG.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 84,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "SentryBarFill",
-                        "Tag": "SentryBarFill"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "12838320593148707829",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
+                        "Texture": "AlternateFire_Icon.png",
+                        "Color": [
+                            1.0,
                             1.0,
                             1.0,
                             1.0
                         ],
-                        "Parent": 82,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "3038487803995161597",
-                        "Mesh": "",
-                        "Material": "SentryBarFill.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 85,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "SentryBarLabel",
-                        "Tag": "SentryBarLabel"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "7073713070114833401",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 82,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "11108938336243958783",
-                        "Mesh": "",
-                        "Material": "SentryBarLabel.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": true,
-                        "MeshType": 1,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "Quad": 3,
+                        "Sprite Layer": 3,
+                        "IsActive": true,
+                        "IsVisible": true
                     }
                 }
             ]
@@ -8077,10 +7837,10 @@
     ],
     "Settings": [
         {
-            "BloomToggle": true,
-            "BloomStrength": 0.004999999888241291,
-            "BloomFilterRadius": 0.0010000000474974513,
-            "Exposure": 5.0,
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 1.0,
             "GlobalBias": 0.004999999888241291,
             "MasterVolume": 1.0,
             "SFXVolume": 1.0,

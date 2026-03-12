@@ -16,8 +16,8 @@ namespace Game
         private string playerName = "Player";
 
         [SerializeField] private float heightOffset = 10.0f;
-        [SerializeField] private float fullScaleX   = 20.0f;
-        [SerializeField] private float barScaleY    = 2.0f;
+        //[SerializeField] private float fullScaleX   = 20.0f;
+        [SerializeField] private float barScaleY    = 4.4f;
         //[SerializeField] private float labelOffsetY = 4.0f;
 
         private uint playerID = 0;
@@ -27,6 +27,8 @@ namespace Game
 
         private float progress    = 0f;
         private bool  initialized = false;
+
+        private float   fullScaleX     = 0f;    //read from Prefab itself 
 
         private Vector3 fillInitialPos;
         private bool    fillInitialPosCached = false;
@@ -61,6 +63,7 @@ namespace Game
                 return;
             }
 
+            fullScaleX     = GetScale(fillID).X;
             fillInitialPos = GetPosition(fillID);
 
             progressEventName = "SummonBarProgress:" + EntityID.ToString();
@@ -104,9 +107,23 @@ namespace Game
             fillScale.Y = barScaleY;
             SetScale(fillID, ref fillScale);
 
-            Vector3 fillPos = fillInitialPos;
-            fillPos.X = fillInitialPos.X + (fullScaleX / 2f) * (1f - progress);
-            SetPosition(fillID, ref fillPos); 
+            // Vector3 fillPos = new Vector3(
+            //     barPos.X - ( fullScaleX / 2f ) + ( fullScaleX * progress / 2f ),
+            //     barPos.Y,
+            //     barPos.Z - 0.1f  // slight Z offset so fill renders in front of BG
+            // );
+            // SetPosition(fillID, ref fillPos);
+
+            Vector3 fillPos = new Vector3(
+                -(fullScaleX / 2f) + (fullScaleX * progress / 2f),
+                0f,
+                -0.1f
+            );
+            SetPosition(fillID, ref fillPos);
+
+           //Vector3 fillPos = fillInitialPos;
+           // fillPos.X = fillInitialPos.X + (fullScaleX / 2f) * (1f - progress);
+           // SetPosition(fillID, ref fillPos); 
         }
 
         private void OnProgressUpdate(string eventName, string payload)
