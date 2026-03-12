@@ -11,14 +11,10 @@ namespace Game
     public class RestartButton : ScriptBehaviour
     {
         private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
-        private const string EVENT_PLAYER_DEAD = "PlayerDead";
-        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
-        //private const string EVENT_WIN_SHOW = "WinScreenShow";       // listen for fade trigger
-       // private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";     // publish when done
+        private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
         private const string EVENT_LOSE_SHOW = "LoseScreenShow";
 
         [SerializeField] private float fadeUpTime = 1.0f;
-        [SerializeField] private float uiStartFadePos = 486.1f;
 
         private bool isButtonActive = false;
         private bool isFading = false;
@@ -29,26 +25,14 @@ namespace Game
         public override void OnStart()
         {
             LogMessage("=== RestartButton OnStart ===");
-
-            //  Event.Subscribe(EVENT_PLAYER_DEAD, OnLoseCondition);
-            // Event.Subscribe(EVENT_CORE_DESTROYED, OnLoseCondition);
-            //Event.Subscribe(EVENT_WIN_SHOW, OnWinCondition);
-            //Event.Subscribe(EVENT_LOSE_SHOW, OnLoseCondition);
-
-
+            Event.Subscribe(EVENT_LOSE_SHOW, OnLoseCondition);
             SetIsVisible((uint)EntityID, false);
-            LogMessage("[RestartButton2] Initialized");
+            LogMessage("[RestartButton] Initialized");
         }
 
         private void OnLoseCondition(string eventName, string payload)
         {
-            LogMessage("[RestartButton2] Lose condition - starting fade");
-            StartFade();
-        }
-
-        private void OnWinCondition(string eventName, string payload)
-        {
-            LogMessage("[RestartButton2] Win condition - starting fade");
+            LogMessage("[RestartButton] Lose condition - starting fade");
             StartFade();
         }
 
@@ -67,22 +51,15 @@ namespace Game
             {
                 fadeElapsed += deltaTime;
 
-                // Fade in using tutorial pattern
                 FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
-
-                Vector3 pos = GetPosition((uint)EntityID);
-                pos.Y = uiStartFadePos - (10.0f * fadeElapsed / fadeUpTime);
-                SetPosition((uint)EntityID, ref pos);
 
                 if (fadeElapsed >= fadeUpTime)
                 {
                     fadeDone = true;
                     isFading = false;
                     isButtonActive = true;
-
-                    // Notify that buttons are fully faded in
                     Event.Publish(EVENT_BUTTONS_FADED, "");
-                    LogMessage("[RestartButton2] Fade complete");
+                    LogMessage("[RestartButton] Fade complete");
                 }
             }
 
@@ -102,7 +79,7 @@ namespace Game
 
             if (Collision2D.IsMouseCollidingWithEntity((uint)EntityID))
             {
-                LogMessage("[RestartButton2] Clicked - reloading scene");
+                LogMessage("[RestartButton] Clicked - reloading scene");
                 AudioManager.StopGroup(AudioType.BGM);
                 AudioManager.StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
@@ -112,12 +89,8 @@ namespace Game
 
         public override void OnDestroy()
         {
-            //Event.Unsubscribe(EVENT_PLAYER_DEAD, OnLoseCondition);
-            // Event.Unsubscribe(EVENT_CORE_DESTROYED, OnLoseCondition);
             Event.Unsubscribe(EVENT_LOSE_SHOW, OnLoseCondition);
-
-            //Event.Unsubscribe(EVENT_WIN_SHOW, OnWinCondition);
-            LogMessage("=== RestartButton2 Destroyed ===");
+            LogMessage("=== RestartButton Destroyed ===");
         }
     }
 }

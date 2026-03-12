@@ -11,14 +11,9 @@ namespace Game
     public class MainMenuButton : ScriptBehaviour
     {
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
-        private const string EVENT_PLAYER_DEAD = "PlayerDead";
-        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
-        private const string EVENT_WIN_SHOW = "WinScreenShow";
-        private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
         private const string EVENT_LOSE_SHOW = "LoseScreenShow";
 
         [SerializeField] private float fadeUpTime = 1.0f;
-        [SerializeField] private float uiStartFadePos = 486.1f ;
 
         private bool isButtonActive = false;
         private bool isFading = false;
@@ -30,9 +25,6 @@ namespace Game
         {
             LogMessage("=== MainMenuButton OnStart ===");
             Event.Subscribe(EVENT_LOSE_SHOW, OnLoseCondition);
-
-            Event.Subscribe(EVENT_WIN_SHOW, OnWinCondition);
-
             SetIsVisible((uint)EntityID, false);
             LogMessage("[MainMenuButton] Initialized");
         }
@@ -40,12 +32,6 @@ namespace Game
         private void OnLoseCondition(string eventName, string payload)
         {
             LogMessage("[MainMenuButton] Lose condition - starting fade");
-            StartFade();
-        }
-
-        private void OnWinCondition(string eventName, string payload)
-        {
-            LogMessage("[MainMenuButton] Win condition - starting fade");
             StartFade();
         }
 
@@ -66,17 +52,12 @@ namespace Game
 
                 FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
 
-                Vector3 pos = GetPosition((uint)EntityID);
-                pos.Y = uiStartFadePos - (10.0f * fadeElapsed / fadeUpTime);
-                SetPosition((uint)EntityID, ref pos);
-
                 if (fadeElapsed >= fadeUpTime)
                 {
                     fadeDone = true;
                     isFading = false;
                     isButtonActive = true;
                     LogMessage("[MainMenuButton] Fade complete");
-                    // RestartButton2 already publishes WinButtonsFaded, no need to double publish
                 }
             }
 
@@ -107,11 +88,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            //Event.Unsubscribe(EVENT_PLAYER_DEAD, OnLoseCondition);
-            //Event.Unsubscribe(EVENT_CORE_DESTROYED, OnLoseCondition);
             Event.Unsubscribe(EVENT_LOSE_SHOW, OnLoseCondition);
-
-            Event.Unsubscribe(EVENT_WIN_SHOW, OnWinCondition);
             LogMessage("=== MainMenuButton Destroyed ===");
         }
     }
