@@ -20,6 +20,7 @@ namespace Engine {
         SpriteRenderer = 14,
         Text = 15,
         Trail = 16,
+        Beam = 17,
         Prefab = 100,
         Tag = 101,
 

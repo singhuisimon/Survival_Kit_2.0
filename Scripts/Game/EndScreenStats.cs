@@ -78,9 +78,7 @@ namespace Game
 
         private void TryShow()
         {
-            // Only show once all three pieces are ready
-            if (!buttonsReady || cachedScore == "" || cachedTime == "")
-                return;
+            if (!buttonsReady || cachedScore == "") return;
 
             if (scoreTextID != 0)
             {
@@ -89,7 +87,7 @@ namespace Game
                 LogMessage("[EndScreenStats] Score displayed: " + cachedScore);
             }
 
-            if (timeTextID != 0)
+            if (timeTextID != 0 && cachedTime != "")
             {
                 SetText(timeTextID, cachedTime);
                 SetIsVisible(timeTextID, true);
