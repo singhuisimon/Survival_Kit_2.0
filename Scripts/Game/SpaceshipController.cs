@@ -63,6 +63,9 @@ namespace Game
         private string EVENT_GAMEWIN = "GameWin";
         private string EVENT_GAMEEND = "GameEnd";
 
+        // Inbound HP command events (any system can publish these)
+        private const string EVENT_PLAYER_HEAL   = "PlayerHeal";
+        private const string EVENT_PLAYER_DAMAGE_INBOUND = "PlayerDamage";
         //Vampirism
         private const string EVENT_WORMHOST_DEAD   = "WormHostDead";
         private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
@@ -195,6 +198,10 @@ namespace Game
             Subscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
             Subscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
 
+            // Inbound HP command events
+            Subscribe(EVENT_PLAYER_HEAL,           OnPlayerHeal);
+            Subscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
+
             SetEmissionRate(healingVFXEntityID, 0.0f);
              mouseSensitivity = (AudioSettings.Instance != null)
 ? AudioSettings.Instance.GetMouseSensitivity()
@@ -276,6 +283,10 @@ namespace Game
             Unsubscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
             Unsubscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
             Unsubscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
+
+            // unsubscribe inbound HP command events
+            Unsubscribe(EVENT_PLAYER_HEAL,           OnPlayerHeal);
+            Unsubscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
         }
 
         private void HandleCursorToggle()
@@ -585,6 +596,53 @@ namespace Game
             return Quat.Slerp(current, target, t).Normalized();
         }
 
+        
+        private void OnPlayerHeal(string eventName, string payload)
+        {
+            if (endscene || playerHP <= 0)
+                return;
+
+            float amount = 10.0f;
+            float.TryParse(payload, out amount);
+
+            HealPlayer(amount);
+            PlayHealAudio();
+            PlayHealVFX();
+            LogMessage("[SpaceshipController] PlayerHeal +" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
+        }
+
+        private void OnPlayerDamage(string eventName, string payload)
+        {
+            if (endscene || playerHP <= 0)
+                return;
+
+            float amount = 10.0f;
+            float.TryParse(payload, out amount);
+
+            playerHP -= amount;
+            if (playerHP < 0.0f) playerHP = 0.0f;
+
+            Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+            LogMessage("[SpaceshipController] PlayerDamage -" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
+
+            if (playerHP <= 0.0f && !isPlayerDead)
+            {
+                isPlayerDead = true;
+                DEATH_TIMER = 0.0f;
+                Vector3 playerPos = GetPosition(playerEntityID);
+
+                SceneDestroyEntity(playerEntityID);
+                uint playerDeathExplosion = PrefabInstantiate(VFX_PlayerDeathExplosionPrefab);
+                if (playerDeathExplosion != INVALID_ENTITY)
+                {
+                    Transform.SetPosition(playerDeathExplosion, ref playerPos);
+                    Vector3 explosionPlayerScale = new Vector3(3.0f, 3.0f, 3.0f);
+                    Transform.SetScale(playerDeathExplosion, ref explosionPlayerScale);
+                }
+                Publish("PlayerDead", "");
+            }
+        }
+        
         //vampirism
         private void OnVampirismKill(string eventName, string payload)
         {
