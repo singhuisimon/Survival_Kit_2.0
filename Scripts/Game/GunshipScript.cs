@@ -29,6 +29,7 @@ namespace Game
         [SerializeField] private float bulletSpeed = 3000f;
         [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
         [SerializeField] private string gunshipDeathPath = "Sources/Prefabs/GunshipDeath.prefab";
+        [SerializeField] private int allyIndex = 1;
 
         // === PRIVATE STATES ===
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -38,6 +39,8 @@ namespace Game
 
         private uint gunshipID = INVALID_ENTITY; // getting the ID of the read gunship entity
         private bool initialized = false;
+
+        private string healthChangeEventName = "";
 
         // List of enemies to verify and target
         private readonly string[] enemyTags = { "botnet" , "WormHost" , "wormchild" , "loveletter" };
@@ -53,6 +56,12 @@ namespace Game
             LogMessage("Helper EntityID: " + EntityID);
 
             TagSetTag((uint)EntityID, "GunshipHelper");
+
+
+            healthChangeEventName = "GunshipHealthChanged:" + allyIndex;
+
+            healthChangeEventName = "GunshipHealthChanged:" + allyIndex;
+            Subscribe("DebugDamageGunship:" + allyIndex, OnTakeDamage); // DEBUG
 
             Subscribe(GAMEOVEREVENT, OnGameEnd);
             Subscribe(GAMEWINEVENT, OnGameEnd);
@@ -128,6 +137,8 @@ namespace Game
                 //Unsubscribe("GunshipDamage:" + gunshipID, OnTakeDamage);
                 Unsubscribe("Damage:" + gunshipID, OnTakeDamage);
                 Unsubscribe("Damage:" + (uint)EntityID, OnTakeDamage);
+            Unsubscribe("DebugDamageGunship:" + allyIndex, OnTakeDamage); // DEBUG
+
 
         }
 
@@ -434,7 +445,14 @@ namespace Game
 
             // To confirm that Gunship did take damage
             LogMessage("Gunship took " + damage + " damage! Health: " + currentHealth + "/" + maxHealth);
-            
+
+
+            if (!string.IsNullOrEmpty(healthChangeEventName))
+            {
+                string healthPayload = currentHealth.ToString() + "|" + maxHealth.ToString();
+                Publish(healthChangeEventName, healthPayload);
+            }
+
             // Check if dead
             if (currentHealth <= 0f)
             {

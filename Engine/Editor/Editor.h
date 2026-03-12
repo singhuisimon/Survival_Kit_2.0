@@ -42,6 +42,7 @@
 #include "../Profiler/Profiler.h"
 #include "Graphics/GraphicsLoader.h"
 #include "Graphics/Renderer.h"
+#include "Audio/AudioManager.h"
 
 class Game;
 
@@ -72,6 +73,7 @@ namespace Engine
 		GLFWwindow* m_Window = nullptr;
 		Game* m_Game = nullptr;
 		ImGuiIO* io = nullptr;
+		AudioManager* m_AudioManager = nullptr;
 
 		std::weak_ptr<TracyProfiler> m_Profiler;
 
@@ -127,6 +129,7 @@ namespace Engine
 			m_Initialized(false),
 			m_ActiveScene(nullptr),
 			m_Renderer(nullptr),
+			m_AudioManager(nullptr),
 			m_Game(nullptr),
 			m_PickedID(0xFFFFFFFFu)
 		{
@@ -176,6 +179,9 @@ namespace Engine
 
 		void SetGame(Game* game) { m_Game = game; }
 		Game* GetGame() const { return m_Game; }
+
+		void SetAudioManager(AudioManager* audiomanager) { m_AudioManager = audiomanager; }
+		AudioManager* GetAudioManager() const { return m_AudioManager; }
 
 		void SetCurrSelectedEntity(const Entity& entity) { m_SelectedEntity = entity; }
 		const Entity GetSelectedEntity() const { return m_SelectedEntity; }

@@ -75,7 +75,7 @@ namespace Game
             if(playercollided){
                 //publish event that payload is collected
                 Publish(EVENT_COLLECT_PAYLOAD, "");
-
+                Publish("PayloadCollected", EntityID.ToString());
 
                 //kills itself thereafter
                 SceneDestroyEntity((uint)EntityID);

@@ -34,12 +34,14 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string EVENT_TURRET_DEAD = "EnemyTurretDestroyed";
         private const string GAMEWIN = "GameWin";
 
         // ===== Points =====
-        private const int POINTS_BOTNET = 10;
-        private const int POINTS_WORMHOST = 100;
-        private const int POINTS_LOVELETTER = 1111;
+        private const int POINTS_BOTNET = 30;
+        private const int POINTS_WORMHOST = 35;
+        private const int POINTS_LOVELETTER = 50;
+        private const int POINTS_TURRET = 25;
 
         // ===== Score Persistence =====
         private const string SAVE_FILE = "Resources/Sources/SaveData/ScoreData2.json";
@@ -59,6 +61,7 @@ namespace Game
             Event.Subscribe(EVENT_BOTNET_DEAD, OnBotnetKilled);
             Event.Subscribe(EVENT_LOVELETTER_DEAD, OnLoveLetterKilled);
             Event.Subscribe(EVENT_WORMHOST_DEAD, OnWormHostKilled);
+            Event.Subscribe(EVENT_TURRET_DEAD, OnTurretKilled);
 
             // Subscribe to game state events
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
@@ -98,6 +101,13 @@ namespace Game
             UpdateScoreDisplay();
         }
 
+        private void OnTurretKilled(string eventName, string payload)
+        {
+            score += POINTS_TURRET;
+            LogMessage("[ScoreBoard2] Turret killed! +" + POINTS_TURRET + " | Score: " + score);
+            UpdateScoreDisplay();
+        }
+
         // ===== GAME STATE HANDLERS =====
 
         private void OnGameOver(string eventName, string payload)
@@ -105,11 +115,19 @@ namespace Game
             LogMessage("[ScoreBoard2] Game over event: " + eventName);
             SaveScore();
             Text.SetIsVisible((uint)EntityID, false);
+
+            // Publish final score for end screen display
+            Publish("ShowFinalScore", score.ToString());
+            LogMessage("[ScoreBoard2] Published final score: " + score);
         }
+
 
         private void OnGameWin(string eventName, string payload)
         {
             LogMessage("[ScoreBoard2] Game win event");
+            score += 2000;
+            LogMessage("[ScoreBoard2] Win bonus +2000 | Score: " + score);
+            UpdateScoreDisplay();
             SaveScore();
             Engine.ProgressTracker.MarkLevelWon("level2");
             Text.SetIsVisible((uint)EntityID, false);
@@ -164,6 +182,7 @@ namespace Game
                 if (FileIO.WriteAllText(SAVE_FILE, json))
                 {
                     scoreSaved = true;
+                    Engine.ProgressTracker.AddCumulativeScore(score);
                     LogMessage("[ScoreBoard2] Score " + score + " saved for " + currentLevel + " at " + timestamp);
                 }
                 else
@@ -274,6 +293,7 @@ namespace Game
             Event.Unsubscribe(EVENT_BOTNET_DEAD, OnBotnetKilled);
             Event.Unsubscribe(EVENT_LOVELETTER_DEAD, OnLoveLetterKilled);
             Event.Unsubscribe(EVENT_WORMHOST_DEAD, OnWormHostKilled);
+            Event.Unsubscribe(EVENT_TURRET_DEAD, OnTurretKilled);
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);

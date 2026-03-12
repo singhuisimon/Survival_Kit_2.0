@@ -506,6 +506,14 @@ namespace Engine
 				selectedResourcesIndex = -1;
 			}
 
+			ImGui::SameLine();
+			if (ImGui::Button(m_ViewMode == AssetViewMode::Grid ? "List View" : "Grid View"))
+			{
+				m_ViewMode = (m_ViewMode == AssetViewMode::Grid)
+					? AssetViewMode::List
+					: AssetViewMode::Grid;
+			}
+
 			ImGui::Separator();
 
 			bool isSearching = !m_SearchQuery.empty() || m_FilterType != ResourceType::UNKNOWN;
@@ -677,7 +685,13 @@ namespace Engine
 			// ===== UNIFIED RENDERING =====
 			if (!assetsToDisplay.empty())
 			{
-				RenderAssetGrid(assetsToDisplay);
+				if (!assetsToDisplay.empty())
+				{
+					if (m_ViewMode == AssetViewMode::Grid)
+						RenderAssetGrid(assetsToDisplay);
+					else
+						RenderAssetList(assetsToDisplay);
+				}
 			}
 			else if (!isSearching)
 			{
@@ -1395,6 +1409,13 @@ namespace Engine
 				m_Editor->GetRenderer()->getBloomStrength() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomStrength;
 				m_Editor->GetRenderer()->getBloomFilterRadius() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomFilterRadius;
 				m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
+
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::MASTER, m_Editor->GetActiveScene()->GetSceneSetting().s_MasterVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::SFX, m_Editor->GetActiveScene()->GetSceneSetting().s_SFXVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::BGM, m_Editor->GetActiveScene()->GetSceneSetting().s_BGMVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::UI, m_Editor->GetActiveScene()->GetSceneSetting().s_UIVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::VO, m_Editor->GetActiveScene()->GetSceneSetting().s_VOVolume);
+				m_Editor->GetAudioManager()->SetEditorCap(AudioType::GAMESFX, m_Editor->GetActiveScene()->GetSceneSetting().s_GameSFXVolume);
 			}
 
 			// Register prefabs
@@ -1489,5 +1510,127 @@ namespace Engine
 		}
 
 		return result;
+	}
+
+	void EditorAssetBrowserPanel::RenderAssetList(const std::vector<DisplayableAsset>& displayAssets)
+	{
+		for (size_t i = 0; i < displayAssets.size(); ++i)
+		{
+			const auto& asset = displayAssets[i];
+
+			bool isSelected = (!asset.fullPath.empty() && (
+				(m_Editor->HasScenePath() && asset.fullPath == m_Editor->GetScenePath()) ||
+				(m_Editor->HasPrefabPath() && asset.fullPath == m_Editor->GetPrefabPath())
+				));
+
+			ImGui::PushID(static_cast<int>(i));
+
+			// Clickable row per asset
+			if (ImGui::Selectable(asset.fileName.c_str(), isSelected, ImGuiSelectableFlags_AllowOverlap))
+			{
+				selectedResourcesIndex = static_cast<int>(i);
+				HandleAssetSelection(asset);
+			}
+
+			// ===== TOOLTIP =====
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::BeginTooltip();
+				ImGui::Text("Name: %s", asset.fileName.c_str());
+				if (asset.isRawAsset && asset.record)
+				{
+					ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+					ImGui::Text("Hash: %s", asset.record->contentHash.c_str());
+					char timeBuf[64];
+					std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
+					std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+					ImGui::Text("Last Write: %s", timeBuf);
+				}
+				ImGui::EndTooltip();
+			}
+
+			// ===== CONTEXT MENU =====
+			if (ImGui::BeginPopupContextItem("AssetListContextMenu"))
+			{
+				ImGui::Text("%s", asset.fileName.c_str());
+				if (asset.isRawAsset && asset.record)
+				{
+					if (asset.record->type == ResourceType::TEXTURE ||
+						asset.record->type == ResourceType::MESH)
+					{
+						ImGui::Separator();
+						if (ImGui::MenuItem("Edit"))
+						{
+							showDescriptorEditorPanel = true;
+							currentEditingGuid = asset.guid;
+							editedAsset = asset.fileName;
+						}
+					}
+				}
+				ImGui::Separator();
+				if (ImGui::MenuItem("Delete"))
+				{
+					m_AssetToDelete = asset;
+					m_ShowDeleteConfirmPopUp = true;
+				}
+				ImGui::EndPopup();
+			}
+
+			// ===== DRAG AND DROP =====
+			if (asset.isRawAsset && asset.record)
+			{
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_SourceAllowNullID))
+				{
+					xresource::instance_guid draggedGuid = asset.guid;
+					ImGui::SetDragDropPayload("ASSET_BROWSER_ITEM", &draggedGuid,
+						sizeof(xresource::instance_guid));
+					ImGui::Text("Dragging: %s", asset.fileName.c_str());
+					ImGui::EndDragDropSource();
+				}
+			}
+
+			// Optional: dim the folder/type info on the same line to the right
+			ImGui::SameLine();
+			ImGui::TextDisabled("  %s", asset.displayFolder.c_str());
+
+			ImGui::PopID();
+		}
+
+		// ===== DELETE CONFIRM POPUP =====
+		if (m_ShowDeleteConfirmPopUp)
+		{
+			ImGui::OpenPopup("Confirm Delete");
+			m_ShowDeleteConfirmPopUp = false;
+		}
+
+		if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::Text("Are you sure you want to delete:");
+			ImGui::Text("%s", m_AssetToDelete.fileName.c_str());
+			ImGui::Separator();
+
+			if (ImGui::Button("Delete", ImVec2(120, 0)))
+			{
+				if (std::filesystem::exists(m_AssetToDelete.fullPath))
+				{
+					std::string resourcesPath = convertAssetPathToRootResources(m_AssetToDelete.fullPath);
+					std::filesystem::remove(m_AssetToDelete.fullPath);
+					std::filesystem::remove(resourcesPath);
+
+					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
+						m_Editor->SetScenePath("");
+					else if (m_Editor->HasPrefabPath() && m_Editor->GetPrefabPath() == m_AssetToDelete.fullPath)
+						m_Editor->ClearPrefabPath();
+
+					selectedResourcesIndex = -1;
+				}
+				ImGui::CloseCurrentPopup();
+			}
+			ImGui::SameLine();
+			if (ImGui::Button("Cancel", ImVec2(120, 0)))
+				ImGui::CloseCurrentPopup();
+
+			ImGui::EndPopup();
+		}
 	}
 }

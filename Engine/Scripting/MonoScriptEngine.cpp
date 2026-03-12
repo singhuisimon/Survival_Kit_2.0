@@ -1402,6 +1402,8 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::MeshRenderer_GetGlobalIlluminate));
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetGlobalIlluminate",
 						 reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetGlobalIlluminate));
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetEmissiveTexture",
+						 reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetEmissiveTexture));
 
 		// =====================================================================
 		// AudioComponent
@@ -1473,10 +1475,10 @@ namespace Engine {
 		// =====================================================================
 		// AudioManager (global controls)
 		// =====================================================================
-		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupVolume",
-						 reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupVolume));
-		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupVolume",
-						 reinterpret_cast<void *>(InternalCalls::AudioManager_GetGroupVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_SetPlayerVolume",
+						 reinterpret_cast<void *>(InternalCalls::AudioManager_SetPlayerVolume));
+		BindInternalCall("Engine.AudioManager::AudioManager_GetPlayerVolume",
+						 reinterpret_cast<void *>(InternalCalls::AudioManager_GetPlayerVolume));
 		BindInternalCall("Engine.AudioManager::AudioManager_SetGroupPitch",
 						 reinterpret_cast<void *>(InternalCalls::AudioManager_SetGroupPitch));
 		BindInternalCall("Engine.AudioManager::AudioManager_GetGroupPitch",
@@ -1589,6 +1591,21 @@ namespace Engine {
 
 		BindInternalCall("Engine.ParticleSystem::SetEmissionRate",
 			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetEmissionRate));
+
+		BindInternalCall("Engine.ParticleSystem::SetColorMin",
+			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetColorMin));
+
+		BindInternalCall("Engine.ParticleSystem::SetColorMax",
+			reinterpret_cast<void*>(InternalCalls::ParticleSystem_SetColorMax));
+
+		// =====================================================================
+		// TrailComponent
+		// =====================================================================
+		BindInternalCall("Engine.TrailSystem::Trail_SetStartColor",
+			reinterpret_cast<void*>(InternalCalls::Trail_SetStartColor));
+
+		BindInternalCall("Engine.TrailSystem::Trail_SetEndColor",
+			reinterpret_cast<void*>(InternalCalls::Trail_SetEndColor));
 
 		// =====================================================================
 // TextComponent

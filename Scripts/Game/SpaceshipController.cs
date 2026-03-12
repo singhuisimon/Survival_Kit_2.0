@@ -74,6 +74,8 @@ namespace Game
         private const float VAMPIRISM_KEYLOGGER   = 2.0f;
         private const float HEAL_VFX_DURATION     = 2.0f;
         private float       HEAL_VFX_ACCUMULATOR  = 0.0f;
+        private float       DEATH_TIMER = 0.0f;
+        private const float DEATH_DELAY = 3.0f;      
 
         private const string HEAL_VFX_ENTITY_NAME = "HealingVFX";
 
@@ -82,6 +84,8 @@ namespace Game
 
         private bool endscene          = false;
         private bool startHealVFXTimer = false;
+
+        
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -112,6 +116,7 @@ namespace Game
         private bool initialized = false;
         private bool cursorWasVisible = false;
         private bool camFollowInit = false;
+        private bool isPlayerDead = false;
 
         // ===== VFX =====
         private const uint INVALID_ENTITY = 0xffffffffu;
@@ -120,6 +125,10 @@ namespace Game
         private float hitSparksTimer = 0.1f;
         private bool isHitSparks = false;
         string playerHitSparksPrefabPath = "Sources/Prefabs/HitSparksPlayer.prefab";
+        string VFX_PlayerDeathExplosionPrefab = "Sources/Prefabs/VFX_PlayerDeathExplosion.prefab";
+
+        // ===== Audio =====
+        string playerHealAudioPrefab = "Sources/Prefabs/Audio_PlayerHeal.prefab";
 
         // ===== Camera Shake =====
         private const float camShakeTimerThreshold = 1.0f;
@@ -127,12 +136,15 @@ namespace Game
         [SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 100.0f;
         [SerializeField] private float CAMSHAKE_DamageTakenDuration = 0.1f;
 
+        // ===== TESTING MOUSE SENSITIVITY =====
+        [SerializeField] private float mouseSensitivity = 1.0f; // Default = 1.0f, range = [0.25 - 2.5] // Just need to save value some where (consider onboarding audio settings)
+
         public override void OnStart()
         {
             playerHP = playerOriginalHP;
             countdownOOB = originalCountdownOOB;
             inEnvironment = true;
-
+             
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
             healingVFXEntityID = SceneFindEntityByName(HEAL_VFX_ENTITY_NAME);
@@ -188,6 +200,16 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (isPlayerDead)
+            {
+                DEATH_TIMER += deltaTime;
+                if (DEATH_TIMER >= DEATH_DELAY)
+                {
+                    isPlayerDead = false;
+                    Publish("PlayerDead", "");
+                }
+            }
+
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
@@ -214,10 +236,14 @@ namespace Game
 
             // For hit sparks VFX
             hitSparksTimer -= deltaTime;
+
+            
         }
 
         public override void OnFixedUpdate(float deltaTime)
         {
+            if (isPlayerDead) return;
+            
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
@@ -262,6 +288,10 @@ namespace Game
         private void UpdateCameraRotationFromMouse(float deltaTime)
         {
             GetMouseDelta(out float dx, out float dy);
+
+            // Update dx and dy with sensitivity value
+            dx *= mouseSensitivity;
+            dy *= mouseSensitivity;
 
             yawRad += -dx * yawSpeed * deltaTime;
             pitchRad += -dy * pitchSpeed * deltaTime;
@@ -422,9 +452,32 @@ namespace Game
 
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
 
-            if (playerHP <= 0)
+            // if (playerHP <= 0)
+            // {
+            //     Publish("PlayerDead", "");
+            // }
+            if (playerHP <= 0 && !isPlayerDead)
             {
-                Publish("PlayerDead", "");
+                isPlayerDead = true;
+                DEATH_TIMER   = 0.0f;
+                Vector3 playerPos = GetPosition(playerEntityID);
+                Quat    playerRot = GetRotation(playerEntityID);
+
+                SceneDestroyEntity(playerEntityID);
+                //Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
+                // Spawn explosion VFX at player position
+                uint playerDeathExplosion = PrefabInstantiate(VFX_PlayerDeathExplosionPrefab);
+                if (playerDeathExplosion == INVALID_ENTITY)
+                {
+                    LogMessage("[SpaceshipController] Death explosion failed to instantiate");
+                }
+                else
+                {
+                    Transform.SetPosition(playerDeathExplosion, ref playerPos);
+                    Vector3 explosionPlayerScale = new Vector3(3.0f, 3.0f, 3.0f);
+                    Transform.SetScale(playerDeathExplosion, ref explosionPlayerScale);
+                    LogMessage("[SpaceshipController] Player destroyed, explosion spawned. Waiting 3s...");
+                }
             }
         }
 
@@ -545,6 +598,7 @@ namespace Game
             if (healAmount > 0.0f)
             { 
                 HealPlayer(healAmount);
+                PlayHealAudio();
                 PlayHealVFX();
             }
                 
@@ -569,6 +623,17 @@ namespace Game
         private void StopHealVFX()
         {
             SetEmissionRate(healingVFXEntityID, 0.0f);
+        }
+
+        private void PlayHealAudio(){
+            
+            uint healsound = 0;
+            healsound = PrefabInstantiate(playerHealAudioPrefab);
+
+            if(healsound == 0){
+                LogMessage("[SpaceshipController] failed to play playerheal audio upon vapirism");
+                return;
+            }
         }
 
     }

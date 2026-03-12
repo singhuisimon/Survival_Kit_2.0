@@ -3,66 +3,7 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 13,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "WormHost",
-                        "Tag": "WormHost"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3752387440855843103",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.0010000000474974513,
-                            0.0010000000474974513,
-                            0.0010000000474974513
-                        ],
-                        "Parent": 8388623,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "1446544431642542369",
-                        "Mesh": "E001_worm_host_v001.fbx",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "17010984743835091235",
-                        "ScriptClassName": "Game.WormHost"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 4194315,
+            "ID": 12,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -74,11 +15,11 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "8694824148664271771",
+                        "ComponentGUID": "13926036590836384015",
                         "Position": [
-                            -1.3839364051818848,
                             0.0,
-                            1.074891448020935
+                            0.0,
+                            3.73880672454834
                         ],
                         "Rotation": [
                             0.0,
@@ -97,14 +38,15 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "2353755873326777245",
+                        "ComponentGUID": "90978535554433297",
                         "Mesh": "E002_worm_child_v001.fbx",
                         "Material": "",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
-                        "MeshType": 2,
+                        "Billboarding": false,
+                        "MeshType": 1,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
@@ -114,14 +56,14 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "12975759477710012699",
+                        "ComponentGUID": "15858063239227130047",
                         "ScriptClassName": "Game.WormChild",
                         "Fields": {
                             "targetX": 0.0,
-                            "OGscaleZ": 0.0,
                             "targetY": 0.0,
-                            "OGscaleY": 0.0,
+                            "OGscaleZ": 0.0,
                             "targetZ": 0.0,
+                            "OGscaleY": 0.0,
                             "OGscaleX": 0.0
                         }
                     }
@@ -129,23 +71,23 @@
             ]
         },
         {
-            "ID": 8388623,
+            "ID": 3,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "WormParent",
-                        "Tag": "WormParent"
+                        "Name": "Ground",
+                        "Tag": "Ground"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11000667157877097361",
+                        "ComponentGUID": "15035892423998259327",
                         "Position": [
-                            -10.21282958984375,
                             0.0,
-                            -9.193717956542969
+                            -1.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
@@ -153,65 +95,9 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": [
-                            4194315,
-                            12,
-                            13
-                        ]
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11822837973103165715",
-                        "ScriptClassName": "Game.WormParent",
-                        "Fields": {
-                            "isStationary": false,
-                            "hasSplit": false,
-                            "targetX": 0.0,
-                            "speed": 0.0,
-                            "stationaryTimer": 0.0,
-                            "timer": 0.0,
-                            "targetY": 0.0,
-                            "targetZ": 0.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 0,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Player",
-                        "Tag": "Player"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "17918196185515376745",
-                        "Position": [
-                            -0.91555255651474,
-                            7.746599197387695,
-                            9.5777587890625
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            0.0005000000237487257,
-                            0.0005000000237487257,
-                            0.0005000000237487257
+                            20.0,
+                            0.10000000149011612,
+                            20.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -220,89 +106,284 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "9847745653267447915",
+                        "ComponentGUID": "5812520387143483523",
                         "Mesh": "",
-                        "Material": "",
+                        "Material": "test.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
+                        "Billboarding": false,
                         "MeshType": 0,
-                        "MaterialIdx": 1,
+                        "MaterialIdx": 0,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
                     }
                 },
                 {
-                    "Type": "AudioComponent",
+                    "Type": "RigidbodyComponent",
                     "Properties": {
-                        "ComponentGUID": "9847745653267447917",
-                        "FilePath": "laserSmall_001.ogg",
-                        "Type": 1,
-                        "State": 2,
-                        "Volume": 0.800000011920929,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
+                        "ComponentGUID": "9847745653267447937",
+                        "Mass": 0.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Sphere",
+                        "Tag": "Sphere"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12730049414784565383",
+                        "Position": [
+                            4.901620864868164,
+                            2.380377769470215,
+                            5.8413166999816895
+                        ],
+                        "Rotation": [
+                            -28.07694435119629,
+                            -0.0,
+                            -0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "3506677377929789579",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "1777295121019519113",
+                        "Mass": 0.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 9.220085144042969,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "TimerBar",
+                        "Tag": "TimerBar"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12730049414784565391",
+                        "Position": [
+                            1.0,
+                            4.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            -28.07694435119629,
+                            -0.0,
+                            -0.0
+                        ],
+                        "Scale": [
+                            4.0,
+                            0.05000000074505806,
+                            0.05000000074505806
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "4083138130233213073",
+                        "Mesh": "",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 0,
+                        "currentClipIndex": 0,
+                        "currentTime": 9.220085144042969,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 6,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "CaveReverb",
+                        "Tag": "CaveReverb"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13306510167087988885",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ReverbComponent",
+                    "Properties": {
+                        "ComponentGUID": "6965441891750330519",
+                        "Preset": 4,
                         "MinDistance": 1.0,
                         "MaxDistance": 50.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11822837973103165707",
-                        "ScriptClassName": "Game.TestScript",
-                        "Fields": {
-                            "SecondaryMaxAmmo": 5,
-                            "moveSpeed": 5.5,
-                            "dashForce": 2.0,
-                            "moveAllowed": true,
-                            "orbitYaw": 0.0,
-                            "aimHeightOffset": 2.0,
-                            "orbitRadius": 7.5,
-                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
-                            "orbitPitch": 0.25,
-                            "SecondaryBulletPrefab": "Sources/Prefabs/SecondaryBullet.prefab",
-                            "PlayerHitSoundPrefab": "Sources/Prefabs/PlayerHit.prefab",
-                            "PrimaryMaxAmmo": 100,
-                            "PrimaryReloadTime": 1.5,
-                            "PrimaryFireRate": 0.30000001192092896,
-                            "SecondaryReloadTime": 3.0,
-                            "SecondaryFireRate": 0.800000011920929
-                        }
+                        "DecayTime": 2500.0,
+                        "HfDecayRatio": 80.0,
+                        "Diffusion": 50.0,
+                        "Density": 100.0,
+                        "WetLevel": 0.0
                     }
                 }
             ]
         },
         {
-            "ID": 1,
+            "ID": 7,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "MainCamera",
-                        "Tag": "MainCamera"
+                        "Name": "AI",
+                        "Tag": "AI"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12730049414784565361",
+                        "ComponentGUID": "2930216625626366107",
                         "Position": [
                             0.0,
-                            5.0,
-                            5.0
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
-                            -139.43670654296875,
                             0.0,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
@@ -315,117 +396,37 @@
                     }
                 },
                 {
-                    "Type": "CameraComponent",
+                    "Type": "BehaviourTreeComponent",
                     "Properties": {
-                        "Enabled": true,
-                        "Primary": false,
-                        "Projection": false,
-                        "autoAspect": true,
-                        "Size": [
-                            0.0,
-                            20.0
-                        ],
-                        "Depth": 0,
-                        "Aspect": 1.7135207653045654,
-                        "FOV": 45.0,
-                        "NearPlane": 0.5,
-                        "FarPlane": 100.0,
-                        "Target": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ]
-                    }
-                },
-                {
-                    "Type": "ListenerComponent",
-                    "Properties": {
-                        "ComponentGUID": "6965441891750330491",
-                        "Active": true
+                        "Active": true,
+                        "ResetOnComplete": false,
+                        "TreeAssetPath": "CreateEnemeyCube.json"
                     }
                 }
             ]
         },
         {
-            "ID": 2,
+            "ID": 8,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "SecondCamera",
-                        "Tag": "SecondCamera"
+                        "Name": "Sunlight",
+                        "Tag": "Sunlight"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "6388981139446906999",
+                        "ComponentGUID": "17918196185515376801",
                         "Position": [
                             0.0,
-                            5.0,
-                            5.0
-                        ],
-                        "Rotation": [
-                            -139.43670654296875,
-                            0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "CameraComponent",
-                    "Properties": {
-                        "Enabled": true,
-                        "Primary": false,
-                        "Projection": true,
-                        "autoAspect": true,
-                        "Size": [
-                            0.0,
-                            20.0
-                        ],
-                        "Depth": 1,
-                        "Aspect": 1.7135207653045654,
-                        "FOV": 45.0,
-                        "NearPlane": 0.5,
-                        "FarPlane": 100.0,
-                        "Target": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ]
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 10,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Spotlight",
-                        "Tag": "Spotlight"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "12153588662481141933",
-                        "Position": [
-                            -5.0,
-                            5.0,
+                            10.0,
                             0.0
                         ],
                         "Rotation": [
-                            -90.0,
-                            0.0,
+                            -59.75373840332031,
+                            30.963762283325195,
                             0.0
                         ],
                         "Scale": [
@@ -440,17 +441,17 @@
                 {
                     "Type": "LightComponent",
                     "Properties": {
-                        "ComponentGUID": "9847745653267447983",
+                        "ComponentGUID": "8118363396357177507",
                         "Enabled": true,
-                        "Type": 2,
+                        "Type": 0,
                         "Color": [
                             1.0,
-                            1.0,
-                            1.0
+                            0.9559999704360962,
+                            0.8389999866485596
                         ],
-                        "Intensity": 2.0,
-                        "Range": 15.0,
-                        "SpotAngleDeg": 40.0,
+                        "Intensity": 0.5,
+                        "Range": 0.0,
+                        "SpotAngleDeg": 0.0,
                         "IndirectMultiplier": 1.0,
                         "TypeShadow": 0,
                         "Resolution": 1024,
@@ -519,27 +520,27 @@
             ]
         },
         {
-            "ID": 8,
+            "ID": 10,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Sunlight",
-                        "Tag": "Sunlight"
+                        "Name": "Spotlight",
+                        "Tag": "Spotlight"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "17918196185515376801",
+                        "ComponentGUID": "12153588662481141933",
                         "Position": [
-                            0.0,
-                            10.0,
+                            -5.0,
+                            5.0,
                             0.0
                         ],
                         "Rotation": [
-                            -59.75373840332031,
-                            30.963762283325195,
+                            -90.0,
+                            0.0,
                             0.0
                         ],
                         "Scale": [
@@ -554,17 +555,17 @@
                 {
                     "Type": "LightComponent",
                     "Properties": {
-                        "ComponentGUID": "8118363396357177507",
+                        "ComponentGUID": "9847745653267447983",
                         "Enabled": true,
-                        "Type": 0,
+                        "Type": 2,
                         "Color": [
                             1.0,
-                            0.9559999704360962,
-                            0.8389999866485596
+                            1.0,
+                            1.0
                         ],
-                        "Intensity": 0.5,
-                        "Range": 0.0,
-                        "SpotAngleDeg": 0.0,
+                        "Intensity": 2.0,
+                        "Range": 15.0,
+                        "SpotAngleDeg": 40.0,
                         "IndirectMultiplier": 1.0,
                         "TypeShadow": 0,
                         "Resolution": 1024,
@@ -576,27 +577,27 @@
             ]
         },
         {
-            "ID": 7,
+            "ID": 2,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "AI",
-                        "Tag": "AI"
+                        "Name": "SecondCamera",
+                        "Tag": "SecondCamera"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "2930216625626366107",
+                        "ComponentGUID": "6388981139446906999",
                         "Position": [
                             0.0,
-                            0.0,
-                            0.0
+                            5.0,
+                            5.0
                         ],
                         "Rotation": [
+                            -139.43670654296875,
                             0.0,
-                            -0.0,
                             0.0
                         ],
                         "Scale": [
@@ -609,251 +610,124 @@
                     }
                 },
                 {
-                    "Type": "BehaviourTreeComponent",
+                    "Type": "CameraComponent",
                     "Properties": {
-                        "Active": true,
-                        "ResetOnComplete": false,
-                        "TreeAssetPath": "CreateEnemeyCube.json"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 6,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "CaveReverb",
-                        "Tag": "CaveReverb"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "13306510167087988885",
-                        "Position": [
+                        "Enabled": true,
+                        "Primary": false,
+                        "Projection": true,
+                        "autoAspect": true,
+                        "Size": [
                             0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ReverbComponent",
-                    "Properties": {
-                        "ComponentGUID": "6965441891750330519",
-                        "Preset": 4,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 50.0,
-                        "DecayTime": 2500.0,
-                        "HfDecayRatio": 80.0,
-                        "Diffusion": 50.0,
-                        "Density": 100.0,
-                        "WetLevel": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 5,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "TimerBar",
-                        "Tag": "TimerBar"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "12730049414784565391",
-                        "Position": [
-                            1.0,
-                            4.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            -28.07694435119629,
-                            -0.0,
-                            -0.0
-                        ],
-                        "Scale": [
-                            4.0,
-                            0.05000000074505806,
-                            0.05000000074505806
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "4083138130233213073",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "AnimatorComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "playing": true,
-                        "respectClipLoop": true,
-                        "controller": 0,
-                        "currentClipIndex": 0,
-                        "currentTime": 9.220085144042969,
-                        "playbackSpeed": 1.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 4,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Sphere",
-                        "Tag": "Sphere"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "12730049414784565383",
-                        "Position": [
-                            4.901620864868164,
-                            2.380377769470215,
-                            5.8413166999816895
-                        ],
-                        "Rotation": [
-                            -28.07694435119629,
-                            -0.0,
-                            -0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "3506677377929789579",
-                        "Mesh": "",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "1777295121019519113",
-                        "Mass": 0.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "AnimatorComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "playing": true,
-                        "respectClipLoop": true,
-                        "controller": 0,
-                        "currentClipIndex": 0,
-                        "currentTime": 9.220085144042969,
-                        "playbackSpeed": 1.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 3,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Ground",
-                        "Tag": "Ground"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15035892423998259327",
-                        "Position": [
-                            0.0,
-                            -1.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            20.0,
-                            0.10000000149011612,
                             20.0
                         ],
+                        "Depth": 1,
+                        "Aspect": 1.9190404415130615,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 100.0,
+                        "Target": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "MainCamera",
+                        "Tag": "MainCamera"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12730049414784565361",
+                        "Position": [
+                            0.0,
+                            5.0,
+                            5.0
+                        ],
+                        "Rotation": [
+                            -139.43670654296875,
+                            0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "CameraComponent",
+                    "Properties": {
+                        "Enabled": true,
+                        "Primary": false,
+                        "Projection": false,
+                        "autoAspect": true,
+                        "Size": [
+                            0.0,
+                            20.0
+                        ],
+                        "Depth": 0,
+                        "Aspect": 1.9190404415130615,
+                        "FOV": 45.0,
+                        "NearPlane": 0.5,
+                        "FarPlane": 100.0,
+                        "Target": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ]
+                    }
+                },
+                {
+                    "Type": "ListenerComponent",
+                    "Properties": {
+                        "ComponentGUID": "6965441891750330491",
+                        "Active": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Player",
+                        "Tag": "Player"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17918196185515376745",
+                        "Position": [
+                            -0.91555255651474,
+                            7.746599197387695,
+                            9.5777587890625
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.0005000000237487257,
+                            0.0005000000237487257,
+                            0.0005000000237487257
+                        ],
                         "Parent": 4294967295,
                         "Children": []
                     }
@@ -861,54 +735,126 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "5812520387143483523",
+                        "ComponentGUID": "9847745653267447915",
                         "Mesh": "",
-                        "Material": "test.mat",
+                        "Material": "",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
+                        "Billboarding": false,
                         "MeshType": 0,
-                        "MaterialIdx": 0,
+                        "MaterialIdx": 1,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
                     }
                 },
                 {
-                    "Type": "RigidbodyComponent",
+                    "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "9847745653267447937",
-                        "Mass": 0.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
+                        "ComponentGUID": "9847745653267447917",
+                        "FilePath": "laserSmall_001.ogg",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 0.800000011920929,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 50.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11822837973103165707",
+                        "ScriptClassName": "Game.TestScript",
+                        "Fields": {
+                            "SecondaryMaxAmmo": 5,
+                            "moveSpeed": 5.5,
+                            "moveAllowed": true,
+                            "dashForce": 2.0,
+                            "aimHeightOffset": 2.0,
+                            "orbitYaw": 0.0,
+                            "orbitRadius": 7.5,
+                            "PrimaryBulletPrefab": "Sources/Prefabs/PrimaryBullet.prefab",
+                            "orbitPitch": 0.25,
+                            "SecondaryBulletPrefab": "Sources/Prefabs/SecondaryBullet.prefab",
+                            "PlayerHitSoundPrefab": "Sources/Prefabs/PlayerHit.prefab",
+                            "PrimaryMaxAmmo": 100,
+                            "PrimaryReloadTime": 1.5,
+                            "PrimaryFireRate": 0.30000001192092896,
+                            "SecondaryReloadTime": 3.0,
+                            "SecondaryFireRate": 0.800000011920929
+                        }
                     }
                 }
             ]
         },
         {
-            "ID": 12,
+            "ID": 8388623,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "WormParent",
+                        "Tag": "WormParent"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11000667157877097361",
+                        "Position": [
+                            -10.21282958984375,
+                            0.0,
+                            -9.193717956542969
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            4194315,
+                            12,
+                            13
+                        ]
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11822837973103165715",
+                        "ScriptClassName": "Game.WormParent",
+                        "Fields": {
+                            "isStationary": false,
+                            "hasSplit": false,
+                            "speed": 0.0,
+                            "targetX": 0.0,
+                            "stationaryTimer": 0.0,
+                            "timer": 0.0,
+                            "targetY": 0.0,
+                            "targetZ": 0.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 4194315,
             "Components": [
                 {
                     "Type": "TagComponent",
@@ -920,11 +866,11 @@
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13926036590836384015",
+                        "ComponentGUID": "8694824148664271771",
                         "Position": [
+                            -1.3839364051818848,
                             0.0,
-                            0.0,
-                            3.73880672454834
+                            1.074891448020935
                         ],
                         "Rotation": [
                             0.0,
@@ -943,14 +889,15 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "90978535554433297",
+                        "ComponentGUID": "2353755873326777245",
                         "Mesh": "E002_worm_child_v001.fbx",
                         "Material": "",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
-                        "MeshType": 1,
+                        "Billboarding": false,
+                        "MeshType": 2,
                         "MaterialIdx": 0,
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
@@ -960,16 +907,76 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "15858063239227130047",
+                        "ComponentGUID": "12975759477710012699",
                         "ScriptClassName": "Game.WormChild",
                         "Fields": {
                             "targetX": 0.0,
-                            "OGscaleZ": 0.0,
                             "targetY": 0.0,
-                            "OGscaleY": 0.0,
+                            "OGscaleZ": 0.0,
                             "targetZ": 0.0,
+                            "OGscaleY": 0.0,
                             "OGscaleX": 0.0
                         }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 13,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "WormHost",
+                        "Tag": "WormHost"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3752387440855843103",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.0010000000474974513,
+                            0.0010000000474974513,
+                            0.0010000000474974513
+                        ],
+                        "Parent": 8388623,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "1446544431642542369",
+                        "Mesh": "E001_worm_host_v001.fbx",
+                        "Material": "",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "17010984743835091235",
+                        "ScriptClassName": "Game.WormHost"
                     }
                 }
             ]
@@ -981,7 +988,13 @@
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
             "Exposure": 1.0,
-            "GlobalBias": 0.004999999888241291
+            "GlobalBias": 0.004999999888241291,
+            "MasterVolume": 1.0,
+            "SFXVolume": 1.0,
+            "BGMVolume": 1.0,
+            "VOVolume": 1.0,
+            "UIVolume": 1.0,
+            "GameSFXVolume": 1.0
         }
     ]
 }

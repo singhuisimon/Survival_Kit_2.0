@@ -16,7 +16,7 @@
 
 namespace Engine {
 
-    enum class AudioType {MASTER, SFX, BGM, UI};
+    enum class AudioType {MASTER, SFX, BGM, UI, VO, GAMESFX};
     enum class PlayState {PLAY, PAUSE, STOP};
     enum class AudioRolloffMode{INVERSE, LINEAR, LINEARSQUARE};
 
@@ -30,7 +30,7 @@ namespace Engine {
         xresource::instance_guid ComponentGUID;
         // --- Serialized Data ---
         std::string AudioFilePath;   // Path to audio asset
-        AudioType Type;              // SFX, BGM, UI, Master
+        AudioType Type;              // SFX, BGM, UI, Master, VO, GAMESFX
         PlayState State;             // Play / Pause / Stop
         float Volume;                // 0.0 - 1.0
         float Pitch;                 // 0.5 - 2.0 (general range)
@@ -57,7 +57,7 @@ namespace Engine {
         AudioComponent()
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()),
             AudioFilePath("")
-            , Type(AudioType::SFX)
+            , Type(AudioType::GAMESFX)
             , State(PlayState::STOP)
             , Volume(1.0f)
             , Pitch(1.0f)
@@ -80,7 +80,7 @@ namespace Engine {
         AudioComponent(const std::string& filepath)
             : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy())
             , AudioFilePath(filepath)
-            , Type(AudioType::SFX)
+            , Type(AudioType::GAMESFX)
             , State(PlayState::STOP)
             , Volume(1.0f)
             , Pitch(1.0f)
@@ -102,7 +102,12 @@ namespace Engine {
         // --- Setters that mark component dirty ---
 
         void SetAudioType(AudioType type) {
-            Type = type;
+            if (type == AudioType::SFX) {
+                Type = AudioType::GAMESFX; // Redirect SFX to GAMESFX group
+            }
+            else {
+                Type = type;
+            }
             IsDirty = true;
         }
 

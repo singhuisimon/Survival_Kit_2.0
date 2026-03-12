@@ -182,6 +182,7 @@ void Game::OnInit()
 			m_Editor = std::make_unique<Engine::Editor>(GetWindow());
 			//m_Editor->SetScene(m_Scene.get());
 			m_Editor->SetRenderer(m_Renderer.get());
+			m_Editor->SetAudioManager(m_AudioManager.get());
 			m_Editor->SetGame(this);
 			m_Editor->OnInit();
 			LOG_INFO("Editor initialized successfully.");
@@ -260,6 +261,13 @@ void Game::OnInit()
 			m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 			m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 			m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+
+			m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
+			m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
 		}
 		else {
 			LOG_WARNING("  -> Could not load scene file, will create default content");
@@ -537,6 +545,13 @@ void Game::CreateDefaultScene()
 	m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 
+	m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
+
 	// ---------------------------------------------------------------------
 	// Load animation clips
 	// ---------------------------------------------------------------------
@@ -631,7 +646,7 @@ void Game::CreateDefaultScene()
 
 	auto &playerAudio = player.AddComponent<Engine::AudioComponent>();
 	playerAudio.AudioFilePath = "laserSmall_001.ogg";
-	playerAudio.Type = Engine::AudioType::SFX;
+	playerAudio.Type = Engine::AudioType::GAMESFX;
 	playerAudio.State = Engine::PlayState::STOP;
 	playerAudio.Volume = 0.8f;
 	playerAudio.Pitch = 1.0f;
@@ -1702,6 +1717,13 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 	m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 	m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
+
+	m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
+	m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
 
 	LOG_INFO("Scene created successfully");
 	return m_ActiveScene;
