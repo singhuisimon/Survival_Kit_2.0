@@ -29,6 +29,8 @@ namespace Game
                 return;
             }
 
+            BeamRenderer.SetTargetEntity(EntityID, playerID);
+
             ModuleRegistry.Register(EntityID);
 
             LogMessage("Payload " + EntityID + " initialized");

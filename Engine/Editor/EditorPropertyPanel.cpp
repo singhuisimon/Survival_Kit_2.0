@@ -3659,55 +3659,55 @@ namespace Engine
 				{
 					ImGui::Text("Shader: %s", material->shaderName.c_str());
 
-					if (ImGui::CollapsingHeader("Texture Maps"))
+					if (ImGui::CollapsingHeader("Texture Maps##Beam"))
 					{
 						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongTypeBeam, ComponentTypeID::Beam);
 						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongTypeBeam, ComponentTypeID::Beam);
 						DisplayAssetField("Emission Map", material->emissionMap, ResourceType::TEXTURE, showWrongTypeBeam, ComponentTypeID::Beam);
 					}
 
-					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
+					if (ImGui::CollapsingHeader("Colors##Beam", ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
+						if (ImGui::ColorEdit3("Base Color##Beam", material->baseColor.data(),
 							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
 							MarkComponentOverridden(ComponentTypeID::Beam);
 
-						if (ImGui::ColorEdit3("Emission Color", material->emissionColor.data(),
+						if (ImGui::ColorEdit3("Emission Color##Beam", material->emissionColor.data(),
 							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
 							MarkComponentOverridden(ComponentTypeID::Beam);
 					}
 
-					if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
+					if (ImGui::CollapsingHeader("Material Properties##Beam", ImGuiTreeNodeFlags_DefaultOpen))
 					{
-						if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f"))
+						if (ImGui::SliderFloat("Opacity##Beam", &material->opacity, 0.0f, 1.0f, "%.2f"))
 							MarkComponentOverridden(ComponentTypeID::Beam);
 
-						if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
+						if (ImGui::SliderFloat("Emission Strength##Beam", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
 						{
 							material->emissionStrength = std::max(0.0f, material->emissionStrength);
 							MarkComponentOverridden(ComponentTypeID::Beam);
 						}
 					}
 
-					if (ImGui::CollapsingHeader("UV Transform"))
+					if (ImGui::CollapsingHeader("UV Transform##Beam"))
 					{
-						if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
+						if (ImGui::DragFloat2("Tiling##Beam", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
 						{
 							material->tiling[0] = std::max(0.1f, material->tiling[0]);
 							material->tiling[1] = std::max(0.1f, material->tiling[1]);
 							MarkComponentOverridden(ComponentTypeID::Beam);
 						}
 
-						if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f"))
+						if (ImGui::DragFloat2("Offset##Beam", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f"))
 							MarkComponentOverridden(ComponentTypeID::Beam);
 					}
 
-					if (ImGui::CollapsingHeader("Render Flags"))
+					if (ImGui::CollapsingHeader("Render Flags##Beam"))
 					{
-						if (ImGui::Checkbox("Enable Emission", &material->enableEmission))
+						if (ImGui::Checkbox("Enable Emission##Beam", &material->enableEmission))
 							MarkComponentOverridden(ComponentTypeID::Beam);
 
-						if (ImGui::Checkbox("Double Sided", &material->doubleSided))
+						if (ImGui::Checkbox("Double Sided##Beam", &material->doubleSided))
 							MarkComponentOverridden(ComponentTypeID::Beam);
 					}
 				}
