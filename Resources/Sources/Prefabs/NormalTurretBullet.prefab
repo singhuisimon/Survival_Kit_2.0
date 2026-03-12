@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: NormalTurretBullet.prefab",
-    "Prefab GUID": 11128500835810561619,
+    "Prefab GUID": 14094086019144251855,
     "version": 1,
     "entities": [
         {
@@ -105,8 +105,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "8204732253401207749",
-                            "FilePath": "Player_Primary_Fire.wav",
-                            "Type": 1,
+                            "FilePath": "Turret Normal Fire.wav",
+                            "Type": 5,
                             "State": 0,
                             "Volume": 0.9509999752044678,
                             "Pitch": 1.0,
@@ -114,10 +114,10 @@
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 18.8439998626709,
-                            "MaxDistance": 256.2539978027344,
+                            "MinDistance": 1.062999963760376,
+                            "MaxDistance": 10.885000228881836,
                             "RolloffMode": 0,
-                            "DopplerLevel": 1.4780000448226929,
+                            "DopplerLevel": 0.996999979019165,
                             "Pan2D": 0.0
                         }
                     }
@@ -130,7 +130,7 @@
                             "ComponentGUID": "15122261281046205391",
                             "ScriptClassName": "Game.NormalTurretBullet",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 7043
                         }
                     }
                 },

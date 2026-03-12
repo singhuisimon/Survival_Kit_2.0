@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Prefab: Audio_UpgradeModulePickUp.prefab",
+    "Prefab GUID": 9071420146454315171,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Audio_UpgradeModulePickUp",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7218109734922731683",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2029962964193951961",
+                            "Name": "Audio_UpgradeModulePickUp",
+                            "Tag": "Audio_UpgradeModulePickUp"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13559178010260488357",
+                            "FilePath": "Upgrade Module Pickup.wav",
+                            "Type": 5,
+                            "State": 2,
+                            "Volume": 2.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4335805973406417063",
+                            "ScriptClassName": "Game.GameDelaySoundPrefab",
+                            "Started": false,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
