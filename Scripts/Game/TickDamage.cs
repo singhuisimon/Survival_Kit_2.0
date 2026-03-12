@@ -2,6 +2,7 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Physics;
+using static Engine.Prefab;
 
 namespace Game
 {
@@ -16,6 +17,8 @@ namespace Game
         [SerializeField] private string playerName = "Player";
         [SerializeField] private float damagePerSecond = 3.0f;
         [SerializeField] private bool debugLogging = false;
+
+        private const string collisionaudiodamagePrefab = "Sources/Prefabs/Audio_Tick_Damage.prefab";
 
         private uint playerID = 0;
         private uint wallID = 0;
@@ -79,6 +82,8 @@ namespace Game
                 float damageThisTick = damagePerSecond * deltaTime;
                 DamageSystem.DealDamage(playerID, damageThisTick, wallID);
 
+                SpawnAudioPrefab();
+
                 if (debugLogging)
                 {
                     LogMessage("[TickDamage] Direct contact detected | wall=" + wallID.ToString() +
@@ -93,6 +98,15 @@ namespace Game
 
         public override void OnDestroy()
         {
+        }
+
+        private void SpawnAudioPrefab(){
+            uint dmgID = 0;
+            dmgID = PrefabInstantiate(collisionaudiodamagePrefab);
+            if(dmgID == 0){
+                LogMessage("[TickDamage] Failed to instantiate damage audio prefab");
+                return;
+            } 
         }
     }
 }
