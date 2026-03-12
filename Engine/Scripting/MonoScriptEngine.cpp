@@ -1406,6 +1406,14 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetEmissiveTexture));
 
 		// =====================================================================
+		// RenderSettings
+		// =====================================================================
+		BindInternalCall("Engine.RenderSettings::Renderer_GetGamma",
+			reinterpret_cast<void*>(InternalCalls::Renderer_GetGamma));
+		BindInternalCall("Engine.RenderSettings::Renderer_SetGamma",
+			reinterpret_cast<void*>(InternalCalls::Renderer_SetGamma));
+
+		// =====================================================================
 		// AudioComponent
 		// =====================================================================
 		BindInternalCall("Engine.Audio::Audio_Play",

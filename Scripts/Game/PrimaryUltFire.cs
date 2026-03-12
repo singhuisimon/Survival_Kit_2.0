@@ -88,6 +88,10 @@ namespace Game
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
+
+            if(hit){
+                return;
+            }
             
             // Check collisions using CollisionManager (efficient!)
             CheckCollisions();

@@ -140,8 +140,8 @@ namespace Game
         [SerializeField] private float CAMSHAKE_DamageTakenMagnitude = 100.0f;
         [SerializeField] private float CAMSHAKE_DamageTakenDuration = 0.1f;
 
-        // ===== TESTING MOUSE SENSITIVITY =====
-        [SerializeField] private float mouseSensitivity = 1.0f; // Default = 1.0f, range = [0.25 - 2.5] // Just need to save value some where (consider onboarding audio settings)
+        // ===== Mouse Sensitivity =====
+        [SerializeField] private float mouseSensitivity = 1.0f; // Default = 1.0f, range = [0.25 - 2.5]
 
         public override void OnStart()
         {

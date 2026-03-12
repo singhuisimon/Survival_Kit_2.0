@@ -39,22 +39,21 @@ namespace Game
             LogMessage("=== DamageBar OnStart ===");
             LogMessage("DamageBar EntityID: " + EntityID);
 
-            // Subscribe to health update events
             Event.Subscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
             LogMessage("DamageBar: Subscribed to event '" + EVENT_PLAYER_HEALTHCHANGE + "'");
 
-            // Store initial position and width
             initialPosition = Transform.GetPosition((uint)EntityID);
 
-            // Get the actual initial scale to determine real width
             Vector3 initialScale = Transform.GetScale((uint)EntityID);
             float actualInitialWidth = initialScale.X;
 
-            // Use the actual width from the scene as barMaxWidth
             barMaxWidth = actualInitialWidth;
             initialWidth = actualInitialWidth;
             currentWidth = actualInitialWidth;
             hpToWidthRatio = barMaxWidth / playerMaxHP;
+
+            // Reset visual to full width in case scene was restarted mid-damage
+            UpdateBarVisual(currentWidth);
 
             initialized = true;
 
@@ -64,6 +63,7 @@ namespace Game
             LogMessage("  HP to Width Ratio: " + hpToWidthRatio);
             LogMessage("  Lerp Duration: " + LERP_DURATION + "s");
         }
+
 
         public override void OnUpdate(float deltaTime)
         {

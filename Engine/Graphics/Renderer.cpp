@@ -1867,7 +1867,7 @@ namespace Engine {
 
 		Font* currentFont = getFont(fontName);
 
-		glActiveTexture(GL_TEXTURE);
+		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, currentFont->getAtlasTexture());
 		prog.setUniform("u_FontAtlas", 0);
 		//render each text item 

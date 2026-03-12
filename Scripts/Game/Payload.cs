@@ -14,6 +14,8 @@ namespace Game
 
         private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
 
+        private const string UpgradeModPickUpAudioPrefab = "Sources/Prefabs/Audio_UpgradeModulePickUp.prefab";
+
          // ===== Entity =====
         private uint playerID = 0;
         private string playerName = "Player";
@@ -83,6 +85,14 @@ namespace Game
 
                 //kills itself thereafter
                 SceneDestroyEntity((uint)EntityID);
+
+                //Spawn Audio PickUp
+                uint audioID = 0;
+                audioID = PrefabInstantiate(UpgradeModPickUpAudioPrefab);
+                if(audioID == 0){
+                    LogMessage("[Payload] Failed to spawn the audio for upgrade mod pick up");
+                    return;
+                }
             }
 
         }

@@ -41,7 +41,8 @@ namespace Game
 
             RigidbodySetIsKinematic(EntityID, true);
 
-            EVENT_BULLET_HIT += EntityID.ToString();
+            EVENT_BULLET_HIT = "Damage:" + EntityID.ToString();
+            isDestroyed = false;
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
 
             wallPos = Transform.GetPosition(EntityID);
@@ -68,11 +69,14 @@ namespace Game
         // Combat
         private void OnBulletHit(string eventName, string payload)
         {
+            if(isDestroyed){
+                return;
+            }
+
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
 
-            health -= 1.0f;
-            LogMessage("DestructableWall hit! Health: " + health);
+            //health -= 1.0f;
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
             if(attackerId != INVALID_ENTITY && health > 0.0f){
@@ -86,6 +90,10 @@ namespace Game
                     }
                 }
             }
+
+            float damage = DamageSystem.ParseAmount(payload);
+            health -= damage;
+            LogMessage("DestructableWall hit! Health: " + health);
 
             if (health <= 0)
             {
