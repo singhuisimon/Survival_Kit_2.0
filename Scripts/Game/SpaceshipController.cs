@@ -162,6 +162,8 @@ namespace Game
                 return;
             }
 
+
+
             RigidbodySetUseGravity(playerEntityID, false);
             RigidbodySetIsKinematic(playerEntityID, false);
 
@@ -194,7 +196,9 @@ namespace Game
             Subscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
 
             SetEmissionRate(healingVFXEntityID, 0.0f);
-
+             mouseSensitivity = (AudioSettings.Instance != null)
+? AudioSettings.Instance.GetMouseSensitivity()
+: mouseSensitivity;
             initialized = true;
             LogMessage("[SpaceshipController] Initialized - smoothed rigidbody movement in FixedUpdate");
         }

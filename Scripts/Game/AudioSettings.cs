@@ -36,9 +36,10 @@ namespace Game
 
         // ===== Mouse Sensitivity =====
         private static readonly float[] MOUSE_SENSITIVITY_STEPS = new float[]
-        {
-            0.25f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f, 2.25f, 2.5f
-        };
+    {
+    0.0f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f, 2.25f, 2.5f
+    };
+
         private const int MOUSE_SENSITIVITY_DEFAULT_INDEX = 3; // 1.0f
         private int mouseSensitivityIndex = MOUSE_SENSITIVITY_DEFAULT_INDEX;
 
