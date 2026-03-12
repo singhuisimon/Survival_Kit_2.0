@@ -32,6 +32,11 @@ namespace Engine
 		DisplayableAsset() : record(nullptr), guid{}, isRawAsset(true) {}
 	};
 
+	enum class AssetViewMode
+	{
+		Grid,
+		List
+	};
 
 	class Editor;
 	class EditorAssetBrowserPanel
@@ -62,6 +67,8 @@ namespace Engine
 		bool m_ShowDeleteConfirmPopUp = false;
 		DisplayableAsset m_AssetToDelete;
 
+		AssetViewMode m_ViewMode = AssetViewMode::Grid;
+
 
 		/*Scene* m_Scene = nullptr;
 		Entity m_SelectedEntity{};
@@ -82,6 +89,7 @@ namespace Engine
 		std::vector<DisplayableAsset>BuildDisplayAssets(const std::vector<const AssetRecord*>& records, const std::string& displayFolder,bool isRawAssets);
 		void FilterAssetsBySearchQuery();
 		void SearchFolderRecursive(const std::string& folderPath, const std::string& displayFolder, const std::string& lowerQuery);
+		void RenderAssetList(const std::vector<DisplayableAsset>& displayAssets);
 	};
 }
 #endif // END OF EDITOR_PROPERTYPANEL_H
