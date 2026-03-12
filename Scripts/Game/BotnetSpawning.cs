@@ -38,31 +38,24 @@ namespace Game {
 
         private bool canSpawn = true;
 
+        private bool initialized = false;
+
         //private Random random = new Random();
 
         public override void OnStart(){
-            timer = interval;
+            initialize();
 
-            wall1ID = SceneFindEntityByName(wall1Name);
-            wall2ID = SceneFindEntityByName(wall2Name);
-            wall3ID = SceneFindEntityByName(wall3Name);
-
-            if(wall1ID == 0){
-                LogMessage("[Botnet Spawning] Warning: Wall1 not found!");
-            }
-            if(wall2ID == 0){
-                LogMessage("[Botnet Spawning] Warning: Wall2 not found!");
-            }
-            if(wall3ID == 0){
-                LogMessage("[Botnet Spawning] Warning: Wall3 not found!");
-            }
-
-            canSpawn = true;
             Subscribe(GAMEOVEREVENT, OnGameEnd);
             Subscribe(GAMEWINEVENT, OnGameEnd);
         }
 
         public override void OnUpdate(float deltaTime){
+
+            if(!initialized){
+                initialize();
+                return;
+            }
+
             // Don't spawn when game is paused
             if (GameState.IsPaused)
                 return;
@@ -100,6 +93,8 @@ namespace Game {
         public override void OnDestroy(){
             Unsubscribe(GAMEOVEREVENT, OnGameEnd);
             Unsubscribe(GAMEWINEVENT, OnGameEnd);
+            canSpawn = false;
+            initialized = false;
         }
 
         private void OnGameEnd(string eventName, string payload){
@@ -173,6 +168,31 @@ namespace Game {
         private void CheckCurrentBotnetCount(){
             currentBotnetCount = SceneFindEntitiesByTag(BOTNETTAG).Length;
             LogMessage("[BotnetSpawning] Current botnet count is: " + currentBotnetCount.ToString() + "/" + maxBotnets.ToString());
+        }
+
+        private void initialize(){
+            wall1ID = SceneFindEntityByName(wall1Name);
+            wall2ID = SceneFindEntityByName(wall2Name);
+            wall3ID = SceneFindEntityByName(wall3Name);
+
+            if(wall1ID == 0){
+                LogMessage("[Botnet Spawning] Warning: Wall1 not found!");
+            }
+            if(wall2ID == 0){
+                LogMessage("[Botnet Spawning] Warning: Wall2 not found!");
+            }
+            if(wall3ID == 0){
+                LogMessage("[Botnet Spawning] Warning: Wall3 not found!");
+            }
+
+            if(wall1ID == 0 || wall2ID == 0 || wall3ID == 0){
+                return;
+            }
+
+            timer = interval;
+
+            canSpawn = true;
+            initialized = true;
         }
     }
 

@@ -1724,7 +1724,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1874,7 +1874,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2003,7 +2003,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -1.0177775099486433e-13,
+                            -0.0,
                             90.0
                         ],
                         "Scale": [
@@ -2705,7 +2705,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -2970,7 +2970,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4200,7 +4200,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8241,7 +8241,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8306,7 +8306,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8637,7 +8637,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -9470,12 +9470,12 @@
     ],
     "Settings": [
         {
-            "BloomToggle": false,
-            "BloomStrength": 0.009999999776482582,
-            "BloomFilterRadius": 0.0024999999441206455,
-            "Exposure": 1.0,
+            "BloomToggle": true,
+            "BloomStrength": 0.004999999888241291,
+            "BloomFilterRadius": 0.0010000000474974513,
+            "Exposure": 5.0,
             "GlobalBias": 0.004999999888241291,
-            "MasterVolume": 1.0,
+            "MasterVolume": 2.0,
             "SFXVolume": 1.0,
             "BGMVolume": 1.0,
             "VOVolume": 1.0,
