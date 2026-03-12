@@ -852,6 +852,15 @@ namespace Engine {
 		 * Input parameter.
 		***************************************************************************/
 		void MeshRenderer_SetGlobalIlluminate(uint64_t entityID, bool gi);
+		/**************************************************************************
+		 * @brief
+		 * Sets the emissive texture on the entity's material by filename.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param textureName
+		 * Managed string with the texture filename (e.g., "PlayerModel_Blue_v003_Emissive.png").
+		***************************************************************************/
+		void MeshRenderer_SetEmissiveTexture(uint64_t entityID, MonoString* textureName);
 
 		// ===== AudioComponent =====
 		/**************************************************************************
@@ -1439,7 +1448,44 @@ namespace Engine {
 		 * The number of particles to emit per second.
 		***************************************************************************/
 		void ParticleSystem_SetEmissionRate(uint64_t entityID, float rate);
+		/**************************************************************************
+		 * @brief
+		 * Sets the minimum particle color (RGBA).
+		 * @param entityID
+		 * The entity id of the particle emitter.
+		 * @param color
+		 * Pointer to a vec4 (r, g, b, a).
+		***************************************************************************/
+		void ParticleSystem_SetColorMin(uint64_t entityID, glm::vec4* color);
+		/**************************************************************************
+		 * @brief
+		 * Sets the maximum particle color (RGBA).
+		 * @param entityID
+		 * The entity id of the particle emitter.
+		 * @param color
+		 * Pointer to a vec4 (r, g, b, a).
+		***************************************************************************/
+		void ParticleSystem_SetColorMax(uint64_t entityID, glm::vec4* color);
 
+		// ===== TrailComponent =====
+		/**************************************************************************
+		 * @brief
+		 * Sets the start color of the entity's trail component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param color
+		 * Pointer to a vec4 (r, g, b, a).
+		***************************************************************************/
+		void Trail_SetStartColor(uint64_t entityID, glm::vec4* color);
+		/**************************************************************************
+		 * @brief
+		 * Sets the end color of the entity's trail component.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param color
+		 * Pointer to a vec4 (r, g, b, a).
+		***************************************************************************/
+		void Trail_SetEndColor(uint64_t entityID, glm::vec4* color);
 
 		void  RNG_Seed(std::uint32_t seed);
 		int   RNG_RandInt(int min, int max);

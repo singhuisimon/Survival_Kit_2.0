@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Audio_Trench_EnemyCoreWarn",
+    "Prefab GUID": 13072718880232253413,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Audio_Trench_EnemyCoreWarn",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17684404898658854877",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5002268347983538139",
+                            "Name": "Audio_Trench_EnemyCoreWarn",
+                            "Tag": "Audio_Trench_EnemyCoreWarn"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2696425338770188255",
+                            "FilePath": "System AI_VO_Trench Run Corrupted Core.wav",
+                            "Type": 4,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6155189852591040481",
+                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "Started": false,
+                            "GCHandle": 3723
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

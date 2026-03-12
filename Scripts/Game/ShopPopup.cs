@@ -382,7 +382,6 @@ namespace Game
 
         private void AwardByteChipsAndResearch(int byteChips, int research)
         {
-            ProgressTracker.LoadProgress();
             ProgressTracker.ByteChips += byteChips;
             ProgressTracker.CumulativeScore += research;
             ProgressTracker.SaveProgress();
