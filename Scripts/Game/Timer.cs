@@ -61,27 +61,29 @@ namespace Game
             if (!initialized || gameOver)
                 return;
 
-            // Don't count down when game is paused
             if (GameState.IsPaused)
                 return;
 
-            // Count down
-            //remainingTime -= (deltaTime / 2);
             remainingTime -= deltaTime;
 
-            // Clamp to 0 and publish win event once
             if (remainingTime <= 0.0f)
             {
                 remainingTime = 0.0f;
                 gameOver = true;
                 Text.SetIsVisible((uint)EntityID, false);
+
+                // Publish time survived (full duration since timer ran out)
+                Publish("ShowTimeSurvived", startingTime.ToString("F2"));
+                LogMessage("[TimerUI] Timer finished - time survived: " + startingTime);
+
                 Publish("TimerFinished", "");
                 LogMessage("[TimerUI] Timer finished! Win!");
+                return;
             }
 
-            // Update display
             UpdateTimerDisplay();
         }
+
 
         private void OnDebugSetTimer(string eventName, string payload)
         {
