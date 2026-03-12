@@ -8,19 +8,10 @@ using static Engine.Event;
 namespace Game
 {
     /// <summary>
-    /// ScoreBoard1 - Tracks and displays player score for Level 1
-    /// Attach this to the score text entity
+    /// ScoreBoard1 - Tracks and displays player score for Level 1 (trench_run)
     /// Displays as "SCORE 0000000" (7 digit zero-padded)
-    /// Hides on win or lose
-    /// Saves top 10 scores with timestamps to JSON
-    ///
-    /// Points:
-    ///   Botnet       = 10
-    ///   WormHost     = 100
-    ///   LoveLetter   = 1111
-    ///
-    /// JSON format:
-    ///   { "Level1": [{"score":5000,"date":"2025-02-23 14:30:45"}, ...] }
+    /// Hides on win or lose, saves top 10 scores to JSON
+    /// Points: Botnet=30, WormHost=35, LoveLetter=50, Turret=25
     /// </summary>
     public class ScoreBoard1 : ScriptBehaviour
     {
@@ -49,7 +40,7 @@ namespace Game
 
         // ===== State =====
         private int score = 0;
-        private bool scoreSaved = false;    // Guard: only save once per session
+        private bool scoreSaved = false;
         private string currentLevel = "trench_run";
 
         public override void OnStart()
@@ -57,20 +48,16 @@ namespace Game
             LogMessage("=== ScoreBoard1 OnStart ===");
             LogMessage("ScoreBoard1 EntityID: " + EntityID);
 
-            // Subscribe to enemy death events
             Event.Subscribe(EVENT_BOTNET_DEAD, OnBotnetKilled);
             Event.Subscribe(EVENT_LOVELETTER_DEAD, OnLoveLetterKilled);
             Event.Subscribe(EVENT_WORMHOST_DEAD, OnWormHostKilled);
             Event.Subscribe(EVENT_TURRET_DEAD, OnTurretKilled);
-
-            // Subscribe to game state events
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
             Event.Subscribe(ENEMY_CORE_DEATH, OnGameOver);
             Event.Subscribe(GAMEWIN, OnGameWin);
 
-            // Initialize score
             score = 0;
             scoreSaved = false;
             UpdateScoreDisplay();
@@ -115,6 +102,10 @@ namespace Game
             LogMessage("[ScoreBoard1] Game over event: " + eventName);
             SaveScore();
             Text.SetIsVisible((uint)EntityID, false);
+
+            // Publish final score for end screen display
+            Publish("ShowFinalScore", score.ToString());
+            LogMessage("[ScoreBoard1] Published final score: " + score);
         }
 
         private void OnGameWin(string eventName, string payload)
@@ -132,7 +123,6 @@ namespace Game
 
         private void UpdateScoreDisplay()
         {
-            // Format: "SCORE 0000000" (7 digits, zero-padded)
             string scoreText = "SCORE " + score.ToString("D7");
             SetText((uint)EntityID, scoreText);
         }
@@ -141,7 +131,6 @@ namespace Game
 
         private void SaveScore()
         {
-            // Guard: only save once per game session
             if (scoreSaved)
             {
                 LogMessage("[ScoreBoard1] Score already saved this session, skipping");
@@ -150,29 +139,22 @@ namespace Game
 
             try
             {
-                // Get current timestamp
                 string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
 
-                // Load all existing scores from file
                 Dictionary<string, List<ScoreEntry>> allScores = LoadAllScores();
 
-                // Get scores for this level, or start fresh
                 if (!allScores.ContainsKey(currentLevel))
                     allScores[currentLevel] = new List<ScoreEntry>();
 
                 List<ScoreEntry> levelScores = allScores[currentLevel];
-
-                // Add new score with timestamp
                 levelScores.Add(new ScoreEntry { score = score, date = timestamp });
 
-                // Sort by score descending, keep top 10
                 levelScores.Sort((a, b) => b.score.CompareTo(a.score));
                 if (levelScores.Count > MAX_SCORES)
                     levelScores.RemoveRange(MAX_SCORES, levelScores.Count - MAX_SCORES);
 
                 allScores[currentLevel] = levelScores;
 
-                // Write back to file
                 string json = SerializeScores(allScores);
                 if (FileIO.WriteAllText(SAVE_FILE, json))
                 {
@@ -206,7 +188,6 @@ namespace Game
                 string json = FileIO.ReadAllText(SAVE_FILE);
                 json = json.Trim().TrimStart('{').TrimEnd('}');
 
-                // Split entries by "],"
                 string[] entries = json.Split(new string[] { "]," }, StringSplitOptions.RemoveEmptyEntries);
 
                 foreach (string entry in entries)
@@ -220,7 +201,6 @@ namespace Game
 
                     var scores = new List<ScoreEntry>();
 
-                    // Parse score objects: {"score":5000,"date":"2025-02-23 14:30:45"}
                     string[] objects = arrayContent.Split(new string[] { "},{" }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string obj in objects)
                     {
@@ -238,10 +218,8 @@ namespace Game
                             string k = kv[0].Trim().Trim('"');
                             string v = kv[1].Trim().Trim('"');
 
-                            if (k == "score")
-                                int.TryParse(v, out scoreVal);
-                            else if (k == "date")
-                                dateVal = v;
+                            if (k == "score") int.TryParse(v, out scoreVal);
+                            else if (k == "date") dateVal = v;
                         }
 
                         if (scoreVal > 0)
@@ -294,11 +272,9 @@ namespace Game
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
             Event.Unsubscribe(ENEMY_CORE_DEATH, OnGameOver);
             Event.Unsubscribe(GAMEWIN, OnGameWin);
-
             LogMessage("=== ScoreBoard1 Destroyed ===");
         }
 
-        // ===== HELPER CLASS =====
         private class ScoreEntry
         {
             public int score;

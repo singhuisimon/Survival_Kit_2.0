@@ -64,6 +64,13 @@ namespace Game
             wasMousePressed = false;
             IsLevel2Selected = false;
 
+            // Ensure selected variants are visible so SetColor can control them
+            if (level1ButtonSelectedId != 0)
+            {
+                SetIsVisible(level1ButtonSelectedId, true);
+                SetColor(level1ButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+            }
+
             // Hide Level 2 button and its selected variant if not unlocked
             if (!level2Unlocked)
             {
@@ -77,8 +84,6 @@ namespace Game
             {
                 if (level2ButtonId != 0)
                     SetIsVisible(level2ButtonId, true);
-                // Ensure the selected (hover) variant is visible but transparent,
-                // so SetColor can reveal it on hover without IsVisible blocking rendering.
                 if (level2ButtonSelectedId != 0)
                 {
                     SetIsVisible(level2ButtonSelectedId, true);
@@ -100,11 +105,6 @@ namespace Game
         {
             if (!entitiesFound)
                 return;
-
-            // Update hover visuals
-            UpdateButtonHover(level1ButtonId, level1ButtonSelectedId);
-            if (level2Unlocked)
-                UpdateButtonHover(level2ButtonId, level2ButtonSelectedId);
 
             bool isMousePressed = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
@@ -155,24 +155,28 @@ namespace Game
                 if (levelSelectionPopup2Id != 0)
                     SetIsVisible(levelSelectionPopup2Id, false);
             }
+
+            // Update button visuals: show selected texture for the active level
+            UpdateButtonSelection();
         }
 
-        private void UpdateButtonHover(uint normalId, uint hoveredId)
+        private void UpdateButtonSelection()
         {
-            if (normalId == 0 || hoveredId == 0) return;
-
-            bool isHovered = Collision2D.IsMouseCollidingWithEntity(normalId) ||
-                            Collision2D.IsMouseCollidingWithEntity(hoveredId);
-
-            if (isHovered)
+            if (IsLevel2Selected)
             {
-                SetColor(normalId, 1.0f, 1.0f, 1.0f, 0.0f);  // Hide normal
-                SetColor(hoveredId, 1.0f, 1.0f, 1.0f, 1.0f);  // Show selected
+                // Level 2 selected: show Level 2 selected, Level 1 normal
+                if (level1ButtonId != 0) SetColor(level1ButtonId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (level1ButtonSelectedId != 0) SetColor(level1ButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (level2ButtonId != 0) SetColor(level2ButtonId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (level2ButtonSelectedId != 0) SetColor(level2ButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f);
             }
             else
             {
-                SetColor(normalId, 1.0f, 1.0f, 1.0f, 1.0f);   // Show normal
-                SetColor(hoveredId, 1.0f, 1.0f, 1.0f, 0.0f);  // Hide selected
+                // Level 1 selected: show Level 1 selected, Level 2 normal
+                if (level1ButtonId != 0) SetColor(level1ButtonId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (level1ButtonSelectedId != 0) SetColor(level1ButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (level2ButtonId != 0) SetColor(level2ButtonId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (level2ButtonSelectedId != 0) SetColor(level2ButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
             }
         }
 

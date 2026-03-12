@@ -3763,8 +3763,8 @@
                     "Properties": {
                         "ComponentGUID": "80004000000000001",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            195.0,
+                            146.0,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -3814,8 +3814,8 @@
                     "Properties": {
                         "ComponentGUID": "80005000000000001",
                         "Position": [
-                            640.0,
-                            -500.0,
+                            270.0,
+                            146.0,
                             -0.6000000238418579
                         ],
                         "Rotation": [
@@ -3824,7 +3824,7 @@
                             0.0
                         ],
                         "Scale": [
-                            34.0,
+                            40.0,
                             13.0,
                             1.0
                         ],
@@ -3836,6 +3836,108 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "ByteChipsButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80032,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop Packs Button Selected",
+                        "Tag": "Shop Packs Button Selected"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80032000000000001",
+                        "Position": [
+                            195.0,
+                            146.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            29.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "PacksButton_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 80033,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Shop ByteChips Button Selected",
+                        "Tag": "Shop ByteChips Button Selected"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "80033000000000001",
+                        "Position": [
+                            270.0,
+                            146.0,
+                            -0.6000000238418579
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            40.0,
+                            13.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ByteChipsButton_Selected.png",
                         "Color": [
                             1.0,
                             1.0,

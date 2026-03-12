@@ -93,15 +93,17 @@ namespace Game
 
         private void OnGameOver(string eventName, string payload)
         {
+            if (gameOver) return; // prevent double-firing
             LogMessage("[TimerUI] Game over triggered by: " + eventName + " - Timer stopped");
             gameOver = true;
             Text.SetIsVisible((uint)EntityID, false);
 
-            // Publish time survived (startingTime - remainingTime)
             float timeSurvived = startingTime - remainingTime;
-            Publish("ShowTimeSurvived", timeSurvived.ToString());
+            if (timeSurvived < 0.0f) timeSurvived = 0.0f;
+            Publish("ShowTimeSurvived", timeSurvived.ToString("F2"));
             LogMessage("[TimerUI] Time survived: " + timeSurvived);
         }
+
 
 
         private void UpdateTimerDisplay()
@@ -115,10 +117,14 @@ namespace Game
             SetText((uint)EntityID, timeText);
         }
 
+
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameOver);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameOver);
+            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
+            Event.Unsubscribe(ENEMY_CORE_DEATH, OnGameOver);
+            Event.Unsubscribe(GAMEWIN, OnGameOver);
             Event.Unsubscribe(EVENT_DEBUG_SET_TIMER, OnDebugSetTimer);
             LogMessage("=== TimerUI Destroyed ===");
         }
