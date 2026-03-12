@@ -2,6 +2,7 @@
 #include <glm/glm.hpp>
 #include <entt/entt.hpp>
 
+#include "../Serialization/ComponentRegistry.h"
 #include "../../External/xresource_guid/include/xresource_guid.h"
 #include "../Utility/Types.h"
 
@@ -10,6 +11,10 @@ namespace Engine
 
     struct BeamComponent
     {
+        static constexpr ComponentTypeID TypeID = ComponentTypeID::Beam;
+        static constexpr const char* TypeName = "BeamComponent";
+
+        xresource::instance_guid ComponentGUID;
 
         // Endpoints (world space)
         glm::vec3 StartPoint = glm::vec3(0.f);
@@ -43,6 +48,8 @@ namespace Engine
 
         // Control
         bool Active = true;
+
+        BeamComponent() : ComponentGUID(xresource::instance_guid::GenerateGUIDCopy()) { }
     };
 
 }
