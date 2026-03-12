@@ -22,7 +22,9 @@ namespace Game
         private const string SHOP_BYTECHIPS_POPUP_NAME = "Shop ByteChips Popup";
         private const string SHOP_CLOSE_BUTTON_NAME = "Shop Close Button";
         private const string PACKS_BUTTON_NAME = "Shop Packs Button";
+        private const string PACKS_BUTTON_SELECTED_NAME = "Shop Packs Button Selected";
         private const string BYTECHIPS_BUTTON_NAME = "Shop ByteChips Button";
+        private const string BYTECHIPS_BUTTON_SELECTED_NAME = "Shop ByteChips Button Selected";
         private const string EXCHANGE_BUTTON_1_NAME = "Shop Exchange Button 1";
         private const string EXCHANGE_BUTTON_2_NAME = "Shop Exchange Button 2";
         private const string EXCHANGE_BUTTON_3_NAME = "Shop Exchange Button 3";
@@ -56,7 +58,9 @@ namespace Game
         private uint byteChipsPopupId;
         private uint closeButtonId;
         private uint packsButtonId;
+        private uint packsButtonSelectedId;
         private uint byteChipsButtonId;
+        private uint byteChipsButtonSelectedId;
         private uint exchangeButton1Id;
         private uint exchangeButton2Id;
         private uint exchangeButton3Id;
@@ -79,8 +83,8 @@ namespace Game
         // Visible positions
         private Vector3 popupVisiblePos = new Vector3(640.0f, 360.0f, -0.5f);
         private Vector3 closeButtonVisiblePos = new Vector3(1115.0f, 112.0f, -0.6f);
-        private Vector3 packsButtonVisiblePos = new Vector3(192.0f, 147.0f, -0.6f);
-        private Vector3 byteChipsButtonVisiblePos = new Vector3(254.0f, 147.0f, -0.6f);
+        private Vector3 packsButtonVisiblePos = new Vector3(195.0f, 146.0f, -0.6f);
+        private Vector3 byteChipsButtonVisiblePos = new Vector3(270.0f, 146.0f, -0.6f);
         private Vector3 slot1VisiblePos = new Vector3(573.0f, 550.0f, -0.6f);
         private Vector3 slot2VisiblePos = new Vector3(815.0f, 550.0f, -0.6f);
         private Vector3 exchangeButton3VisiblePos = new Vector3(1057.0f, 550.0f, -0.6f);
@@ -121,7 +125,11 @@ namespace Game
             byteChipsPopupId = SceneFindEntityByName(SHOP_BYTECHIPS_POPUP_NAME);
             closeButtonId = SceneFindEntityByName(SHOP_CLOSE_BUTTON_NAME);
             packsButtonId = SceneFindEntityByName(PACKS_BUTTON_NAME);
+            packsButtonSelectedId = SceneFindEntityByName(PACKS_BUTTON_SELECTED_NAME);
             byteChipsButtonId = SceneFindEntityByName(BYTECHIPS_BUTTON_NAME);
+            byteChipsButtonSelectedId = SceneFindEntityByName(BYTECHIPS_BUTTON_SELECTED_NAME);
+            LogMessage("ShopPopup: packsButtonId=" + packsButtonId + " packsButtonSelectedId=" + packsButtonSelectedId +
+                " byteChipsButtonId=" + byteChipsButtonId + " byteChipsButtonSelectedId=" + byteChipsButtonSelectedId);
             exchangeButton1Id = SceneFindEntityByName(EXCHANGE_BUTTON_1_NAME);
             exchangeButton2Id = SceneFindEntityByName(EXCHANGE_BUTTON_2_NAME);
             exchangeButton3Id = SceneFindEntityByName(EXCHANGE_BUTTON_3_NAME);
@@ -215,16 +223,16 @@ namespace Game
                     return;
                 }
 
-                // Check Packs tab button
-                if (!isPacksTab && packsButtonId != 0 && Collision2D.IsMouseCollidingWithEntity(packsButtonId))
+                // Check Packs tab button (normal or selected variant)
+                if (!isPacksTab && IsPacksTabClicked())
                 {
                     LogMessage("ShopPopup: Packs tab clicked");
                     SwitchToPacksTab();
                     return;
                 }
 
-                // Check ByteChips tab button
-                if (isPacksTab && byteChipsButtonId != 0 && Collision2D.IsMouseCollidingWithEntity(byteChipsButtonId))
+                // Check ByteChips tab button (normal or selected variant)
+                if (isPacksTab && IsByteChipsTabClicked())
                 {
                     LogMessage("ShopPopup: ByteChips tab clicked");
                     SwitchToByteChipsTab();
@@ -461,13 +469,24 @@ namespace Game
             // Show shared elements
             if (closeButtonId != 0) SetPosition(closeButtonId, ref closeButtonVisiblePos);
             if (packsButtonId != 0) SetPosition(packsButtonId, ref packsButtonVisiblePos);
+            if (packsButtonSelectedId != 0)
+            {
+                SetIsVisible(packsButtonSelectedId, true);
+                SetPosition(packsButtonSelectedId, ref packsButtonVisiblePos);
+            }
             if (byteChipsButtonId != 0) SetPosition(byteChipsButtonId, ref byteChipsButtonVisiblePos);
+            if (byteChipsButtonSelectedId != 0)
+            {
+                SetIsVisible(byteChipsButtonSelectedId, true);
+                SetPosition(byteChipsButtonSelectedId, ref byteChipsButtonVisiblePos);
+            }
 
             // Show score texts
             UpdateScoreDisplay();
             UpdateByteChipsDisplay();
 
             // Default to Packs tab
+            UpdateTabButtonVisuals();
             ShowPacksTab();
 
             LogMessage("ShopPopup: Popup shown (Packs tab)");
@@ -496,6 +515,7 @@ namespace Game
         private void SwitchToPacksTab()
         {
             isPacksTab = true;
+            UpdateTabButtonVisuals();
             ShowPacksTab();
             LogMessage("ShopPopup: Switched to Packs tab");
         }
@@ -503,8 +523,47 @@ namespace Game
         private void SwitchToByteChipsTab()
         {
             isPacksTab = false;
+            UpdateTabButtonVisuals();
             ShowByteChipsTab();
             LogMessage("ShopPopup: Switched to ByteChips tab");
+        }
+
+        private bool IsPacksTabClicked()
+        {
+            if (packsButtonId != 0 && Collision2D.IsMouseCollidingWithEntity(packsButtonId))
+                return true;
+            if (packsButtonSelectedId != 0 && Collision2D.IsMouseCollidingWithEntity(packsButtonSelectedId))
+                return true;
+            return false;
+        }
+
+        private bool IsByteChipsTabClicked()
+        {
+            if (byteChipsButtonId != 0 && Collision2D.IsMouseCollidingWithEntity(byteChipsButtonId))
+                return true;
+            if (byteChipsButtonSelectedId != 0 && Collision2D.IsMouseCollidingWithEntity(byteChipsButtonSelectedId))
+                return true;
+            return false;
+        }
+
+        private void UpdateTabButtonVisuals()
+        {
+            if (isPacksTab)
+            {
+                // Packs selected: show selected packs, normal bytechips
+                if (packsButtonId != 0) SetColor(packsButtonId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (packsButtonSelectedId != 0) SetColor(packsButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (byteChipsButtonId != 0) SetColor(byteChipsButtonId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (byteChipsButtonSelectedId != 0) SetColor(byteChipsButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+            }
+            else
+            {
+                // ByteChips selected: show normal packs, selected bytechips
+                if (packsButtonId != 0) SetColor(packsButtonId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (packsButtonSelectedId != 0) SetColor(packsButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (byteChipsButtonId != 0) SetColor(byteChipsButtonId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (byteChipsButtonSelectedId != 0) SetColor(byteChipsButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f);
+            }
         }
 
         private void ShowPacksTab()
@@ -684,7 +743,9 @@ namespace Game
             if (byteChipsPopupId != 0) SetPosition(byteChipsPopupId, ref hidePos);
             if (closeButtonId != 0) SetPosition(closeButtonId, ref hidePos2);
             if (packsButtonId != 0) SetPosition(packsButtonId, ref hidePos2);
+            if (packsButtonSelectedId != 0) SetPosition(packsButtonSelectedId, ref hidePos2);
             if (byteChipsButtonId != 0) SetPosition(byteChipsButtonId, ref hidePos2);
+            if (byteChipsButtonSelectedId != 0) SetPosition(byteChipsButtonSelectedId, ref hidePos2);
             if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref hidePos2);
             if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref hidePos2);
             if (exchangeButton3Id != 0) SetPosition(exchangeButton3Id, ref hidePos2);
