@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_UpgradeModulePickUp.prefab",
-    "Prefab GUID": 9071420146454315171,
+    "Prefab GUID": 14108643553270743213,
     "version": 1,
     "entities": [
         {
@@ -53,7 +53,7 @@
                             "ComponentGUID": "13559178010260488357",
                             "FilePath": "Upgrade Module Pickup.wav",
                             "Type": 5,
-                            "State": 2,
+                            "State": 0,
                             "Volume": 2.0,
                             "Pitch": 1.0,
                             "Loop": false,
@@ -74,9 +74,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4335805973406417063",
-                            "ScriptClassName": "Game.GameDelaySoundPrefab",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 35
                         }
                     }
                 }
