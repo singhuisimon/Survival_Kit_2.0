@@ -513,6 +513,8 @@ namespace Engine {
 			float Age;           // Normalized age [0, 1]
 		};
 
+		void UploadMaterialUniforms(ShaderProgram& shader, MaterialResource* mat);
+
 		GLuint m_TrailVAO;
 		GLuint m_TrailVBO;
 		GLuint m_TrailEBO;

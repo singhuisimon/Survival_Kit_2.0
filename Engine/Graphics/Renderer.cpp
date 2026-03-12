@@ -2041,6 +2041,52 @@ namespace Engine {
 		return &m_defaultFont;
 	}
 
+	void Renderer::UploadMaterialUniforms(ShaderProgram& shader, MaterialResource* mat)
+	{
+		if (!mat)
+		{
+			shader.setUniform("u_HasBaseMap", false);
+			shader.setUniform("u_HasEmissionMap", false);
+			shader.setUniform("u_EnableEmission", false);
+			shader.setUniform("u_BaseColor", glm::vec3(1.f));
+			shader.setUniform("u_EmissionColor", glm::vec3(1.f));
+			shader.setUniform("u_EmissionStrength", 0.f);
+			shader.setUniform("u_Opacity", 1.f);
+			shader.setUniform("u_UVTiling", glm::vec2(1.f, 1.f));
+			shader.setUniform("u_UVOffset", glm::vec2(0.f, 0.f));
+			return;
+		}
+
+		// Base map
+		TextureResource* baseTex = RM.loadResource<TextureResource>(convertToTextureGuid(mat->baseMap));
+		bool hasBase = (baseTex != nullptr);
+		shader.setUniform("u_HasBaseMap", hasBase);
+		if (hasBase)
+		{
+			glBindTextureUnit(15, static_cast<GLuint>(baseTex->textureID));
+			//shader.setUniform("u_BaseMap", 0);
+		}
+		shader.setUniform("u_BaseColor", glm::vec3(mat->baseColor[0], mat->baseColor[1], mat->baseColor[2]));
+
+		// Emission map
+		TextureResource* emissionTex = RM.loadResource<TextureResource>(convertToTextureGuid(mat->emissionMap));
+		bool hasEmission = (emissionTex != nullptr);
+		shader.setUniform("u_HasEmissionMap", hasEmission);
+		shader.setUniform("u_EnableEmission", mat->enableEmission);
+		shader.setUniform("u_EmissionStrength", mat->emissionStrength);
+		shader.setUniform("u_EmissionColor", glm::vec3(mat->emissionColor[0], mat->emissionColor[1], mat->emissionColor[2]));
+		if (hasEmission)
+		{
+			glBindTextureUnit(16, static_cast<GLuint>(emissionTex->textureID));
+			//shader.setUniform("u_EmissionMap", 1);
+		}
+
+		// Opacity and UV transform
+		shader.setUniform("u_Opacity", mat->opacity);
+		shader.setUniform("u_UVTiling", glm::vec2(mat->tiling[0], mat->tiling[1]));
+		shader.setUniform("u_UVOffset", glm::vec2(mat->offset[0], mat->offset[1]));
+	}
+
 	void Renderer::BuildTrailGeometry(const TrailComponent& trail, std::vector<TrailVertex>& vertices, std::vector<u32>& indices) {
 		vertices.clear();
 		indices.clear();
@@ -2184,11 +2230,14 @@ namespace Engine {
 			shaderProgram.setUniform("u_EndColor", trail->EndColor);
 
 			// Bind material texture if available
-			if (trail->MaterialGuid != 0) {
-				// Load material texture
-				// std::string matPath = AM.getNamedFromGuid(trail->MaterialGuid);
-				// Bind texture...
-			}
+			MaterialResource* mat = (trail->MaterialGuid != 0)
+				? RM.loadResource<MaterialResource>(convertToMaterialGuid(trail->MaterialGuid))
+				: nullptr;
+
+			UploadMaterialUniforms(shaderProgram, mat);
+			shaderProgram.setUniform("u_UVScrollOffset", 0.f); // Trails don't scroll
+			shaderProgram.setUniform("u_StartColor", trail->StartColor);
+			shaderProgram.setUniform("u_EndColor", trail->EndColor);
 
 			// Draw
 			glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()),
@@ -2329,6 +2378,12 @@ namespace Engine {
 			glNamedBufferData(m_BeamVBO, vertices.size() * sizeof(TrailVertex), vertices.data(), GL_DYNAMIC_DRAW);
 			glNamedBufferData(m_BeamEBO, indices.size() * sizeof(u32), indices.data(), GL_DYNAMIC_DRAW);
 
+			MaterialResource* mat = (beam->MaterialGuid != 0)
+				? RM.loadResource<MaterialResource>(convertToMaterialGuid(beam->MaterialGuid))
+				: nullptr;
+
+			UploadMaterialUniforms(shaderProgram, mat);
+			shaderProgram.setUniform("u_UVScrollOffset", beam->UVScrollOffset);
 			shaderProgram.setUniform("u_StartColor", beam->StartColor);
 			shaderProgram.setUniform("u_EndColor", beam->EndColor);
 

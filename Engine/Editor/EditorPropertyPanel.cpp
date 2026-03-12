@@ -3762,7 +3762,51 @@ namespace Engine
 				if (ImGui::DragFloat3("Start Offset", &beam.StartOffset.x, 0.01f, -10.0f, 10.0f))
 					MarkComponentOverridden(ComponentTypeID::Beam);
 
-				if (ImGui::DragFloat3("End Point Offset", &beam.EndPointOffset.x, 0.01f, -10.0f, 10.0f))
+				ImGui::Spacing();
+
+				// --- Target Entity Picker ---
+				std::string currentTargetName = "None";
+				if (beam.TargetEntity != entt::null && m_Scene->GetRegistry().valid(beam.TargetEntity))
+				{
+					auto* tag = m_Scene->GetRegistry().try_get<TagComponent>(beam.TargetEntity);
+					if (tag)
+						currentTargetName = tag->Tag;
+				}
+
+				ImGui::Text("Target Entity");
+				ImGui::SameLine();
+				ImGui::SetNextItemWidth(-1.f);
+				if (ImGui::BeginCombo("##BeamTargetEntity", currentTargetName.c_str()))
+				{
+					if (ImGui::Selectable("None", beam.TargetEntity == entt::null))
+					{
+						beam.TargetEntity = entt::null;
+						MarkComponentOverridden(ComponentTypeID::Beam);
+					}
+
+					auto view = m_Scene->GetRegistry().view<TagComponent>();
+					for (auto entity : view)
+					{
+						if (entity == static_cast<entt::entity>(m_SelectedEntity))
+							continue;
+
+						auto& tag = view.get<TagComponent>(entity);
+						bool isSelected = (beam.TargetEntity == entity);
+
+						if (ImGui::Selectable(tag.Tag.c_str(), isSelected))
+						{
+							beam.TargetEntity = entity;
+							MarkComponentOverridden(ComponentTypeID::Beam);
+						}
+
+						if (isSelected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
+				}
+
+				if (ImGui::DragFloat3("End Offset", &beam.EndPointOffset.x, 0.01f, -10.0f, 10.0f))
 					MarkComponentOverridden(ComponentTypeID::Beam);
 
 				ImGui::Spacing();
