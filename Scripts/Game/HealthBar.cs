@@ -20,6 +20,7 @@ namespace Game
         private Vector3 initialPosition;
         private float initialWidth;
         private float playerMaxHP = 100.0f;
+        private float currentHP = 100.0f;  // track actual HP
         private float hpToWidthRatio;
 
         // ===== Lerp State (heal only) =====
@@ -39,11 +40,18 @@ namespace Game
 
             barMaxWidth = initialScale.X;
             initialWidth = initialScale.X;
-            currentWidth = initialScale.X;
             hpToWidthRatio = barMaxWidth / playerMaxHP;
 
+            // ===== Always reset to full HP on start =====
+            currentHP = playerMaxHP;
+            currentWidth = initialWidth;
+            isLerping = false;
+            lerpTimer = 0.0f;
+
+            UpdateBarVisual(currentWidth);
+
             initialized = true;
-            LogMessage("HealthBar initialized - Max Width: " + barMaxWidth);
+            LogMessage("HealthBar initialized - Max Width: " + barMaxWidth + " HP: " + currentHP);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -93,7 +101,7 @@ namespace Game
                 targetWidth = newTargetWidth;
                 lerpTimer = 0.0f;
                 isLerping = true;
-                LogMessage("HealthBar: Heal - lerping " + startWidth + " -> " + targetWidth);
+                LogMessage("HealthBar: Heal - lerping " + startWidth + " -> " + targetWidth + " (HP: " + currentHP + " -> " + newHP + ")");
             }
             else
             {
@@ -101,8 +109,10 @@ namespace Game
                 isLerping = false;
                 currentWidth = newTargetWidth;
                 UpdateBarVisual(currentWidth);
-                LogMessage("HealthBar: Damage - snapped to " + currentWidth);
+                LogMessage("HealthBar: Damage - snapped to " + currentWidth + " (HP: " + currentHP + " -> " + newHP + ")");
             }
+
+            currentHP = newHP;
         }
 
         private void UpdateBarVisual(float width)

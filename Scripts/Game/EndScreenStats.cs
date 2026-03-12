@@ -42,8 +42,8 @@ namespace Game
             if (scoreTextID != 0) SetIsVisible(scoreTextID, false);
             if (timeTextID != 0) SetIsVisible(timeTextID, false);
 
-            Event.Subscribe(EVENT_SHOW_SCORE, OnScoreReceived);
-            Event.Subscribe(EVENT_SHOW_TIME, OnTimeReceived);
+            //  Event.Subscribe(EVENT_SHOW_SCORE, OnScoreReceived);
+            //Event.Subscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Subscribe(EVENT_BUTTONS_DONE, OnButtonsFaded);
 
             LogMessage("[EndScreenStats] Initialized");
@@ -97,8 +97,8 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Event.Unsubscribe(EVENT_SHOW_SCORE, OnScoreReceived);
-            Event.Unsubscribe(EVENT_SHOW_TIME, OnTimeReceived);
+          //  Event.Unsubscribe(EVENT_SHOW_SCORE, OnScoreReceived);
+           // Event.Unsubscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Unsubscribe(EVENT_BUTTONS_DONE, OnButtonsFaded);
             LogMessage("=== EndScreenStats Destroyed ===");
         }

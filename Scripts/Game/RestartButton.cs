@@ -83,7 +83,7 @@ namespace Game
                 AudioManager.StopGroup(AudioType.BGM);
                 AudioManager.StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
-                Scene.SceneLoadFromFile(GAME_SCENE_PATH);
+                bool sucess = Scene.SceneLoadFromFile(GAME_SCENE_PATH);
             }
         }
 

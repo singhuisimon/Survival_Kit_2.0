@@ -29,7 +29,6 @@ namespace Game
         private float startWidth = 0.0f;
         private float targetWidth = 0.0f;
         private float currentWidth = 0.0f;
-
         public override void OnStart()
         {
             LogMessage("=== HealBar OnStart ===");
@@ -42,6 +41,9 @@ namespace Game
             initialWidth = initialScale.X;
             currentWidth = initialScale.X;
             hpToWidthRatio = barMaxWidth / playerMaxHP;
+
+            // Reset visual to full width in case scene was restarted mid-heal
+            UpdateBarVisual(currentWidth);
 
             initialized = true;
             LogMessage("HealBar initialized - Max Width: " + barMaxWidth);
