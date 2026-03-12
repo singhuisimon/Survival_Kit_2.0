@@ -13,7 +13,7 @@ namespace Game
         private const string BG_NAME    = "SentryBarBG";
         private const string LABEL_NAME = "SentryBarLabel";
 
-        [SerializeField] private float maxDuration = 200.0f; // original is 90.0f for 90 seconds
+        [SerializeField] private float maxDuration = 20.0f; // original is 90.0f for 90 seconds
         [SerializeField] private float heightOffset = 10.0f;
         //[SerializeField] private float fullScaleX  = 20.0f;
         [SerializeField] private float barScaleY   = 0.9f;
@@ -46,9 +46,15 @@ namespace Game
             countdown = maxDuration;
 
             // cache children immediately
-            fillID  = SceneFindEntityByName(FILL_NAME);
-            bgID    = SceneFindEntityByName(BG_NAME);
-            labelID = SceneFindEntityByName(LABEL_NAME);
+            // fillID  = SceneFindEntityByName(FILL_NAME);
+            // bgID    = SceneFindEntityByName(BG_NAME);
+            // labelID = SceneFindEntityByName(LABEL_NAME);
+
+            fillID  = FindChildByTag(FILL_NAME,  (uint)EntityID);
+            bgID    = FindChildByTag(BG_NAME,    (uint)EntityID);
+            labelID = FindChildByTag(LABEL_NAME, (uint)EntityID);
+
+            LogMessage("[SentryLifetimeBar] EntityID=" + EntityID + " fillID=" + fillID + " bgID=" + bgID);
 
             if (fillID == 0 || fillID == INVALID_ENTITY)
             {
@@ -56,12 +62,25 @@ namespace Game
                 return;
             }
 
-            fullScaleX     = GetScale(fillID).X;
+            //fullScaleX     = GetScale(fillID).X;
+            fullScaleX = GetScale(bgID).X;
+            LogMessage("[SentryLifetimeBar] fullScaleX = " + fullScaleX);
             fillInitialPos = GetPosition(fillID);
+
+            Vector3 initScale = GetScale(fillID);
+            initScale.X = fullScaleX;  // ensure a full bar first
+            initScale.Y = barScaleY;
+            SetScale(fillID, ref initScale);
+
+            Vector3 initPos = new Vector3(0f, 0f, -0.1f); // (fullScaleX/2f) - (fullScaleX*1/2f) = 0
+            SetPosition(fillID, ref initPos);
 
             Subscribe(GAMEOVEREVENT, OnGameEnd);
             Subscribe(GAMEWINEVENT, OnGameEnd);
             Subscribe(PLAYERDEADEVENT, OnGameEnd);
+
+            Vector3 bgPos = GetPosition(bgID);
+            LogMessage("[SentryLifetimeBar] BG local pos = " + bgPos.X + ", " + bgPos.Y + ", " + bgPos.Z);
 
             if (NextSentryID != 0 && NextSentryID != INVALID_ENTITY)
             {
@@ -164,6 +183,19 @@ namespace Game
         public override void OnDestroy()
         {
 
+        }
+
+        // this is because of having multiple sentries
+        private uint FindChildByTag(string tag, uint parentID)
+        {
+            uint[] matches = SceneFindEntitiesByTag(tag);
+            foreach (uint id in matches)
+            {
+                if ((uint)TransformGetParent(id) == parentID)
+                    return id;
+            }
+            LogWarning("[" + GetType().Name + "] Could not find child with tag: " + tag);
+            return 0;
         }
     }
 }

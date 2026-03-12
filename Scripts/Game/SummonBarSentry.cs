@@ -53,9 +53,9 @@ namespace Game
             }
 
             // cache children immediately in OnStart
-            fillID  = SceneFindEntityByName(FILL_NAME);
-            bgID    = SceneFindEntityByName(BG_NAME);
-            labelID = SceneFindEntityByName(LABEL_NAME);
+            fillID  = FindChildByTag(FILL_NAME,  (uint)EntityID);
+            bgID    = FindChildByTag(BG_NAME,    (uint)EntityID);
+            labelID = FindChildByTag(LABEL_NAME, (uint)EntityID);
 
             if (fillID == 0 || fillID == INVALID_ENTITY)
             {
@@ -63,8 +63,20 @@ namespace Game
                 return;
             }
 
-            fullScaleX     = GetScale(fillID).X;
+            //fullScaleX     = GetScale(fillID).X;
+            fullScaleX = GetScale(bgID).X;
+            LogMessage("[SummonBar] fullScaleX = " + fullScaleX);
             fillInitialPos = GetPosition(fillID);
+
+            // stamp fill into the correct empty state
+            Vector3 initScale = GetScale(fillID);
+            initScale.X = 0f;  
+            initScale.Y = barScaleY;
+            SetScale(fillID, ref initScale);
+
+            Vector3 initPos = new Vector3(-(fullScaleX / 2f), 0f, -0.1f);
+            SetPosition(fillID, ref initPos);
+
 
             progressEventName = "SummonBarProgress:" + EntityID.ToString();
             killEventName     = "SummonBarKill:"     + EntityID.ToString();
@@ -84,6 +96,9 @@ namespace Game
             initialized = true;
 
             LogMessage("[SummonBar] Initialized.");
+
+            Vector3 bgPos = GetPosition(bgID);
+            LogMessage("[SummonBar] BG local pos = " + bgPos.X + ", " + bgPos.Y + ", " + bgPos.Z);
         }
 
         public override void OnUpdate(float deltaTime) 
@@ -156,6 +171,18 @@ namespace Game
         public override void OnDestroy()
         {
 
+        }
+
+        private uint FindChildByTag(string tag, uint parentID)
+        {
+            uint[] matches = SceneFindEntitiesByTag(tag);
+            foreach (uint id in matches)
+            {
+                if ((uint)TransformGetParent(id) == parentID)
+                    return id;
+            }
+            LogWarning("[" + GetType().Name + "] Could not find child with tag: " + tag);
+            return 0;
         }
 
         // private void OnGameEnd(string eventName, string payload)

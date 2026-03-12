@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: SentryBar.prefab",
-    "Prefab GUID": 8510871526414336357,
-    "version": 8,
+    "Prefab GUID": 16920077193468240801,
+    "version": 2,
     "entities": [
         {
             "Name": "SentryBar",
@@ -53,7 +53,7 @@
                             "ComponentGUID": "13152956841223373041",
                             "ScriptClassName": "Game.SentryLifetimeBar",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 3763
                         }
                     }
                 }
@@ -85,7 +85,7 @@
                                 1.100000023841858,
                                 1.0
                             ],
-                            "Parent": 0,
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -150,7 +150,7 @@
                                 0.8999999761581421,
                                 1.0
                             ],
-                            "Parent": 6291633,
+                            "Parent": 4294967295,
                             "Children": []
                         }
                     }
@@ -201,7 +201,7 @@
                         "Properties": {
                             "ComponentGUID": "7073713070114833401",
                             "Position": [
-                                5.960464477539065e-8,
+                                5.960464477539064e-8,
                                 2.700000047683716,
                                 0.0
                             ],
@@ -211,11 +211,11 @@
                                 0.0
                             ],
                             "Scale": [
-                                6.0,
-                                1.399999976158142,
+                                8.100000381469727,
+                                1.5,
                                 1.0
                             ],
-                            "Parent": 4294967295,
+                            "Parent": 0,
                             "Children": []
                         }
                     }

@@ -114,7 +114,14 @@ namespace Game
                 if (!isHoldingKey && payloadCount > 0)
                 {
                     isHoldingKey  = true;
-                    barEntityID   = PrefabInstantiate(summonBarPrefab);
+                    //barEntityID   = PrefabInstantiate(summonBarPrefab);
+
+                    // Spawn bar root already above the player
+                    Vector3 playerPos = GetPosition(playerID);
+                    Vector3 barSpawnPos = new Vector3(playerPos.X, playerPos.Y + 10.0f, playerPos.Z);
+                    Quat    identityRot = new Quat(0f, 0f, 0f, 1f);
+                    Vector3 defaultScale = new Vector3(1f, 1f, 1f);
+                    barEntityID = PrefabInstantiateWithTransform(summonBarPrefab, ref barSpawnPos, ref identityRot, ref defaultScale, false);
 
                     if (barEntityID == 0)
                         LogWarning("[SentryCount] Failed to spawn SummonBarPrefab.");
@@ -160,11 +167,11 @@ namespace Game
                 KillSummonBar(); // tells bar to destroy itself + children
 
                 // Cancelled early — destroy bar
-                if (barEntityID != 0)
-                {
-                    SceneDestroyEntity(barEntityID);
-                    barEntityID = 0;
-                }
+                //if (barEntityID != 0)
+                // {
+                //     SceneDestroyEntity(barEntityID);
+                //     barEntityID = 0;
+                // }
             }
 
         }
@@ -201,7 +208,15 @@ namespace Game
 
             // write SentryID to the static before instantiating the bar
             SentryLifetimeBar.NextSentryID = sentryID;
-            uint sentryBarID = PrefabInstantiate(sentryBarPrefab);
+            //uint sentryBarID = PrefabInstantiate(sentryBarPrefab);
+
+            Vector3 sentryPos    = GetPosition(sentryID);
+            Vector3 barSpawnPos  = new Vector3(sentryPos.X, sentryPos.Y + 10.0f, sentryPos.Z);
+            Quat    identityRot  = new Quat(0f, 0f, 0f, 1f);
+            Vector3 defaultScale = new Vector3(1f, 1f, 1f);
+
+            uint sentryBarID = PrefabInstantiateWithTransform(sentryBarPrefab, ref barSpawnPos, ref identityRot, ref defaultScale, false);
+
 
             if (sentryBarID == 0)
             {
@@ -247,11 +262,13 @@ namespace Game
             Text.SetIsVisible((uint)EntityID, false);
             allowedspawn = false;
 
-            if (barEntityID != 0)
-            {
-                SceneDestroyEntity(barEntityID);
-                barEntityID = 0;
-            }
+            KillSummonBar(); //destroy bar if player was mid-hold
+
+            // if (barEntityID != 0)
+            // {
+            //     SceneDestroyEntity(barEntityID);
+            //     barEntityID = 0;
+            // }
         }
 
         private void UpdateCountDisplay()

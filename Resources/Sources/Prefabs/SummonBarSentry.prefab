@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: SummonBarSentry.prefab",
     "Prefab GUID": 14115882737627365563,
-    "version": 5,
+    "version": 15,
     "entities": [
         {
             "Name": "SummonBarSentry",
@@ -211,11 +211,11 @@
                                 0.0
                             ],
                             "Scale": [
-                                30.0,
-                                8.5,
+                                15.399999618530272,
+                                5.599999904632568,
                                 1.0
                             ],
-                            "Parent": 4294967295,
+                            "Parent": 0,
                             "Children": []
                         }
                     }
