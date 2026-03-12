@@ -59,6 +59,7 @@ namespace Game
                     isFading = false;
                     isButtonActive = true;
                     Event.Publish(EVENT_BUTTONS_FADED, "");
+                    Event.Publish("LoseButtonsFaded", "");
                     LogMessage("[RestartButton] Fade complete");
                 }
             }

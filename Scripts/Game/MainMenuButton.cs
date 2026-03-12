@@ -57,6 +57,7 @@ namespace Game
                     fadeDone = true;
                     isFading = false;
                     isButtonActive = true;
+                    Event.Publish("LoseButtonsFaded", "");
                     LogMessage("[MainMenuButton] Fade complete");
                 }
             }

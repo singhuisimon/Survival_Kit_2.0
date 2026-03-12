@@ -8,16 +8,12 @@ using static Engine.Prefab;
 
 namespace Game
 {
-    /// <summary>
-    /// WinScreen - Shows win screen when timer runs out
-    /// Attach this to the win screen texture entity
-    /// Listens to "TimerFinished" event
-    /// </summary>
     public class WinScreen : ScriptBehaviour
     {
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
         private const string GAMEWIN = "GameWin";
+        private const string WIN_SCREEN_SHOW = "WinScreenShow";
 
         private bool initialized = false;
         private bool countdownstart = false;
@@ -32,38 +28,71 @@ namespace Game
         private const string winTrenchVOPrefab = "Sources/Prefabs/Audio_Win_Trench_VO.prefab";
         private const string winLevel2VOPrefab = "Sources/Prefabs/Audio_Win_Level2_VO.prefab";
 
+        // Texture fade
+        private bool isFading = false;
+        private bool fadeDone = false;
+        private float fadeElapsed = 0.0f;
+        [SerializeField] private float fadeUpTime = 1.0f;
+
+        // Button fade delay
+        private bool pendingShow = false;
+        private float showDelay = 2.0f;
+        private float showDelayTimer = 0.0f;
+
         public override void OnStart()
         {
             LogMessage("=== WinScreen OnStart ===");
             LogMessage("WinScreen EntityID: " + EntityID);
 
-            // Subscribe to timer finished
             Event.Subscribe(EVENT_TIMER_FINISHED, OnLevel2Win);
             Event.Subscribe(ENEMY_CORE_DEATH, OnTrenchWin);
 
-            // Start hidden
             SetIsVisible((uint)EntityID, false);
 
             initialized = true;
-            LogMessage("[WinScreen] Initialized - waiting for timer to finish");
+            LogMessage("[WinScreen] Initialized - waiting for win condition");
         }
 
-        private void OnUpdate(float deltaTime){
+        public override void OnUpdate(float deltaTime)
+        {
+            // Fade in texture
+            if (isFading && !fadeDone)
+            {
+                fadeElapsed += deltaTime;
+                FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
 
-            if(countdownstart){
+                if (fadeElapsed >= fadeUpTime)
+                {
+                    fadeDone = true;
+                    isFading = false;
+                    LogMessage("[WinScreen] Texture fade complete");
+                }
+            }
+
+            // VO countdown
+            if (countdownstart)
+            {
                 countdown -= deltaTime;
-
-                if(countdown <= 0.0f && !spawnedVO){
-                    uint winVOID = 0;
-                    winVOID = PrefabInstantiate(winVOPrefab);
-                    if(winVOID == 0){
-                        LogMessage("[WinScreen] Failed to instantiate win voiceover for audio: " + winVOPrefab);
-                    }
-
+                if (countdown <= 0.0f && !spawnedVO)
+                {
+                    uint winVOID = PrefabInstantiate(winVOPrefab);
+                    if (winVOID == 0)
+                        LogMessage("[WinScreen] Failed to instantiate win VO: " + winVOPrefab);
                     spawnedVO = true;
                 }
             }
 
+            // Wait then show buttons/popup
+            if (pendingShow)
+            {
+                showDelayTimer -= deltaTime;
+                if (showDelayTimer <= 0.0f)
+                {
+                    pendingShow = false;
+                    LogMessage("[WinScreen] Delay done - publishing WinScreenShow");
+                    Publish(WIN_SCREEN_SHOW, "");
+                }
+            }
         }
 
         private void OnTrenchWin(string eventName, string payload)
@@ -74,8 +103,17 @@ namespace Game
             countdownstart = true;
             countdown = countdowntrench;
             Input.SetCursorVisible(true);
+
+            SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
+            isFading = true;
+            fadeElapsed = 0.0f;
+            fadeDone = false;
             SetIsVisible((uint)EntityID, true);
+
             Publish(GAMEWIN, "");
+
+            pendingShow = true;
+            showDelayTimer = showDelay;
         }
 
         private void OnLevel2Win(string eventName, string payload)
@@ -86,8 +124,17 @@ namespace Game
             countdownstart = true;
             countdown = countdownlevel2;
             Input.SetCursorVisible(true);
+
+            SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
+            isFading = true;
+            fadeElapsed = 0.0f;
+            fadeDone = false;
             SetIsVisible((uint)EntityID, true);
+
             Publish(GAMEWIN, "");
+
+            pendingShow = true;
+            showDelayTimer = showDelay;
         }
 
         public override void OnDestroy()
@@ -95,10 +142,6 @@ namespace Game
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnLevel2Win);
             Event.Unsubscribe(ENEMY_CORE_DEATH, OnTrenchWin);
             LogMessage("=== WinScreen Destroyed ===");
-        }
-
-        private void AfterWin(){
-
         }
     }
 }
