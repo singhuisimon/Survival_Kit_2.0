@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: PrimaryUltBullet.prefab",
-    "Prefab GUID": 10011062783140806857,
+    "Prefab GUID": 13413752204194285143,
     "version": 1,
     "entities": [
         {
@@ -123,6 +123,75 @@
                     }
                 },
                 {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "MAT_PrimaryUltBullet1.mat",
+                            "Initial Velocity": [
+                                1.0,
+                                1.0,
+                                74.0999984741211
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.05000000074505806,
+                                0.05000000074505806,
+                                6.099999904632568
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 43,
+                            "Particle Type": 0,
+                            "Emission Rate": 5.0,
+                            "Particle Lifetime": 4.5,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.0,
+                            "Shrink Phase Start": 0.0,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.6399999856948853,
+                            "Spread Angle": 180.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 360.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": true,
+                            "Burst Mode": true
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
@@ -130,7 +199,49 @@
                             "ComponentGUID": "9692336290588672261",
                             "ScriptClassName": "Game.PrimaryUltFire",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 83723
+                        }
+                    }
+                },
+                {
+                    "type": 16,
+                    "typeName": "TrailComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7072683928856233555",
+                            "Material Type": "",
+                            "Max Segments": 50,
+                            "Segment Lifetime": 1.0,
+                            "Min Distance": 0.10000000149011612,
+                            "Sample Interval": 0.01600000075995922,
+                            "Sample Accumulator": 0.0,
+                            "Start Color": [
+                                0.9769586324691772,
+                                1.0,
+                                0.0,
+                                1.0
+                            ],
+                            "End Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Width": 0.8600000143051147,
+                            "End Width": 0.10000000149011612,
+                            "Last Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Local Offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Has Last Position": false,
+                            "Active": true,
+                            "Emit Trail": true
                         }
                     }
                 }

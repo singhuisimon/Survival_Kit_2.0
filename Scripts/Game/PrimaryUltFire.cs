@@ -18,7 +18,7 @@ namespace Game
     {
         [SerializeField] private float aoeRadius = 10.0f;
         [SerializeField] private float projectileLifetime = 2.0f;
-        [SerializeField] private float damage = 20.0f;  // Damage dealt by direct hit
+        [SerializeField] private float damage = 60.0f;  // Damage dealt by direct hit
         //[SerializeField] 
         private string ultExplosionPrefab = "Sources/Prefabs/PrimaryUltExplosion.prefab";
         string MainExplosionPrefabPath = "Sources/Prefabs/MainExplosion1.prefab";

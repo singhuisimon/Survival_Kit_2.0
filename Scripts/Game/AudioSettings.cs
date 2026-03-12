@@ -1,9 +1,9 @@
 /**
- * @file AudioSettings.cs
- * @brief Simple audio settings manager with JSON persistence
- * @author Jack
- * @date January 2026
- */
+* @file AudioSettings.cs
+* @brief Simple audio settings manager with JSON persistence
+* @author Jack
+* @date January 2026
+*/
 
 using System;
 using System.Collections.Generic;
@@ -12,7 +12,7 @@ using Engine;
 namespace Game
 {
     /// <summary>
-    /// Manages audio settings with automatic JSON persistence
+    /// Manages audio and input settings with automatic JSON persistence
     /// </summary>
     public class AudioSettings : ScriptBehaviour
     {
@@ -24,7 +24,7 @@ namespace Game
             get { return instance; }
         }
 
-        // Settings values
+        // ===== Audio Settings =====
         private float masterVolume = 1.0f;
         private float bgmVolume = 0.7f;
         private float sfxVolume = 0.8f;
@@ -33,6 +33,15 @@ namespace Game
         private bool bgmMuted = false;
         private bool sfxMuted = false;
         private bool uiMuted = false;
+
+        // ===== Mouse Sensitivity =====
+        private static readonly float[] MOUSE_SENSITIVITY_STEPS = new float[]
+    {
+    0.0f, 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f, 2.25f, 2.5f
+    };
+
+        private const int MOUSE_SENSITIVITY_DEFAULT_INDEX = 3; // 1.0f
+        private int mouseSensitivityIndex = MOUSE_SENSITIVITY_DEFAULT_INDEX;
 
         // File paths
         private const string SAVE_FILE = "Resources/Sources/SaveData/UserAudioSettings.json";
@@ -53,10 +62,7 @@ namespace Game
 
             instance = this;
 
-            // Load settings from JSON
             LoadSettings();
-
-            // Apply to AudioManager
             ApplyAllSettings();
 
             Logger.LogMessage("[AudioSettings] Initialized with persistent data");
@@ -70,9 +76,10 @@ namespace Game
             {
                 logTimer = 0.0f;
                 Logger.LogMessage("[AudioSettings] Volumes - Master: " + masterVolume.ToString("F2") +
-                                ", BGM: " + bgmVolume.ToString("F2") +
-                                ", SFX: " + sfxVolume.ToString("F2") +
-                                ", UI: " + uiVolume.ToString("F2"));
+                    ", BGM: " + bgmVolume.ToString("F2") +
+                    ", SFX: " + sfxVolume.ToString("F2") +
+                    ", UI: " + uiVolume.ToString("F2") +
+                    ", MouseSens: " + GetMouseSensitivity().ToString("F2"));
             }
 
             if (Input.IsKeyPressed(KeyCode.Up))
@@ -109,19 +116,17 @@ namespace Game
         public override void OnDestroy()
         {
             if (instance == this)
-            {
                 instance = null;
-            }
         }
 
-        // Volume Controls
+        // ===== Volume Controls =====
+
         public void SetMasterVolume(float volume)
         {
             masterVolume = Clamp01(volume);
             AudioManager.SetGroupVolume(AudioType.MASTER, masterVolume);
             SaveSettings();
         }
-
         public float GetMasterVolume() { return masterVolume; }
 
         public void SetBGMVolume(float volume)
@@ -130,7 +135,6 @@ namespace Game
             AudioManager.SetGroupVolume(AudioType.BGM, bgmVolume);
             SaveSettings();
         }
-
         public float GetBGMVolume() { return bgmVolume; }
 
         public void SetSFXVolume(float volume)
@@ -139,7 +143,6 @@ namespace Game
             AudioManager.SetGroupVolume(AudioType.SFX, sfxVolume);
             SaveSettings();
         }
-
         public float GetSFXVolume() { return sfxVolume; }
 
         public void SetUIVolume(float volume)
@@ -148,24 +151,22 @@ namespace Game
             AudioManager.SetGroupVolume(AudioType.UI, uiVolume);
             SaveSettings();
         }
-
         public float GetUIVolume() { return uiVolume; }
 
-        // Mute Controls
+        // ===== Mute Controls =====
+
         public void ToggleMasterMute()
         {
             masterMuted = !masterMuted;
             AudioManager.SetMuteGroup(AudioType.MASTER, masterMuted);
             SaveSettings();
         }
-
         public void SetMasterMute(bool mute)
         {
             masterMuted = mute;
             AudioManager.SetMuteGroup(AudioType.MASTER, masterMuted);
             SaveSettings();
         }
-
         public bool IsMasterMuted() { return masterMuted; }
 
         public void ToggleBGMMute()
@@ -174,14 +175,12 @@ namespace Game
             AudioManager.SetMuteGroup(AudioType.BGM, bgmMuted);
             SaveSettings();
         }
-
         public void SetBGMMute(bool mute)
         {
             bgmMuted = mute;
             AudioManager.SetMuteGroup(AudioType.BGM, bgmMuted);
             SaveSettings();
         }
-
         public bool IsBGMMuted() { return bgmMuted; }
 
         public void ToggleSFXMute()
@@ -190,14 +189,12 @@ namespace Game
             AudioManager.SetMuteGroup(AudioType.SFX, sfxMuted);
             SaveSettings();
         }
-
         public void SetSFXMute(bool mute)
         {
             sfxMuted = mute;
             AudioManager.SetMuteGroup(AudioType.SFX, sfxMuted);
             SaveSettings();
         }
-
         public bool IsSFXMuted() { return sfxMuted; }
 
         public void ToggleUIMute()
@@ -206,17 +203,51 @@ namespace Game
             AudioManager.SetMuteGroup(AudioType.UI, uiMuted);
             SaveSettings();
         }
-
         public void SetUIMute(bool mute)
         {
             uiMuted = mute;
             AudioManager.SetMuteGroup(AudioType.UI, uiMuted);
             SaveSettings();
         }
-
         public bool IsUIMuted() { return uiMuted; }
 
-        // Save/Load with JSON
+        // ===== Mouse Sensitivity Controls =====
+
+        public float GetMouseSensitivity()
+        {
+            return MOUSE_SENSITIVITY_STEPS[mouseSensitivityIndex];
+        }
+
+        public float GetMouseSensitivityNormalized()
+        {
+            return (float)mouseSensitivityIndex / (float)(MOUSE_SENSITIVITY_STEPS.Length - 1);
+        }
+
+        public void SetMouseSensitivityUp()
+        {
+            if (mouseSensitivityIndex < MOUSE_SENSITIVITY_STEPS.Length - 1)
+                mouseSensitivityIndex++;
+            SaveSettings();
+            Logger.LogMessage("[AudioSettings] Mouse Sensitivity: " + GetMouseSensitivity().ToString("F2"));
+        }
+
+        public void SetMouseSensitivityDown()
+        {
+            if (mouseSensitivityIndex > 0)
+                mouseSensitivityIndex--;
+            SaveSettings();
+            Logger.LogMessage("[AudioSettings] Mouse Sensitivity: " + GetMouseSensitivity().ToString("F2"));
+        }
+
+        public void ResetMouseSensitivity()
+        {
+            mouseSensitivityIndex = MOUSE_SENSITIVITY_DEFAULT_INDEX;
+            SaveSettings();
+            Logger.LogMessage("[AudioSettings] Mouse Sensitivity reset to default: " + GetMouseSensitivity().ToString("F2"));
+        }
+
+        // ===== Save / Load =====
+
         private void LoadSettings()
         {
             try
@@ -259,6 +290,13 @@ namespace Game
                 sfxMuted = GetBoolValue(data, "sfxMuted", false);
                 uiMuted = GetBoolValue(data, "uiMuted", false);
 
+                // Load mouse sensitivity index, clamp to valid range
+                mouseSensitivityIndex = (int)GetFloatValue(data, "mouseSensitivityIndex", MOUSE_SENSITIVITY_DEFAULT_INDEX);
+                if (mouseSensitivityIndex < 0)
+                    mouseSensitivityIndex = 0;
+                if (mouseSensitivityIndex >= MOUSE_SENSITIVITY_STEPS.Length)
+                    mouseSensitivityIndex = MOUSE_SENSITIVITY_DEFAULT_INDEX;
+
                 Logger.LogMessage("[AudioSettings] Loaded successfully");
             }
             catch (Exception e)
@@ -279,17 +317,14 @@ namespace Game
                 json += "  \"masterMuted\": " + masterMuted.ToString().ToLower() + ",\n";
                 json += "  \"bgmMuted\": " + bgmMuted.ToString().ToLower() + ",\n";
                 json += "  \"sfxMuted\": " + sfxMuted.ToString().ToLower() + ",\n";
-                json += "  \"uiMuted\": " + uiMuted.ToString().ToLower() + "\n";
+                json += "  \"uiMuted\": " + uiMuted.ToString().ToLower() + ",\n";
+                json += "  \"mouseSensitivityIndex\": " + mouseSensitivityIndex + "\n";
                 json += "}";
 
                 if (FileIO.WriteAllText(SAVE_FILE, json))
-                {
                     Logger.LogMessage("[AudioSettings] Saved to: " + SAVE_FILE);
-                }
                 else
-                {
                     Logger.LogError("[AudioSettings] Failed to save file");
-                }
             }
             catch (Exception e)
             {
@@ -297,7 +332,8 @@ namespace Game
             }
         }
 
-        // JSON Parser
+        // ===== JSON Parser =====
+
         private Dictionary<string, string> ParseSimpleJson(string json)
         {
             var result = new Dictionary<string, string>();
@@ -331,7 +367,8 @@ namespace Game
             return defaultValue;
         }
 
-        // Utility
+        // ===== Utility =====
+
         private void ApplyAllSettings()
         {
             AudioManager.SetGroupVolume(AudioType.MASTER, masterVolume);

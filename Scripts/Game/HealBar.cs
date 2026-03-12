@@ -7,13 +7,14 @@ using static Engine.Event;
 namespace Game
 {
     /// <summary>
-    /// HealthBar - Snaps DOWN instantly on damage, lerps UP slowly on heal.
-    /// Mirror of DamageBar which lerps down on damage.
+    /// HealBar - Green bar that snaps UP instantly on heal, lerps DOWN on damage.
+    /// Mirror of DamageBar. Attach to a green HealBarFill entity.
+    /// Layer order managed in editor, not in code.
     /// </summary>
-    public class HealthBar : ScriptBehaviour
+    public class HealBar : ScriptBehaviour
     {
         private const string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
-        private const float LERP_DURATION = 0.5f;
+        private const float LERP_DURATION = 0.5f; // Must match HealthBar lerp duration
 
         private float barMaxWidth;
         private bool initialized = false;
@@ -22,7 +23,7 @@ namespace Game
         private float playerMaxHP = 100.0f;
         private float hpToWidthRatio;
 
-        // ===== Lerp State (heal only) =====
+        // ===== Lerp State (damage only) =====
         private bool isLerping = false;
         private float lerpTimer = 0.0f;
         private float startWidth = 0.0f;
@@ -31,7 +32,7 @@ namespace Game
 
         public override void OnStart()
         {
-            LogMessage("=== HealthBar OnStart ===");
+            LogMessage("=== HealBar OnStart ===");
             Event.Subscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
 
             initialPosition = Transform.GetPosition((uint)EntityID);
@@ -43,7 +44,7 @@ namespace Game
             hpToWidthRatio = barMaxWidth / playerMaxHP;
 
             initialized = true;
-            LogMessage("HealthBar initialized - Max Width: " + barMaxWidth);
+            LogMessage("HealBar initialized - Max Width: " + barMaxWidth);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -60,7 +61,7 @@ namespace Game
                     t = 1.0f;
                     isLerping = false;
                     currentWidth = targetWidth;
-                    LogMessage("HealthBar: Lerp complete at width " + currentWidth);
+                    LogMessage("HealBar: Lerp complete at width " + currentWidth);
                 }
                 else
                 {
@@ -73,11 +74,11 @@ namespace Game
 
         private void OnPlayerHealthChange(string eventName, string payload)
         {
-            LogMessage("=== HealthBar: OnPlayerHealthChange ===");
+            LogMessage("=== HealBar: OnPlayerHealthChange ===");
 
             if (!float.TryParse(payload, out float newHP))
             {
-                LogError("HealthBar: Failed to parse HP: " + payload);
+                LogError("HealBar: Failed to parse HP: " + payload);
                 return;
             }
 
@@ -88,12 +89,11 @@ namespace Game
 
             if (newTargetWidth > currentWidth)
             {
-                // ===== HEAL: lerp UP =====
-                startWidth = currentWidth;
-                targetWidth = newTargetWidth;
-                lerpTimer = 0.0f;
-                isLerping = true;
-                LogMessage("HealthBar: Heal - lerping " + startWidth + " -> " + targetWidth);
+                // ===== HEAL: snap UP instantly =====
+                isLerping = false;
+                currentWidth = newTargetWidth;
+                UpdateBarVisual(currentWidth);
+                LogMessage("HealBar: Heal - snapped to " + currentWidth);
             }
             else
             {
@@ -101,8 +101,9 @@ namespace Game
                 isLerping = false;
                 currentWidth = newTargetWidth;
                 UpdateBarVisual(currentWidth);
-                LogMessage("HealthBar: Damage - snapped to " + currentWidth);
+                LogMessage("HealBar: Damage - snapped to " + currentWidth);
             }
+
         }
 
         private void UpdateBarVisual(float width)
@@ -125,7 +126,7 @@ namespace Game
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
-            LogMessage("=== HealthBar Destroyed ===");
+            LogMessage("=== HealBar Destroyed ===");
         }
     }
 }
