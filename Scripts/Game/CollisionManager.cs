@@ -94,6 +94,7 @@ namespace Game
             { "destructablewall", CollisionCategory.ENVIRONMENT },
             { "trench_vo_wall_trigger", CollisionCategory.ENVIRONMENT },
             { "trench_vo_core_trigger", CollisionCategory.ENVIRONMENT },
+            { "decorindestructiblewall", CollisionCategory.ENVIRONMENT },
 
             // Payload
             { "payload", CollisionCategory.PAYLOAD}
