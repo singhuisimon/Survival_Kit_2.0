@@ -22,7 +22,7 @@ namespace Game
         private const string TAG_PLAYER = "Player";
 
         // Events
-        private const string GAMEOVER = "GameOver";
+        private const string COREDEAD = "CoreDeadTriggerPostTrenchRun";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.1f;
@@ -43,7 +43,7 @@ namespace Game
 
             inRange = false;
             shootingTimer = 0.0f;
-            Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(COREDEAD, OnGameOver);
          
         }
 
@@ -85,7 +85,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(COREDEAD, OnGameOver);
         }
 
         public void ShootAtTarget()
