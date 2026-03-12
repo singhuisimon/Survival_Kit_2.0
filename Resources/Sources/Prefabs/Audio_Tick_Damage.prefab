@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_Tick_Damage",
-    "Prefab GUID": 3613840249832210601,
+    "Prefab Name": "Prefab: Audio_Tick_Damage.prefab",
+    "Prefab GUID": 12754309110095200419,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "Player Collide Damage.wav",
                             "Type": 5,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 0.49900001287460327,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "12837212286685986973",
                             "ScriptClassName": "Game.GameDelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 35
+                            "GCHandle": 19
                         }
                     }
                 }
