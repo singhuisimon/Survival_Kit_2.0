@@ -18,6 +18,7 @@
 #include <glm/glm.hpp>
 #include "../Component/TextComponent.h"
 #include  "../Component/TrailComponent.h"
+#include "../Component/BeamComponent.h"
 
 #include "Asset/ResourceData.h"
 
@@ -33,7 +34,8 @@ namespace Engine{
 		SPRITE2D,
 		Particle,
 		TEXT,
-		TRAIL
+		TRAIL,
+		BEAM
 	};
 
 	/**
@@ -89,6 +91,9 @@ namespace Engine{
 
 		// Trail data
 		TrailComponent* m_trail_data = nullptr;
+
+		// Beam data
+		BeamComponent* m_beam_data = nullptr;
 	};
 
 }

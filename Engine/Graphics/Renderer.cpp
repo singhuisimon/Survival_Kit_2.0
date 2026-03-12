@@ -489,7 +489,7 @@ namespace Engine {
 				prog.setUniform("u_ObjectID", pickId);
 			}
 
-			if (item.m_drawitem_type == DrawItemType::SPRITE2D || item.m_drawitem_type == DrawItemType::TEXT || item.m_drawitem_type == DrawItemType::TRAIL) continue;
+			if (item.m_drawitem_type == DrawItemType::SPRITE2D || item.m_drawitem_type == DrawItemType::TEXT || item.m_drawitem_type == DrawItemType::TRAIL || item.m_drawitem_type == DrawItemType::BEAM) continue;
 
 			size_t material_handle = static_cast<size_t>(item.m_default_material_handle);
 			Material& test_material = m_gl.t_testing_material[material_handle];
@@ -697,6 +697,7 @@ namespace Engine {
 
 		renderSkyboxHDR();
 		RenderTrails(draw_items, v, p, cam_pos);
+		RenderBeams(draw_items, v, p, cam_pos);
 	}
 
 	void Renderer::endFrame(RenderPass const& pass) {
@@ -1443,6 +1444,7 @@ namespace Engine {
 	void Renderer::initBasicGeometry() {
 		RenderBypassUtils::loadBasicPrimitives(m_gl.m_mesh_storage, m_gl.m_mesh_data_storage, m_gl.m_mesh_data2d_storage);
 		InitTrailResources();
+		InitBeamResources();
 	}
 
 	/**
@@ -2200,5 +2202,146 @@ namespace Engine {
 
 		shaderProgram.programFree();
 	}
+
+	void Renderer::InitBeamResources()
+	{
+		glCreateVertexArrays(1, &m_BeamVAO);
+		glCreateBuffers(1, &m_BeamVBO);
+		glCreateBuffers(1, &m_BeamEBO);
+
+		glEnableVertexArrayAttrib(m_BeamVAO, 0);
+		glVertexArrayAttribFormat(m_BeamVAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(TrailVertex, Position));
+		glVertexArrayAttribBinding(m_BeamVAO, 0, 0);
+
+		glEnableVertexArrayAttrib(m_BeamVAO, 1);
+		glVertexArrayAttribFormat(m_BeamVAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(TrailVertex, Tangent));
+		glVertexArrayAttribBinding(m_BeamVAO, 1, 0);
+
+		glEnableVertexArrayAttrib(m_BeamVAO, 2);
+		glVertexArrayAttribFormat(m_BeamVAO, 2, 2, GL_FLOAT, GL_FALSE, offsetof(TrailVertex, UV));
+		glVertexArrayAttribBinding(m_BeamVAO, 2, 0);
+
+		glEnableVertexArrayAttrib(m_BeamVAO, 3);
+		glVertexArrayAttribFormat(m_BeamVAO, 3, 1, GL_FLOAT, GL_FALSE, offsetof(TrailVertex, Width));
+		glVertexArrayAttribBinding(m_BeamVAO, 3, 0);
+
+		glEnableVertexArrayAttrib(m_BeamVAO, 4);
+		glVertexArrayAttribFormat(m_BeamVAO, 4, 1, GL_FLOAT, GL_FALSE, offsetof(TrailVertex, Age));
+		glVertexArrayAttribBinding(m_BeamVAO, 4, 0);
+
+		glVertexArrayVertexBuffer(m_BeamVAO, 0, m_BeamVBO, 0, sizeof(TrailVertex));
+		glVertexArrayElementBuffer(m_BeamVAO, m_BeamEBO);
+	}
+
+	void Renderer::BuildBeamGeometry(const BeamComponent& beam, std::vector<TrailVertex>& vertices, std::vector<u32>& indices)
+	{
+		vertices.clear();
+		indices.clear();
+
+		u32 segmentCount = glm::max(beam.NumSegments, 2u);
+
+		glm::vec3 beamDir = beam.EndPoint - beam.StartPoint;
+		glm::vec3 tangent = glm::normalize(beamDir);
+
+		// Precompute a stable perpendicular for noise displacement
+		glm::vec3 perpAxis = glm::abs(glm::dot(tangent, glm::vec3(0.f, 1.f, 0.f))) < 0.99f
+			? glm::normalize(glm::cross(tangent, glm::vec3(0.f, 1.f, 0.f)))
+			: glm::normalize(glm::cross(tangent, glm::vec3(1.f, 0.f, 0.f)));
+
+		for (u32 i = 0; i < segmentCount; ++i)
+		{
+			float t = static_cast<float>(i) / static_cast<float>(segmentCount - 1);
+
+			glm::vec3 pos = beam.StartPoint + beamDir * t;
+			float     width = glm::mix(beam.StartWidth, beam.EndWidth, t);
+
+			// Apply noise on interior points only
+			if (beam.NoiseAmplitude > 0.f && i > 0 && i < segmentCount - 1)
+			{
+				// Simple hash-based noise driven by accumulator so it animates
+				float seed = t * 7.3f + beam.NoiseAccumulator;
+				float noise = glm::fract(glm::sin(seed) * 43758.5453f) * 2.f - 1.f;
+				pos += perpAxis * noise * beam.NoiseAmplitude;
+			}
+
+			float scrolledU = t + beam.UVScrollOffset;
+
+			TrailVertex leftVert;
+			leftVert.Position = pos;
+			leftVert.Tangent = tangent;
+			leftVert.UV = glm::vec2(scrolledU, 0.f);
+			leftVert.Width = width;
+			leftVert.Age = t;  // Maps 0 (start) -> 1 (end) for color lerp
+
+			TrailVertex rightVert;
+			rightVert.Position = pos;
+			rightVert.Tangent = tangent;
+			rightVert.UV = glm::vec2(scrolledU, 1.f);
+			rightVert.Width = width;
+			rightVert.Age = t;
+
+			vertices.push_back(leftVert);
+			vertices.push_back(rightVert);
+		}
+
+		for (u32 i = 0; i < segmentCount - 1; ++i)
+		{
+			u32 base = i * 2;
+			indices.push_back(base);
+			indices.push_back(base + 2);
+			indices.push_back(base + 1);
+
+			indices.push_back(base + 1);
+			indices.push_back(base + 2);
+			indices.push_back(base + 3);
+		}
+	}
+
+	void Renderer::RenderBeams(std::span<const DrawItem> beamItems, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camPos)
+	{
+		if (beamItems.empty())
+			return;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, m_framebuffers[0].handle());
+
+		auto& shaderProgram = m_gl.m_shader_storage[static_cast<size_t>(ShaderIndex::TRAIL)];
+		shaderProgram.programUse();
+
+		shaderProgram.setUniform("u_ViewProjection", proj * view);
+		shaderProgram.setUniform("u_CameraPos", camPos);
+
+		glDisable(GL_DEPTH_TEST);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		std::vector<TrailVertex> vertices;
+		std::vector<u32>         indices;
+
+		for (const auto& item : beamItems)
+		{
+			const BeamComponent* beam = item.m_beam_data;
+			if (!beam || !beam->Active)
+				continue;
+
+			BuildBeamGeometry(*beam, vertices, indices);
+
+			glNamedBufferData(m_BeamVBO, vertices.size() * sizeof(TrailVertex), vertices.data(), GL_DYNAMIC_DRAW);
+			glNamedBufferData(m_BeamEBO, indices.size() * sizeof(u32), indices.data(), GL_DYNAMIC_DRAW);
+
+			shaderProgram.setUniform("u_StartColor", beam->StartColor);
+			shaderProgram.setUniform("u_EndColor", beam->EndColor);
+
+			glBindVertexArray(m_BeamVAO);
+			glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
+		}
+
+		glEnable(GL_DEPTH_TEST);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
+
+		shaderProgram.programFree();
+	}
+
 }// end of namespace Engine
 

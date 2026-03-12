@@ -109,6 +109,9 @@ namespace Engine
 				// Trail Component
 				DisplayTrailComponent(dotButtonSize);
 
+				// Beam Component
+				DisplayBeamComponent(dotButtonSize);
+
 				// Add Component Button
 				AddComponent();
 
@@ -3471,6 +3474,323 @@ namespace Engine
 		
 	}
 
+	void EditorPropertyPanel::DisplayBeamComponent(ImVec2& dotButtonSize) {
+
+		if (m_SelectedEntity.HasComponent<BeamComponent>())
+		{
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, false);
+			ImGui::SetColumnWidth(0, headerWidth);
+
+			bool isComponentOverriden = IsComponentOverridden(ComponentTypeID::Beam);
+			if (isComponentOverriden)
+				ImGui::PushStyleColor(ImGuiCol_Header, ImVec4(0.6f, 0.4f, 0.1f, 0.5f));
+
+			bool openBeamComponent = ImGui::CollapsingHeader("Beam Component", ImGuiTreeNodeFlags_DefaultOpen);
+
+			if (isComponentOverriden)
+				ImGui::PopStyleColor();
+
+			bool removeBeamComponent = false;
+
+			ImGui::NextColumn();
+
+			if (ImGui::Button("...###BeamBtn", dotButtonSize))
+			{
+				ImGui::OpenPopup("BeamPopUp");
+			}
+
+			if (ImGui::BeginPopup("BeamPopUp"))
+			{
+				if (ImGui::MenuItem("Remove Component"))
+				{
+					removeBeamComponent = true;
+					if (m_SelectedEntity.HasComponent<PrefabComponent>())
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						prefabComp.ClearComponentOverride(ComponentTypeID::Beam);
+						std::string originalJSON = ComponentSerializer::SerializeComponent(
+							m_SelectedEntity, ComponentTypeID::Beam);
+						prefabComp.MarkComponentRemoved(ComponentTypeID::Beam, originalJSON);
+						LOG_INFO("Marked Beam as REMOVED override");
+					}
+				}
+				ImGui::EndPopup();
+			}
+
+			ImGui::Columns(1);
+
+			if (openBeamComponent)
+			{
+				auto& beam = m_SelectedEntity.GetComponent<BeamComponent>();
+
+				// ======================= Asset Reference Section =======================
+				ImGui::SeparatorText("Asset References");
+
+				static bool showWrongTypeBeam = false;
+				DisplayAssetField("Material", beam.MaterialGuid, ResourceType::MATERIAL, showWrongTypeBeam, ComponentTypeID::Beam);
+
+				if (showWrongTypeBeam)
+				{
+					ImGui::OpenPopup("Incompatible Asset Type###BeamMaterial");
+					showWrongTypeBeam = false;
+				}
+				if (ImGui::BeginPopup("Incompatible Asset Type###BeamMaterial"))
+				{
+					ImGui::Text("The dropped asset type does not match the expected type.");
+					if (ImGui::Button("Close"))
+						ImGui::CloseCurrentPopup();
+					ImGui::EndPopup();
+				}
+
+				// Overwrite Current Material Button
+				if (ImGui::Button("Overwrite Current Material###BeamOverwrite"))
+				{
+					MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(beam.MaterialGuid));
+					if (material)
+					{
+						std::string currentMaterialName = AM.getNameFromGuid(beam.MaterialGuid);
+						if (!currentMaterialName.empty())
+							ImGui::OpenPopup("Confirm Overwrite###BeamConfirm");
+						else
+							ImGui::OpenPopup("No Material Selected###BeamNoMat");
+					}
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Save As New Material###BeamSaveAs"))
+					ImGui::OpenPopup("Save As New Material###BeamSaveAsModal");
+
+				// --- Popups ---
+
+				if (ImGui::BeginPopupModal("Confirm Overwrite###BeamConfirm", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("Are you sure you want to overwrite the current material?");
+					ImGui::Separator();
+
+					if (ImGui::Button("Yes", ImVec2(120, 0)))
+					{
+						MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(beam.MaterialGuid));
+						if (material)
+						{
+							std::string currentMaterialName = AM.getNameFromGuid(beam.MaterialGuid);
+							serializeMaterial(material, currentMaterialName);
+							AM.scanAndProcess();
+							ImGui::CloseCurrentPopup();
+							ImGui::OpenPopup("Material Saved###BeamSaved");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("No", ImVec2(120, 0)))
+						ImGui::CloseCurrentPopup();
+
+					ImGui::EndPopup();
+				}
+
+				static char beamSaveAsName[256] = "";
+				if (ImGui::BeginPopupModal("Save As New Material###BeamSaveAsModal", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("Enter a name for the new material:");
+					ImGui::InputText("##BeamSaveAsName", beamSaveAsName, sizeof(beamSaveAsName));
+					ImGui::Separator();
+
+					if (ImGui::Button("Save", ImVec2(120, 0)))
+					{
+						if (strlen(beamSaveAsName) > 0)
+						{
+							MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(beam.MaterialGuid));
+							if (material)
+							{
+								serializeMaterial(material, std::string(beamSaveAsName));
+								AM.scanAndProcess();
+								memset(beamSaveAsName, 0, sizeof(beamSaveAsName));
+								ImGui::CloseCurrentPopup();
+								ImGui::OpenPopup("Material Saved###BeamSaved");
+							}
+						}
+						else
+						{
+							ImGui::OpenPopup("Invalid Name###BeamInvalid");
+						}
+					}
+
+					ImGui::SameLine();
+
+					if (ImGui::Button("Cancel", ImVec2(120, 0)))
+					{
+						memset(beamSaveAsName, 0, sizeof(beamSaveAsName));
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginPopupModal("Material Saved###BeamSaved", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("Material saved successfully!");
+					if (ImGui::Button("OK"))
+						ImGui::CloseCurrentPopup();
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginPopupModal("Invalid Name###BeamInvalid", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("Please enter a valid material name.");
+					if (ImGui::Button("OK"))
+						ImGui::CloseCurrentPopup();
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginPopupModal("No Material Selected###BeamNoMat", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::Text("No material currently selected to overwrite.");
+					if (ImGui::Button("OK"))
+						ImGui::CloseCurrentPopup();
+					ImGui::EndPopup();
+				}
+
+				// Material Properties
+				MaterialResource* material = RM.loadResource<MaterialResource>(convertToMaterialGuid(beam.MaterialGuid));
+
+				if (material)
+				{
+					ImGui::Text("Shader: %s", material->shaderName.c_str());
+
+					if (ImGui::CollapsingHeader("Texture Maps"))
+					{
+						DisplayAssetField("Base Map (Albedo)", material->baseMap, ResourceType::TEXTURE, showWrongTypeBeam, ComponentTypeID::Beam);
+						DisplayAssetField("Normal Map", material->normalMap, ResourceType::TEXTURE, showWrongTypeBeam, ComponentTypeID::Beam);
+						DisplayAssetField("Emission Map", material->emissionMap, ResourceType::TEXTURE, showWrongTypeBeam, ComponentTypeID::Beam);
+					}
+
+					if (ImGui::CollapsingHeader("Colors", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						if (ImGui::ColorEdit3("Base Color", material->baseColor.data(),
+							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+							MarkComponentOverridden(ComponentTypeID::Beam);
+
+						if (ImGui::ColorEdit3("Emission Color", material->emissionColor.data(),
+							ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+							MarkComponentOverridden(ComponentTypeID::Beam);
+					}
+
+					if (ImGui::CollapsingHeader("Material Properties", ImGuiTreeNodeFlags_DefaultOpen))
+					{
+						if (ImGui::SliderFloat("Opacity", &material->opacity, 0.0f, 1.0f, "%.2f"))
+							MarkComponentOverridden(ComponentTypeID::Beam);
+
+						if (ImGui::SliderFloat("Emission Strength", &material->emissionStrength, 0.0f, 100.0f, "%.2f"))
+						{
+							material->emissionStrength = std::max(0.0f, material->emissionStrength);
+							MarkComponentOverridden(ComponentTypeID::Beam);
+						}
+					}
+
+					if (ImGui::CollapsingHeader("UV Transform"))
+					{
+						if (ImGui::DragFloat2("Tiling", material->tiling.data(), 0.1f, 0.1f, 10.0f, "%.2f"))
+						{
+							material->tiling[0] = std::max(0.1f, material->tiling[0]);
+							material->tiling[1] = std::max(0.1f, material->tiling[1]);
+							MarkComponentOverridden(ComponentTypeID::Beam);
+						}
+
+						if (ImGui::DragFloat2("Offset", material->offset.data(), 0.01f, -10.0f, 10.0f, "%.3f"))
+							MarkComponentOverridden(ComponentTypeID::Beam);
+					}
+
+					if (ImGui::CollapsingHeader("Render Flags"))
+					{
+						if (ImGui::Checkbox("Enable Emission", &material->enableEmission))
+							MarkComponentOverridden(ComponentTypeID::Beam);
+
+						if (ImGui::Checkbox("Double Sided", &material->doubleSided))
+							MarkComponentOverridden(ComponentTypeID::Beam);
+					}
+				}
+
+				// ======================= Configuration Section =======================
+				ImGui::SeparatorText("Configuration");
+
+				if (ImGui::DragInt("Num Segments", (int*)(&beam.NumSegments), 1.0f, 2, 64))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				ImGui::Spacing();
+
+				// ======================= Visual Properties Section =======================
+				ImGui::SeparatorText("Visual Properties");
+
+				if (ImGui::ColorEdit4("Start Color", &beam.StartColor.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				if (ImGui::ColorEdit4("End Color", &beam.EndColor.r, ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_InputRGB))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				if (ImGui::DragFloat("Start Width", &beam.StartWidth, 0.01f, 0.01f, 10.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				if (ImGui::DragFloat("End Width", &beam.EndWidth, 0.01f, 0.0f, 10.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				ImGui::Spacing();
+
+				// ======================= Noise Section =======================
+				ImGui::SeparatorText("Noise");
+
+				if (ImGui::DragFloat("Noise Amplitude", &beam.NoiseAmplitude, 0.01f, 0.0f, 10.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				if (ImGui::DragFloat("Noise Speed", &beam.NoiseSpeed, 0.01f, 0.0f, 20.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				ImGui::Spacing();
+
+				// ======================= UV Scroll Section =======================
+				ImGui::SeparatorText("UV Scroll");
+
+				if (ImGui::DragFloat("Scroll Speed", &beam.UVScrollSpeed, 0.01f, -10.0f, 10.0f, "%.2f"))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				ImGui::Spacing();
+
+				// ======================= Target Section =======================
+				ImGui::SeparatorText("Target");
+
+				if (ImGui::DragFloat3("Start Offset", &beam.StartOffset.x, 0.01f, -10.0f, 10.0f))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				if (ImGui::DragFloat3("End Point Offset", &beam.EndPointOffset.x, 0.01f, -10.0f, 10.0f))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				ImGui::Spacing();
+
+				// ======================= Control Section =======================
+				ImGui::SeparatorText("Control");
+
+				if (ImGui::Checkbox("Active", &beam.Active))
+					MarkComponentOverridden(ComponentTypeID::Beam);
+
+				// ======================= Debug Info Section =======================
+				ImGui::Spacing();
+				ImGui::SeparatorText("Debug Info");
+
+				ImGui::BeginDisabled();
+				ImGui::DragFloat3("Start Point", &beam.StartPoint.x);
+				ImGui::DragFloat3("End Point", &beam.EndPoint.x);
+				ImGui::EndDisabled();
+			}
+
+			if (removeBeamComponent)
+			{
+				m_SelectedEntity.RemoveComponent<BeamComponent>();
+			}
+		}
+
+	}
+
 	// Animator Window
 	void EditorPropertyPanel::AnimatorWindow(){
 		
@@ -6088,7 +6408,62 @@ namespace Engine
 					ImGui::SetTooltip("Adds trail effect to this object.");
 				}
 			}
+			ImGui::EndDisabled();
 
+			// ------------------------ Add Beam Component ----------------------------
+			bool hasBeamComponent = m_SelectedEntity.HasComponent<BeamComponent>();
+			ImGui::BeginDisabled(hasBeamComponent);
+			if (ImGui::MenuItem("Beam Component"))
+			{
+				if (!hasBeamComponent)
+				{
+					m_SelectedEntity.AddComponent<BeamComponent>();
+					if (m_SelectedEntity.HasComponent<PrefabComponent>())
+					{
+						auto& prefabComp = m_SelectedEntity.GetComponent<PrefabComponent>();
+						bool existsInPrefab = false;
+						if (prefabComp.isPrefabRoot)
+						{
+							Prefab prefab;
+							if (PrefabRegistry::Get().LoadPrefab(prefabComp.PrefabAssetGuid, prefab))
+							{
+								if (const PrefabEntityData* entityData = prefab.GetRootEntity())
+								{
+									for (const auto& comp : entityData->components)
+									{
+										if (comp.type == ComponentTypeID::Beam)
+										{
+											existsInPrefab = true;
+											break;
+										}
+									}
+								}
+							}
+						}
+						if (!existsInPrefab)
+						{
+							std::string componentJSON = ComponentSerializer::SerializeComponent(
+								m_SelectedEntity, ComponentTypeID::Beam);
+							prefabComp.MarkComponentAdded(ComponentTypeID::Beam, componentJSON);
+							LOG_INFO("Marked Beam as ADDED component (not in prefab)");
+						}
+						else
+						{
+							prefabComp.ClearComponentRemoval(ComponentTypeID::Beam);
+							prefabComp.ClearAllOverridesForComponent(ComponentTypeID::Beam);
+							LOG_INFO("Marked Beam as RESTORED (was removed, now re-added)");
+						}
+					}
+				}
+			}
+
+			if (ImGui::IsItemHovered())
+			{
+				if (!hasBeamComponent)
+				{
+					ImGui::SetTooltip("Adds beam effect to this object.");
+				}
+			}
 			ImGui::EndDisabled();
 
 			ImGui::EndPopup(); // end pop up for Add Component  
