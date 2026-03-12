@@ -12,7 +12,7 @@ namespace Game
     ///   Comma (,)      = Kill player instantly
     ///   Period (.)     = Kill enemy core (win level)
     ///   Slash (/)      = Set timer to 10 seconds
-    ///   Semicolon (;)  = Add 10,000 research points
+    ///   Semicolon (;)  = Add 10,000 research points (in ShopPopup.cs)
     ///   Apostrophe (') = Reset all progress (not high scores)
     /// 
     /// NEW
@@ -52,7 +52,6 @@ namespace Game
         private bool wasCommaPressed = false;
         private bool wasPeriodPressed = false;
         private bool wasSlashPressed = false;
-        private bool wasSemicolonPressed = false;
         private bool wasApostrophePressed = false;
 
         
@@ -110,15 +109,6 @@ namespace Game
                 Publish("DebugSetTimer", "10");
             }
             wasSlashPressed = slashPressed;
-
-            // Semicolon = Add 10,000 research points
-            bool semiPressed = IsKeyPressed(KeyCode.Semicolon);
-            if (semiPressed && !wasSemicolonPressed)
-            {
-                ProgressTracker.AddCumulativeScore(10000);
-                LogMessage("[DebugCheats] Semicolon pressed - added 10,000 research points. Total: " + ProgressTracker.CumulativeScore);
-            }
-            wasSemicolonPressed = semiPressed;
 
             // Apostrophe = Reset all progress
             bool apostrophePressed = IsKeyPressed(KeyCode.Apostrophe);
