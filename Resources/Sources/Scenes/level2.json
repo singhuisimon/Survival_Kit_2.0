@@ -9482,7 +9482,7 @@
             "BloomFilterRadius": 0.0010000000474974513,
             "Exposure": 5.0,
             "GlobalBias": 0.004999999888241291,
-            "MasterVolume": 1.0,
+            "MasterVolume": 2.0,
             "SFXVolume": 1.0,
             "BGMVolume": 1.0,
             "VOVolume": 1.0,
