@@ -7,11 +7,6 @@ using static Engine.Scene;
 
 namespace Game
 {
-    /// <summary>
-    /// EndScreenStats - Receives final score and time survived payloads,
-    /// then displays them on the end screen after buttons have faded in.
-    /// Listens to: "ShowFinalScore", "ShowTimeSurvived", "WinButtonsFaded"
-    /// </summary>
     public class EndScreenStats : ScriptBehaviour
     {
         [SerializeField] private string scoreTextEntityName = "UI_EndScore";
@@ -20,6 +15,8 @@ namespace Game
         private const string EVENT_SHOW_SCORE = "ShowFinalScore";
         private const string EVENT_SHOW_TIME = "ShowTimeSurvived";
         private const string EVENT_BUTTONS_DONE = "WinButtonsFaded";
+        private const string EVENT_GAMEOVER = "GameOver";
+        private const string EVENT_GAMEWIN = "GameWin";
 
         private uint scoreTextID = 0;
         private uint timeTextID = 0;
@@ -38,34 +35,52 @@ namespace Game
             if (scoreTextID == 0) LogMessage("[EndScreenStats] Could not find: " + scoreTextEntityName);
             if (timeTextID == 0) LogMessage("[EndScreenStats] Could not find: " + timeTextEntityName);
 
-            // Start both hidden
             if (scoreTextID != 0) SetIsVisible(scoreTextID, false);
             if (timeTextID != 0) SetIsVisible(timeTextID, false);
 
-            //  Event.Subscribe(EVENT_SHOW_SCORE, OnScoreReceived);
-            //Event.Subscribe(EVENT_SHOW_TIME, OnTimeReceived);
+            // ===== Reset state on every start =====
+            cachedScore = "";
+            cachedTime = "";
+            buttonsReady = false;
+
+            Event.Subscribe(EVENT_SHOW_SCORE, OnScoreReceived);
+            Event.Subscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Subscribe(EVENT_BUTTONS_DONE, OnButtonsFaded);
+            Event.Subscribe(EVENT_GAMEOVER, OnGameReset);
+            Event.Subscribe(EVENT_GAMEWIN, OnGameReset);
 
             LogMessage("[EndScreenStats] Initialized");
+        }
+
+        private void OnGameReset(string eventName, string payload)
+        {
+            // Reset every time a new game over/win starts
+            // so stats don't show instantly on repeated loses
+            cachedScore = "";
+            cachedTime = "";
+            buttonsReady = false;
+
+            if (scoreTextID != 0) SetIsVisible(scoreTextID, false);
+            if (timeTextID != 0) SetIsVisible(timeTextID, false);
+
+            LogMessage("[EndScreenStats] State reset for new end screen");
         }
 
         private void OnScoreReceived(string eventName, string payload)
         {
             LogMessage("[EndScreenStats] Score received: " + payload);
-            cachedScore = "SCORE  " + int.Parse(payload).ToString("D7");
+            cachedScore = "SCORE " + int.Parse(payload).ToString("D7");
             TryShow();
         }
 
         private void OnTimeReceived(string eventName, string payload)
         {
             LogMessage("[EndScreenStats] Time received: " + payload);
-
             float timeSurvived = 0.0f;
             float.TryParse(payload, out timeSurvived);
-
             int minutes = (int)(timeSurvived / 60);
             int seconds = (int)(timeSurvived % 60);
-            cachedTime = string.Format("TIME  {0:00} m : {1:00} s", minutes, seconds);
+            cachedTime = string.Format("TIME {0:00} m : {1:00} s", minutes, seconds);
             TryShow();
         }
 
@@ -97,9 +112,11 @@ namespace Game
 
         public override void OnDestroy()
         {
-          //  Event.Unsubscribe(EVENT_SHOW_SCORE, OnScoreReceived);
-           // Event.Unsubscribe(EVENT_SHOW_TIME, OnTimeReceived);
+            Event.Unsubscribe(EVENT_SHOW_SCORE, OnScoreReceived);
+            Event.Unsubscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Unsubscribe(EVENT_BUTTONS_DONE, OnButtonsFaded);
+            Event.Unsubscribe(EVENT_GAMEOVER, OnGameReset);
+            Event.Unsubscribe(EVENT_GAMEWIN, OnGameReset);
             LogMessage("=== EndScreenStats Destroyed ===");
         }
     }
