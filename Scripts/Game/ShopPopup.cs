@@ -343,26 +343,50 @@ namespace Game
             // ByteChips tab: clicking exchange buttons awards ByteChips + research points (repeatable)
             if (exchangeButton4Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton4Id))
             {
-                AwardByteChipsAndResearch(60, 60);
-                LogMessage("ShopPopup: ByteChips pack 1 bought - +60 ByteChips +60 Research");
+                int researchBonus = ProgressTracker.BytePack1Bought ? 0 : 60;
+                if (!ProgressTracker.BytePack1Bought)
+                {
+                    ProgressTracker.BytePack1Bought = true;
+                    ProgressTracker.SaveProgress();
+                }
+                AwardByteChipsAndResearch(60, researchBonus);
+                LogMessage("ShopPopup: ByteChips pack 1 bought - +60 ByteChips" + (researchBonus > 0 ? " +60 Research (first-time bonus)" : " (no bonus)"));
                 return true;
             }
             if (exchangeButton1Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton1Id))
             {
-                AwardByteChipsAndResearch(180, 180);
-                LogMessage("ShopPopup: ByteChips pack 2 bought - +180 ByteChips +180 Research");
+                int researchBonus = ProgressTracker.BytePack2Bought ? 0 : 180;
+                if (!ProgressTracker.BytePack2Bought)
+                {
+                    ProgressTracker.BytePack2Bought = true;
+                    ProgressTracker.SaveProgress();
+                }
+                AwardByteChipsAndResearch(180, researchBonus);
+                LogMessage("ShopPopup: ByteChips pack 2 bought - +180 ByteChips" + (researchBonus > 0 ? " +180 Research (first-time bonus)" : " (no bonus)"));
                 return true;
             }
             if (exchangeButton2Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton2Id))
             {
-                AwardByteChipsAndResearch(300, 300);
-                LogMessage("ShopPopup: ByteChips pack 3 bought - +300 ByteChips +300 Research");
+                int researchBonus = ProgressTracker.BytePack3Bought ? 0 : 300;
+                if (!ProgressTracker.BytePack3Bought)
+                {
+                    ProgressTracker.BytePack3Bought = true;
+                    ProgressTracker.SaveProgress();
+                }
+                AwardByteChipsAndResearch(300, researchBonus);
+                LogMessage("ShopPopup: ByteChips pack 3 bought - +300 ByteChips" + (researchBonus > 0 ? " +300 Research (first-time bonus)" : " (no bonus)"));
                 return true;
             }
             if (exchangeButton3Id != 0 && Collision2D.IsMouseCollidingWithEntity(exchangeButton3Id))
             {
-                AwardByteChipsAndResearch(600, 600);
-                LogMessage("ShopPopup: ByteChips pack 4 bought - +600 ByteChips +600 Research");
+                int researchBonus = ProgressTracker.BytePack4Bought ? 0 : 600;
+                if (!ProgressTracker.BytePack4Bought)
+                {
+                    ProgressTracker.BytePack4Bought = true;
+                    ProgressTracker.SaveProgress();
+                }
+                AwardByteChipsAndResearch(600, researchBonus);
+                LogMessage("ShopPopup: ByteChips pack 4 bought - +600 ByteChips" + (researchBonus > 0 ? " +600 Research (first-time bonus)" : " (no bonus)"));
                 return true;
             }
 
