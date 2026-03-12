@@ -10,6 +10,7 @@ using static Engine.Rigidbody;
 using static Engine.Event;
 using static Engine.ParticleSystem;
 using System.Collections.Specialized;
+using static Game.AudioSettings;
 
 namespace Game
 {
@@ -295,7 +296,9 @@ namespace Game
 
             yawRad += -dx * yawSpeed * deltaTime;
             pitchRad += -dy * pitchSpeed * deltaTime;
-
+            float sensitivity = (AudioSettings.Instance != null)
+    ? AudioSettings.Instance.GetMouseSensitivity()
+    : mouseSensitivity;
             float limit = pitchLimitDegrees * SimpleMath.DEG_TO_RAD;
             pitchRad = SimpleMath.Clamp(pitchRad, -limit, limit);
 
