@@ -13,7 +13,7 @@ namespace Game
         private const string BG_NAME    = "SentryBarBG";
         private const string LABEL_NAME = "SentryBarLabel";
 
-        [SerializeField] private float maxDuration = 20.0f; // original is 90.0f for 90 seconds
+        [SerializeField] private float maxDuration = 90.0f; // original is 90.0f for 90 seconds
         [SerializeField] private float heightOffset = 10.0f;
         //[SerializeField] private float fullScaleX  = 20.0f;
         [SerializeField] private float barScaleY   = 0.9f;
