@@ -80,13 +80,13 @@ namespace Game
 
         private Vector3 GammaMinus = new Vector3(565.3f, 161.3f, -0.6f);
         private Vector3 GammaPlus= new Vector3(598.7f, 161.3f, -0.6f);
-        private Vector3 GammaVolume = new Vector3(359.4f, 269.3f, -0.6f);
+        private Vector3 MouseVolume = new Vector3(359.4f, 269.3f, -0.6f);
         private Vector3 GammaDefault = new Vector3(225.9f, 199.5f, -0.6f);
 
 
         private Vector3 MouseMinus = new Vector3(564.8f, 269.8f, -0.6f);
         private Vector3 MousePlus = new Vector3(598.2f, 269.3f, -0.6f);
-        private Vector3 MouseVolume = new Vector3(359.4f, 160.5f, -0.6f);
+        private Vector3 GammaVolume = new Vector3(359.4f, 160.5f, -0.6f);
         private Vector3 MouseDefault = new Vector3(226.2f, 306.8f, -0.6f);
 
 
@@ -326,14 +326,22 @@ namespace Game
                     if (mousePlusId != 0 && Collision2D.IsMouseCollidingWithEntity(mousePlusId))
                     {
                         LogMessage("SettingsPopup: Mouse Sensitivity +");
-                        // TODO
+                        AudioSettings.Instance.SetMouseSensitivityUp();
+                        LogMessage("SettingsPopup: Mouse Sensitivity + (Now: " + AudioSettings.Instance.GetMouseSensitivity() + ")");
+                        UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(),
+                            mouseVolumeInitialWidth, mouseVolumeInitialPosition);
+                        return;
+
                         return;
                     }
 
                     if (mouseMinusId != 0 && Collision2D.IsMouseCollidingWithEntity(mouseMinusId))
                     {
                         LogMessage("SettingsPopup: Mouse Sensitivity -");
-                        // TODO
+                        AudioSettings.Instance.SetMouseSensitivityDown();
+                        LogMessage("SettingsPopup: Mouse Sensitivity - (Now: " + AudioSettings.Instance.GetMouseSensitivity() + ")");
+                        UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(),
+                            mouseVolumeInitialWidth, mouseVolumeInitialPosition);
                         return;
                     }
 
@@ -347,7 +355,10 @@ namespace Game
                     if (mouseDefaultId != 0 && Collision2D.IsMouseCollidingWithEntity(mouseDefaultId))
                     {
                         LogMessage("SettingsPopup: Mouse Sensitivity Default");
-                        // TODO
+                        AudioSettings.Instance.ResetMouseSensitivity();
+                        LogMessage("SettingsPopup: Mouse Sensitivity reset to default");
+                        UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(),
+                            mouseVolumeInitialWidth, mouseVolumeInitialPosition);
                         return;
                     }
 
@@ -424,7 +435,12 @@ namespace Game
                                      volumeFill2InitialWidth, volumeFill2InitialPosition);
                 UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(),
                                      volumeFill3InitialWidth, volumeFill3InitialPosition);
-            
+
+
+            UpdateVolumeFillVisual(mouseVolumeId, 1.0f - AudioSettings.Instance.GetMouseSensitivityNormalized(),
+               mouseVolumeInitialWidth, mouseVolumeInitialPosition);
+
+
             LogMessage("SettingsPopup: Popup shown");
         }
 
