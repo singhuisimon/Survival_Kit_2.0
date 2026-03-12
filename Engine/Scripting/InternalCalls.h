@@ -862,6 +862,20 @@ namespace Engine {
 		***************************************************************************/
 		void MeshRenderer_SetEmissiveTexture(uint64_t entityID, MonoString* textureName);
 
+		// ===== RenderSettings =====
+		/**************************************************************************
+		 * @brief
+		 * Return the gamma value from the render settings
+		***************************************************************************/
+		float Renderer_GetGamma();
+		/**************************************************************************
+		 * @brief
+		 * Set the gamma value to the render settings
+		 * @param gamma
+		 * Value to set the new gamma value
+		***************************************************************************/
+		void  Renderer_SetGamma(float gamma);
+
 		// ===== AudioComponent =====
 		/**************************************************************************
 		 * @brief

@@ -1982,6 +1982,32 @@ namespace Engine
 			mono_free(utf8);
 		}
 
+		/**************************************************************************
+		 * @brief
+		 * Return the gamma value from the render settings
+		***************************************************************************/
+		float Renderer_GetGamma()
+		{
+			if (!s_Renderer)
+				return 2.2f; // fallback default
+
+			return s_Renderer->getGamma();
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Set the gamma value to the render settings 
+		 * @param gamma
+		 * Value to set the new gamma value
+		***************************************************************************/
+		void Renderer_SetGamma(float gamma)
+		{
+			if (!s_Renderer)
+				return;
+
+			s_Renderer->getGamma() = gamma;
+		}
+
 		// =====================================================================
 		// AudioComponent
 		// =====================================================================
