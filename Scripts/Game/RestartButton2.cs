@@ -11,8 +11,8 @@ namespace Game
     public class RestartButton2 : ScriptBehaviour
     {
         private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
-        private const string EVENT_WIN_SHOW = "WinScreenShow";
-        private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
+        //private const string EVENT_WIN_SHOW = "WinScreenShow";
+        //private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
         private const string EVENT_LOSE_SHOW = "LoseScreenShow";
 
         [SerializeField] private float fadeUpTime = 1.0f;
@@ -26,7 +26,7 @@ namespace Game
         public override void OnStart()
         {
             LogMessage("=== RestartButton2 OnStart ===");
-            Event.Subscribe(EVENT_WIN_SHOW, OnWinCondition);
+            //Event.Subscribe(EVENT_WIN_SHOW, OnWinCondition);
             Event.Subscribe(EVENT_LOSE_SHOW, OnLoseCondition);
             SetIsVisible((uint)EntityID, false);
             LogMessage("[RestartButton2] Initialized");
@@ -98,7 +98,7 @@ namespace Game
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_LOSE_SHOW, OnLoseCondition);
-            Event.Unsubscribe(EVENT_WIN_SHOW, OnWinCondition);
+           // Event.Unsubscribe(EVENT_WIN_SHOW, OnWinCondition);
             LogMessage("=== RestartButton2 Destroyed ===");
         }
     }
