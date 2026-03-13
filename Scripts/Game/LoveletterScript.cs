@@ -54,8 +54,8 @@ namespace Game
         [SerializeField] private float waitTimeAtSurface = 3.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
-        [SerializeField] private float maxHealth = 300.0f;
-        [SerializeField] private float currentHealth = 300.0f;
+        [SerializeField] private float maxHealth = 60.0f;
+        [SerializeField] private float currentHealth = 60.0f;
         private bool isDead = false;
 
         // Vampirism: track who landed the killing blow
