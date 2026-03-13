@@ -24,7 +24,7 @@ namespace Game
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
 
         // Health
-        [SerializeField] private float health = 5.0f;
+        [SerializeField] private float health = 15.0f; //changed from 5->15
 
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
@@ -75,8 +75,6 @@ namespace Game
 
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
-
-            //health -= 1.0f;
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
             if(attackerId != INVALID_ENTITY && health > 0.0f){

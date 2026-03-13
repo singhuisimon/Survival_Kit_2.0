@@ -283,7 +283,8 @@ namespace Game
             Vector3 emptyVec = new Vector3(0, 0, 0);
             RigidbodySetAngularVelocity(EntityID, ref emptyVec);
 
-            health -= 1.0f;
+            float damage = DamageSystem.ParseAmount(payload);
+            health -= damage;
             LogMessage("WormHost hit! Health: " + health);
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
