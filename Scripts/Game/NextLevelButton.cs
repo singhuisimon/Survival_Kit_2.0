@@ -4,62 +4,67 @@ using static Engine.Scene;
 using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
+using static Engine.Transform;
 
 namespace Game
 {
-    /// <summary>
-    /// NextLevelButton_Win - Next level button on win screen
-    /// Uses exact same collision logic as pause menu
-    /// </summary>
     public class NextLevelButton : ScriptBehaviour
     {
-        // Scene paths
         private const string LEVEL_2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
         private const string FALLBACK_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
+        private const string EVENT_WIN_SHOW = "WinScreenShow";
+        private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
 
-        // Win event
-        private const string EVENT_ENEMYCORE_DEATH = "EnemyCoreDeath";
-
-        // State
-        private bool isButtonActive = false;
-        private bool wasMousePressed = false;
-
-        // Current level tracking
         [SerializeField("Current Level")]
         private int currentLevel = 1;
 
+        [SerializeField] private float fadeUpTime = 1.0f;
+
+        private bool isButtonActive = false;
+        private bool wasMousePressed = false;
+        private bool isFading = false;
+        private bool fadeDone = false;
+        private float fadeElapsed = 0.0f;
+
         public override void OnStart()
         {
-            LogMessage("=== NextLevelButton_Win OnStart ===");
-            LogMessage("NextLevelButton_Win EntityID: " + EntityID);
-            LogMessage("Current Level: " + currentLevel);
-
-            // Subscribe to win event
-            Event.Subscribe(EVENT_ENEMYCORE_DEATH, OnWinCondition);
-
-            // Start invisible and inactive
+            LogMessage("=== NextLevelButton OnStart ===");
+            Event.Subscribe(EVENT_WIN_SHOW, OnWinCondition);
             SetIsVisible((uint)EntityID, false);
             isButtonActive = false;
-
-            LogMessage("[NextLevelButton_Win] Initialized");
+            LogMessage("[NextLevelButton] Initialized - Level: " + currentLevel);
         }
 
         private void OnWinCondition(string eventName, string payload)
         {
-            LogMessage("[NextLevelButton_Win] Win condition triggered - showing button");
-
-            // Make button visible and active
+            LogMessage("[NextLevelButton] Win condition - starting fade");
+            isFading = true;
+            fadeElapsed = 0.0f;
+            fadeDone = false;
+            isButtonActive = false;
             SetIsVisible((uint)EntityID, true);
-            isButtonActive = true;
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // Only process when button is active
-            if (!isButtonActive)
-                return;
+            if (isFading && !fadeDone)
+            {
+                fadeElapsed += deltaTime;
+                FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
 
-            // Handle mouse click (exact same as pause menu)
+                if (fadeElapsed >= fadeUpTime)
+                {
+                    fadeDone = true;
+                    isFading = false;
+                    isButtonActive = true;
+                    Event.Publish(EVENT_BUTTONS_FADED, "");
+                    Event.Publish("WinButtonsFaded", "");
+
+                    LogMessage("[NextLevelButton] Fade complete");
+                }
+            }
+
+            if (!isButtonActive) return;
             HandleMouseClick();
         }
 
@@ -71,31 +76,14 @@ namespace Game
 
             if (!mouseJustPressed) return;
 
-            // Check if button clicked (exact same as pause menu)
-            if (IsButtonClicked((uint)EntityID))
+            if (Collision2D.IsMouseCollidingWithEntity((uint)EntityID))
             {
-                LogMessage("[NextLevelButton_Win] Button clicked - loading next level");
-
-                // Stop all audio
+                LogMessage("[NextLevelButton] Clicked - loading next level");
                 AudioManager.StopGroup(AudioType.BGM);
                 AudioManager.StopGroup(AudioType.SFX);
-
-                // Hide cursor for gameplay
                 Input.SetCursorVisible(false);
-
-                // Determine which level to load
-                string nextScenePath = GetNextLevelPath();
-                LogMessage("Loading scene: " + nextScenePath);
-
-                // Load next level
-                //Event.Publish("LoadScene", nextScenePath);
-                bool success = Scene.SceneLoadFromFile(nextScenePath);
+                Scene.SceneLoadFromFile(GetNextLevelPath());
             }
-        }
-
-        private bool IsButtonClicked(uint buttonId)
-        {
-            return (buttonId != 0 && Collision2D.IsMouseCollidingWithEntity(buttonId));
         }
 
         private string GetNextLevelPath()
@@ -104,14 +92,12 @@ namespace Game
             {
                 case 1:
                     return LEVEL_2_SCENE_PATH;
-
                 case 2:
-                    LogMessage("No more levels - returning to main menu");
+                    LogMessage("[NextLevelButton] No more levels - returning to main menu");
                     Input.SetCursorVisible(true);
                     return FALLBACK_SCENE_PATH;
-
                 default:
-                    LogMessage("Unknown level - returning to main menu");
+                    LogMessage("[NextLevelButton] Unknown level - returning to main menu");
                     Input.SetCursorVisible(true);
                     return FALLBACK_SCENE_PATH;
             }
@@ -119,8 +105,8 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Event.Unsubscribe(EVENT_ENEMYCORE_DEATH, OnWinCondition);
-            LogMessage("=== NextLevelButton_Win Destroyed ===");
+            Event.Unsubscribe(EVENT_WIN_SHOW, OnWinCondition);
+            LogMessage("=== NextLevelButton Destroyed ===");
         }
     }
 }

@@ -368,6 +368,10 @@ namespace Game
 
 
                     //play sound effects here
+                    if(reloadID != 0){
+                    LogMessage("[PlayerWeapon] Playing audio right now");
+                    AudioPlay(reloadID);
+                }
                 }
             }
             else

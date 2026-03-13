@@ -43,6 +43,11 @@ namespace Game
         // ===== Prefab =====
         private string sentryPrefab = "Sources/Prefabs/NormalSentry.prefab";
         private string sentrySpawnPrefab = "Sources/Prefabs/SentrySpawn.prefab";
+        private string summonBarPrefab = "Sources/Prefabs/SummonBarSentry.prefab";
+        private string sentryBarPrefab = "Sources/Prefabs/SentryBar.prefab";
+        
+        private uint   barEntityID     = 0;
+        private bool   isHoldingKey    = false;
 
         public override void OnStart()
         {
@@ -81,6 +86,7 @@ namespace Game
             initialized = true;
         }
 
+
         public override void OnUpdate(float deltaTime)
         {
             if (!initialized)
@@ -102,16 +108,49 @@ namespace Game
                 SetIsVisible((uint)EntityID, true);
             }
 
-            if(IsKeyPressed(KeyCode.D1) && spawnAndLifted){
+            if(IsKeyPressed(KeyCode.D1) && spawnAndLifted)
+            {
+                // Spawn bar on the very first frame of press (only if we have payload)
+                if (!isHoldingKey && payloadCount > 0)
+                {
+                    isHoldingKey  = true;
+                    //barEntityID   = PrefabInstantiate(summonBarPrefab);
+
+                    // Spawn bar root already above the player
+                    Vector3 playerPos = GetPosition(playerID);
+                    Vector3 barSpawnPos = new Vector3(playerPos.X, playerPos.Y + 10.0f, playerPos.Z);
+                    Quat    identityRot = new Quat(0f, 0f, 0f, 1f);
+                    Vector3 defaultScale = new Vector3(1f, 1f, 1f);
+                    barEntityID = PrefabInstantiateWithTransform(summonBarPrefab, ref barSpawnPos, ref identityRot, ref defaultScale, false);
+
+                    if (barEntityID == 0)
+                        LogWarning("[SentryCount] Failed to spawn SummonBarPrefab.");
+                }
+
                 countdown -= deltaTime;
 
-                if(countdown <= 0.0f){
+                // Publish progress (0 = just started, 1 = complete)
+                if (barEntityID != 0)
+                {
+                    float progress = 1f - (countdown / holdTimer);
+                    progress = SimpleMath.Clamp(progress, 0f, 1f);
 
-                    LogMessage("[SentryCount] Detected sentry to be spawn!");
-                    
+                    Publish("SummonBarProgress:" + barEntityID.ToString(), progress.ToString("F4"));
+                }
+
+                if(countdown <= 0.0f)
+                {
+
+                    LogMessage("[SentryCount] - Sentry spawning!");
+
+                    KillSummonBar(); 
+
                     SpawnSentry();
 
+                    countdown = holdTimer;
+
                     spawnAndLifted = false;
+                    isHoldingKey   = false;
                 }
             }
 
@@ -122,8 +161,28 @@ namespace Game
                 countdown = holdTimer;
 
                 spawnAndLifted = true;
+
+                isHoldingKey   = false;
+
+                KillSummonBar(); // tells bar to destroy itself + children
+
+                // Cancelled early — destroy bar
+                //if (barEntityID != 0)
+                // {
+                //     SceneDestroyEntity(barEntityID);
+                //     barEntityID = 0;
+                // }
             }
 
+        }
+
+        private void KillSummonBar()
+        {
+            if (barEntityID != 0)
+            {
+                Publish("SummonBarKill:" + barEntityID.ToString(), "");
+                barEntityID = 0;
+            }
         }
 
         private void SpawnSentry(){
@@ -146,6 +205,29 @@ namespace Game
 
             SetPosition(sentryID, ref spawnPos);
             SetRotation(sentryID, ref spawnRot);
+
+            // write SentryID to the static before instantiating the bar
+            SentryLifetimeBar.NextSentryID = sentryID;
+            //uint sentryBarID = PrefabInstantiate(sentryBarPrefab);
+
+            Vector3 sentryPos    = GetPosition(sentryID);
+            Vector3 barSpawnPos  = new Vector3(sentryPos.X, sentryPos.Y + 10.0f, sentryPos.Z);
+            Quat    identityRot  = new Quat(0f, 0f, 0f, 1f);
+            Vector3 defaultScale = new Vector3(1f, 1f, 1f);
+
+            uint sentryBarID = PrefabInstantiateWithTransform(sentryBarPrefab, ref barSpawnPos, ref identityRot, ref defaultScale, false);
+
+
+            if (sentryBarID == 0)
+            {
+                LogWarning("[SentryCount] Failed to spawn SentryBar.");
+                SentryLifetimeBar.NextSentryID = 0; // clear stale value
+            }
+            else
+            {
+                LogMessage("[SentryCount] Spawned SentryBar " + sentryBarID + " for sentry " + sentryID);
+            }
+
 
             payloadCount -= 1;
 
@@ -179,6 +261,14 @@ namespace Game
             SetText((uint)EntityID, "");
             Text.SetIsVisible((uint)EntityID, false);
             allowedspawn = false;
+
+            KillSummonBar(); //destroy bar if player was mid-hold
+
+            // if (barEntityID != 0)
+            // {
+            //     SceneDestroyEntity(barEntityID);
+            //     barEntityID = 0;
+            // }
         }
 
         private void UpdateCountDisplay()
