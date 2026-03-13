@@ -44,6 +44,8 @@ namespace Game
         //private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
         //private const string EVENT_ULT_CHARGED = "UltCharged";
         //private const string EVENT_ALT_FIRED = "AltFired";
+        private const string EVENT_GAMELOSE = "LoseScreenShow";
+        private const string EVENT_GAMEWIN = "GameWin";
 
         // Fading
         private bool EPressed = false;
@@ -57,6 +59,7 @@ namespace Game
         [SerializeField] private float switchTime = 0.5f;
 
         private bool instructionsRead = false;
+        private bool gameEnd = false;
         //private bool botnetSeen = false;
         //private bool wormSeen = false;
         //private bool loveletterSeen = false;
@@ -78,12 +81,20 @@ namespace Game
             SpriteRenderer.SetIsVisible(loveletterInfoID, false);
             SpriteRenderer.SetIsVisible(proceedID, false);
 
+            // Subscribe to the events
+            Subscribe(EVENT_GAMELOSE, OnGameEnd);
+            Subscribe(EVENT_GAMEWIN, OnGameEnd);
+
         }
 
         public override void OnUpdate(float deltaTime)
         {
             if (GameState.IsPaused)
                 return;
+
+            if (gameEnd){
+                return;
+            }
 
             // Most updated player position
             Vector3 currentPos = Transform.GetPosition(playerID);
@@ -135,7 +146,8 @@ namespace Game
 
         public override void OnDestroy()
         {
-
+            Unsubscribe(EVENT_GAMELOSE, OnGameEnd);
+            Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
         }
 
         private void HandleInstructionState(Vector3 currentPos, float dt)
@@ -326,6 +338,21 @@ namespace Game
         {
             Vector3 newPos = new Vector3(x, y, 0.0f);
             Transform.SetPosition(proceedID, ref newPos);
+        }
+        
+        private void OnGameEnd(string eventName, string payload){
+            LogMessage("[TutorialUIManagerLevel2] Detect game end, hiding all tooltip");
+
+            //Hide all the Tooltip UI
+            ShowProceedText(false);
+
+            SpriteRenderer.SetIsVisible(instructionID, false);
+            SpriteRenderer.SetIsVisible(botnetInfoID, false);
+            SpriteRenderer.SetIsVisible(wormInfoID, false);
+            SpriteRenderer.SetIsVisible(loveletterInfoID, false);
+            SpriteRenderer.SetIsVisible(proceedID, false);
+            gameEnd = true;
+            return;
         }
     }
 }
