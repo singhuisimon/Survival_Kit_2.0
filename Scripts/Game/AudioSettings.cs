@@ -222,6 +222,14 @@ namespace Game
         {
             try
             {
+                // Create directory if it doesn't exist
+                string directory = "Resources/Sources/SaveData";
+                if (!FileIO.DirectoryExists(directory))
+                {
+                    FileIO.CreateDirectory(directory);
+                    Logger.LogMessage("[AudioSettings] Created SaveData directory");
+                }
+
                 string json = "{\n";
                 json += "  \"masterVolume\": " + masterVolume + ",\n";
                 json += "  \"bgmVolume\": " + bgmVolume + ",\n";
@@ -242,6 +250,7 @@ namespace Game
             }
             catch (Exception e) { Logger.LogError("[AudioSettings] Save error: " + e.Message); }
         }
+
 
         private void ApplyAllSettings()
         {
