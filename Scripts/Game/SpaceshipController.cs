@@ -469,6 +469,7 @@ namespace Game
             LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player from payload" + payload);
 
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+            Publish("HealthBarDamaged", playerHP.ToString()); // ADD
 
             // if (playerHP <= 0)
             // {
@@ -623,6 +624,8 @@ namespace Game
             if (playerHP < 0.0f) playerHP = 0.0f;
 
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+            Publish("HealthBarDamaged", playerHP.ToString()); // ADD
+
             LogMessage("[SpaceshipController] PlayerDamage -" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
 
             if (playerHP <= 0.0f && !isPlayerDead)
@@ -677,6 +680,8 @@ namespace Game
 
             LogMessage("[SpaceshipController] Vampirism healed player +" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
+            Publish("HealthBarHealing", playerHP.ToString()); // ADD
+
         }
 
         private void PlayHealVFX()

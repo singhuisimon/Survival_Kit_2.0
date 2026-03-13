@@ -3,74 +3,72 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.Event;
+using static Engine.SpriteRenderer;
 
 namespace Game
 {
-    /// <summary>
-    /// DamageBar - Red bar that smoothly lerps behind the white health bar
-    /// Attach this to the DamageBarFill (red bar) entity
-    /// Shows delayed damage visualization by lerping over 0.5 seconds
-    /// </summary>
     public class DamageBar : ScriptBehaviour
     {
-        // ===== Event Names =====
-        private const string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
+        private const string EVENT_HEALING = "HealthBarHealing";
+        private const string EVENT_DAMAGED = "HealthBarDamaged";
+        private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+        private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string EVENT_ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string EVENT_GAME_WIN = "GameWin";
 
-        // ===== Visual Settings =====
-        private float barMaxWidth;  // Maximum width at 100% health (set from scene)
-        private const float LERP_DURATION = 0.5f;  // Time to lerp in seconds
+        private const float LERP_DURATION = 0.5f;
 
-        // ===== State =====
+        private float barMaxWidth;
         private bool initialized = false;
-        private Vector3 initialPosition;  // Store initial center position
-        private float initialWidth;  // Store initial width to calculate offset
-        private float playerMaxHP = 100.0f;  // Player's actual max HP
-        private float hpToWidthRatio;  // Ratio: barMaxWidth / playerMaxHP
+        private Vector3 initialPosition;
+        private float initialWidth;
+        private float playerMaxHP = 100.0f;
+        private float currentHP = 100.0f;
+        private float hpToWidthRatio;
 
-        // ===== Lerp State =====
         private bool isLerping = false;
         private float lerpTimer = 0.0f;
-        private float startWidth = 0.0f;   // Width at start of lerp
-        private float targetWidth = 0.0f;  // Width to lerp to
-        private float currentWidth = 0.0f; // Current lerped width
+        private float startWidth = 0.0f;
+        private float targetWidth = 0.0f;
+        private float currentWidth = 0.0f;
 
         public override void OnStart()
         {
             LogMessage("=== DamageBar OnStart ===");
-            LogMessage("DamageBar EntityID: " + EntityID);
-
-            Event.Subscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
-            LogMessage("DamageBar: Subscribed to event '" + EVENT_PLAYER_HEALTHCHANGE + "'");
+            Event.Subscribe(EVENT_HEALING, OnHealing);
+            Event.Subscribe(EVENT_DAMAGED, OnDamaged);
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Subscribe(EVENT_ENEMY_CORE_DEATH, OnGameEnd);
+            Event.Subscribe(EVENT_GAME_WIN, OnGameEnd);
 
             initialPosition = Transform.GetPosition((uint)EntityID);
-
             Vector3 initialScale = Transform.GetScale((uint)EntityID);
-            float actualInitialWidth = initialScale.X;
 
-            barMaxWidth = actualInitialWidth;
-            initialWidth = actualInitialWidth;
-            currentWidth = actualInitialWidth;
+            barMaxWidth = initialScale.X;
+            initialWidth = initialScale.X;
             hpToWidthRatio = barMaxWidth / playerMaxHP;
 
-            // Reset visual to full width in case scene was restarted mid-damage
+            currentHP = playerMaxHP;
+            currentWidth = initialWidth;
+            isLerping = false;
+            lerpTimer = 0.0f;
+            startWidth = initialWidth;
+            targetWidth = initialWidth;
+
             UpdateBarVisual(currentWidth);
+            SetIsVisible((uint)EntityID, true);
 
             initialized = true;
-
-            LogMessage("DamageBar initialized:");
-            LogMessage("  Max Width (from scene): " + barMaxWidth);
-            LogMessage("  Initial Position X: " + initialPosition.X);
-            LogMessage("  HP to Width Ratio: " + hpToWidthRatio);
-            LogMessage("  Lerp Duration: " + LERP_DURATION + "s");
+            LogMessage("DamageBar initialized - Max Width: " + barMaxWidth + " HP: " + currentHP);
         }
-
 
         public override void OnUpdate(float deltaTime)
         {
-            if (!initialized)
-                return;
+            if (!initialized) return;
 
-            // Update lerp if active
             if (isLerping)
             {
                 lerpTimer += deltaTime;
@@ -78,7 +76,6 @@ namespace Game
 
                 if (t >= 1.0f)
                 {
-                    // Lerp complete
                     t = 1.0f;
                     isLerping = false;
                     currentWidth = targetWidth;
@@ -86,63 +83,60 @@ namespace Game
                 }
                 else
                 {
-                    // Lerp between start and target
                     currentWidth = Lerp(startWidth, targetWidth, t);
                 }
 
-                // Update visual
                 UpdateBarVisual(currentWidth);
             }
         }
 
-        // ===== EVENT HANDLERS =====
-
-        private void OnPlayerHealthChange(string eventName, string payload)
+        private void OnDamaged(string eventName, string payload)
         {
-            LogMessage("=== DamageBar: OnPlayerHealthChange CALLED ===");
-            LogMessage("  Payload: '" + payload + "'");
-
-            if (!float.TryParse(payload, out float newHP))
-            {
-                LogError("DamageBar: Failed to parse HP from payload: " + payload);
-                return;
-            }
-
-            // Clamp HP to valid range (0-100)
+            if (!float.TryParse(payload, out float newHP)) return;
             if (newHP < 0.0f) newHP = 0.0f;
             if (newHP > playerMaxHP) newHP = playerMaxHP;
 
-            // Convert HP to width
             float newTargetWidth = newHP * hpToWidthRatio;
 
-            LogMessage("  New HP: " + newHP + " -> Target Width: " + newTargetWidth);
-            LogMessage("  Current Width: " + currentWidth);
-
-            // Start new lerp (or update existing lerp target)
-            startWidth = currentWidth;  // Start from wherever we currently are
+            // ===== DAMAGE: hold current width, lerp down =====
+            startWidth = currentWidth;
             targetWidth = newTargetWidth;
             lerpTimer = 0.0f;
             isLerping = true;
+            currentHP = newHP;
 
-            LogMessage("  Starting lerp: " + startWidth + " -> " + targetWidth);
+            SetIsVisible((uint)EntityID, true);
+            LogMessage("DamageBar: Damage - lerping " + startWidth + " -> " + targetWidth);
         }
 
-        // ===== HELPER METHODS =====
+        private void OnHealing(string eventName, string payload)
+        {
+            if (!float.TryParse(payload, out float newHP)) return;
+            if (newHP < 0.0f) newHP = 0.0f;
+            if (newHP > playerMaxHP) newHP = playerMaxHP;
+
+            // ===== HEAL: snap instantly, hide red bar =====
+            isLerping = false;
+            currentWidth = newHP * hpToWidthRatio;
+            currentHP = newHP;
+            UpdateBarVisual(currentWidth);
+            SetIsVisible((uint)EntityID, false);
+            LogMessage("DamageBar: Heal - snapped and hidden");
+        }
+
+        private void OnGameEnd(string eventName, string payload)
+        {
+            LogMessage("DamageBar: Game ended (" + eventName + ") - hiding bar");
+            isLerping = false;
+            SetIsVisible((uint)EntityID, false);
+        }
 
         private void UpdateBarVisual(float width)
         {
-            // Get current scale
             Vector3 currentScale = Transform.GetScale((uint)EntityID);
-
-            // Set width
-            Vector3 newScale = new Vector3(
-                width,
-                currentScale.Y,
-                currentScale.Z
-            );
+            Vector3 newScale = new Vector3(width, currentScale.Y, currentScale.Z);
             Transform.SetScale((uint)EntityID, ref newScale);
 
-            // Adjust position to keep LEFT edge fixed
             float widthDifference = initialWidth - width;
             Vector3 newPosition = new Vector3(
                 initialPosition.X - widthDifference,
@@ -152,16 +146,17 @@ namespace Game
             Transform.SetPosition((uint)EntityID, ref newPosition);
         }
 
-        private float Lerp(float a, float b, float t)
-        {
-            return a + (b - a) * t;
-        }
+        private float Lerp(float a, float b, float t) { return a + (b - a) * t; }
 
         public override void OnDestroy()
         {
-            // Clean up event subscriptions
-            Event.Unsubscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
-
+            Event.Unsubscribe(EVENT_HEALING, OnHealing);
+            Event.Unsubscribe(EVENT_DAMAGED, OnDamaged);
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);
+            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Unsubscribe(EVENT_ENEMY_CORE_DEATH, OnGameEnd);
+            Event.Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
             LogMessage("=== DamageBar Destroyed ===");
         }
     }
