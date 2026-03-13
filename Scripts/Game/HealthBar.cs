@@ -3,16 +3,20 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.Event;
+using static Engine.SpriteRenderer;
 
 namespace Game
 {
-    /// <summary>
-    /// HealthBar - Snaps DOWN instantly on damage, lerps UP slowly on heal.
-    /// Mirror of DamageBar which lerps down on damage.
-    /// </summary>
     public class HealthBar : ScriptBehaviour
     {
-        private const string EVENT_PLAYER_HEALTHCHANGE = "Health Change";
+        private const string EVENT_HEALING = "HealthBarHealing";
+        private const string EVENT_DAMAGED = "HealthBarDamaged";
+        private const string EVENT_PLAYER_DEAD = "PlayerDead";
+        private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
+        private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string EVENT_ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string EVENT_GAME_WIN = "GameWin";
+
         private const float LERP_DURATION = 0.5f;
 
         private float barMaxWidth;
@@ -20,10 +24,9 @@ namespace Game
         private Vector3 initialPosition;
         private float initialWidth;
         private float playerMaxHP = 100.0f;
-        private float currentHP = 100.0f;  // track actual HP
+        private float currentHP = 100.0f;
         private float hpToWidthRatio;
 
-        // ===== Lerp State (heal only) =====
         private bool isLerping = false;
         private float lerpTimer = 0.0f;
         private float startWidth = 0.0f;
@@ -33,7 +36,13 @@ namespace Game
         public override void OnStart()
         {
             LogMessage("=== HealthBar OnStart ===");
-            Event.Subscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
+            Event.Subscribe(EVENT_HEALING, OnHealing);
+            Event.Subscribe(EVENT_DAMAGED, OnDamaged);
+            Event.Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
+            Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Subscribe(EVENT_ENEMY_CORE_DEATH, OnGameEnd);
+            Event.Subscribe(EVENT_GAME_WIN, OnGameEnd);
 
             initialPosition = Transform.GetPosition((uint)EntityID);
             Vector3 initialScale = Transform.GetScale((uint)EntityID);
@@ -42,13 +51,15 @@ namespace Game
             initialWidth = initialScale.X;
             hpToWidthRatio = barMaxWidth / playerMaxHP;
 
-            // ===== Always reset to full HP on start =====
             currentHP = playerMaxHP;
             currentWidth = initialWidth;
             isLerping = false;
             lerpTimer = 0.0f;
+            startWidth = initialWidth;
+            targetWidth = initialWidth;
 
             UpdateBarVisual(currentWidth);
+            SetIsVisible((uint)EntityID, true);
 
             initialized = true;
             LogMessage("HealthBar initialized - Max Width: " + barMaxWidth + " HP: " + currentHP);
@@ -79,40 +90,44 @@ namespace Game
             }
         }
 
-        private void OnPlayerHealthChange(string eventName, string payload)
+        private void OnHealing(string eventName, string payload)
         {
-            LogMessage("=== HealthBar: OnPlayerHealthChange ===");
-
-            if (!float.TryParse(payload, out float newHP))
-            {
-                LogError("HealthBar: Failed to parse HP: " + payload);
-                return;
-            }
-
+            if (!float.TryParse(payload, out float newHP)) return;
             if (newHP < 0.0f) newHP = 0.0f;
             if (newHP > playerMaxHP) newHP = playerMaxHP;
 
             float newTargetWidth = newHP * hpToWidthRatio;
 
-            if (newTargetWidth > currentWidth)
-            {
-                // ===== HEAL: lerp UP =====
-                startWidth = currentWidth;
-                targetWidth = newTargetWidth;
-                lerpTimer = 0.0f;
-                isLerping = true;
-                LogMessage("HealthBar: Heal - lerping " + startWidth + " -> " + targetWidth + " (HP: " + currentHP + " -> " + newHP + ")");
-            }
-            else
-            {
-                // ===== DAMAGE: snap DOWN instantly =====
-                isLerping = false;
-                currentWidth = newTargetWidth;
-                UpdateBarVisual(currentWidth);
-                LogMessage("HealthBar: Damage - snapped to " + currentWidth + " (HP: " + currentHP + " -> " + newHP + ")");
-            }
-
+            // ===== HEAL: lerp UP =====
+            startWidth = currentWidth;
+            targetWidth = newTargetWidth;
+            lerpTimer = 0.0f;
+            isLerping = true;
             currentHP = newHP;
+            LogMessage("HealthBar: Heal - lerping " + startWidth + " -> " + targetWidth);
+        }
+
+        private void OnDamaged(string eventName, string payload)
+        {
+            if (!float.TryParse(payload, out float newHP)) return;
+            if (newHP < 0.0f) newHP = 0.0f;
+            if (newHP > playerMaxHP) newHP = playerMaxHP;
+
+            float newTargetWidth = newHP * hpToWidthRatio;
+
+            // ===== DAMAGE: snap DOWN instantly =====
+            isLerping = false;
+            currentWidth = newTargetWidth;
+            currentHP = newHP;
+            UpdateBarVisual(currentWidth);
+            LogMessage("HealthBar: Damage - snapped to " + currentWidth);
+        }
+
+        private void OnGameEnd(string eventName, string payload)
+        {
+            LogMessage("HealthBar: Game ended (" + eventName + ") - hiding bar");
+            isLerping = false;
+            SetIsVisible((uint)EntityID, false);
         }
 
         private void UpdateBarVisual(float width)
@@ -134,7 +149,13 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Event.Unsubscribe(EVENT_PLAYER_HEALTHCHANGE, OnPlayerHealthChange);
+            Event.Unsubscribe(EVENT_HEALING, OnHealing);
+            Event.Unsubscribe(EVENT_DAMAGED, OnDamaged);
+            Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
+            Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);
+            Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Unsubscribe(EVENT_ENEMY_CORE_DEATH, OnGameEnd);
+            Event.Unsubscribe(EVENT_GAME_WIN, OnGameEnd);
             LogMessage("=== HealthBar Destroyed ===");
         }
     }

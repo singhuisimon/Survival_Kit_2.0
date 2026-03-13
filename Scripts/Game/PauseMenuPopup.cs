@@ -67,7 +67,7 @@ namespace Game
             "PrimaryWeaponFrame",
             "PrimaryWeaponWindow",
             "SecondayWeaponUI",
-            "SentryWindow",
+
             "AltFireIcon",
             "WeaponBarReload",
             "CoreHealthBarRefill",

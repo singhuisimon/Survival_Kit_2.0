@@ -165,7 +165,7 @@ namespace Game
                 movedShift = true;
             }
 
-            if (movedWASD && movedSpacebar && movedShift)
+            if (movedWASD)
             {
                 // Fade out WASD
                 ShowUI(pressWASDID, false, dt);

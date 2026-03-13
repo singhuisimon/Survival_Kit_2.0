@@ -12,7 +12,7 @@ namespace Game
     /// Handles the shop popup in the main menu.
     /// Two tabs: Packs (default) and ByteChips.
     /// Packs tab: Skin slots with Exchange/Equip/Equipped button states.
-    /// ByteChips tab: Exchange buttons, clicking shows Label_PackOwned.
+    /// ByteChips tab: Exchange buttons for purchasing ByteChip packs.
     /// </summary>
     public class ShopPopup : ScriptBehaviour
     {
@@ -37,10 +37,6 @@ namespace Game
         private const string EQUIP_BUTTON_3_NAME = "Shop Equip Button 3";
         private const string EQUIPPED_BUTTON_3_NAME = "Shop Equipped Button 3";
         private const string EQUIP_BUTTON_DEFAULT_NAME = "Shop Equip Button Default";
-        private const string LABEL_PACK_OWNED_1_NAME = "Label_PackOwned_1";
-        private const string LABEL_PACK_OWNED_2_NAME = "Label_PackOwned_2";
-        private const string LABEL_PACK_OWNED_3_NAME = "Label_PackOwned_3";
-        private const string LABEL_PACK_OWNED_4_NAME = "Label_PackOwned_4";
         private const string SCORE_TEXT_1_NAME = "Shop Score Text 1";
         private const string SCORE_TEXT_2_NAME = "Shop Score Text 2";
 
@@ -73,10 +69,6 @@ namespace Game
         private uint equipButton3Id;         // Skin 3 - Equip state
         private uint equippedButton3Id;      // Skin 3 - Equipped state
         private uint equipButtonDefaultId;   // Default skin - Equip state
-        private uint labelPackOwned1Id;
-        private uint labelPackOwned2Id;
-        private uint labelPackOwned3Id;
-        private uint labelPackOwned4Id;
         private uint scoreText1Id;
         private uint scoreText2Id;
 
@@ -85,15 +77,11 @@ namespace Game
         private Vector3 closeButtonVisiblePos = new Vector3(1115.0f, 112.0f, -0.6f);
         private Vector3 packsButtonVisiblePos = new Vector3(195.0f, 146.0f, -0.6f);
         private Vector3 byteChipsButtonVisiblePos = new Vector3(270.0f, 146.0f, -0.6f);
-        private Vector3 slot1VisiblePos = new Vector3(573.0f, 550.0f, -0.6f);
-        private Vector3 slot2VisiblePos = new Vector3(815.0f, 550.0f, -0.6f);
-        private Vector3 exchangeButton3VisiblePos = new Vector3(1057.0f, 550.0f, -0.6f);
-        private Vector3 exchangeButton4VisiblePos = new Vector3(330.0f, 550.0f, -0.6f);
-        private Vector3 slotDefaultVisiblePos = new Vector3(330.0f, 550.0f, -0.6f);
-        private Vector3 labelPackOwned1VisiblePos = new Vector3(276.0f, 536.0f, -0.6f);
-        private Vector3 labelPackOwned2VisiblePos = new Vector3(519.0f, 536.0f, -0.6f);
-        private Vector3 labelPackOwned3VisiblePos = new Vector3(761.0f, 536.0f, -0.6f);
-        private Vector3 labelPackOwned4VisiblePos = new Vector3(1003.0f, 536.0f, -0.6f);
+        private Vector3 slot1VisiblePos = new Vector3(573.0f, 550.0f, -0.7f);
+        private Vector3 slot2VisiblePos = new Vector3(815.0f, 550.0f, -0.7f);
+        private Vector3 exchangeButton3VisiblePos = new Vector3(1057.0f, 550.0f, -0.7f);
+        private Vector3 exchangeButton4VisiblePos = new Vector3(330.0f, 550.0f, -0.7f);
+        private Vector3 slotDefaultVisiblePos = new Vector3(330.0f, 550.0f, -0.7f);
         private Vector3 scoreText1VisiblePos = new Vector3(280.0f, 537.0f, -0.6f);
         private Vector3 scoreText2VisiblePos = new Vector3(470.0f, 537.0f, -0.6f);
 
@@ -142,10 +130,6 @@ namespace Game
             equipButton3Id = SceneFindEntityByName(EQUIP_BUTTON_3_NAME);
             equippedButton3Id = SceneFindEntityByName(EQUIPPED_BUTTON_3_NAME);
             equipButtonDefaultId = SceneFindEntityByName(EQUIP_BUTTON_DEFAULT_NAME);
-            labelPackOwned1Id = SceneFindEntityByName(LABEL_PACK_OWNED_1_NAME);
-            labelPackOwned2Id = SceneFindEntityByName(LABEL_PACK_OWNED_2_NAME);
-            labelPackOwned3Id = SceneFindEntityByName(LABEL_PACK_OWNED_3_NAME);
-            labelPackOwned4Id = SceneFindEntityByName(LABEL_PACK_OWNED_4_NAME);
             scoreText1Id = SceneFindEntityByName(SCORE_TEXT_1_NAME);
             scoreText2Id = SceneFindEntityByName(SCORE_TEXT_2_NAME);
 
@@ -406,8 +390,7 @@ namespace Game
 
         private void TryPurchaseSkin(int skinIndex)
         {
-            ProgressTracker.LoadProgress();
-
+            // Do NOT call LoadProgress here - use in-memory state
             if (ProgressTracker.CumulativeScore < SKIN_COST)
             {
                 LogMessage("ShopPopup: Not enough points to purchase skin " + skinIndex +
@@ -438,8 +421,7 @@ namespace Game
 
         private void TryPurchaseSkin3()
         {
-            ProgressTracker.LoadProgress();
-
+            // Do NOT call LoadProgress here - use in-memory state
             if (ProgressTracker.ByteChips < SKIN3_BYTECHIP_COST)
             {
                 LogMessage("ShopPopup: Not enough ByteChips to purchase skin 3 (have " +
@@ -459,14 +441,29 @@ namespace Game
 
         private void EquipSkin(int skinIndex)
         {
-            ProgressTracker.LoadProgress();
-            ProgressTracker.EquippedSkin = skinIndex;
-            ProgressTracker.SaveProgress();
+            try
+            {
+                LogMessage("ShopPopup: EquipSkin(" + skinIndex + ") called");
 
-            LogMessage("ShopPopup: Equipped skin " + skinIndex);
+                // Do NOT call LoadProgress here - it resets all in-memory state.
+                // If the save file doesn't exist (e.g. SaveData dir missing),
+                // LoadProgress would lose the purchase state that's currently in memory.
+                ProgressTracker.EquippedSkin = skinIndex;
 
-            // Refresh button states
-            UpdatePacksButtonStates();
+                LogMessage("ShopPopup: EquippedSkin set to " + skinIndex + ", saving...");
+                ProgressTracker.SaveProgress();
+
+                LogMessage("ShopPopup: Equipped skin " + skinIndex + ", updating button states...");
+
+                // Refresh button states
+                UpdatePacksButtonStates();
+
+                LogMessage("ShopPopup: EquipSkin(" + skinIndex + ") completed successfully");
+            }
+            catch (Exception e)
+            {
+                LogError("ShopPopup: EquipSkin CRASHED: " + e.Message + "\n" + e.StackTrace);
+            }
         }
 
         private void OnOtherPopupOpened(string eventName, string payload)
@@ -602,13 +599,19 @@ namespace Game
             // Hide ByteChips-only elements
             if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref hidePos2);
 
-            // Update skin button states (including slot 3) and Pack Owned labels
+            // Update skin button states (including slot 3)
             UpdatePacksButtonStates();
         }
 
         private void UpdatePacksButtonStates()
         {
+            try
+            {
             Vector3 hidePos2 = new Vector3(CENTER_X, HIDDEN_Y, -0.6f);
+
+            LogMessage("ShopPopup: UpdatePacksButtonStates - Skin1=" + ProgressTracker.Skin1Purchased +
+                " Skin2=" + ProgressTracker.Skin2Purchased + " Skin3=" + ProgressTracker.Skin3Purchased +
+                " Equipped=" + ProgressTracker.EquippedSkin);
 
             // === Slot 1 (position 573, 550) ===
             // Hide all slot 1 buttons first
@@ -689,35 +692,11 @@ namespace Game
                 if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref slotDefaultVisiblePos);
             }
 
-            // === Pack Owned labels on skin slots ===
-            // Default slot - always owned
-            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref labelPackOwned1VisiblePos);
-
-            // Skin 1 - show if purchased
-            if (labelPackOwned2Id != 0)
-            {
-                if (ProgressTracker.Skin1Purchased)
-                    SetPosition(labelPackOwned2Id, ref labelPackOwned2VisiblePos);
-                else
-                    SetPosition(labelPackOwned2Id, ref hidePos2);
+            LogMessage("ShopPopup: UpdatePacksButtonStates completed successfully");
             }
-
-            // Skin 2 - show if purchased
-            if (labelPackOwned3Id != 0)
+            catch (Exception e)
             {
-                if (ProgressTracker.Skin2Purchased)
-                    SetPosition(labelPackOwned3Id, ref labelPackOwned3VisiblePos);
-                else
-                    SetPosition(labelPackOwned3Id, ref hidePos2);
-            }
-
-            // Skin 3 - show if purchased
-            if (labelPackOwned4Id != 0)
-            {
-                if (ProgressTracker.Skin3Purchased)
-                    SetPosition(labelPackOwned4Id, ref labelPackOwned4VisiblePos);
-                else
-                    SetPosition(labelPackOwned4Id, ref hidePos2);
+                LogError("ShopPopup: UpdatePacksButtonStates CRASHED: " + e.Message + "\n" + e.StackTrace);
             }
         }
 
@@ -739,12 +718,6 @@ namespace Game
             if (equippedButton3Id != 0) SetPosition(equippedButton3Id, ref hidePos2);
             if (equippedButtonId != 0) SetPosition(equippedButtonId, ref hidePos2);
             if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref hidePos2);
-
-            // Hide all Pack Owned labels (they belong to the Packs tab now)
-            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
-            if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
-            if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
-            if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
 
             // Always show all exchange buttons (packs are repeatable)
             if (exchangeButton4Id != 0) SetPosition(exchangeButton4Id, ref exchangeButton4VisiblePos);
@@ -782,10 +755,6 @@ namespace Game
             if (equipButton3Id != 0) SetPosition(equipButton3Id, ref hidePos2);
             if (equippedButton3Id != 0) SetPosition(equippedButton3Id, ref hidePos2);
             if (equipButtonDefaultId != 0) SetPosition(equipButtonDefaultId, ref hidePos2);
-            if (labelPackOwned1Id != 0) SetPosition(labelPackOwned1Id, ref hidePos2);
-            if (labelPackOwned2Id != 0) SetPosition(labelPackOwned2Id, ref hidePos2);
-            if (labelPackOwned3Id != 0) SetPosition(labelPackOwned3Id, ref hidePos2);
-            if (labelPackOwned4Id != 0) SetPosition(labelPackOwned4Id, ref hidePos2);
             if (scoreText1Id != 0) SetPosition(scoreText1Id, ref hidePos2);
             if (scoreText2Id != 0) SetPosition(scoreText2Id, ref hidePos2);
 
