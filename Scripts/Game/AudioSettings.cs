@@ -217,7 +217,6 @@ namespace Game
             }
             catch (Exception e) { Logger.LogError("[AudioSettings] Failed to load JSON: " + e.Message); }
         }
-
         private void SaveSettings()
         {
             try
@@ -238,10 +237,11 @@ namespace Game
                 if (FileIO.WriteAllText(SAVE_FILE, json))
                     Logger.LogMessage("[AudioSettings] Saved to: " + SAVE_FILE);
                 else
-                    Logger.LogError("[AudioSettings] Failed to save file");
+                    Logger.LogError("[AudioSettings] Failed to save file - SaveData folder may not exist");
             }
             catch (Exception e) { Logger.LogError("[AudioSettings] Save error: " + e.Message); }
         }
+
 
         private void ApplyAllSettings()
         {

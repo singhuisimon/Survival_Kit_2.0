@@ -8,13 +8,14 @@ using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Transform;
+using static Engine.SpriteRenderer;
 using static Game.AudioSettings;
 
 namespace Game
 {
     public class SettingsPopup : ScriptBehaviour
     {
-        // Entity names — unchanged
+        // Entity names
         private const string SETTINGS_BUTTON_NAME = "Settings Button";
         private const string SETTINGS_POPUP_NAME = "Settings Popup";
         private const string CLOSE_BUTTON_NAME = "Settings Close Button";
@@ -27,6 +28,14 @@ namespace Game
         private const string VOLUME_FILL_1_NAME = "Settings Volume Fill 1";
         private const string VOLUME_FILL_2_NAME = "Settings Volume Fill 2";
         private const string VOLUME_FILL_3_NAME = "Settings Volume Fill 3";
+
+        // Mute button entity names
+        private const string MUTE_MASTER_UNTICKED_NAME = "MuteMasterButton";
+        private const string MUTE_BGM_UNTICKED_NAME = "MuteBGMButton";
+        private const string MUTE_SFX_UNTICKED_NAME = "MuteSFXButton";
+        private const string MUTE_MASTER_TICKED_NAME = "MuteMasterButton_Ticked";
+        private const string MUTE_BGM_TICKED_NAME = "MuteBGMButton_Ticked";
+        private const string MUTE_SFX_TICKED_NAME = "MuteSFXButton_Ticked";
 
         private const float HIDDEN_Y = -500.0f;
         private const float VISIBLE_Y = 360.0f;
@@ -53,6 +62,15 @@ namespace Game
         private uint gammaDefaultId;
         private uint mouseDefaultId;
 
+        // Mute button IDs
+        private uint muteMasterId;
+        private uint muteBGMId;
+        private uint muteSFXId;
+        private uint muteMasterTickedId;
+        private uint muteBGMTickedId;
+        private uint muteSFXTickedId;
+
+        // Visible positions
         private Vector3 popupVisiblePos = new Vector3(640.0f, 375.0f, -0.5f);
         private Vector3 closeButtonVisiblePos = new Vector3(801.4f, 63.6f, -0.6f);
         private Vector3 plusButton1VisiblePos = new Vector3(598.0f, 423.9f, -0.6f);
@@ -119,6 +137,14 @@ namespace Game
             gammaDefaultId = SceneFindEntityByName("GammaDefault");
             mouseDefaultId = SceneFindEntityByName("MouseDefault");
 
+            // Mute buttons
+            muteMasterId = SceneFindEntityByName(MUTE_MASTER_UNTICKED_NAME);
+            muteBGMId = SceneFindEntityByName(MUTE_BGM_UNTICKED_NAME);
+            muteSFXId = SceneFindEntityByName(MUTE_SFX_UNTICKED_NAME);
+            muteMasterTickedId = SceneFindEntityByName(MUTE_MASTER_TICKED_NAME);
+            muteBGMTickedId = SceneFindEntityByName(MUTE_BGM_TICKED_NAME);
+            muteSFXTickedId = SceneFindEntityByName(MUTE_SFX_TICKED_NAME);
+
             if (settingsPopupId == 0) LogError("SettingsPopup: Could not find: " + SETTINGS_POPUP_NAME);
             if (closeButtonId == 0) LogError("SettingsPopup: Could not find: " + CLOSE_BUTTON_NAME);
 
@@ -127,6 +153,14 @@ namespace Game
             if (volumeFill3Id != 0) { volumeFill3InitialWidth = GetScale(volumeFill3Id).X; volumeFill3InitialPosition = volumeFill3VisiblePos; LogMessage("SettingsPopup: Volume Fill 3 initial width = " + volumeFill3InitialWidth); }
             if (gammaVolumeId != 0) { gammaVolumeInitialWidth = GetScale(gammaVolumeId).X; gammaVolumeInitialPosition = GammaVolume; }
             if (mouseVolumeId != 0) { mouseVolumeInitialWidth = GetScale(mouseVolumeId).X; mouseVolumeInitialPosition = MouseVolume; }
+
+            // Hide all mute buttons on start
+            if (muteMasterId != 0) SetIsVisible(muteMasterId, false);
+            if (muteBGMId != 0) SetIsVisible(muteBGMId, false);
+            if (muteSFXId != 0) SetIsVisible(muteSFXId, false);
+            if (muteMasterTickedId != 0) SetIsVisible(muteMasterTickedId, false);
+            if (muteBGMTickedId != 0) SetIsVisible(muteBGMTickedId, false);
+            if (muteSFXTickedId != 0) SetIsVisible(muteSFXTickedId, false);
 
             entitiesFound = true;
             isPopupVisible = false;
@@ -212,6 +246,38 @@ namespace Game
                     AudioSettings.Instance.SetSFXVolume(AudioSettings.Instance.GetSFXVolume() - 0.1f);
                     UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(), volumeFill3InitialWidth, volumeFill3InitialPosition);
                     LogMessage("SettingsPopup: SFX Volume - (Now: " + AudioSettings.Instance.GetSFXVolume().ToString("F2") + ")");
+                    return;
+                }
+
+                // ===== Mute Buttons =====
+                if ((muteMasterId != 0 && Collision2D.IsMouseCollidingWithEntity(muteMasterId)) ||
+                    (muteMasterTickedId != 0 && Collision2D.IsMouseCollidingWithEntity(muteMasterTickedId)))
+                {
+                    AudioSettings.Instance.ToggleMasterMute();
+                    bool muted = AudioSettings.Instance.IsMasterMuted();
+                    if (muteMasterId != 0) SetIsVisible(muteMasterId, !muted);
+                    if (muteMasterTickedId != 0) SetIsVisible(muteMasterTickedId, muted);
+                    LogMessage("SettingsPopup: Master Mute toggled (Now: " + muted + ")");
+                    return;
+                }
+                if ((muteBGMId != 0 && Collision2D.IsMouseCollidingWithEntity(muteBGMId)) ||
+                    (muteBGMTickedId != 0 && Collision2D.IsMouseCollidingWithEntity(muteBGMTickedId)))
+                {
+                    AudioSettings.Instance.ToggleBGMMute();
+                    bool muted = AudioSettings.Instance.IsBGMMuted();
+                    if (muteBGMId != 0) SetIsVisible(muteBGMId, !muted);
+                    if (muteBGMTickedId != 0) SetIsVisible(muteBGMTickedId, muted);
+                    LogMessage("SettingsPopup: BGM Mute toggled (Now: " + muted + ")");
+                    return;
+                }
+                if ((muteSFXId != 0 && Collision2D.IsMouseCollidingWithEntity(muteSFXId)) ||
+                    (muteSFXTickedId != 0 && Collision2D.IsMouseCollidingWithEntity(muteSFXTickedId)))
+                {
+                    AudioSettings.Instance.ToggleSFXMute();
+                    bool muted = AudioSettings.Instance.IsSFXMuted();
+                    if (muteSFXId != 0) SetIsVisible(muteSFXId, !muted);
+                    if (muteSFXTickedId != 0) SetIsVisible(muteSFXTickedId, muted);
+                    LogMessage("SettingsPopup: SFX Mute toggled (Now: " + muted + ")");
                     return;
                 }
 
@@ -321,6 +387,18 @@ namespace Game
                 UpdateVolumeFillVisual(volumeFill3Id, AudioSettings.Instance.GetSFXVolume(), volumeFill3InitialWidth, volumeFill3InitialPosition);
                 UpdateVolumeFillVisual(gammaVolumeId, AudioSettings.Instance.GetGammaNormalized(), gammaVolumeInitialWidth, gammaVolumeInitialPosition);
                 UpdateVolumeFillVisual(mouseVolumeId, AudioSettings.Instance.GetMouseSensitivityNormalized(), mouseVolumeInitialWidth, mouseVolumeInitialPosition);
+
+                // Show correct mute sprite based on current mute state
+                bool masterMuted = AudioSettings.Instance.IsMasterMuted();
+                bool bgmMuted = AudioSettings.Instance.IsBGMMuted();
+                bool sfxMuted = AudioSettings.Instance.IsSFXMuted();
+
+                if (muteMasterId != 0) SetIsVisible(muteMasterId, !masterMuted);
+                if (muteMasterTickedId != 0) SetIsVisible(muteMasterTickedId, masterMuted);
+                if (muteBGMId != 0) SetIsVisible(muteBGMId, !bgmMuted);
+                if (muteBGMTickedId != 0) SetIsVisible(muteBGMTickedId, bgmMuted);
+                if (muteSFXId != 0) SetIsVisible(muteSFXId, !sfxMuted);
+                if (muteSFXTickedId != 0) SetIsVisible(muteSFXTickedId, sfxMuted);
             }
 
             LogMessage("SettingsPopup: Popup shown");
@@ -354,6 +432,14 @@ namespace Game
             if (mouseVolumeId != 0) SetPosition(mouseVolumeId, ref hidePos2);
             if (gammaDefaultId != 0) SetPosition(gammaDefaultId, ref hidePos2);
             if (mouseDefaultId != 0) SetPosition(mouseDefaultId, ref hidePos2);
+
+            // Hide all mute buttons
+            if (muteMasterId != 0) SetIsVisible(muteMasterId, false);
+            if (muteBGMId != 0) SetIsVisible(muteBGMId, false);
+            if (muteSFXId != 0) SetIsVisible(muteSFXId, false);
+            if (muteMasterTickedId != 0) SetIsVisible(muteMasterTickedId, false);
+            if (muteBGMTickedId != 0) SetIsVisible(muteBGMTickedId, false);
+            if (muteSFXTickedId != 0) SetIsVisible(muteSFXTickedId, false);
 
             LogMessage("SettingsPopup: Popup hidden");
         }
