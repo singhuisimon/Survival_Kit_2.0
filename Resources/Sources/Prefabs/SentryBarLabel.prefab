@@ -1,7 +1,7 @@
 {
     "Prefab Name": "SentryBarLabel",
-    "Prefab GUID": 3657600814311491375,
-    "version": 1,
+    "Prefab GUID": 18069119621897078573,
+    "version": 2,
     "entities": [
         {
             "Name": "SentryBarLabel",
@@ -25,8 +25,8 @@
                                 0.0
                             ],
                             "Scale": [
-                                1.0,
-                                1.0,
+                                6.599999904632568,
+                                1.600000023841858,
                                 1.0
                             ],
                             "Parent": 4294967295,

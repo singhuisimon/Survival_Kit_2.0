@@ -4,7 +4,7 @@
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "SpawningSentryLabel.png",
+    "emissionMap": "",
     "occlusionMap": "",
     "baseColor": [
         1.0,
@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": true,
     "castShadows": true,
-    "treatBlacksAsTransparent": true
+    "treatBlacksAsTransparent": false
 }

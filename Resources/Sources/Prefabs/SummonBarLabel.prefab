@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "SummonBarLabel",
-    "Prefab GUID": 12880972851154208527,
+    "Prefab Name": "Prefab: SummonBarLabel.prefab",
+    "Prefab GUID": 967131045531222193,
     "version": 1,
     "entities": [
         {
@@ -25,8 +25,8 @@
                                 0.0
                             ],
                             "Scale": [
-                                1.0,
-                                1.0,
+                                7.0,
+                                2.4000000953674316,
                                 1.0
                             ],
                             "Parent": 4294967295,
