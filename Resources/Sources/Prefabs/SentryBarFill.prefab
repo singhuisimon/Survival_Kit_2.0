@@ -1,0 +1,84 @@
+{
+    "Prefab Name": "SentryBarFill",
+    "Prefab GUID": 12880972851163350821,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "SentryBarFill",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3657600814307903261",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14610355108072949531",
+                            "Name": "SentryBarFill",
+                            "Tag": "SentryBarFill"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8269286832735569695",
+                            "Mesh": "",
+                            "Material": "SentryBarFill.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": true,
+                            "MeshType": 1,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9998669089646167841",
+                            "ScriptClassName": "",
+                            "Started": false,
+                            "GCHandle": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
