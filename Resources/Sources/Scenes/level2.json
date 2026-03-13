@@ -9473,6 +9473,48 @@
                     }
                 }
             ]
+        },
+        {
+            "ID": 9999901,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "SkinApplier",
+                        "Tag": "SkinApplier"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9999901000000000003",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9999901000000000004",
+                        "ScriptClassName": "Game.SkinApplier"
+                    }
+                }
+            ]
         }
     ],
     "Settings": [
