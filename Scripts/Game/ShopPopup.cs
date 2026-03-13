@@ -382,8 +382,7 @@ namespace Game
 
         private void TryPurchaseSkin(int skinIndex)
         {
-            ProgressTracker.LoadProgress();
-
+            // Do NOT call LoadProgress here - use in-memory state
             if (ProgressTracker.CumulativeScore < SKIN_COST)
             {
                 LogMessage("ShopPopup: Not enough points to purchase skin " + skinIndex +
@@ -414,8 +413,7 @@ namespace Game
 
         private void TryPurchaseSkin3()
         {
-            ProgressTracker.LoadProgress();
-
+            // Do NOT call LoadProgress here - use in-memory state
             if (ProgressTracker.ByteChips < SKIN3_BYTECHIP_COST)
             {
                 LogMessage("ShopPopup: Not enough ByteChips to purchase skin 3 (have " +
@@ -435,14 +433,29 @@ namespace Game
 
         private void EquipSkin(int skinIndex)
         {
-            ProgressTracker.LoadProgress();
-            ProgressTracker.EquippedSkin = skinIndex;
-            ProgressTracker.SaveProgress();
+            try
+            {
+                LogMessage("ShopPopup: EquipSkin(" + skinIndex + ") called");
 
-            LogMessage("ShopPopup: Equipped skin " + skinIndex);
+                // Do NOT call LoadProgress here - it resets all in-memory state.
+                // If the save file doesn't exist (e.g. SaveData dir missing),
+                // LoadProgress would lose the purchase state that's currently in memory.
+                ProgressTracker.EquippedSkin = skinIndex;
 
-            // Refresh button states
-            UpdatePacksButtonStates();
+                LogMessage("ShopPopup: EquippedSkin set to " + skinIndex + ", saving...");
+                ProgressTracker.SaveProgress();
+
+                LogMessage("ShopPopup: Equipped skin " + skinIndex + ", updating button states...");
+
+                // Refresh button states
+                UpdatePacksButtonStates();
+
+                LogMessage("ShopPopup: EquipSkin(" + skinIndex + ") completed successfully");
+            }
+            catch (Exception e)
+            {
+                LogError("ShopPopup: EquipSkin CRASHED: " + e.Message + "\n" + e.StackTrace);
+            }
         }
 
         private void OnOtherPopupOpened(string eventName, string payload)
@@ -584,7 +597,13 @@ namespace Game
 
         private void UpdatePacksButtonStates()
         {
+            try
+            {
             Vector3 hidePos2 = new Vector3(CENTER_X, HIDDEN_Y, -0.6f);
+
+            LogMessage("ShopPopup: UpdatePacksButtonStates - Skin1=" + ProgressTracker.Skin1Purchased +
+                " Skin2=" + ProgressTracker.Skin2Purchased + " Skin3=" + ProgressTracker.Skin3Purchased +
+                " Equipped=" + ProgressTracker.EquippedSkin);
 
             // === Slot 1 (position 573, 550) ===
             // Hide all slot 1 buttons first
@@ -694,6 +713,13 @@ namespace Game
                     SetPosition(labelPackOwned4Id, ref labelPackOwned4VisiblePos);
                 else
                     SetPosition(labelPackOwned4Id, ref hidePos2);
+            }
+
+            LogMessage("ShopPopup: UpdatePacksButtonStates completed successfully");
+            }
+            catch (Exception e)
+            {
+                LogError("ShopPopup: UpdatePacksButtonStates CRASHED: " + e.Message + "\n" + e.StackTrace);
             }
         }
 
