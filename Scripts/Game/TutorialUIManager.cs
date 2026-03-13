@@ -73,6 +73,7 @@ namespace Game
         private bool altUsed = false;
         private bool altFireShown = false;
 
+        private Vector3 wallPos = new Vector3(0.0f, 0.0f, 0.0f);
 
         private bool wallDestroyedPublished = false;
 
@@ -97,6 +98,8 @@ namespace Game
             SpriteRenderer.SetIsVisible(altFireID, false);
             SpriteRenderer.SetIsVisible(proceedID, false);
 
+            wallPos = Transform.GetPosition(wallID);
+
             Subscribe(EVENT_ONE_TURRET_DESTROYED, OnTurretDestroyed);
             Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
             Subscribe(EVENT_ULT_CHARGED, OnUltCharged);
@@ -109,7 +112,6 @@ namespace Game
                 return;
 
             Vector3 currentPos = Transform.GetPosition(playerID);
-            Vector3 wallPos = Transform.GetPosition(wallID);
 
             switch (currentState)
             {
@@ -139,6 +141,8 @@ namespace Game
 
                 case TutorialState.AltFire:
                     HandleAltFire(deltaTime);
+                    break;
+                default:
                     break;
             }
         }
