@@ -3,7 +3,6 @@ using System;
 using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
-using static Engine.Transform;
 
 namespace Game
 {
@@ -13,7 +12,6 @@ namespace Game
 
         [SerializeField] private float fadeUpTime = 1.0f;
 
-        private Vector3 initialPosition;
         private bool isFading = false;
         private bool fadeDone = false;
         private float fadeElapsed = 0.0f;
@@ -22,7 +20,6 @@ namespace Game
         {
             LogMessage("=== WinScreenPopup OnStart ===");
             SetIsVisible((uint)EntityID, false);
-            initialPosition = GetPosition((uint)EntityID);
             Event.Subscribe(EVENT_WIN_SHOW, OnShow);
             LogMessage("[WinScreenPopup] Initialized");
         }
@@ -30,18 +27,14 @@ namespace Game
         private void OnShow(string eventName, string payload)
         {
             LogMessage("[WinScreenPopup] Starting fade in");
-            initialPosition = GetPosition((uint)EntityID);
+
+            // Reset alpha to 0 before fading in
+            SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
+
             isFading = true;
             fadeElapsed = 0.0f;
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
-
-            Vector3 startPos = new Vector3(
-                initialPosition.X,
-                initialPosition.Y - 10.0f,
-                initialPosition.Z
-            );
-            SetPosition((uint)EntityID, ref startPos);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -52,19 +45,8 @@ namespace Game
 
                 FadeIn((uint)EntityID, fadeElapsed, fadeUpTime);
 
-                float t = fadeElapsed / fadeUpTime;
-                if (t > 1.0f) t = 1.0f;
-
-                Vector3 pos = new Vector3(
-                    initialPosition.X,
-                    initialPosition.Y - 10.0f + (10.0f * t),
-                    initialPosition.Z
-                );
-                SetPosition((uint)EntityID, ref pos);
-
                 if (fadeElapsed >= fadeUpTime)
                 {
-                    SetPosition((uint)EntityID, ref initialPosition);
                     fadeDone = true;
                     isFading = false;
                     LogMessage("[WinScreenPopup] Fade complete");

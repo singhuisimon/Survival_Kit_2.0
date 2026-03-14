@@ -271,7 +271,7 @@ namespace Game
             if (tooltipElapsed > tooltipMinTime) {
 
                 // Display assistance message: "Press "E" to proceed"
-                SetProceedTextPosition(1122, 295);
+                //SetProceedTextPosition(1107.1f, 475.8f);
                 ShowProceedText(true);
 
                 // Check for 'E' input
@@ -412,7 +412,7 @@ namespace Game
 
         private void ShowProceedText(bool value)
         {
-            Engine.Text.SetIsVisible(proceedID, value);
+            Engine.SpriteRenderer.SetIsVisible(proceedID, value);
         }
 
         private void SetProceedTextPosition(float x, float y)
