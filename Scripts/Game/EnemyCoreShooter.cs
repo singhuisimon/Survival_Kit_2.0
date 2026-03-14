@@ -23,6 +23,7 @@ namespace Game
 
         // Events
         private const string GAMEOVER = "GameOver";
+        private const string GAMEWIN = "GameWin";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.1f;
@@ -44,6 +45,7 @@ namespace Game
             inRange = false;
             shootingTimer = 0.0f;
             Subscribe(GAMEOVER, OnGameOver);
+            Subscribe(GAMEWIN, OnGameOver);
          
         }
 
@@ -86,6 +88,7 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(GAMEOVER, OnGameOver);
+            Unsubscribe(GAMEWIN, OnGameOver);
         }
 
         public void ShootAtTarget()
