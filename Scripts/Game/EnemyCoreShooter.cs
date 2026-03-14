@@ -28,7 +28,7 @@ namespace Game
         // Shooting
         [SerializeField] private float shootingCooldown = 0.1f;
         private float shootingTimer = 0.0f;
-
+        private bool isDead = false;
         string EnemyTurretBulletPrefabPath = "Sources/Prefabs/EnemyTurretBullet.prefab";
 
         // Lifecycle
@@ -51,6 +51,9 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (GameState.IsPaused || isDead)
+                return;
+
             if (playerID == INVALID_ENTITY)
                 return;
 
@@ -203,7 +206,9 @@ namespace Game
             return q;
         }
 
-        private void OnGameOver(string eventName, string payload){
+        private void OnGameOver(string eventName, string payload)
+        {
+            isDead = true;
             SceneDestroyEntity(EntityID);
         }
     }
