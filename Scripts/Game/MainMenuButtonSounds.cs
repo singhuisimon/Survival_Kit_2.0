@@ -33,7 +33,27 @@ namespace Game
             "Credits Close Button 2",
             "Start Game Yes Button",
             "Shop Button",
-            "Shop Close Button"
+            "Shop Close Button",
+            // Settings popup buttons
+            "Settings Close Button",
+            "Settings Plus Button 1",
+            "Settings Plus Button 2",
+            "Settings Plus Button 3",
+            "Settings Minus Button 1",
+            "Settings Minus Button 2",
+            "Settings Minus Button 3",
+            "MuteMasterButton",
+            "MuteBGMButton",
+            "MuteSFXButton",
+            "MuteMasterButton_Ticked",
+            "MuteBGMButton_Ticked",
+            "MuteSFXButton_Ticked",
+            "GammaPlus",
+            "GammaMinus",
+            "GammaDefault",
+            "MousePlus",
+            "MouseMinus",
+            "MouseDefault"
         };
 
         // Audio entity IDs

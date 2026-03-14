@@ -81,7 +81,11 @@ namespace Engine
 
 		if (!active_scene_) return false;
 
-		auto view = active_scene_->GetRegistry().view<TransformComponent, SpriteRendererComponent>();
+		auto& registry = active_scene_->GetRegistry();
+		if (!registry.valid(entityId) || !registry.all_of<TransformComponent, SpriteRendererComponent>(entityId))
+			return false;
+
+		auto view = registry.view<TransformComponent, SpriteRendererComponent>();
 
 		auto& transform = view.get<TransformComponent>(entityId);
 		auto& sprite = view.get<SpriteRendererComponent>(entityId);
