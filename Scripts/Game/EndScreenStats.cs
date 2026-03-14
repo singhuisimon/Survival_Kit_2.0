@@ -129,6 +129,9 @@ namespace Game
             }
             else if (timeTextID != 0)
             {
+            cachedTime = "TIME N/A";
+                SetText(timeTextID, cachedTime);
+                Text.SetIsVisible(timeTextID, true);
                 LogMessage("[EndScreenStats] No time data - time text stays hidden");
             }
         }
