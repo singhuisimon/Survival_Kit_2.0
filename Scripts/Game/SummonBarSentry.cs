@@ -9,29 +9,25 @@ namespace Game
 
     public class SummonBarSentry : ScriptBehaviour
     {
-        private const string FILL_NAME = "SummonBarFill";
-        private const string BG_NAME    = "SummonBarBG";
-        private const string LABEL_NAME = "SummonBarLabel";
+
+        public static uint NextBGID    = 0;
+        public static uint NextLabelID = 0;
 
         private string playerName = "Player";
 
         [SerializeField] private float heightOffset = 10.0f;
-        //[SerializeField] private float fullScaleX   = 20.0f;
-        [SerializeField] private float barScaleY    = 4.4f;
+        [SerializeField] private float fullScaleX   = 12.0f;
+        [SerializeField] private float barScaleY    = 1.0f;
         //[SerializeField] private float labelOffsetY = 4.0f;
 
+        // ===== Entity IDs =====
         private uint playerID = 0;
-        private uint fillID   = 0;
         private uint bgID     = 0;
         private uint labelID  = 0;
 
+        // ===== State =====
         private float progress    = 0f;
         private bool  initialized = false;
-
-        private float   fullScaleX     = 0f;    //read from Prefab itself 
-
-        private Vector3 fillInitialPos;
-        private bool    fillInitialPosCached = false;
 
         private const uint INVALID_ENTITY = 0xffffffffu;
 
@@ -52,32 +48,23 @@ namespace Game
                 return;
             }
 
-            // cache children immediately in OnStart
-            fillID  = FindChildByTag(FILL_NAME,  (uint)EntityID);
-            bgID    = FindChildByTag(BG_NAME,    (uint)EntityID);
-            labelID = FindChildByTag(LABEL_NAME, (uint)EntityID);
+            // Take ownership of BG and Label spawned by SentryCount
+            bgID    = NextBGID;
+            labelID = NextLabelID;
+            NextBGID    = 0;
+            NextLabelID = 0;
 
-            if (fillID == 0 || fillID == INVALID_ENTITY)
+            if (bgID == 0 || bgID == INVALID_ENTITY)
             {
-                LogError("[SummonBar] Could not find SummonBarFill!");
-                return;
+                LogWarning("[SummonBar] NextBGID was not set — bar may look wrong.");
             }
 
-            //fullScaleX     = GetScale(fillID).X;
-            fullScaleX = GetScale(bgID).X;
-            LogMessage("[SummonBar] fullScaleX = " + fullScaleX);
-            fillInitialPos = GetPosition(fillID);
-
-            // stamp fill into the correct empty state
-            Vector3 initScale = GetScale(fillID);
-            initScale.X = 0f;  
+            // Stamp fill into correct empty state immediately
+            Vector3 initScale = GetScale((uint)EntityID);
+            initScale.X = 0f;
             initScale.Y = barScaleY;
-            SetScale(fillID, ref initScale);
-
-            Vector3 initPos = new Vector3(-(fullScaleX / 2f), 0f, -0.1f);
-            SetPosition(fillID, ref initPos);
-
-
+            SetScale((uint)EntityID, ref initScale);
+        
             progressEventName = "SummonBarProgress:" + EntityID.ToString();
             killEventName     = "SummonBarKill:"     + EntityID.ToString();
 
@@ -88,17 +75,11 @@ namespace Game
             Subscribe(EVENT_PLAYERDEAD,  OnKill);
             Subscribe(EVENT_GAMEWIN,     OnKill);
 
-            // Subscribe(EVENT_GAMEOVER, OnGameEnd);
-            // Subscribe(EVENT_PLAYERDEAD, OnGameEnd);
-            // Subscribe(EVENT_GAMEWIN, OnGameEnd);
-
             progress = 0f; // progress bar starts empty
             initialized = true;
 
-            LogMessage("[SummonBar] Initialized.");
+            LogMessage("[SummonBar] Initialized. bgID=" + bgID + " labelID=" + labelID);
 
-            Vector3 bgPos = GetPosition(bgID);
-            LogMessage("[SummonBar] BG local pos = " + bgPos.X + ", " + bgPos.Y + ", " + bgPos.Z);
         }
 
         public override void OnUpdate(float deltaTime) 
@@ -107,38 +88,25 @@ namespace Game
 
             if (GameState.IsPaused) return;
 
-            // move the bar root above the player
+            // Compute bar world position (above player)
             Vector3 playerPos = GetPosition(playerID);
             Vector3 barPos = new Vector3(
                 playerPos.X,
                 playerPos.Y + heightOffset,
                 playerPos.Z
             );
+
+            // Move fill 
             SetPosition((uint)EntityID, ref barPos);
 
+            // Move BG and Label to same world position
+            if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID,    ref barPos);
+            if (labelID != 0 && labelID != INVALID_ENTITY) SetPosition(labelID, ref barPos);
 
-            Vector3 fillScale = GetScale(fillID);
+            Vector3 fillScale = GetScale((uint)EntityID);
             fillScale.X = fullScaleX * progress;
             fillScale.Y = barScaleY;
-            SetScale(fillID, ref fillScale);
-
-            // Vector3 fillPos = new Vector3(
-            //     barPos.X - ( fullScaleX / 2f ) + ( fullScaleX * progress / 2f ),
-            //     barPos.Y,
-            //     barPos.Z - 0.1f  // slight Z offset so fill renders in front of BG
-            // );
-            // SetPosition(fillID, ref fillPos);
-
-            Vector3 fillPos = new Vector3(
-                -(fullScaleX / 2f) + (fullScaleX * progress / 2f),
-                0f,
-                -0.1f
-            );
-            SetPosition(fillID, ref fillPos);
-
-           //Vector3 fillPos = fillInitialPos;
-           // fillPos.X = fillInitialPos.X + (fullScaleX / 2f) * (1f - progress);
-           // SetPosition(fillID, ref fillPos); 
+            SetScale((uint)EntityID, ref fillScale);
         }
 
         private void OnProgressUpdate(string eventName, string payload)
@@ -158,9 +126,7 @@ namespace Game
             Unsubscribe(EVENT_PLAYERDEAD,  OnKill);
             Unsubscribe(EVENT_GAMEWIN,     OnKill);
 
-            // Engine does NOT auto-destroy children — do it explicitly here
-            // where we are guaranteed to have the cached IDs from OnUpdate
-            if (fillID  != 0 && fillID  != INVALID_ENTITY) SceneDestroyEntity(fillID);
+            // Destroy BG and Label (owned by this script)
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SceneDestroyEntity(bgID);
             if (labelID != 0 && labelID != INVALID_ENTITY) SceneDestroyEntity(labelID);
 
@@ -173,36 +139,6 @@ namespace Game
 
         }
 
-        private uint FindChildByTag(string tag, uint parentID)
-        {
-            uint[] matches = SceneFindEntitiesByTag(tag);
-            foreach (uint id in matches)
-            {
-                if ((uint)TransformGetParent(id) == parentID)
-                    return id;
-            }
-            LogWarning("[" + GetType().Name + "] Could not find child with tag: " + tag);
-            return 0;
-        }
-
-        // private void OnGameEnd(string eventName, string payload)
-        // {
-        //     SceneDestroyEntity((uint)EntityID);
-        // }
-
-        // public override void OnDestroy()
-        // {
-        //     Unsubscribe(progressEventName, OnProgressUpdate);
-        //     Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
-        //     Unsubscribe(EVENT_PLAYERDEAD, OnGameEnd);
-        //     Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
-
-        //     if (fillID  != 0 && fillID  != INVALID_ENTITY) SceneDestroyEntity(fillID);
-        //     if (bgID    != 0 && bgID    != INVALID_ENTITY) SceneDestroyEntity(bgID);
-        //     if (labelID != 0 && labelID != INVALID_ENTITY) SceneDestroyEntity(labelID);
-
-        //     LogMessage("[SummonBar] Destroyed.");
-        // }
         
 
     }
