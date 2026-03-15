@@ -14,7 +14,7 @@ namespace Game
         public static uint NextLabelID  = 0;
 
         // ===== Settings =====
-        [SerializeField] private float maxDuration = 20.0f; // original is 90.0f for 90 seconds
+        [SerializeField] private float maxDuration = 90.0f; // original is 90.0f for 90 seconds
         [SerializeField] private float heightOffset = 10.0f;
         [SerializeField] private float fullScaleX  = 12.0f;
         [SerializeField] private float barScaleY   = 1.0f;
