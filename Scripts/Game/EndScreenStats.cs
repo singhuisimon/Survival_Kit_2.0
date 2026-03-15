@@ -95,7 +95,7 @@ namespace Game
 
             int minutes = (int)(timeSurvived / 60);
             int seconds = (int)(timeSurvived % 60);
-            cachedTime = string.Format("TIME {0:00} m : {1:00} s", minutes, seconds);
+            cachedTime = string.Format("{0:00} m : {1:00} s", minutes, seconds);
             LogMessage("[EndScreenStats] Cached time: " + cachedTime);
             TryShow();
         }
@@ -129,7 +129,7 @@ namespace Game
             }
             else if (timeTextID != 0)
             {
-            cachedTime = "TIME N/A";
+            cachedTime = "N/A";
                 SetText(timeTextID, cachedTime);
                 Text.SetIsVisible(timeTextID, true);
                 LogMessage("[EndScreenStats] No time data - time text stays hidden");
