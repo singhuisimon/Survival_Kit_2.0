@@ -53,6 +53,8 @@ namespace Game
 
         [SerializeField] private float fadeUpTime = 1.0f;
 
+        private bool gameOverTriggered = false;
+
         public override void OnStart()
         {
             LogMessage("=== GameOverScreen OnStart ===");
@@ -142,6 +144,10 @@ namespace Game
 
         private void OnGameOver(string eventName, string payload)
         {
+
+            if (gameOverTriggered) return;
+            gameOverTriggered = true;
+            
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
 
             StopGroup(AudioType.MASTER);

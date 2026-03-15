@@ -29,6 +29,7 @@ namespace Game
 
         private float elapsedTime = 0.0f;
         private Vector3 savedVelocity = Vector3.Zero;
+        private Vector3 savedAngularVelocity = Vector3.Zero;
         private bool wasPaused = false;
 
         private string DAMAGEPLAYERAUDIOPREFAB = "Sources/Prefabs/Audio_EmemyDamage.prefab";
@@ -65,8 +66,11 @@ namespace Game
                 {
                     // Just paused - save velocity and stop
                     savedVelocity = RigidbodyGetVelocity((uint)EntityID);
+                    savedAngularVelocity = RigidbodyGetAngularVelocity((uint)EntityID);
+
                     Vector3 zero = Vector3.Zero;
                     RigidbodySetVelocity((uint)EntityID, ref zero);
+
                     wasPaused = true;
                 }
                 return;
@@ -75,6 +79,7 @@ namespace Game
             {
                 // Just unpaused - restore velocity
                 RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
+                RigidbodySetAngularVelocity((uint)EntityID, ref savedAngularVelocity);
                 wasPaused = false;
             }
 

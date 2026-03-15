@@ -28,6 +28,7 @@ namespace Game
 
         // Events
         private string EVENT_BULLET_HIT = "Damage:";
+        private const string GAMEWIN = "GameWin";
         private const string GAMEOVER = "GameOver";
         private const string EVENT_KEYLOGGER_DEATH = "KeyloggerDeath";
         private const string EVENT_WALL_DESTROYED = "DestructableWallDestroyed";
@@ -55,7 +56,7 @@ namespace Game
         private uint tempEnemyHitSparksID = INVALID_ENTITY;
         private float hitSparksTimer = 0.1f;
         private bool isHitSparks = false;
-
+        private bool wasPaused = false;
         private bool dead = false;
 
         // Lifecycle
@@ -78,17 +79,20 @@ namespace Game
 
             EVENT_BULLET_HIT += EntityID.ToString();
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Subscribe(GAMEWIN, OnGameOver);
             Subscribe(GAMEOVER, OnGameOver);
             Subscribe(EVENT_WALL_DESTROYED, OnDestructableWallDestroyed);
             
-            //Vector3 newpos = Engine.Transform.GetPosition(EntityID);
-            Engine.Transform.SetPosition(EntityID, ref newpos);
             LogMessage("====EnemyTurret: " + "x" + newpos.X + "y:" + newpos.Y + "z:" + newpos.Z);
          
         }
 
         public override void OnUpdate(float deltaTime)
         {
+            if (HandlePause()){
+                return;
+            }
+
             if (playerID == INVALID_ENTITY)
                 return;
 
@@ -133,7 +137,10 @@ namespace Game
                 explosionTimer -= deltaTime;
                 if (explosionTimer <= 0.0f)
                 {
-                    SceneDestroyEntity(enemyHitSparksID);
+                    if(enemyHitSparksID != INVALID_ENTITY)
+                    {
+                        SceneDestroyEntity(enemyHitSparksID);
+                    }
                     SceneDestroyEntity(mainExplosionID);
                     SceneDestroyEntity(EntityID);
                 }
@@ -143,6 +150,7 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_BULLET_HIT, OnBulletHit);
+            Unsubscribe(GAMEWIN, OnGameOver);
             Unsubscribe(GAMEOVER, OnGameOver);
             Unsubscribe(EVENT_WALL_DESTROYED, OnDestructableWallDestroyed);
         }
@@ -174,7 +182,10 @@ namespace Game
             {
                 hitSparksTimer = 0.3f;
                 tempEnemyHitSparksID = enemyHitSparksID;
-                SceneDestroyEntity(tempEnemyHitSparksID);
+                if(tempEnemyHitSparksID != INVALID_ENTITY)
+                {
+                    SceneDestroyEntity(tempEnemyHitSparksID);
+                }
                 enemyHitSparksID = INVALID_ENTITY;
                 isHitSparks = false;
             }
@@ -340,6 +351,25 @@ namespace Game
 
         private void OnDestructableWallDestroyed(string eventName, string payload){
             shootingAllowed = true;
+        }
+
+        private bool HandlePause()
+        {
+            if (GameState.IsPaused)
+            {
+                if (!wasPaused)
+                {
+                    wasPaused = true;
+                }
+                return true;
+            }
+
+            if (wasPaused)
+            {
+                wasPaused = false;
+            }
+
+            return false;
         }
     }
 }
