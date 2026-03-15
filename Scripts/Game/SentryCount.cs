@@ -181,16 +181,21 @@ namespace Game
             Vector3 playerPos = GetPosition(playerID);
             Vector3 spawnPos = new Vector3 (playerPos.X, playerPos.Y + barHeightOffset, playerPos.Z);
             Quat identityRot = new Quat(0f, 0f, 0f, 1f);
-            Vector3 defaultScale = new Vector3(1f, 1f, 1f);
+            Vector3 defaultScale = new Vector3(1f, 1f, 1f);     // Not in use
+
+            Vector3 bgScale = new Vector3(12.5f, 1.5f, 1.0f);
+            Vector3 labelScale = new Vector3(10.0f, 3.3f, 1.0f);
+            Vector3 fillScale  = new Vector3(0f, 0f, 0f); 
+
 
             // Spawn BG and Label first
-            uint bgID    = PrefabInstantiateWithTransform(summonBarBG,    ref spawnPos, ref identityRot, ref defaultScale, false);
-            uint labelID = PrefabInstantiateWithTransform(summonBarLabel, ref spawnPos, ref identityRot, ref defaultScale, false);
+            uint bgID    = PrefabInstantiateWithTransform(summonBarBG,    ref spawnPos, ref identityRot, ref bgScale, false);
+            uint labelID = PrefabInstantiateWithTransform(summonBarLabel, ref spawnPos, ref identityRot, ref labelScale, false);
 
             SummonBarSentry.NextBGID = bgID;
             SummonBarSentry.NextLabelID = labelID;
 
-            barEntityID = PrefabInstantiateWithTransform(summonBarFill, ref spawnPos, ref identityRot, ref defaultScale, false);
+            barEntityID = PrefabInstantiateWithTransform(summonBarFill, ref spawnPos, ref identityRot, ref fillScale, false);
 
             if (barEntityID == 0)
             {
@@ -243,17 +248,21 @@ namespace Game
             Vector3 sentryPos    = GetPosition(sentryID);
             Vector3 barSpawnPos  = new Vector3(sentryPos.X, sentryPos.Y + barHeightOffset, sentryPos.Z);
             Quat    identityRot  = new Quat(0f, 0f, 0f, 1f);
-            Vector3 defaultScale = new Vector3(1f, 1f, 1f);
+            Vector3 defaultScale = new Vector3(1f, 1f, 1f);     // Not in use
 
-            uint sentryBGID    = PrefabInstantiateWithTransform(sentryBarBG,    ref barSpawnPos, ref identityRot, ref defaultScale, false);
-            uint sentryLabelID = PrefabInstantiateWithTransform(sentryBarLabel, ref barSpawnPos, ref identityRot, ref defaultScale, false);
+            Vector3 bgScale    = new Vector3(12.5f, 1.5f, 1.0f);
+            Vector3 labelScale = new Vector3(10.0f, 2.5f, 1.0f);
+            Vector3 fillScale  = new Vector3(0f, 0f, 0f);
+
+            uint sentryBGID    = PrefabInstantiateWithTransform(sentryBarBG,    ref barSpawnPos, ref identityRot, ref bgScale, false);
+            uint sentryLabelID = PrefabInstantiateWithTransform(sentryBarLabel, ref barSpawnPos, ref identityRot, ref labelScale, false);
 
             // Pass all IDs to fill script via statics before instantiating fill
             SentryLifetimeBar.NextSentryID = sentryID;
             SentryLifetimeBar.NextBGID     = sentryBGID;
             SentryLifetimeBar.NextLabelID  = sentryLabelID;
 
-            uint sentryBarFillID = PrefabInstantiateWithTransform(sentryBarFill, ref barSpawnPos, ref identityRot, ref defaultScale, false);
+            uint sentryBarFillID = PrefabInstantiateWithTransform(sentryBarFill, ref barSpawnPos, ref identityRot, ref fillScale, false);
 
             if (sentryBarFillID == 0)
             {

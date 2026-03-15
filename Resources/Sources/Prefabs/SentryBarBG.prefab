@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: SentryBarBG.prefab",
-    "Prefab GUID": 6592549194595598599,
+    "Prefab GUID": 572714237085728941,
     "version": 1,
     "entities": [
         {
@@ -25,7 +25,7 @@
                                 0.0
                             ],
                             "Scale": [
-                                13.5,
+                                12.5,
                                 1.5,
                                 1.0
                             ],

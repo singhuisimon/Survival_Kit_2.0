@@ -54,6 +54,14 @@ namespace Game
             NextBGID    = 0;
             NextLabelID = 0;
 
+            Vector3 playerPos = GetPosition(playerID);
+            Vector3 barPos = new Vector3(playerPos.X, playerPos.Y + heightOffset, playerPos.Z);
+            if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID, ref barPos);
+            if (labelID != 0 && labelID != INVALID_ENTITY) {
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 5.0f, barPos.Z);
+                SetPosition(labelID, ref labelPos);
+            }
+
             if (bgID == 0 || bgID == INVALID_ENTITY)
             {
                 LogWarning("[SummonBar] NextBGID was not set — bar may look wrong.");
@@ -101,12 +109,24 @@ namespace Game
 
             // Move BG and Label to same world position
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID,    ref barPos);
-            if (labelID != 0 && labelID != INVALID_ENTITY) SetPosition(labelID, ref barPos);
+            if (labelID != 0 && labelID != INVALID_ENTITY)
+            {
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 5.0f, barPos.Z);
+                SetPosition(labelID, ref labelPos);
+            }
 
             Vector3 fillScale = GetScale((uint)EntityID);
             fillScale.X = fullScaleX * progress;
             fillScale.Y = barScaleY;
             SetScale((uint)EntityID, ref fillScale);
+
+            // Anchor to Left Edge
+            // Vector3 fillPos = new Vector3(
+            //     barPos.X - (fullScaleX / 2f) + (fullScaleX * progress / 2f),
+            //     barPos.Y,
+            //     barPos.Z + 0.5f
+            // );
+            // SetPosition((uint)EntityID, ref fillPos);
         }
 
         private void OnProgressUpdate(string eventName, string payload)

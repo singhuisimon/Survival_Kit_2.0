@@ -14,7 +14,7 @@ namespace Game
         public static uint NextLabelID  = 0;
 
         // ===== Settings =====
-        [SerializeField] private float maxDuration = 90.0f; // original is 90.0f for 90 seconds
+        [SerializeField] private float maxDuration = 20.0f; // original is 90.0f for 90 seconds
         [SerializeField] private float heightOffset = 10.0f;
         [SerializeField] private float fullScaleX  = 12.0f;
         [SerializeField] private float barScaleY   = 1.0f;
@@ -48,15 +48,6 @@ namespace Game
             if (bgID == 0 || bgID == INVALID_ENTITY)
                 LogWarning("[SentryLifetimeBar] NextBGID was not set — bar may look wrong.");
 
-            // Stamp fill into correct full state immediately
-            Vector3 initScale = GetScale((uint)EntityID);
-            initScale.X = fullScaleX;
-            initScale.Y = barScaleY;
-            SetScale((uint)EntityID, ref initScale);
-
-            Subscribe(GAMEOVEREVENT,   OnGameEnd);
-            Subscribe(GAMEWINEVENT,    OnGameEnd);
-            Subscribe(PLAYERDEADEVENT, OnGameEnd);
 
             if (NextSentryID != 0 && NextSentryID != INVALID_ENTITY)
             {
@@ -69,6 +60,25 @@ namespace Game
             {
                 LogWarning("[SentryLifetimeBar] NextSentryID was not set before instantiation!");
             }
+
+            Vector3 sentryPos = GetPosition(sentryID);
+            Vector3 barPos = new Vector3(sentryPos.X, sentryPos.Y + heightOffset, sentryPos.Z);
+            if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID, ref barPos);
+            if (labelID != 0 && labelID != INVALID_ENTITY) {
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.0f, barPos.Z);
+                SetPosition(labelID, ref labelPos);
+            }
+
+            // Stamp fill into correct full state immediately
+            Vector3 initScale = GetScale((uint)EntityID);
+            initScale.X = fullScaleX;
+            initScale.Y = barScaleY;
+            SetScale((uint)EntityID, ref initScale);
+
+            Subscribe(GAMEOVEREVENT,   OnGameEnd);
+            Subscribe(GAMEWINEVENT,    OnGameEnd);
+            Subscribe(PLAYERDEADEVENT, OnGameEnd);
+
         }
 
         public override void OnUpdate(float deltaTime)
@@ -86,12 +96,15 @@ namespace Game
             );
 
             // Move fill (this entity)
-            SetPosition((uint)EntityID, ref barPos);
+            //SetPosition((uint)EntityID, ref barPos);
 
             // Move BG and Label to same world position
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID,    ref barPos);
-            if (labelID != 0 && labelID != INVALID_ENTITY) SetPosition(labelID, ref barPos);
- 
+            if (labelID != 0 && labelID != INVALID_ENTITY)
+            {
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.0f, barPos.Z);
+                SetPosition(labelID, ref labelPos);
+            }
             countdown -= deltaTime;
 
             if (countdown <= 0f)
@@ -109,6 +122,13 @@ namespace Game
             fillScale.X = fullScaleX * progress;
             fillScale.Y = barScaleY;
             SetScale((uint)EntityID, ref fillScale);
+
+            // Vector3 fillPos = new Vector3(
+            //     barPos.X + (fullScaleX / 2f) - (fullScaleX * progress / 2f),
+            //     barPos.Y,
+            //     barPos.Z + 0.5f
+            // );
+            // SetPosition((uint)EntityID, ref fillPos);
         }
 
         // when game ends, bar should disappear immediately
