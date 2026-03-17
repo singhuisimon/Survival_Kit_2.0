@@ -44,7 +44,7 @@ namespace Game
         
         private string GAMEOVEREVENT = "GameOver";
         private string GAMEWINEVENT = "GameWin";
-        private bool disableshooting = false;
+        private bool gameEnd = false;
 
         // Start up
         public override void OnStart() 
@@ -60,7 +60,7 @@ namespace Game
             // not detecting Sentry here (might not be ready on frame 0)
             initialized = false;
             timeUp = false;
-            disableshooting = false;
+            gameEnd = false;
         }
 
         // update loop
@@ -78,6 +78,7 @@ namespace Game
 
                 countdown = maxDuration;
                 timeUp = false;
+                gameEnd = false;
 
                 turretRotation = GetRotation(sentryID);
                 
@@ -87,6 +88,11 @@ namespace Game
             // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
+
+            // Don't do anything when gameEnd
+            if(gameEnd){
+                return;
+            }
 
             countdown -= deltaTime;
 
@@ -98,10 +104,6 @@ namespace Game
             if (timeUp)
                 return;
 
-            if(disableshooting){
-                return;
-            }
-            
             // Update fire cooldown
             if (fireCooldown > 0f) 
             {
@@ -130,7 +132,7 @@ namespace Game
 
         private void OnGameEnd(string eventName, string payload){
             LogMessage("[SentriesNormal] detect game over disabling shooting");
-            disableshooting = true;
+            gameEnd = true;
         }
 
         // Targeting System
@@ -355,9 +357,13 @@ namespace Game
 
             deathID = PrefabInstantiate(sentryDespawn);
             
-            // Publish death event 
+            if(deathID == 0){
+                LogMessage("[Sentries Normal] Failed to spawn sentry despawn audio after sentry despawn");
+            }
+
+            SetPosition(deathID, ref spawnPos);
             
-            // Destroy the gunship
+            // Destroy the sentry
             SceneDestroyEntity(sentryID);
         }
 
