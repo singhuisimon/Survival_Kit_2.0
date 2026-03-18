@@ -52,6 +52,9 @@ namespace Engine
 	static constexpr float  MAX_FRAME_DT_SECONDS = 0.25f;
 	static constexpr double ACCUMULATOR_EPS = 1e-9;
 	static constexpr std::uint32_t DEFAULT_MAX_CATCH_UP_STEPS = 8u;
+	static constexpr int   DEFAULT_COLLISION_STEPS = 2;
+	static constexpr float SMALL_BODY_CCD_EXTENT = 0.25f;
+	static constexpr float FAST_BODY_CCD_SPEED = 12.0f;
 
 	/*****************************************************************************/
 	/*!
@@ -315,6 +318,66 @@ namespace Engine
 
 	/*****************************************************************************/
 	/*!
+	\brief      Computes the smallest authored extent of a body for CCD heuristics.
+	\param      rb   Rigidbody component.
+	\return     Smallest positive extent/radius, or negative if unavailable.
+	*/
+	/*****************************************************************************/
+	static inline float ComputeSmallestBodyExtent(RigidbodyComponent const &rb)
+	{
+		switch (rb.Shape)
+		{
+		case ColliderType::BOX:
+		case ColliderType::AABB:
+		{
+			glm::vec3 he = rb.BoxHalfExtents;
+			if (he.x > 0.0f && he.y > 0.0f && he.z > 0.0f)
+				return std::min(he.x, std::min(he.y, he.z));
+			break;
+		}
+
+		case ColliderType::SPHERE:
+			if (rb.SphereRadius > 0.0f)
+				return rb.SphereRadius;
+			break;
+
+		default:
+			break;
+		}
+
+		return -1.0f;
+	}
+
+	/*****************************************************************************/
+	/*!
+	\brief      Chooses motion quality for a body using size/speed heuristics.
+	\details    Small, fast dynamic bodies use LinearCast to reduce tunneling.
+	\param      rb   Rigidbody component.
+	\return     Jolt motion quality for the body.
+	*/
+	/*****************************************************************************/
+	static inline JPH::EMotionQuality ChooseMotionQuality(RigidbodyComponent const &rb)
+	{
+		// Jolt sensors / triggers are discrete-only.
+		if (rb.Mass <= 0.0f || rb.IsKinematic || rb.IsTrigger)
+			return JPH::EMotionQuality::Discrete;
+
+		float const smallestExtent = ComputeSmallestBodyExtent(rb);
+		float const linearSpeed = glm::length(rb.Velocity);
+
+		bool const smallBody = (smallestExtent > 0.0f && smallestExtent <= SMALL_BODY_CCD_EXTENT);
+		bool const fastBody = (linearSpeed >= FAST_BODY_CCD_SPEED);
+		bool const canCrossOwnThicknessInStep =
+			(smallestExtent > 0.0f) &&
+			(linearSpeed * static_cast<float>(DEFAULT_FIXED_STEP_SECONDS) >= (smallestExtent * 2.0f));
+
+		return (smallBody || fastBody || canCrossOwnThicknessInStep)
+			? JPH::EMotionQuality::LinearCast
+			: JPH::EMotionQuality::Discrete;
+	}
+
+	/*****************************************************************************/
+	/*!
 	\brief      Initializes Jolt world components and mirrors existing ECS bodies.
 	\param      scene   Scene pointer used to enumerate entities and components.
 	*/
@@ -452,7 +515,7 @@ namespace Engine
 		{
 			mPhysics.Update(
 				static_cast<float>(mFixedStepSeconds),
-				1,
+				DEFAULT_COLLISION_STEPS,
 				mTempAllocator,
 				mJobSystem
 			);
@@ -624,6 +687,21 @@ namespace Engine
 						if (rb.IsTrigger != isSensor)
 							body.SetIsSensor(rb.IsTrigger);
 					}
+				}
+
+				if (!immovable)
+				{
+					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
+					if (lock.Succeeded())
+					{
+						lock.GetBody().SetEnhancedInternalEdgeRemoval(true);
+					}
+				}
+
+				if (!immovable)
+				{
+					JPH::EMotionQuality const targetMotionQuality = ChooseMotionQuality(rb);
+					mBodyInterface->SetMotionQuality(id, targetMotionQuality);
 				}
 
 				glm::vec3 curPos = ExtractWorldPosition(tc.WorldTransform);
@@ -945,6 +1023,7 @@ namespace Engine
 		}
 
 		settings.mFriction = 0.6f;
+		settings.mMotionQuality = ChooseMotionQuality(rb);
 		settings.mRestitution = std::clamp(rb.Restitution, 0.0f, 1.0f);
 		settings.mLinearDamping = rb.LinearDamping;
 		settings.mAngularDamping = rb.AngularDamping;
@@ -960,13 +1039,19 @@ namespace Engine
 			mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
 		}
 
-		if (!rb.UseGravity)
 		{
 			JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
 			if (lock.Succeeded())
 			{
-				if (JPH::MotionProperties *mp = lock.GetBody().GetMotionProperties())
-					mp->SetGravityFactor(0.0f);
+				JPH::Body &body = lock.GetBody();
+				if (!immovable)
+					body.SetEnhancedInternalEdgeRemoval(true);
+
+				if (!rb.UseGravity)
+				{
+					if (JPH::MotionProperties *mp = body.GetMotionProperties())
+						mp->SetGravityFactor(0.0f);
+				}
 			}
 		}
 
