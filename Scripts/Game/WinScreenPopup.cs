@@ -12,9 +12,9 @@ namespace Game
 
         [SerializeField] private float fadeUpTime = 1.0f;
 
-        private bool isFading = false;
-        private bool fadeDone = false;
-        private float fadeElapsed = 0.0f;
+        private bool isFading;
+        private bool fadeDone;
+        private float fadeElapsed;
 
         public override void OnStart()
         {
@@ -22,6 +22,11 @@ namespace Game
             SetIsVisible((uint)EntityID, false);
             Event.Subscribe(EVENT_WIN_SHOW, OnShow);
             LogMessage("[WinScreenPopup] Initialized");
+
+
+         isFading = false;
+         fadeDone = false;
+         fadeElapsed = 0.0f;
         }
 
         private void OnShow(string eventName, string payload)
