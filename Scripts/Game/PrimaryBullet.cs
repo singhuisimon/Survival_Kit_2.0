@@ -1,5 +1,4 @@
 using Engine;
-using System;
 using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
@@ -10,8 +9,10 @@ using static Engine.Audio;
 namespace Game
 {
     /// <summary>
-    /// Primary weapon bullet - updated to use CollisionManager.
-    /// Queries CollisionManager for hits instead of manually checking all collisions.
+    /// Primary weapon bullet.
+    /// - Uses CollisionManager for valid enemy hits
+    /// - Also listens for Damage:&lt;EntityID&gt; so environment/hazard scripts can kill it
+    ///   without needing CollisionManager participation
     /// </summary>
     public class PrimaryBullet : ScriptBehaviour
     {
@@ -28,24 +29,23 @@ namespace Game
         private Vector3 savedVelocity = Vector3.Zero;
         private bool wasPaused = false;
 
-        private float lifetime = 0.0f;
         private bool hit = false;
-
         private bool audioplayed = false;
+
+        private string environmentDamageEvent = "Damage:";
 
         public override void OnStart()
         {
-            
+            environmentDamageEvent = "Damage:" + EntityID.ToString();
+            Event.Subscribe(environmentDamageEvent, OnEnvironmentHit);
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            // Handle pause - save/restore velocity
             if (GameState.IsPaused)
             {
                 if (!wasPaused)
                 {
-                    // Just paused - save velocity and stop
                     savedVelocity = RigidbodyGetVelocity((uint)EntityID);
                     Vector3 zero = Vector3.Zero;
                     RigidbodySetVelocity((uint)EntityID, ref zero);
@@ -55,23 +55,26 @@ namespace Game
             }
             else if (wasPaused)
             {
-                // Just unpaused - restore velocity
                 RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
                 wasPaused = false;
             }
 
-            if(!audioplayed){
+            if (!audioplayed)
+            {
                 AudioPlay((uint)EntityID);
                 audioplayed = true;
             }
 
-            // Lifetime check
             elapsedTime += deltaTime;
-            if (elapsedTime >= ProjectileLifetime && !hit)
+
+            if (!hit && elapsedTime >= ProjectileLifetime)
             {
                 SceneDestroyEntity((uint)EntityID);
                 return;
-            } else if (hit && elapsedTime >= lifetime){
+            }
+
+            if (hit)
+            {
                 SceneDestroyEntity((uint)EntityID);
                 return;
             }
@@ -79,66 +82,63 @@ namespace Game
 
         public override void OnFixedUpdate(float deltaTime)
         {
-            // Don't update when game is paused
             if (GameState.IsPaused)
                 return;
 
-            // Check collisions using CollisionManager
-            if(!hit){
+            if (!hit)
                 CheckCollisions();
-            }
         }
-
-        // ========================================================================
-        // COLLISION HANDLING - Using CollisionManager (OPTIMIZED!)
-        // ========================================================================
 
         private void CheckCollisions()
         {
-            // Query the CollisionManager for hits
+            // Enemy / valid target hits still come from CollisionManager.
             List<uint> hits = CollisionManager.GetPlayerProjectileHits((uint)EntityID);
-            
-            if (hits != null && hits.Count > 0)
+
+            if (hits == null || hits.Count == 0)
+                return;
+
+            foreach (uint targetId in hits)
             {
-                // Process all hits (in case bullet passed through multiple enemies in one frame)
-                foreach (uint targetId in hits)
-                {
-                    OnBulletHit((uint)EntityID, targetId);
-                }
-                
-                // Note: OnBulletHit destroys the bullet, so we only process first frame of hits
-                // The bullet won't exist next frame to check again
+                OnBulletHit((uint)EntityID, targetId);
+
+                // Stop after the first valid hit so we do not double-process in the same frame.
+                if (hit)
+                    return;
             }
         }
 
-        // ========================================================================
-        // WHEN A VALID TARGET IS HIT
-        // ========================================================================
-
         private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
         {
-            // Deal damage using DamageSystem
             DamageSystem.DealDamage(targetEntityID, Damage, bulletEntityID);
-            
-            // Publish events
+
             Publish("BulletHit", targetEntityID.ToString());
             Publish("BulletHitEnemy", true.ToString());
             Publish("GainUlt", UltRecharged.ToString());
-            
-            LogMessage("BulletHit: target=" + targetEntityID + " from bullet=" + bulletEntityID + " damage=" + Damage);
+
+            LogMessage(
+                "BulletHit: target=" + targetEntityID +
+                " from bullet=" + bulletEntityID +
+                " damage=" + Damage
+            );
 
             AudioStop((uint)EntityID);
-
             hit = true;
-            lifetime += 0.5f;
+        }
 
-            // Destroy the bullet
-            // SceneDestroyEntity(bulletEntityID);
+        private void OnEnvironmentHit(string eventName, string payload)
+        {
+            if (hit)
+                return;
+
+            LogMessage("[PrimaryBullet] Environment hit received for bullet " + EntityID.ToString());
+
+            AudioStop((uint)EntityID);
+            hit = true;
         }
 
         public override void OnDestroy()
         {
-            // Optional cleanup hook
+            Event.Unsubscribe(environmentDamageEvent, OnEnvironmentHit);
         }
     }
 }
