@@ -30,7 +30,6 @@ namespace Game
         private bool wasPaused = false;
 
         private bool hit = false;
-        private bool audioplayed = false;
 
         private string environmentDamageEvent = "Damage:";
 
@@ -57,12 +56,6 @@ namespace Game
             {
                 RigidbodySetVelocity((uint)EntityID, ref savedVelocity);
                 wasPaused = false;
-            }
-
-            if (!audioplayed)
-            {
-                AudioPlay((uint)EntityID);
-                audioplayed = true;
             }
 
             elapsedTime += deltaTime;
@@ -121,7 +114,6 @@ namespace Game
                 " damage=" + Damage
             );
 
-            AudioStop((uint)EntityID);
             hit = true;
         }
 
@@ -131,8 +123,6 @@ namespace Game
                 return;
 
             LogMessage("[PrimaryBullet] Environment hit received for bullet " + EntityID.ToString());
-
-            AudioStop((uint)EntityID);
             hit = true;
         }
 

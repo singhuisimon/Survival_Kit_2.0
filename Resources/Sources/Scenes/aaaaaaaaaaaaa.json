@@ -63,6 +63,68 @@
                     }
                 }
             ]
+        },
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_PrimaryFire",
+                        "Tag": "Audio_PrimaryFire"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15185355717120606371",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "1926758414142439589",
+                        "FilePath": "Player Primary Fire 4.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 0.7099999785423279,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 201.9600067138672,
+                        "MaxDistance": 610.239013671875,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "12879512707907649703",
+                        "ScriptClassName": "Game.AudioPrimaryBullet"
+                    }
+                }
+            ]
         }
     ],
     "Settings": [

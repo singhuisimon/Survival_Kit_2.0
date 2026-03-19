@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Camera;
 using static Engine.Event;
 using static Engine.Audio;
+using static Engine.RNG;
 using static Engine.AudioManager;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
@@ -56,6 +57,7 @@ namespace Game
 
         //[SerializeField]
         private string PrimaryBulletPrefab = "Sources/Prefabs/PrimaryBullet.prefab";
+        private string PrimaryBulletAudioPrefab = "Sources/Prefabs/Audio_PrimaryFire.prefab";
         //audio
         //vfx -> trail
 
@@ -108,6 +110,8 @@ namespace Game
         //sfx alt charge
         //sfx alt ready
         //sfx swap weapon
+        [SerializeField] private float primaryPitchMin = 0.95f;
+        [SerializeField] private float primaryPitchMax = 1.0f;
 
         #endregion
 
@@ -451,6 +455,13 @@ namespace Game
                     LogMessage("[PlayerWeapon] Primary Fire bulletID fail to instantiate");
                 }
 
+                uint bulletaudioID = 0;
+                bulletaudioID = PrefabInstantiateWithTransform(PrimaryBulletAudioPrefab, ref bulletSpawnPos, ref bulletRot, ref scale, false);
+                if (bulletaudioID == 0)
+                {
+                    LogMessage("[PlayerWeapon] Primary Fire bulletaudioID fail to instantiate");
+                }
+
                 // Reset muzzle timer and begin new cycle of muzzle flash
                 if(muzzleTimer < 0.0f)
                 {
@@ -472,6 +483,13 @@ namespace Game
                 // NEW: bullet velocity inherits (estimated) player velocity
                 Vector3 bulletVel = ComputeBulletVelocity(bulletDirection, primarybulletSpeed);
                 RigidbodySetVelocity(bulletID, ref bulletVel);
+
+                // NEW: bullet audio velocity uses bullet velocity
+                RigidbodySetVelocity(bulletaudioID, ref bulletVel);
+
+                // NEW: Adjust the bullet pitch
+                float newPitch = RandFloat(primaryPitchMin, primaryPitchMax);
+                AudioSetPitch(bulletaudioID, newPitch);
 
                 primaryAmmo -= 1;
                 Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());
