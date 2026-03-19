@@ -53,8 +53,8 @@ namespace Game
         {
             if (instance != null && instance != this)
             {
-                Logger.LogWarning("[AudioSettings] Instance already exists - destroying duplicate");
-                Scene.SceneDestroyEntity(this.EntityID);
+                Logger.LogWarning("[AudioSettings] Instance already exists - reusing existing");
+                // Don't destroy - just return, the old instance is still valid
                 return;
             }
 
@@ -63,8 +63,8 @@ namespace Game
             ApplyAllSettings();
 
             Logger.LogMessage("[AudioSettings] Initialized with persistent data");
-            Logger.LogMessage("[AudioSettings] Controls: UP/DOWN = Master, LEFT/RIGHT = BGM, M = Mute");
         }
+
 
         public override void OnUpdate(float deltaTime)
         {
