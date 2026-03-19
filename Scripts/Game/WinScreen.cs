@@ -66,7 +66,7 @@ namespace Game
                     fadeDone = true;
                     isFading = false;
                     LogMessage("[WinScreen] Texture fade complete");
-                    Publish(WIN_SCREEN_SHOW, "");
+                   // Publish(WIN_SCREEN_SHOW, "");
 
                 }
             }
