@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_PrimaryFire.prefab",
-    "Prefab GUID": 8580659738168377509,
+    "Prefab GUID": 3756987878261866661,
     "version": 1,
     "entities": [
         {
@@ -84,10 +84,10 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "1926758414142439589",
-                            "FilePath": "Player Primary Fire 4.wav",
+                            "FilePath": "Player Primary Fire 6.wav",
                             "Type": 5,
                             "State": 2,
-                            "Volume": 0.3580000102519989,
+                            "Volume": 0.45100000500679016,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
