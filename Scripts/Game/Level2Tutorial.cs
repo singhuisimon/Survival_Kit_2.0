@@ -315,6 +315,7 @@ namespace Game
             if(tutorialstate > 2){
                 spawnInterval = tutorialSpawnInterval;
                 tutorialover = true;
+                Publish(EVENT_TUTORIALOVER, "");
             }
 
         }

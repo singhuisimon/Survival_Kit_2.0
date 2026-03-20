@@ -117,6 +117,8 @@ namespace Game
         public override void OnDestroy(){
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+            Unsubscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Unsubscribe(EVENT_TUTORIALOVER, OnTutorialEnd);
 
             canSpawn = false;
             initialized = false;
@@ -216,7 +218,7 @@ namespace Game
         }
 
         private void initialize(){
-            spawntimer = spawnInterval;
+            //spawntimer = spawnInterval;
             canSpawn = true;
             initialized = true;
             decreaseTimer = decreaseInterval;
