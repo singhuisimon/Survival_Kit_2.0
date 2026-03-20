@@ -22,6 +22,7 @@ namespace Game
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
+        private string destroyedAudioPrefab = "Sources/Prefabs/Audio_DestructableWall.prefab";
 
         // Health
         [SerializeField] private float health = 15.0f; //changed from 5->15
@@ -100,6 +101,12 @@ namespace Game
                 playerkillID = PrefabInstantiate(playerKillPrefab);
                 if(playerkillID == 0){
                     LogMessage("[DestructableWall] Player Kill DestructableWall! But playerkillID fail to instantiate");
+                }
+                uint audioDestroyedID = 0;
+                audioDestroyedID = PrefabInstantiate(destroyedAudioPrefab);
+                if(audioDestroyedID != 0){
+                    Vector3 currPos = GetPosition((uint)EntityID);
+                    SetPosition(audioDestroyedID, ref currPos);
                 }
                 Publish("DestructableWallDestroyed", EntityID.ToString());
                 SceneDestroyEntity(EntityID);

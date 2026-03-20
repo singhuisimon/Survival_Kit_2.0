@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "EnemyTurretBullet",
-    "Prefab GUID": 13036127089097572517,
+    "Prefab Name": "Prefab: EnemyTurretBullet.prefab",
+    "Prefab GUID": 8010919202430173347,
     "version": 2,
     "entities": [
         {
@@ -40,6 +40,7 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "17182587738235767337",
+                            "Name": "EnemyTurretBullet",
                             "Tag": "EnemyTurretBullet"
                         }
                     }
@@ -56,6 +57,7 @@
                             "Visible": true,
                             "GlobalIlluminate": true,
                             "ShadowReceive": false,
+                            "Billboarding": false,
                             "MeshType": 0,
                             "MaterialIdx": 0,
                             "TextureIdx": 0,
@@ -103,8 +105,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "18379146660872716859",
-                            "FilePath": "Worm Shoot.wav",
-                            "Type": 1,
+                            "FilePath": "Trojan Shoot.wav",
+                            "Type": 5,
                             "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
