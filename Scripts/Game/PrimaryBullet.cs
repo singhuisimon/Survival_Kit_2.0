@@ -11,8 +11,10 @@ namespace Game
     /// <summary>
     /// Primary weapon bullet.
     /// - Uses CollisionManager for valid enemy hits
-    /// - Also listens for Damage:&lt;EntityID&gt; so environment/hazard scripts can kill it
+    /// - Also listens for Damage:<EntityID> so environment/hazard scripts can kill it
     ///   without needing CollisionManager participation
+    /// - After impact, becomes inert immediately but destroys on the following update,
+    ///   so attacker metadata can still be resolved by other scripts for one full frame.
     /// </summary>
     public class PrimaryBullet : ScriptBehaviour
     {
@@ -30,6 +32,13 @@ namespace Game
         private bool wasPaused = false;
 
         private bool hit = false;
+
+        // Frame-based deferred destroy state:
+        // 1) queue on hit
+        // 2) arm on next update
+        // 3) destroy on the update after that
+        private bool destroyQueued = false;
+        private bool destroyArmed = false;
 
         private string environmentDamageEvent = "Damage:";
 
@@ -66,9 +75,16 @@ namespace Game
                 return;
             }
 
-            if (hit)
+            if (destroyArmed)
             {
                 SceneDestroyEntity((uint)EntityID);
+                return;
+            }
+
+            if (destroyQueued)
+            {
+                destroyQueued = false;
+                destroyArmed = true;
                 return;
             }
         }
@@ -102,6 +118,9 @@ namespace Game
 
         private void OnBulletHit(uint bulletEntityID, uint targetEntityID)
         {
+            if (hit)
+                return;
+
             DamageSystem.DealDamage(targetEntityID, Damage, bulletEntityID);
 
             Publish("BulletHit", targetEntityID.ToString());
@@ -114,7 +133,7 @@ namespace Game
                 " damage=" + Damage
             );
 
-            hit = true;
+            BeginDeferredDestroy();
         }
 
         private void OnEnvironmentHit(string eventName, string payload)
@@ -123,7 +142,21 @@ namespace Game
                 return;
 
             LogMessage("[PrimaryBullet] Environment hit received for bullet " + EntityID.ToString());
+            BeginDeferredDestroy();
+        }
+
+        private void BeginDeferredDestroy()
+        {
             hit = true;
+
+            // Stop movement immediately so the bullet is logically dead now.
+            Vector3 zero = Vector3.Zero;
+            RigidbodySetVelocity((uint)EntityID, ref zero);
+
+            // Do not destroy on the very next update.
+            // Instead, survive that update and destroy on the following one.
+            destroyQueued = true;
+            destroyArmed = false;
         }
 
         public override void OnDestroy()

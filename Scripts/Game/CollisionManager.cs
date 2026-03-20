@@ -186,7 +186,7 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
         public override void OnStart()
         {
             instance = this;
-            LogMessage("[CollisionManager] Initialized with category-based collision system");
+            //LogMessage("[CollisionManager] Initialized with category-based collision system");
         }
 
         public override void OnFixedUpdate(float deltaTime)
@@ -206,7 +206,7 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
                 string tagA = TagGetTag(entityA);
                 string tagB = TagGetTag(entityB);
 
-                LogMessage("[CM] Pair: " + tagA + " vs " + tagB); // UNCOMMENT THIS IF U WANT TO SEE WHAT IS COLLIDING
+                //LogMessage("[CM] Pair: " + tagA + " vs " + tagB); // UNCOMMENT THIS IF U WANT TO SEE WHAT IS COLLIDING
 
                 CollisionCategory categoryA = GetCategory(tagA);
                 CollisionCategory categoryB = GetCategory(tagB);
@@ -486,7 +486,7 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
         {
             if (dict == null || instance == null)
             {
-                LogMessage("[CollisionManager] ERROR: Instance is null!");
+                //LogMessage("[CollisionManager] ERROR: Instance is null!");
                 return null;
             }
 
