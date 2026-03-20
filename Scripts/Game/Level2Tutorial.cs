@@ -56,9 +56,9 @@ namespace Game
         // ============== RNG Setting =================
         private static uint seed = 123;
 
-        [SerializeField] private float botnetSpawnWeight = 50.0f;
+        [SerializeField] private float botnetSpawnWeight = 55.0f;
         [SerializeField] private float wormHostSpawnWeight = 40.0f;
-        [SerializeField] private float loveletterSpawnWeight = 10.0f;
+        [SerializeField] private float loveletterSpawnWeight = 5.0f;
 
         public override void OnStart(){
             initialize();
