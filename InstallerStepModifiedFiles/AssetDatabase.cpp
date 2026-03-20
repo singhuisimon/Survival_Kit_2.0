@@ -1,0 +1,295 @@
+/**
+ * @file AssetDatabase.cpp
+ * @brief Implements asset database management functions. 
+ * @author Wai Lwin Thit
+ * @date 15/09/2025
+ * Copyright (C) 2025 DigiPen Institute of Technology.
+ * Reproduction or disclosure of this file or its contents without the
+ * prior written consent of DigiPen Institute of Technology is prohibited.
+ */
+
+#include "AssetDatabase.h"
+#include "AssetManager.h"
+#include "../Utility/AssetPath.h"
+
+#include <filesystem>
+#include <fstream>
+#include <random>
+#include <sstream>
+#include <algorithm>
+
+//external library for GUID
+#include "../xresource_guid/include/xresource_guid.h"
+#include "../Utility/Logger.h"
+
+namespace fs = std::filesystem;
+
+namespace Engine {
+
+
+	//generate GUIDs using xresource_guid library
+	static xresource::instance_guid GenId()
+	{
+        return xresource::instance_guid::GenerateGUIDCopy();
+	}
+
+	std::string AssetDatabase::NormalizePath(const std::string& path)
+	{
+		// Convert to a canonical, forward-slash style so map keys are stable
+		fs::path p(path);
+		p = p.lexically_normal();
+
+		//always use forward slashes for internal storage in assetdb.txt
+		std::string result =  p.generic_string();
+
+		//remove the trailing slash for consistency
+		if (!result.empty() && result.back() == '/') {
+			result.pop_back();
+		}
+
+		return result;
+	}
+
+	std::string AssetDatabase::ExtensionLower(const std::string& path)
+	{
+		std::string ext = fs::path(path).extension().string();
+		std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) {
+			return static_cast<char>(std::tolower(c));
+			});
+		return ext;
+	}
+
+#pragma region LoadSave
+	bool AssetDatabase::Load(const std::string& file)
+	{
+		std::ifstream in(file);
+		if (!in.is_open()) {
+			LOG_DEBUG("Asset database not found (first run): ", file);
+			return false;
+		}
+
+		Clear();
+
+		std::string line;
+		int lineNum = 0;
+		int loadedCount = 0;
+
+		while (std::getline(in, line)) {
+			lineNum++;
+
+			// Skip comments and empty lines
+			if (line.empty() || line[0] == '#') {
+				continue;
+			}
+
+			// Parse line: guid|type|sourcePath|ext|contentHash|lastWriteTime|valid
+			std::stringstream ss(line);
+			std::string guidStr, typeStr, sourcePath, ext, contentHash, timeStr, validStr;
+			std::string descModTimeStr, lastCompTimeStr, needsRecompileStr;  // NEW
+
+			if (!std::getline(ss, guidStr, '|')) continue;
+			if (!std::getline(ss, typeStr, '|')) continue;
+			if (!std::getline(ss, sourcePath, '|')) continue;
+			if (!std::getline(ss, ext, '|')) continue;
+			if (!std::getline(ss, contentHash, '|')) continue;
+			if (!std::getline(ss, timeStr, '|')) continue;
+			if (!std::getline(ss, validStr, '|')) continue;
+
+			// NEW: Try to read new fields 
+			bool hasNewFields = false;
+			if (std::getline(ss, descModTimeStr, '|')) {
+				hasNewFields = true;
+				std::getline(ss, lastCompTimeStr, '|');
+				std::getline(ss, needsRecompileStr);
+			}
+
+			try {
+				AssetRecord rec;
+				rec.guid.m_Value = std::stoull(guidStr, nullptr, 16);
+				rec.type = static_cast<ResourceType>(std::stoi(typeStr));
+				
+				//since the files are stored in relative path, get the absolute path
+				if (sourcePath.find("\\Resources\\") == 0 || sourcePath.find("/Resources/") == 0) {
+					// Remove the leading \Resources\ or /Resources/ part
+					std::string pathWithoutResources = sourcePath;
+					if (pathWithoutResources.find("\\Resources\\") == 0) {
+						pathWithoutResources = pathWithoutResources.substr(11); // Length of "\Resources\"
+					}
+					else if (pathWithoutResources.find("/Resources/") == 0) {
+						pathWithoutResources = pathWithoutResources.substr(11); // Length of "/Resources/"
+					}
+
+					//editor load from the root repo resources
+					//std::string sourceRoot = Engine::getRootResourcesPath();
+					std::string sourceRoot = Engine::getAssetsPath();
+					fs::path fullPath = fs::path(sourceRoot) / pathWithoutResources;
+
+					//normalize with function NormalizePath
+					rec.sourcePath = NormalizePath(fullPath.string());
+				}
+				else {
+					rec.sourcePath = NormalizePath(sourcePath);
+				}
+
+				rec.ext = ext;
+				rec.contentHash = contentHash;
+				rec.lastWriteTime = static_cast<std::time_t>(std::stoll(timeStr));
+				rec.valid = (validStr == "1");
+
+				// NEW: Parse new fields if present
+				if (hasNewFields) {
+					rec.descriptorModifiedTime = descModTimeStr.empty() ? 0 : static_cast<std::time_t>(std::stoll(descModTimeStr));
+					rec.lastCompiledTime = lastCompTimeStr.empty() ? 0 : static_cast<std::time_t>(std::stoll(lastCompTimeStr));
+					rec.needsRecompile = (needsRecompileStr == "1");
+				}
+				else {
+					// Old format - initialize to defaults
+					rec.descriptorModifiedTime = 0;
+					rec.lastCompiledTime = 0;
+					rec.needsRecompile = false;
+				}
+
+				//use normalized path as key 
+				byId[rec.guid] = rec;
+				bySourcePath[rec.sourcePath] = rec.guid;
+				loadedCount++;
+			}
+			catch (const std::exception& e) {
+				LOG_WARNING("Failed to parse database line ", lineNum, ": ", e.what());
+			}
+		}
+
+		LOG_INFO("Loaded ", loadedCount, " asset records from database");
+		return true;
+	}
+
+	bool AssetDatabase::Save(const std::string& file) const
+	{
+
+		// Ensure directory exists
+		fs::path filepath(file);
+		if (filepath.has_parent_path()) {
+			fs::create_directories(filepath.parent_path());
+		}
+
+		std::ofstream out(file, std::ios::trunc);
+		if (!out.is_open()) {
+			LOG_ERROR("Failed to open database file for writing: ", file);
+			return false;
+		}
+
+		// Write header
+		out << "# Asset Database\n";
+		out << "# guid|type|sourcePath|ext|contentHash|lastWriteTime|valid|descriptorModifiedTime|lastCompiledTime|needsRecompile\n";		
+		out << "# Version: 1.0\n\n";
+
+		// Write records
+		for (const auto& [guid, rec] : byId) {
+			//convert absolute path to relative path before writing
+			std::string pathToWrite = getRelativeAssetPath(rec.sourcePath);
+
+			out << std::hex << guid.m_Value << std::dec << '|'
+				<< static_cast<int>(rec.type) << '|'
+				<< pathToWrite << '|'
+				<< rec.ext << '|'
+				<< rec.contentHash << '|'
+				<< rec.lastWriteTime << '|'
+				<< (rec.valid ? "1" : "0") << '|';
+
+			//for tracking fields
+			out << rec.descriptorModifiedTime << "|"
+				<< rec.lastCompiledTime << "|"
+				<< (rec.needsRecompile ? "1" : "0") << "\n";
+		}
+
+		out.close(); 
+
+		LOG_DEBUG("Saved ", byId.size(), " asset records to database");
+		return true;
+	}
+#pragma endregion
+
+	xresource::instance_guid AssetDatabase::EnsureIdForPath(const std::string& path)
+	{
+		const std::string key = NormalizePath(path);
+
+
+		if (auto it = bySourcePath.find(key); it != bySourcePath.end()) {
+			return it->second;
+		}
+
+
+		// Create new record with generated guid
+		xresource::instance_guid guid = GenId();
+		AssetRecord rec;
+		rec.guid = guid;
+		rec.sourcePath = key;
+		rec.ext = ExtensionLower(key);
+
+
+		byId[guid] = rec;
+		bySourcePath[key] = guid;
+		return guid;
+	}
+
+	const AssetRecord* AssetDatabase::Find(xresource::instance_guid guid) const
+	{
+		auto it = byId.find(guid);
+		return (it == byId.end()) ? nullptr : &it->second;
+	}
+
+	AssetRecord* AssetDatabase::FindMutable(xresource::instance_guid guid)
+	{
+		auto it = byId.find(guid);
+		return (it == byId.end()) ? nullptr : &it->second;
+	}
+
+	const AssetRecord* AssetDatabase::FindBySource(const std::string& path) const
+	{
+		const std::string key = NormalizePath(path);
+		auto it = bySourcePath.find(key);
+		if (it == bySourcePath.end()) return nullptr;
+		return Find(it->second);
+	}
+
+	AssetRecord* AssetDatabase::FindBySourceMutable(const std::string& path)
+	{
+		const std::string key = NormalizePath(path);
+		auto it = bySourcePath.find(key);
+		if (it == bySourcePath.end()) return nullptr;
+		return FindMutable(it->second);
+	}
+
+	bool AssetDatabase::Remove(xresource::instance_guid guid)
+	{
+		auto it = byId.find(guid);
+		if (it == byId.end()) return false;
+		bySourcePath.erase(it->second.sourcePath);
+		byId.erase(it);
+		return true;
+	}
+
+	bool AssetDatabase::RemoveBySource(const std::string& path)
+	{
+		const std::string key = NormalizePath(path);
+		auto it = bySourcePath.find(key);
+		if (it == bySourcePath.end()) return false;
+		return Remove(it->second);
+	}
+
+	std::vector<AssetRecord*> AssetDatabase::AllMutable()
+	{
+		std::vector<AssetRecord*> v;
+		v.reserve(byId.size());
+		for (auto& [guid, rec] : byId)
+			v.push_back(&rec);
+		return v;
+	}
+
+	void AssetDatabase::Clear()
+	{
+		byId.clear();
+		bySourcePath.clear();
+	}
+
+}//end of namespace Engine

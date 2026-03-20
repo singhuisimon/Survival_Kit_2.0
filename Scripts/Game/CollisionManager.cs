@@ -53,7 +53,7 @@ namespace Game
             // Player projectiles (all lowercase keys)
             { "primarybullet", CollisionCategory.PLAYER_PROJECTILE },
             { "primaryultbullet", CollisionCategory.PLAYER_PROJECTILE },
-            { "primaryultaoe", CollisionCategory.PLAYER_PROJECTILE },
+            { "primaryultexplosion", CollisionCategory.PLAYER_PROJECTILE },
             { "secondarybullet", CollisionCategory.PLAYER_PROJECTILE },
             { "missile", CollisionCategory.PLAYER_PROJECTILE },
             
