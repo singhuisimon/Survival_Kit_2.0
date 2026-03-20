@@ -140,10 +140,11 @@ namespace Engine
 				ImGui::MenuItem("Performance", nullptr, &m_Editor->GetPerformanceProfileWindowRef());
 				ImGui::MenuItem("Logger", nullptr, &m_Editor->GetLoggerWindowRef());
 				ImGui::MenuItem("AudioFileTracker", nullptr, &m_Editor->GetAudioTrackerWindowRef());
+				ImGui::MenuItem("Render Settings", nullptr, &m_ShowHDRSettings);
 
 				ImGui::Separator();
 
-				ImGui::MenuItem("Render Settings", nullptr, &m_ShowHDRSettings);
+				//ImGui::MenuItem("Render Settings", nullptr, &m_ShowHDRSettings);
 
 				ImGui::EndMenu();
 			}
@@ -436,188 +437,192 @@ namespace Engine
 	}
 	void EditorMenu::DisplayHDRSettings()
 	{
+		if (!m_ShowHDRSettings) return;
 		if(!m_Editor || !m_Editor->GetRenderer())
 			return;
-
-		ImGui::Begin("Render Settings", &m_ShowHDRSettings);
-
-		ImGui::SeparatorText("Quality");
-
-		float& exposure = m_Editor->GetRenderer()->getExposure();
-
-		// Exposure control
-		if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 5.0f, "%.2f"))
+		bool isOpen = ImGui::Begin("Render Settings", &m_ShowHDRSettings, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+		//ImGui::Begin("Render Settings", &m_ShowHDRSettings);
+		if (isOpen)
 		{
-			// Exposure value changed
+
+			ImGui::SeparatorText("Quality");
+
+			float& exposure = m_Editor->GetRenderer()->getExposure();
+
+			// Exposure control
+			if (ImGui::SliderFloat("Exposure", &exposure, 0.1f, 5.0f, "%.2f"))
+			{
+				// Exposure value changed
+			}
+
+			// Optional: Add a reset button
+			if (ImGui::Button("Reset to Default"))
+			{
+				exposure = 1.0f;
+			}
+
+			// Optional: Add tooltip
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("Reset exposure to default value (1.0)");
+			}
+
+			ImGui::SeparatorText("Lighting");
+
+			/*
+			- Main Light
+			- Additional Lights
+			For both:
+			bool Cast Shadows
+			float Shadows resolution
+			int Per object limit
+			*/
+
+			ImGui::SeparatorText("Shadows");
+
+			// ======================
+			// Global bias
+			// ======================
+			// Slider
+			auto& globalBias = m_Editor->GetRenderer()->getGlobalBias();
+			if (ImGui::SliderFloat("Global Bias",
+				&globalBias,
+				0.0f, 2.0f, "%.3f"))
+			{
+				// Global bias changed
+			}
+
+			// Reset button for shadow settings
+			if (ImGui::Button("Reset to Default##Shadow"))
+			{
+				globalBias = 0.005f;
+			}
+
+			// Tooltip for bloom settings
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("Reset global bias (0.005) to default values");
+			}
+
+			ImGui::SeparatorText("Post-Processing");
+
+			// ======================
+			// Bloom toggle
+			// ======================
+			auto& bloomToggle = m_Editor->GetRenderer()->getBloomToggle();
+			auto& bloomStrength = m_Editor->GetRenderer()->getBloomStrength();
+			auto& bloomFilter = m_Editor->GetRenderer()->getBloomFilterRadius();
+			ImGui::Checkbox("Enable Bloom", &bloomToggle);
+
+			// ======================
+			// Bloom strength
+			// ======================
+			// Slider
+			if (ImGui::SliderFloat("Bloom Strength",
+				&bloomStrength,
+				0.0f, 1.0f, "%.3f"))
+			{
+				// Bloom strength changed
+			}
+
+			// Input box on the same line
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(80.0f);
+			ImGui::InputFloat("##BloomStrengthInput",
+				&bloomStrength,
+				0.0f, 0.0f, "%.3f");
+
+			// Clamp manually if you want to enforce range:
+			bloomStrength = std::clamp(bloomStrength, 0.0f, 1.0f);
+
+			// ======================
+			// Bloom filter radius
+			// ======================
+			// Slider (typical useful range is small around 0.001 to 0.02)
+			if (ImGui::SliderFloat("Filter Radius",
+				&bloomFilter,
+				0.001f, 0.02f, "%.4f"))
+			{
+				// Filter radius changed
+			}
+
+			// Input box on the same line
+			ImGui::SameLine();
+			ImGui::SetNextItemWidth(80.0f);
+			ImGui::InputFloat("##FilterRadiusInput",
+				&bloomFilter,
+				0.0f, 0.0f, "%.4f");
+
+			// Clamp to avoid nonsense values 
+			bloomFilter = std::clamp(bloomFilter, 0.0001f, 0.05f);
+
+			// Reset button for bloom settings
+			if (ImGui::Button("Reset to Default##Bloom"))
+			{
+				bloomStrength = 0.01f;
+				bloomFilter = 0.0025f;
+			}
+
+			// Tooltip for bloom settings
+			if (ImGui::IsItemHovered())
+			{
+				ImGui::SetTooltip("Reset bloom strength (0.01) and filter radius (0.0025) to default values");
+			}
+
+			auto& gamma = m_Editor->GetRenderer()->getGamma();
+
+			// Adjust gamma
+			if (ImGui::SliderFloat("Gamma", &gamma, 1.2f, 3.2f, "%.1f"))
+			{
+				// Gamma changed
+			}
+
+			// Reset button for gamma
+			if (ImGui::Button("Reset to Default##Gamma"))
+			{
+				gamma = 2.2f;
+			}
+
+			ImGui::SeparatorText("Debug Drawing");
+
+			auto& dbg = m_Editor->GetRenderer()->GetPhysicsDebugSettings();
+
+			// Master toggle
+			ImGui::Checkbox("Enable Debug Draw", &dbg.enabled);
+
+			// Disable the rest when off (nice UX)
+			ImGui::BeginDisabled(!dbg.enabled);
+
+			ImGui::Checkbox("Draw Shapes", &dbg.drawShape);
+			ImGui::Checkbox("Wireframe", &dbg.wireframe);
+
+			ImGui::Checkbox("Draw Bounding Box (AABB)", &dbg.drawBoundingBox);
+			ImGui::Checkbox("Draw Center Of Mass", &dbg.drawCenterOfMass);
+			ImGui::Checkbox("Draw World Transform", &dbg.drawWorldTransform);
+			ImGui::Checkbox("Draw Velocity", &dbg.drawVelocity);
+
+			ImGui::Separator();
+
+			ImGui::Checkbox("Draw Constraints", &dbg.drawConstraints);
+			ImGui::Checkbox("Draw Constraint Limits", &dbg.drawConstraintLimits);
+
+			// Reset button
+			if (ImGui::Button("Reset##PhysicsDebug"))
+			{
+				dbg.enabled = true;
+				dbg.drawShape = true;
+				dbg.wireframe = true;
+				dbg.drawBoundingBox = false;
+				dbg.drawCenterOfMass = false;
+				dbg.drawWorldTransform = false;
+				dbg.drawVelocity = false;
+				dbg.drawConstraints = true;
+				dbg.drawConstraintLimits = false;
+			}
+
+			ImGui::EndDisabled();
+
 		}
-
-		// Optional: Add a reset button
-		if (ImGui::Button("Reset to Default"))
-		{
-			exposure = 1.0f;
-		}
-
-		// Optional: Add tooltip
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("Reset exposure to default value (1.0)");
-		}
-
-		ImGui::SeparatorText("Lighting");
-
-		/* 
-		- Main Light
-		- Additional Lights
-		For both: 
-		bool Cast Shadows
-		float Shadows resolution
-		int Per object limit
-		*/
-
-		ImGui::SeparatorText("Shadows");
-		
-		// ======================
-		// Global bias
-		// ======================
-		// Slider
-		auto& globalBias = m_Editor->GetRenderer()->getGlobalBias();
-		if (ImGui::SliderFloat("Global Bias",
-			&globalBias,
-			0.0f, 2.0f, "%.3f"))
-		{
-			// Global bias changed
-		}
-
-		// Reset button for shadow settings
-		if (ImGui::Button("Reset to Default##Shadow"))
-		{
-			globalBias = 0.005f;
-		}
-
-		// Tooltip for bloom settings
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("Reset global bias (0.005) to default values");
-		}
-
-		ImGui::SeparatorText("Post-Processing");
-
-		// ======================
-		// Bloom toggle
-		// ======================
-		auto& bloomToggle = m_Editor->GetRenderer()->getBloomToggle();
-		auto& bloomStrength = m_Editor->GetRenderer()->getBloomStrength();
-		auto& bloomFilter = m_Editor->GetRenderer()->getBloomFilterRadius();
-		ImGui::Checkbox("Enable Bloom", &bloomToggle);
-
-		// ======================
-		// Bloom strength
-		// ======================
-		// Slider
-		if (ImGui::SliderFloat("Bloom Strength",
-			&bloomStrength,
-			0.0f, 1.0f, "%.3f"))
-		{
-			// Bloom strength changed
-		}
-
-		// Input box on the same line
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(80.0f);
-		ImGui::InputFloat("##BloomStrengthInput",
-			&bloomStrength,
-			0.0f, 0.0f, "%.3f");
-
-		// Clamp manually if you want to enforce range:
-		bloomStrength = std::clamp(bloomStrength, 0.0f, 1.0f);
-
-		// ======================
-		// Bloom filter radius
-		// ======================
-		// Slider (typical useful range is small around 0.001 to 0.02)
-		if (ImGui::SliderFloat("Filter Radius",
-			&bloomFilter,
-			0.001f, 0.02f, "%.4f"))
-		{
-			// Filter radius changed
-		}
-
-		// Input box on the same line
-		ImGui::SameLine();
-		ImGui::SetNextItemWidth(80.0f);
-		ImGui::InputFloat("##FilterRadiusInput",
-			&bloomFilter,
-			0.0f, 0.0f, "%.4f");
-
-		// Clamp to avoid nonsense values 
-		bloomFilter = std::clamp(bloomFilter, 0.0001f, 0.05f);
-
-		// Reset button for bloom settings
-		if (ImGui::Button("Reset to Default##Bloom"))
-		{
-			bloomStrength = 0.01f;
-			bloomFilter = 0.0025f;
-		}
-
-		// Tooltip for bloom settings
-		if (ImGui::IsItemHovered())
-		{
-			ImGui::SetTooltip("Reset bloom strength (0.01) and filter radius (0.0025) to default values");
-		}
-
-		auto& gamma = m_Editor->GetRenderer()->getGamma();
-
-		// Adjust gamma
-		if (ImGui::SliderFloat("Gamma", &gamma, 1.2f, 3.2f, "%.1f"))
-		{
-			// Gamma changed
-		}
-
-		// Reset button for gamma
-		if (ImGui::Button("Reset to Default##Gamma"))
-		{
-			gamma = 2.2f;
-		}
-
-		ImGui::SeparatorText("Debug Drawing");
-
-		auto& dbg = m_Editor->GetRenderer()->GetPhysicsDebugSettings();
-
-		// Master toggle
-		ImGui::Checkbox("Enable Debug Draw", &dbg.enabled);
-
-		// Disable the rest when off (nice UX)
-		ImGui::BeginDisabled(!dbg.enabled);
-
-		ImGui::Checkbox("Draw Shapes", &dbg.drawShape);
-		ImGui::Checkbox("Wireframe", &dbg.wireframe);
-
-		ImGui::Checkbox("Draw Bounding Box (AABB)", &dbg.drawBoundingBox);
-		ImGui::Checkbox("Draw Center Of Mass", &dbg.drawCenterOfMass);
-		ImGui::Checkbox("Draw World Transform", &dbg.drawWorldTransform);
-		ImGui::Checkbox("Draw Velocity", &dbg.drawVelocity);
-
-		ImGui::Separator();
-
-		ImGui::Checkbox("Draw Constraints", &dbg.drawConstraints);
-		ImGui::Checkbox("Draw Constraint Limits", &dbg.drawConstraintLimits);
-
-		// Reset button
-		if (ImGui::Button("Reset##PhysicsDebug"))
-		{
-			dbg.enabled = true;
-			dbg.drawShape = true;
-			dbg.wireframe = true;
-			dbg.drawBoundingBox = false;
-			dbg.drawCenterOfMass = false;
-			dbg.drawWorldTransform = false;
-			dbg.drawVelocity = false;
-			dbg.drawConstraints = true;
-			dbg.drawConstraintLimits = false;
-		}
-
-		ImGui::EndDisabled();
-
 		ImGui::End();
 	}
 

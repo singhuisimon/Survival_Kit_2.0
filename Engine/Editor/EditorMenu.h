@@ -37,7 +37,7 @@ namespace Engine
 		bool m_SaveScenePanel = false;
 		bool m_CloseSaveAsPanel = false;
 		bool m_OpenPrefabPanel = false;
-		bool m_ShowHDRSettings = false;
+		bool m_ShowHDRSettings = true;
 		bool m_SavePrefabPanel = false;
 		bool m_CloseSavePrefabPanel = false;
 		bool m_SceneModified = false;
