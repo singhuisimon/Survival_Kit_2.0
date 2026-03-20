@@ -64,8 +64,8 @@ namespace Engine
 				if (ImGui::MenuItem("Save Scene", nullptr, false, isInSceneMode))
 				{
 					m_CurrScenePath = m_Editor->GetScenePath();
-					Scene*m_Scene = m_Editor->GetActiveScene();
-					Renderer* m_Renderer = m_Editor->GetRenderer();
+					//Scene*m_Scene = m_Editor->GetActiveScene();
+					//Renderer* m_Renderer = m_Editor->GetRenderer();
 
 					LOG_DEBUG("====== Save Current Scene: ", m_CurrScenePath, " =======");
 					if (!m_CurrScenePath.empty())
@@ -303,8 +303,8 @@ namespace Engine
 					}
 					else
 					{
-						Scene* m_Scene = m_Editor->GetActiveScene();
-						Renderer* m_Renderer = m_Editor->GetRenderer();
+						//Scene* m_Scene = m_Editor->GetActiveScene();
+						//Renderer* m_Renderer = m_Editor->GetRenderer();
 
 						m_Editor->SaveActiveSceneToPath(defaultNewScenePath);
 						LOG_DEBUG("Scene saved as: ", defaultNewScenePath);

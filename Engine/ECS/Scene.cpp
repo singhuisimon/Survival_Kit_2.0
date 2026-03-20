@@ -79,9 +79,13 @@ namespace Engine {
         //        }
         //    }
         //}
-
         SceneSerializer serializer(this);
-        return serializer.Deserialize(filepath);
+        bool result = serializer.Deserialize(filepath);
+        if (result) {
+            m_CurrentFilePath = filepath; 
+        }
+        return result;
+
     }
 
     //Entity Scene::CreateEntityFromPrefab(

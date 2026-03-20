@@ -36,7 +36,7 @@ namespace Engine
         ImGui::CreateContext();
         io = &ImGui::GetIO(); (void)io;
 
-        float fontSize = 18.0f;
+        //float fontSize = 18.0f;
         std::string fontPath = getAssetFilePath("Sources/Fonts/Quantico-Regular.ttf");
         io->Fonts->AddFontFromFileTTF(fontPath.c_str(), 32.0f);
         //ImGui::GetStyle().ScaleAllSizes(m_FontScale);

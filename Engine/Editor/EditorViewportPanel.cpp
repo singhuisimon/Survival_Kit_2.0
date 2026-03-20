@@ -138,7 +138,7 @@ namespace Engine
                     else {
                         // Child entity: convert world position to local space
                         auto& registry = scene->GetRegistry();
-                        auto view = registry.view<TransformComponent>();
+                        //auto view = registry.view<TransformComponent>();
 
                         // Check if parent exists
                         entt::entity parentEntity = static_cast<entt::entity>(tc.Parent);
@@ -171,7 +171,7 @@ namespace Engine
                 {
                     //// Extract rotation matrix and convert to quaternion
                     //glm::mat3 rotationMatrix;
-                    //rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));
+                    //rotationMatrix[0] = glm::normalize(glm::vec3(transform[0]));f
                     //rotationMatrix[1] = glm::normalize(glm::vec3(transform[1]));
                     //rotationMatrix[2] = glm::normalize(glm::vec3(transform[2]));
 
@@ -192,7 +192,7 @@ namespace Engine
                     else {
                         // Child entity: convert world rotation to local
                         auto& registry = scene->GetRegistry();
-                        auto view = registry.view<TransformComponent>();
+                        //auto view = registry.view<TransformComponent>();
 
                         entt::entity parentEntity = static_cast<entt::entity>(tc.Parent);
                         if (registry.valid(parentEntity) && registry.all_of<TransformComponent>(parentEntity)) {
@@ -385,19 +385,47 @@ namespace Engine
         }
 
         Scene *activeScene = m_Editor->GetActiveScene();
-
+        //m_OriginalScenePath = activeScene->GetFilePath();
+        //m_OriginalScenePath = m_currentPath;
+        //LOG_DEBUG("[VIEWPORT] Play m_OriginalScenePath - ", m_OriginalScenePath);
+        //LOG_DEBUG("[VIEWPORT] Play m_currentPath - ", m_OriginalScenePath);
         // Capture edit-mode script field overrides BEFORE any hot-reload or scene changes.
         CacheEditModeScriptFieldOverrides(activeScene);
-
+      
         auto &se = Engine::MonoScriptEngine::GetInstance();
         se.HotReloadOnPlay(true);
 
-        // Store the original scene state before playing
-        if(activeScene && m_Editor->HasScenePath()) {
-            m_OriginalScenePath = m_Editor->GetScenePath();
-            m_OriginalSceneName = m_Editor->GetSceneName();
-            std::cout << "[VIEWPORT] Saved scene state: " << m_OriginalSceneName << std::endl;
+        if (activeScene)
+        {
+            LOG_DEBUG("[VIEWPORT] Play state: inside if (activeScene)");
+            m_OriginalScenePath = activeScene->GetFilePath(); // set the scene path from scene.
+            LOG_DEBUG("[VIEWPORT] Play state m_OriginalScenePath in if activeScene - ", m_OriginalScenePath);
+            m_Editor->SetScenePath(m_OriginalScenePath);
+           
+            //m_Editor->GetScenePath();
+            m_OriginalSceneName = activeScene->GetName();
+            std::string checkedPath = m_Editor->GetScenePath();
+            std::string checkedName = m_Editor->GetSceneName();
+            LOG_DEBUG("[VIEWPORT] Play state m_Editor->GetScenePath() - ", checkedPath);
+            LOG_DEBUG("[VIEWPORT] Play state m_Editor->GetSceneName() - ", checkedName);
         }
+        else
+        {
+            LOG_DEBUG("[VIEWPORT] No Active Scene now");
+        }
+        //if(m_Editor->HasScenePath() && !m_Editor->GetScenePath().empty()) {
+        //    //LOG_DEBUG("[VIEWPORT] this is being call in play state.");
+        //    m_OriginalScenePath = m_Editor->GetScenePath();
+        //    m_OriginalSceneName = m_Editor->GetSceneName();
+        //    
+        //}
+        //else if (activeScene) {
+        //    LOG_DEBUG("[VIEWPORT] HasScenePath - ", m_Editor->GetScenePath());
+        //    // Scene was loaded at startup without going through the editor file menu
+        //    // Ask the scene itself what file it came from
+        //    m_OriginalScenePath = m_Editor->GetScenePath(); // see Fix 3
+        //    m_OriginalSceneName = activeScene->GetName();
+        //}
 
         m_PlayState = PlayState::PLAY;
         std::cout << "[VIEWPORT] State changed: STOP to PLAY" << std::endl;
@@ -424,34 +452,38 @@ namespace Engine
 
     void EditorViewportPanel::Stop()
     {
+        //LOG_DEBUG("[Viewport Stop Call]....AAAAAAAAAAAAAAAAA");
         // ONLY allow Stop from PLAY or PAUSE states
         if (m_PlayState == PlayState::PLAY || m_PlayState == PlayState::PAUSE)
         {
+            LOG_DEBUG("[VIEWPORT] Stop Call....inside m_PlayState");
+          
             Scene* activeScene = m_Editor->GetActiveScene();
+            //std::string currentFile = activeScene->GetFilePath();
+            // Check what is the current path load by scene first
+            m_OriginalScenePath = activeScene->GetFilePath();
+            m_Editor->SetScenePath(m_OriginalScenePath);
+            std::string checkedpath = m_Editor->GetScenePath();
+            LOG_DEBUG("[VIEWPORT] Stop: activeScene->GetFilePath() - ", m_OriginalScenePath);
+            LOG_DEBUG("[VIEWPORT] Stop: m_Editor->GetScenePath() - ", checkedpath);
+
+            //LOG_DEBUG("[Viewport Stop: m_OriginalScenePath - ", m_OriginalScenePath);
             if (activeScene && !m_OriginalScenePath.empty())
             {
-                // Kept comments from claude so I can remember - Amanda
-                // Stop all audio before clearing the registry.
-                // registry.clear() fires on_destroy signals, but StopSound sets Channel=nullptr
-                // without calling channel->stop(), so orphaned FMOD channels can survive.
                 if (m_Editor->GetAudioManager())
                 {
                     m_Editor->GetAudioManager()->StopAll();
                 }
-
-                // Clear current scene
                 activeScene->GetRegistry().clear();
-
-                // Load the original scene
                 activeScene->LoadFromFile(m_OriginalScenePath);
                 RestoreEditModeScriptFieldOverrides(activeScene);
-                auto &se = Engine::MonoScriptEngine::GetInstance();
+                auto& se = Engine::MonoScriptEngine::GetInstance();
                 se.EnsureAllScriptInstances(activeScene, true);
                 // Reset scene name and path in Editor
                 m_Editor->SetScenePath(m_OriginalScenePath);
-                m_Editor->SetSceneName(m_OriginalSceneName);
-
-                std::cout << "[VIEWPORT] Scene reset to: " << m_OriginalSceneName << std::endl;
+                std::string checkedname = m_Editor->GetSceneName();
+            
+                std::cout << "[VIEWPORT] Scene reset to: " << checkedname << std::endl;
             }
 
             m_PlayState = PlayState::STOP;
@@ -466,9 +498,9 @@ namespace Engine
 
     void EditorViewportPanel::ViewportButtons()
     {
-        Scene* scene = m_Editor->GetActiveScene();
+        //Scene* scene = m_Editor->GetActiveScene();
         Entity selectedEntity = m_Editor->GetSelectedEntity();
-        uint32_t pickedID = m_Editor->GetPickedID();
+        //uint32_t pickedID = m_Editor->GetPickedID();
         std::string scenePath = m_Editor->GetScenePath();
         std::string sceneName = m_Editor->GetSceneName();
 
@@ -514,6 +546,7 @@ namespace Engine
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(100, 200, 100, 255));
 
             if (ImGui::Button("Play")) {
+                LOG_DEBUG("[VIEWPORT] Button Play is trigger.");
                 Play();
             }
 
@@ -549,6 +582,7 @@ namespace Engine
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(220, 170, 60, 255));
 
             if (ImGui::Button("Pause")) {
+                LOG_DEBUG("[Viewport: Button Pause is trigger.");
                 Pause(); // Will resume from pause
             }
 
@@ -566,6 +600,7 @@ namespace Engine
             ImGui::PushStyleColor(ImGuiCol_ButtonActive, IM_COL32(180, 0, 0, 255));
 
             if (ImGui::Button("Stop")) {
+                LOG_DEBUG("[Viewport: Button Stop is trigger.");
                 Stop();
             }
 

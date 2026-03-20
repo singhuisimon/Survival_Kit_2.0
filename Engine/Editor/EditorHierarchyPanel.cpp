@@ -241,7 +241,7 @@ namespace Engine
 	void EditorHierarchyPanel::DrawEntityTree(Entity& entity)
 	{
 		Entity currentSelectedEntity = m_Editor->GetSelectedEntity();
-		u32 currentPickedID = m_Editor->GetPickedID();
+		//u32 currentPickedID = m_Editor->GetPickedID();
 
 		Scene* m_Scene = m_Editor->GetActiveScene();
 		if (!m_Scene) return;
@@ -377,7 +377,7 @@ namespace Engine
 
 					// Handle children
 					if (hasChildren) {
-						auto& transform = entity.GetComponent<TransformComponent>();
+						//auto& transform = entity.GetComponent<TransformComponent>();
 						for (uint32_t childID : transform.Children) {
 							Entity childEntity(static_cast<entt::entity>(childID), &m_Scene->GetRegistry());
 
