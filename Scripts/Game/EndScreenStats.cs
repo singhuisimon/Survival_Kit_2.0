@@ -31,6 +31,18 @@ namespace Game
         private bool buttonsReady = false;
         private bool statsShown = false;
 
+        // Score animation
+        private bool isAnimatingScore = false;
+        private float displayedScore = 0.0f;
+        private int targetScore = 0;
+        private const float SCORE_ANIM_DURATION = 2.0f;
+        private float scoreAnimElapsed = 0.0f;
+
+        // Start delay
+        private float scoreStartDelay = 1.0f;
+        private float scoreStartDelayTimer = 0.0f;
+        private bool scoreDelayDone = false;
+
         public override void OnStart()
         {
             LogMessage("=== EndScreenStats OnStart ===");
@@ -48,6 +60,12 @@ namespace Game
             cachedTime = "";
             buttonsReady = false;
             statsShown = false;
+            isAnimatingScore = false;
+            displayedScore = 0.0f;
+            targetScore = 0;
+            scoreAnimElapsed = 0.0f;
+            scoreStartDelayTimer = 0.0f;
+            scoreDelayDone = false;
 
             Event.Subscribe(EVENT_SHOW_SCORE, OnScoreReceived);
             Event.Subscribe(EVENT_SHOW_TIME, OnTimeReceived);
@@ -58,12 +76,49 @@ namespace Game
             LogMessage("[EndScreenStats] Initialized");
         }
 
+        public override void OnUpdate(float deltaTime)
+        {
+            if (!isAnimatingScore) return;
+
+            // Wait 1 second before counting up
+            if (!scoreDelayDone)
+            {
+                scoreStartDelayTimer += deltaTime;
+                if (scoreStartDelayTimer >= scoreStartDelay)
+                    scoreDelayDone = true;
+                return;
+            }
+
+            scoreAnimElapsed += deltaTime;
+            float t = scoreAnimElapsed / SCORE_ANIM_DURATION;
+
+            if (t >= 1.0f)
+            {
+                t = 1.0f;
+                isAnimatingScore = false;
+            }
+
+            // Ease out: fast at start, slows near the end
+            float eased = 1.0f - (1.0f - t) * (1.0f - t);
+            displayedScore = eased * targetScore;
+            int current = (int)displayedScore;
+
+            if (scoreTextID != 0)
+                SetText(scoreTextID,current.ToString("D7"));
+        }
+
         private void OnGameReset(string eventName, string payload)
         {
             cachedScore = "";
             cachedTime = "";
             buttonsReady = false;
             statsShown = false;
+            isAnimatingScore = false;
+            displayedScore = 0.0f;
+            targetScore = 0;
+            scoreAnimElapsed = 0.0f;
+            scoreStartDelayTimer = 0.0f;
+            scoreDelayDone = false;
 
             if (scoreTextID != 0) Text.SetIsVisible(scoreTextID, false);
             if (timeTextID != 0) Text.SetIsVisible(timeTextID, false);
@@ -81,7 +136,7 @@ namespace Game
                 return;
             }
 
-            cachedScore = "SCORE " + scoreVal.ToString("D7");
+            cachedScore = scoreVal.ToString();
             LogMessage("[EndScreenStats] Cached score: " + cachedScore);
             TryShow();
         }
@@ -114,11 +169,18 @@ namespace Game
 
             statsShown = true;
 
+            int.TryParse(cachedScore, out targetScore);
+            displayedScore = 0.0f;
+            scoreAnimElapsed = 0.0f;
+            scoreStartDelayTimer = 0.0f;
+            scoreDelayDone = false;
+            isAnimatingScore = true;
+
             if (scoreTextID != 0)
             {
-                SetText(scoreTextID, cachedScore);
+                SetText(scoreTextID, "0000000");
                 Text.SetIsVisible(scoreTextID, true);
-                LogMessage("[EndScreenStats] Score displayed: " + cachedScore);
+                LogMessage("[EndScreenStats] Score animation starting - target: " + targetScore);
             }
 
             if (timeTextID != 0 && cachedTime != "")
@@ -129,10 +191,9 @@ namespace Game
             }
             else if (timeTextID != 0)
             {
-            cachedTime = "N/A";
-                SetText(timeTextID, cachedTime);
+                SetText(timeTextID, "N/A");
                 Text.SetIsVisible(timeTextID, true);
-                LogMessage("[EndScreenStats] No time data - time text stays hidden");
+                LogMessage("[EndScreenStats] No time data - showing N/A");
             }
         }
 
@@ -142,7 +203,7 @@ namespace Game
             Event.Unsubscribe(EVENT_SHOW_TIME, OnTimeReceived);
             Event.Unsubscribe(EVENT_WIN_BUTTONS, OnButtonsFaded);
             Event.Unsubscribe(EVENT_LOSE_BUTTONS, OnButtonsFaded);
-           //Event.Unsubscribe(EVENT_GAMEOVER, OnGameReset);
+            //Event.Unsubscribe(EVENT_GAMEOVER, OnGameReset);
             LogMessage("=== EndScreenStats Destroyed ===");
         }
     }
