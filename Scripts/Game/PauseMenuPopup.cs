@@ -10,14 +10,9 @@ using static Game.AudioSettings;
 
 namespace Game
 {
-    /// <summary>
-    /// Handles the pause menu popup during gameplay.
-    /// Uses SetIsVisible to show/hide positions are defined in the scene JSON and never change.
-    /// Press P to toggle pause menu.
-    /// </summary>
     public class PauseMenuPopup : ScriptBehaviour
     {
-        // Entity names - must match names in scene JSON
+        // Entity names
         private const string BG_NAME = "PauseMenu_EngineBG";
         private const string RESUME_BUTTON_NAME = "Paused_ResumeButton";
         private const string RESUME_BUTTON_HOVERED_NAME = "Paused_ResumeButton_Hovered";
@@ -32,20 +27,36 @@ namespace Game
         private const string MAINMENU_BUTTON_HOVERED_NAME = "Paused_MainMenuButton_Hovered";
         private const string HOWTOPLAY_BUTTON_NAME = "Paused_HowToPlayButton";
         private const string HOWTOPLAY_BUTTON_HOVERED_NAME = "Paused_HowToPlayButton_Hovered";
-        // Mixer Set 2
+        // Mixer Set 2 - BGM
         private const string MIXER_FILL_2_NAME = "Paused_MixerFill_2";
         private const string PLUS_BUTTON_2_NAME = "Paused_PlusButton_2";
         private const string PLUS_BUTTON_2_HOVERED_NAME = "Paused_PlusButton_2_Hovered";
         private const string MINUS_BUTTON_2_NAME = "Paused_MinusButton_2";
         private const string MINUS_BUTTON_2_HOVERED_NAME = "Paused_MinusButton_2_Hovered";
-        // Mixer Set 3
+        // Mixer Set 3 - SFX
         private const string MIXER_FILL_3_NAME = "Paused_MixerFill_3";
         private const string PLUS_BUTTON_3_NAME = "Paused_PlusButton_3";
         private const string PLUS_BUTTON_3_HOVERED_NAME = "Paused_PlusButton_3_Hovered";
         private const string MINUS_BUTTON_3_NAME = "Paused_MinusButton_3";
         private const string MINUS_BUTTON_3_HOVERED_NAME = "Paused_MinusButton_3_Hovered";
+        // Mixer Set 4 - Gamma
+        private const string MIXER_FILL_4_NAME = "Paused_MixerFill_4";
+        private const string PLUS_BUTTON_4_NAME = "Paused_PlusButton_4";
+        private const string PLUS_BUTTON_4_HOVERED_NAME = "Paused_PlusButton_4_Hovered";
+        private const string MINUS_BUTTON_4_NAME = "Paused_MinusButton_4";
+        private const string MINUS_BUTTON_4_HOVERED_NAME = "Paused_MinusButton_4_Hovered";
+        private const string DEFAULT_BUTTON_4_NAME = "Paused_DefaultButton_4";
+        private const string DEFAULT_BUTTON_4_HOVERED_NAME = "Paused_DefaultButton_4_Hovered";
+        // Mixer Set 5 - Mouse Sensitivity
+        private const string MIXER_FILL_5_NAME = "Paused_MixerFill_5";
+        private const string PLUS_BUTTON_5_NAME = "Paused_PlusButton_5";
+        private const string PLUS_BUTTON_5_HOVERED_NAME = "Paused_PlusButton_5_Hovered";
+        private const string MINUS_BUTTON_5_NAME = "Paused_MinusButton_5";
+        private const string MINUS_BUTTON_5_HOVERED_NAME = "Paused_MinusButton_5_Hovered";
+        private const string DEFAULT_BUTTON_5_NAME = "Paused_DefaultButton_5";
+        private const string DEFAULT_BUTTON_5_HOVERED_NAME = "Paused_DefaultButton_5_Hovered";
 
-        // Checkbox entity names - Code Added by Rio
+        // Checkboxes
         private const string CHECKBOX_MASTER_UNTICKED_NAME = "Paused_Checkbox_Master_Unticked";
         private const string CHECKBOX_MASTER_TICKED_NAME = "Paused_Checkbox_Master_Ticked";
         private const string CHECKBOX_BGM_UNTICKED_NAME = "Paused_Checkbox_BGM_Unticked";
@@ -55,75 +66,54 @@ namespace Game
 
         // HUD elements to hide when paused
         private static readonly string[] HUD_ELEMENT_NAMES = {
-            "TImer",
-            "StageCount",
-            "scoreboard",
-            "WeaponAmmoCount",
-            "HealthCount",
-            "CoreHealthCount",
-            "HealthBarFill",
-            "HealthBarWindow",
-            "PlayerHealth",
-            "PrimaryWeaponFrame",
-            "PrimaryWeaponWindow",
-            "SecondayWeaponUI",
-
-            "AltFireIcon",
-            "WeaponBarReload",
-            "CoreHealthBarRefill",
-            "CoreHealthBarFrame",
-            "CoreHealthBarWindow",
-            "Crosshair",
-            "Crosshair2"
+            "TImer", "StageCount", "scoreboard", "WeaponAmmoCount",
+            "HealthCount", "CoreHealthCount", "HealthBarFill", "HealthBarWindow",
+            "PlayerHealth", "PrimaryWeaponFrame", "PrimaryWeaponWindow",
+            "SecondayWeaponUI", "AltFireIcon", "WeaponBarReload",
+            "CoreHealthBarRefill", "CoreHealthBarFrame", "CoreHealthBarWindow",
+            "Crosshair", "Crosshair2"
         };
 
-        // Scene paths for navigation
+        // Scene paths
         private const string MAIN_MENU_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
         private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
         private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
 
-        // Pause events
         private const string EVENT_GAME_PAUSED = "GamePaused";
         private const string EVENT_GAME_RESUMED = "GameResumed";
 
-        private const float CENTER_X = 640.0f;
-
         // Entity IDs
         private uint bgId;
-        private uint resumeButtonId;
-        private uint resumeButtonHoveredId;
-        private uint restartButtonId;
-        private uint restartButtonHoveredId;
-        private uint plusButtonId;
-        private uint plusButtonHoveredId;
+        private uint resumeButtonId, resumeButtonHoveredId;
+        private uint restartButtonId, restartButtonHoveredId;
+        private uint plusButtonId, plusButtonHoveredId;
         private uint mixerFillId;
-        private uint minusButtonId;
-        private uint minusButtonHoveredId;
-        private uint mainMenuButtonId;
-        private uint mainMenuButtonHoveredId;
-        private uint howToPlayButtonId;
-        private uint howToPlayButtonHoveredId;
-        // Mixer Set 2 IDs
+        private uint minusButtonId, minusButtonHoveredId;
+        private uint mainMenuButtonId, mainMenuButtonHoveredId;
+        private uint howToPlayButtonId, howToPlayButtonHoveredId;
+        // Mixer 2 - BGM
         private uint mixerFillId2;
-        private uint plusButtonId2;
-        private uint plusButtonHoveredId2;
-        private uint minusButtonId2;
-        private uint minusButtonHoveredId2;
-        // Mixer Set 3 IDs
+        private uint plusButtonId2, plusButtonHoveredId2;
+        private uint minusButtonId2, minusButtonHoveredId2;
+        // Mixer 3 - SFX
         private uint mixerFillId3;
-        private uint plusButtonId3;
-        private uint plusButtonHoveredId3;
-        private uint minusButtonId3;
-        private uint minusButtonHoveredId3;
-        // Checkbox IDs - added by Rio
-        private uint checkboxMasterUntickedId;
-        private uint checkboxMasterTickedId;
-        private uint checkboxBGMUntickedId;
-        private uint checkboxBGMTickedId;
-        private uint checkboxSFXUntickedId;
-        private uint checkboxSFXTickedId;
+        private uint plusButtonId3, plusButtonHoveredId3;
+        private uint minusButtonId3, minusButtonHoveredId3;
+        // Mixer 4 - Gamma
+        private uint mixerFillId4;
+        private uint plusButtonId4, plusButtonHoveredId4;
+        private uint minusButtonId4, minusButtonHoveredId4;
+        private uint defaultButtonId4, defaultButtonHoveredId4;
+        // Mixer 5 - Mouse Sensitivity
+        private uint mixerFillId5;
+        private uint plusButtonId5, plusButtonHoveredId5;
+        private uint minusButtonId5, minusButtonHoveredId5;
+        private uint defaultButtonId5, defaultButtonHoveredId5;
+        // Checkboxes
+        private uint checkboxMasterUntickedId, checkboxMasterTickedId;
+        private uint checkboxBGMUntickedId, checkboxBGMTickedId;
+        private uint checkboxSFXUntickedId, checkboxSFXTickedId;
 
-        // HUD element IDs
         private uint[] hudElementIds;
 
         // State
@@ -134,17 +124,18 @@ namespace Game
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
 
-        // Mixer bar initial values (read from scene at startup, before any hiding)
+        // Mixer initial X scales and positions (horizontal fill, anchored right)
         private float mixerFill1InitialWidth;
         private float mixerFill2InitialWidth;
         private float mixerFill3InitialWidth;
+        private float mixerFill4InitialWidth;
+        private float mixerFill5InitialWidth;
         private Vector3 mixerFill1InitialPosition;
         private Vector3 mixerFill2InitialPosition;
         private Vector3 mixerFill3InitialPosition;
+        private Vector3 mixerFill4InitialPosition;
+        private Vector3 mixerFill5InitialPosition;
 
-        // =====================================================================
-        // HELPER: Safe visibility setter � skips if ID is 0
-        // =====================================================================
         private static void SafeSetVisible(uint id, bool visible)
         {
             if (id == 0) return;
@@ -159,7 +150,6 @@ namespace Game
         {
             LogMessage("PauseMenuPopup: Initializing...");
 
-            // --- 1. Find all pause menu entities ---
             bgId = SceneFindEntityByName(BG_NAME);
             resumeButtonId = SceneFindEntityByName(RESUME_BUTTON_NAME);
             resumeButtonHoveredId = SceneFindEntityByName(RESUME_BUTTON_HOVERED_NAME);
@@ -174,18 +164,34 @@ namespace Game
             mainMenuButtonHoveredId = SceneFindEntityByName(MAINMENU_BUTTON_HOVERED_NAME);
             howToPlayButtonId = SceneFindEntityByName(HOWTOPLAY_BUTTON_NAME);
             howToPlayButtonHoveredId = SceneFindEntityByName(HOWTOPLAY_BUTTON_HOVERED_NAME);
-            // Mixer Set 2
+            // Mixer 2
             mixerFillId2 = SceneFindEntityByName(MIXER_FILL_2_NAME);
             plusButtonId2 = SceneFindEntityByName(PLUS_BUTTON_2_NAME);
             plusButtonHoveredId2 = SceneFindEntityByName(PLUS_BUTTON_2_HOVERED_NAME);
             minusButtonId2 = SceneFindEntityByName(MINUS_BUTTON_2_NAME);
             minusButtonHoveredId2 = SceneFindEntityByName(MINUS_BUTTON_2_HOVERED_NAME);
-            // Mixer Set 3
+            // Mixer 3
             mixerFillId3 = SceneFindEntityByName(MIXER_FILL_3_NAME);
             plusButtonId3 = SceneFindEntityByName(PLUS_BUTTON_3_NAME);
             plusButtonHoveredId3 = SceneFindEntityByName(PLUS_BUTTON_3_HOVERED_NAME);
             minusButtonId3 = SceneFindEntityByName(MINUS_BUTTON_3_NAME);
             minusButtonHoveredId3 = SceneFindEntityByName(MINUS_BUTTON_3_HOVERED_NAME);
+            // Mixer 4 - Gamma
+            mixerFillId4 = SceneFindEntityByName(MIXER_FILL_4_NAME);
+            plusButtonId4 = SceneFindEntityByName(PLUS_BUTTON_4_NAME);
+            plusButtonHoveredId4 = SceneFindEntityByName(PLUS_BUTTON_4_HOVERED_NAME);
+            minusButtonId4 = SceneFindEntityByName(MINUS_BUTTON_4_NAME);
+            minusButtonHoveredId4 = SceneFindEntityByName(MINUS_BUTTON_4_HOVERED_NAME);
+            defaultButtonId4 = SceneFindEntityByName(DEFAULT_BUTTON_4_NAME);
+            defaultButtonHoveredId4 = SceneFindEntityByName(DEFAULT_BUTTON_4_HOVERED_NAME);
+            // Mixer 5 - Mouse Sensitivity
+            mixerFillId5 = SceneFindEntityByName(MIXER_FILL_5_NAME);
+            plusButtonId5 = SceneFindEntityByName(PLUS_BUTTON_5_NAME);
+            plusButtonHoveredId5 = SceneFindEntityByName(PLUS_BUTTON_5_HOVERED_NAME);
+            minusButtonId5 = SceneFindEntityByName(MINUS_BUTTON_5_NAME);
+            minusButtonHoveredId5 = SceneFindEntityByName(MINUS_BUTTON_5_HOVERED_NAME);
+            defaultButtonId5 = SceneFindEntityByName(DEFAULT_BUTTON_5_NAME);
+            defaultButtonHoveredId5 = SceneFindEntityByName(DEFAULT_BUTTON_5_HOVERED_NAME);
             // Checkboxes
             checkboxMasterUntickedId = SceneFindEntityByName(CHECKBOX_MASTER_UNTICKED_NAME);
             checkboxMasterTickedId = SceneFindEntityByName(CHECKBOX_MASTER_TICKED_NAME);
@@ -194,32 +200,40 @@ namespace Game
             checkboxSFXUntickedId = SceneFindEntityByName(CHECKBOX_SFX_UNTICKED_NAME);
             checkboxSFXTickedId = SceneFindEntityByName(CHECKBOX_SFX_TICKED_NAME);
 
-            // --- 2. IMMEDIATELY hide all pause menu entities to prevent first-frame flash ---
-            //        Safe because SafeSetVisible skips IDs that are 0.
             HidePauseMenu();
 
-            // --- 3. Read mixer initial values BEFORE any position changes ---
-            //        Positions are still at their scene JSON values at this point.
+            // Read initial X scales and positions for mixer fills
             if (mixerFillId != 0)
             {
-                mixerFill1InitialWidth = GetScale(mixerFillId).Y;
+                mixerFill1InitialWidth = GetScale(mixerFillId).X;
                 mixerFill1InitialPosition = GetPosition(mixerFillId);
-                LogMessage("PauseMenuPopup: Mixer 1 initial height = " + mixerFill1InitialWidth);
+                LogMessage("PauseMenuPopup: Mixer 1 initial width = " + mixerFill1InitialWidth);
             }
             if (mixerFillId2 != 0)
             {
-                mixerFill2InitialWidth = GetScale(mixerFillId2).Y;
+                mixerFill2InitialWidth = GetScale(mixerFillId2).X;
                 mixerFill2InitialPosition = GetPosition(mixerFillId2);
-                LogMessage("PauseMenuPopup: Mixer 2 initial height = " + mixerFill2InitialWidth);
+                LogMessage("PauseMenuPopup: Mixer 2 initial width = " + mixerFill2InitialWidth);
             }
             if (mixerFillId3 != 0)
             {
-                mixerFill3InitialWidth = GetScale(mixerFillId3).Y;
+                mixerFill3InitialWidth = GetScale(mixerFillId3).X;
                 mixerFill3InitialPosition = GetPosition(mixerFillId3);
-                LogMessage("PauseMenuPopup: Mixer 3 initial height = " + mixerFill3InitialWidth);
+                LogMessage("PauseMenuPopup: Mixer 3 initial width = " + mixerFill3InitialWidth);
+            }
+            if (mixerFillId4 != 0)
+            {
+                mixerFill4InitialWidth = GetScale(mixerFillId4).X;
+                mixerFill4InitialPosition = GetPosition(mixerFillId4);
+                LogMessage("PauseMenuPopup: Mixer 4 (Gamma) initial width = " + mixerFill4InitialWidth);
+            }
+            if (mixerFillId5 != 0)
+            {
+                mixerFill5InitialWidth = GetScale(mixerFillId5).X;
+                mixerFill5InitialPosition = GetPosition(mixerFillId5);
+                LogMessage("PauseMenuPopup: Mixer 5 (MouseSens) initial width = " + mixerFill5InitialWidth);
             }
 
-            // --- 4. Find HUD elements ---
             hudElementIds = new uint[HUD_ELEMENT_NAMES.Length];
             for (int i = 0; i < HUD_ELEMENT_NAMES.Length; i++)
             {
@@ -228,15 +242,12 @@ namespace Game
                     LogMessage("PauseMenuPopup: HUD element not found: " + HUD_ELEMENT_NAMES[i]);
             }
 
-            // --- 5. Final state setup ---
-            if (bgId == 0)
-                LogError("PauseMenuPopup: Could not find: " + BG_NAME);
+            if (bgId == 0) LogError("PauseMenuPopup: Could not find: " + BG_NAME);
 
             entitiesFound = (bgId != 0);
             isPaused = false;
             gameEnded = false;
 
-            // Detect which level we're in
             uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
             if (turrets != null && turrets.Length > 0)
             {
@@ -275,7 +286,7 @@ namespace Game
 
             if (pauseKeyJustPressed)
             {
-                LogMessage("PauseMenuPopup: Escape key pressed! isPaused=" + isPaused);
+                LogMessage("PauseMenuPopup: Escape pressed! isPaused=" + isPaused);
                 if (isPaused) HidePauseMenu();
                 else ShowPauseMenu();
             }
@@ -289,20 +300,16 @@ namespace Game
 
         // =====================================================================
         // SHOW PAUSE MENU
-        // Positions are already correct in the scene JSON � just make visible.
         // =====================================================================
         private void ShowPauseMenu()
         {
             if (isPaused) return;
 
             isPaused = true;
-            LogMessage("PauseMenuPopup: Showing pause menu");
-
             GameState.IsPaused = true;
             Input.SetCursorVisible(true);
             Event.Publish(EVENT_GAME_PAUSED, "");
 
-            // Show all main buttons (not hovered � HandleHoverStates manages those)
             SafeSetVisible(bgId, true);
             SafeSetVisible(resumeButtonId, true);
             SafeSetVisible(restartButtonId, true);
@@ -311,16 +318,26 @@ namespace Game
             SafeSetVisible(minusButtonId, true);
             SafeSetVisible(mainMenuButtonId, true);
             SafeSetVisible(howToPlayButtonId, true);
-            // Mixer Set 2
+            // Mixer 2
             SafeSetVisible(mixerFillId2, true);
             SafeSetVisible(plusButtonId2, true);
             SafeSetVisible(minusButtonId2, true);
-            // Mixer Set 3
+            // Mixer 3
             SafeSetVisible(mixerFillId3, true);
             SafeSetVisible(plusButtonId3, true);
             SafeSetVisible(minusButtonId3, true);
+            // Mixer 4 - Gamma
+            SafeSetVisible(mixerFillId4, true);
+            SafeSetVisible(plusButtonId4, true);
+            SafeSetVisible(minusButtonId4, true);
+            SafeSetVisible(defaultButtonId4, true);
+            // Mixer 5 - Mouse Sensitivity
+            SafeSetVisible(mixerFillId5, true);
+            SafeSetVisible(plusButtonId5, true);
+            SafeSetVisible(minusButtonId5, true);
+            SafeSetVisible(defaultButtonId5, true);
 
-            // Hovered versions start hidden � HandleHoverStates will show them on mouse-over
+            // All hovered versions start hidden
             SafeSetVisible(resumeButtonHoveredId, false);
             SafeSetVisible(restartButtonHoveredId, false);
             SafeSetVisible(plusButtonHoveredId, false);
@@ -331,39 +348,43 @@ namespace Game
             SafeSetVisible(minusButtonHoveredId2, false);
             SafeSetVisible(plusButtonHoveredId3, false);
             SafeSetVisible(minusButtonHoveredId3, false);
+            SafeSetVisible(plusButtonHoveredId4, false);
+            SafeSetVisible(minusButtonHoveredId4, false);
+            SafeSetVisible(defaultButtonHoveredId4, false);
+            SafeSetVisible(plusButtonHoveredId5, false);
+            SafeSetVisible(minusButtonHoveredId5, false);
+            SafeSetVisible(defaultButtonHoveredId5, false);
 
-            // Update mixer bar heights to reflect current volume
+            // Update all mixer fills
             if (Instance != null)
             {
-                UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
-                                      mixerFill1InitialWidth, mixerFill1InitialPosition);
-                UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
-                                      mixerFill2InitialWidth, mixerFill2InitialPosition);
-                UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
-                                      mixerFill3InitialWidth, mixerFill3InitialPosition);
+                UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
+                                mixerFill1InitialWidth, mixerFill1InitialPosition);
+                UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
+                                mixerFill2InitialWidth, mixerFill2InitialPosition);
+                UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
+                                mixerFill3InitialWidth, mixerFill3InitialPosition);
+                UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
+                                mixerFill4InitialWidth, mixerFill4InitialPosition);
+                UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
+                                mixerFill5InitialWidth, mixerFill5InitialPosition);
             }
 
-            // Hide HUD
             if (hudElementIds != null)
-            {
                 for (int i = 0; i < hudElementIds.Length; i++)
                     SafeSetVisible(hudElementIds[i], false);
-            }
 
             UpdateCheckboxVisuals();
-
             LogMessage("PauseMenuPopup: Menu shown");
         }
 
         // =====================================================================
         // HIDE PAUSE MENU
-        // Guards ensure this is safe to call during OnStart before full init.
         // =====================================================================
         private void HidePauseMenu()
         {
             isPaused = false;
 
-            // Hide all pause menu entities
             SafeSetVisible(bgId, false);
             SafeSetVisible(resumeButtonId, false);
             SafeSetVisible(resumeButtonHoveredId, false);
@@ -378,18 +399,34 @@ namespace Game
             SafeSetVisible(mainMenuButtonHoveredId, false);
             SafeSetVisible(howToPlayButtonId, false);
             SafeSetVisible(howToPlayButtonHoveredId, false);
-            // Mixer Set 2
+            // Mixer 2
             SafeSetVisible(mixerFillId2, false);
             SafeSetVisible(plusButtonId2, false);
             SafeSetVisible(plusButtonHoveredId2, false);
             SafeSetVisible(minusButtonId2, false);
             SafeSetVisible(minusButtonHoveredId2, false);
-            // Mixer Set 3
+            // Mixer 3
             SafeSetVisible(mixerFillId3, false);
             SafeSetVisible(plusButtonId3, false);
             SafeSetVisible(plusButtonHoveredId3, false);
             SafeSetVisible(minusButtonId3, false);
             SafeSetVisible(minusButtonHoveredId3, false);
+            // Mixer 4 - Gamma
+            SafeSetVisible(mixerFillId4, false);
+            SafeSetVisible(plusButtonId4, false);
+            SafeSetVisible(plusButtonHoveredId4, false);
+            SafeSetVisible(minusButtonId4, false);
+            SafeSetVisible(minusButtonHoveredId4, false);
+            SafeSetVisible(defaultButtonId4, false);
+            SafeSetVisible(defaultButtonHoveredId4, false);
+            // Mixer 5 - Mouse Sensitivity
+            SafeSetVisible(mixerFillId5, false);
+            SafeSetVisible(plusButtonId5, false);
+            SafeSetVisible(plusButtonHoveredId5, false);
+            SafeSetVisible(minusButtonId5, false);
+            SafeSetVisible(minusButtonHoveredId5, false);
+            SafeSetVisible(defaultButtonId5, false);
+            SafeSetVisible(defaultButtonHoveredId5, false);
             // Checkboxes
             SafeSetVisible(checkboxMasterUntickedId, false);
             SafeSetVisible(checkboxMasterTickedId, false);
@@ -398,15 +435,10 @@ namespace Game
             SafeSetVisible(checkboxSFXUntickedId, false);
             SafeSetVisible(checkboxSFXTickedId, false);
 
-            // Restore HUD � only if array is initialized (safe during OnStart early call)
             if (hudElementIds != null)
-            {
                 for (int i = 0; i < hudElementIds.Length; i++)
                     SafeSetVisible(hudElementIds[i], true);
-            }
 
-            // Only fire events/cursor change if fully initialized
-            // (prevents side effects when called as a first-frame hide during OnStart)
             if (entitiesFound)
             {
                 GameState.IsPaused = false;
@@ -417,7 +449,6 @@ namespace Game
 
         // =====================================================================
         // HOVER STATES
-        // Uses SetIsVisible instead of SetPosition � no position changes needed.
         // =====================================================================
         private void HandleHoverStates()
         {
@@ -431,16 +462,19 @@ namespace Game
             UpdateButtonHover(minusButtonId2, minusButtonHoveredId2);
             UpdateButtonHover(plusButtonId3, plusButtonHoveredId3);
             UpdateButtonHover(minusButtonId3, minusButtonHoveredId3);
+            UpdateButtonHover(plusButtonId4, plusButtonHoveredId4);
+            UpdateButtonHover(minusButtonId4, minusButtonHoveredId4);
+            UpdateButtonHover(defaultButtonId4, defaultButtonHoveredId4);
+            UpdateButtonHover(plusButtonId5, plusButtonHoveredId5);
+            UpdateButtonHover(minusButtonId5, minusButtonHoveredId5);
+            UpdateButtonHover(defaultButtonId5, defaultButtonHoveredId5);
         }
 
         private void UpdateButtonHover(uint normalId, uint hoveredId)
         {
             if (normalId == 0 || hoveredId == 0) return;
-
             bool isHovered = Collision2D.IsMouseCollidingWithEntity(normalId) ||
                              Collision2D.IsMouseCollidingWithEntity(hoveredId);
-
-            // Show whichever state matches, hide the other
             SpriteRenderer.SetIsVisible(normalId, !isHovered);
             SpriteRenderer.SetIsVisible(hoveredId, isHovered);
         }
@@ -453,7 +487,6 @@ namespace Game
             bool isMousePressed = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
-
             if (!mouseJustPressed) return;
 
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
@@ -465,14 +498,13 @@ namespace Game
 
             if (IsButtonClicked(restartButtonId, restartButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Restart clicked - reloading scene: " + currentGameScenePath);
+                LogMessage("PauseMenuPopup: Restart clicked");
                 StopGroup(AudioType.BGM);
                 StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
                 isPaused = false;
                 GameState.IsPaused = false;
-                bool success = Scene.SceneLoadFromFile(currentGameScenePath);
-                if (success) LogMessage("Restart scene load success.");
+                Scene.SceneLoadFromFile(currentGameScenePath);
                 return;
             }
 
@@ -485,8 +517,7 @@ namespace Game
                 GameState.IsPaused = false;
                 Input.SetCursorVisible(true);
                 Event.Publish(EVENT_GAME_RESUMED, "");
-                bool success = Scene.SceneLoadFromFile(MAIN_MENU_SCENE_PATH);
-                if (success) LogMessage("Main menu load success.");
+                Scene.SceneLoadFromFile(MAIN_MENU_SCENE_PATH);
                 return;
             }
 
@@ -496,99 +527,149 @@ namespace Game
                 return;
             }
 
-            // Master volume +
+            // Master volume +/-
             if (IsButtonClicked(plusButtonId, plusButtonHoveredId))
             {
                 if (Instance != null)
                 {
-                    Instance.SetMasterVolume(Instance.GetMasterVolume() + 0.111f);
-                    UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
-                                         mixerFill1InitialWidth, mixerFill1InitialPosition);
-                    LogMessage("Master Volume: " + Instance.GetMasterVolume().ToString("F2"));
+                    Instance.SetMasterVolume(Instance.GetMasterVolume() + 0.1f);
+                    UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
+                                    mixerFill1InitialWidth, mixerFill1InitialPosition);
                 }
                 return;
             }
-
-            // Master volume -
             if (IsButtonClicked(minusButtonId, minusButtonHoveredId))
             {
                 if (Instance != null)
                 {
-                    Instance.SetMasterVolume(Instance.GetMasterVolume() - 0.111f);
-                    UpdateMixerFillVisual(mixerFillId, Instance.GetMasterVolume(),
-                                         mixerFill1InitialWidth, mixerFill1InitialPosition);
-                    LogMessage("Master Volume: " + Instance.GetMasterVolume().ToString("F2"));
+                    Instance.SetMasterVolume(Instance.GetMasterVolume() - 0.1f);
+                    UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
+                                    mixerFill1InitialWidth, mixerFill1InitialPosition);
                 }
                 return;
             }
 
-            // BGM volume +
+            // BGM volume +/-
             if (IsButtonClicked(plusButtonId2, plusButtonHoveredId2))
             {
                 if (Instance != null)
                 {
-                    Instance.SetBGMVolume(Instance.GetBGMVolume() + 0.111f);
-                    UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
-                                         mixerFill2InitialWidth, mixerFill2InitialPosition);
-                    LogMessage("BGM Volume: " + Instance.GetBGMVolume().ToString("F2"));
+                    Instance.SetBGMVolume(Instance.GetBGMVolume() + 0.1f);
+                    UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
+                                    mixerFill2InitialWidth, mixerFill2InitialPosition);
                 }
                 return;
             }
-
-            // BGM volume -
             if (IsButtonClicked(minusButtonId2, minusButtonHoveredId2))
             {
                 if (Instance != null)
                 {
-                    Instance.SetBGMVolume(Instance.GetBGMVolume() - 0.111f);
-                    UpdateMixerFillVisual(mixerFillId2, Instance.GetBGMVolume(),
-                                         mixerFill2InitialWidth, mixerFill2InitialPosition);
-                    LogMessage("BGM Volume: " + Instance.GetBGMVolume().ToString("F2"));
+                    Instance.SetBGMVolume(Instance.GetBGMVolume() - 0.1f);
+                    UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
+                                    mixerFill2InitialWidth, mixerFill2InitialPosition);
                 }
                 return;
             }
 
-            // SFX volume +
+            // SFX volume +/-
             if (IsButtonClicked(plusButtonId3, plusButtonHoveredId3))
             {
                 if (Instance != null)
                 {
-                    Instance.SetSFXVolume(Instance.GetSFXVolume() + 0.111f);
-                    UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
-                                         mixerFill3InitialWidth, mixerFill3InitialPosition);
-                    LogMessage("SFX Volume: " + Instance.GetSFXVolume().ToString("F2"));
+                    Instance.SetSFXVolume(Instance.GetSFXVolume() + 0.1f);
+                    UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
+                                    mixerFill3InitialWidth, mixerFill3InitialPosition);
                 }
                 return;
             }
-
-            // SFX volume -
             if (IsButtonClicked(minusButtonId3, minusButtonHoveredId3))
             {
                 if (Instance != null)
                 {
-                    Instance.SetSFXVolume(Instance.GetSFXVolume() - 0.111f);
-                    UpdateMixerFillVisual(mixerFillId3, Instance.GetSFXVolume(),
-                                         mixerFill3InitialWidth, mixerFill3InitialPosition);
-                    LogMessage("SFX Volume: " + Instance.GetSFXVolume().ToString("F2"));
+                    Instance.SetSFXVolume(Instance.GetSFXVolume() - 0.1f);
+                    UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
+                                    mixerFill3InitialWidth, mixerFill3InitialPosition);
                 }
                 return;
             }
 
-            // Master mute checkbox
+            // Gamma +/-/default
+            if (IsButtonClicked(plusButtonId4, plusButtonHoveredId4))
+            {
+                if (Instance != null)
+                {
+                    Instance.IncrementGamma();
+                    UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
+                                    mixerFill4InitialWidth, mixerFill4InitialPosition);
+                }
+                return;
+            }
+            if (IsButtonClicked(minusButtonId4, minusButtonHoveredId4))
+            {
+                if (Instance != null)
+                {
+                    Instance.DecrementGamma();
+                    UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
+                                    mixerFill4InitialWidth, mixerFill4InitialPosition);
+                }
+                return;
+            }
+            if (IsButtonClicked(defaultButtonId4, defaultButtonHoveredId4))
+            {
+                if (Instance != null)
+                {
+                    Instance.ResetGamma();
+                    UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
+                                    mixerFill4InitialWidth, mixerFill4InitialPosition);
+                    LogMessage("PauseMenuPopup: Gamma reset to default");
+                }
+                return;
+            }
+
+            // Mouse Sensitivity +/-/default
+            if (IsButtonClicked(plusButtonId5, plusButtonHoveredId5))
+            {
+                if (Instance != null)
+                {
+                    Instance.SetMouseSensitivityUp();
+                    UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
+                                    mixerFill5InitialWidth, mixerFill5InitialPosition);
+                }
+                return;
+            }
+            if (IsButtonClicked(minusButtonId5, minusButtonHoveredId5))
+            {
+                if (Instance != null)
+                {
+                    Instance.SetMouseSensitivityDown();
+                    UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
+                                    mixerFill5InitialWidth, mixerFill5InitialPosition);
+                }
+                return;
+            }
+            if (IsButtonClicked(defaultButtonId5, defaultButtonHoveredId5))
+            {
+                if (Instance != null)
+                {
+                    Instance.ResetMouseSensitivity();
+                    UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
+                                    mixerFill5InitialWidth, mixerFill5InitialPosition);
+                    LogMessage("PauseMenuPopup: Mouse sensitivity reset to default");
+                }
+                return;
+            }
+
+            // Checkboxes
             if (IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId))
             {
                 if (Instance != null) { Instance.ToggleMasterMute(); UpdateCheckboxVisuals(); }
                 return;
             }
-
-            // BGM mute checkbox
             if (IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId))
             {
                 if (Instance != null) { Instance.ToggleBGMMute(); UpdateCheckboxVisuals(); }
                 return;
             }
-
-            // SFX mute checkbox
             if (IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId))
             {
                 if (Instance != null) { Instance.ToggleSFXMute(); UpdateCheckboxVisuals(); }
@@ -609,45 +690,44 @@ namespace Game
         }
 
         // =====================================================================
-        // CHECKBOX VISUALS � show ticked or unticked based on mute state
+        // CHECKBOX VISUALS
         // =====================================================================
         private void UpdateCheckboxVisuals()
         {
             if (Instance == null) return;
-
             bool masterMuted = Instance.IsMasterMuted();
             SpriteRenderer.SetIsVisible(checkboxMasterTickedId, masterMuted);
             SpriteRenderer.SetIsVisible(checkboxMasterUntickedId, !masterMuted);
-
             bool bgmMuted = Instance.IsBGMMuted();
             SpriteRenderer.SetIsVisible(checkboxBGMTickedId, bgmMuted);
             SpriteRenderer.SetIsVisible(checkboxBGMUntickedId, !bgmMuted);
-
             bool sfxMuted = Instance.IsSFXMuted();
             SpriteRenderer.SetIsVisible(checkboxSFXTickedId, sfxMuted);
             SpriteRenderer.SetIsVisible(checkboxSFXUntickedId, !sfxMuted);
         }
 
         // =====================================================================
-        // MIXER BAR VISUAL � adjusts height based on volume
+        // MIXER FILL - matches SettingsPopup logic exactly
+        // Shrinks X scale, shifts X by full widthDiff to anchor right edge
         // =====================================================================
-        private void UpdateMixerFillVisual(uint fillId, float volume, float initialHeight, Vector3 initialPosition)
+        private void UpdateMixerFill(uint fillId, float volume, float initialWidth, Vector3 initialPosition)
         {
             if (fillId == 0) return;
 
-            volume = volume < 0.0f ? 0.0f : (volume > 1.0f ? 1.0f : volume);
+            if (volume < 0.0f) volume = 0.0f;
+            if (volume > 1.0f) volume = 1.0f;
 
-            float newHeight = initialHeight * volume;
+            float newWidth = initialWidth * volume;
             Vector3 currentScale = GetScale(fillId);
-            Vector3 newScale = new Vector3(currentScale.X, newHeight, currentScale.Z);
+            Vector3 newScale = new Vector3(newWidth, currentScale.Y, currentScale.Z);
             SetScale(fillId, ref newScale);
 
-            float heightDiff = initialHeight - newHeight;
-            Vector3 newPos = new Vector3(initialPosition.X, initialPosition.Y + heightDiff, initialPosition.Z);
+            float widthDiff = initialWidth - newWidth;
+            Vector3 newPos = new Vector3(initialPosition.X - widthDiff, initialPosition.Y, initialPosition.Z);
             SetPosition(fillId, ref newPos);
 
-            LogMessage("UpdateMixerFill: Volume=" + volume.ToString("F2") +
-                       " Height=" + newHeight.ToString("F1"));
+            LogMessage("PauseMenuPopup MixerFill: volume=" + volume.ToString("F2") +
+                       " width=" + newWidth.ToString("F1") + " posX=" + newPos.X.ToString("F1"));
         }
 
         // =====================================================================
