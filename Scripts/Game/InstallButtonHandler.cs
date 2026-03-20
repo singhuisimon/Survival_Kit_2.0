@@ -30,7 +30,7 @@ namespace Game
         private const string BSOD_ERROR_SOUND_NAME = "UI BSOD Error Sound";
 
         private const string TRENCH_RUN_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
-        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
+        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_graphic_card.json";
         private const int NUM_ERROR_POPUPS = 8;
 
         private const float HIDDEN_Y = -500.0f;

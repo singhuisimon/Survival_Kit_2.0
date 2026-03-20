@@ -3,19 +3,19 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 0,
+            "ID": 2,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Audio_Tick_Damage",
-                        "Tag": "Audio_Tick_Damage"
+                        "Name": "Audio_DestructableWall",
+                        "Tag": "Audio_DestructableWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "10531369277471621273",
+                        "ComponentGUID": "3959597086063100103",
                         "Position": [
                             0.0,
                             0.0,
@@ -38,16 +38,16 @@
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "5343222506741170331",
-                        "FilePath": "Player Collide Damage.wav",
+                        "ComponentGUID": "17218194389042200777",
+                        "FilePath": "Destructible Wall Destroyed.wav",
                         "Type": 5,
-                        "State": 2,
+                        "State": 0,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": false,
+                        "Is3D": true,
                         "MinDistance": 1.0,
                         "MaxDistance": 100.0,
                         "RolloffMode": 0,
@@ -58,8 +58,8 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "12837212286685986973",
-                        "ScriptClassName": "Game.GameDelaySoundPrefab"
+                        "ComponentGUID": "13182969122918334667",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
                     }
                 }
             ]
@@ -122,6 +122,68 @@
                     "Properties": {
                         "ComponentGUID": "12879512707907649703",
                         "ScriptClassName": "Game.AudioPrimaryBullet"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_Tick_Damage",
+                        "Tag": "Audio_Tick_Damage"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10531369277471621273",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "5343222506741170331",
+                        "FilePath": "Player Collide Damage.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "12837212286685986973",
+                        "ScriptClassName": "Game.GameDelaySoundPrefab"
                     }
                 }
             ]
