@@ -35,7 +35,7 @@ namespace Engine
                     case 3: ApplyCustomTheme();          break;
                 }
 
-                float currentScale = m_Editor->GetFontScale();
+                //float currentScale = m_Editor->GetFontScale();
                 if (currentScale != 1.0f) {
                     ImGui::GetStyle().ScaleAllSizes(currentScale);
                 }
@@ -68,7 +68,7 @@ namespace Engine
                     case 3: ApplyCustomTheme(); break;
                 }
 
-                float currentScale = m_Editor->GetFontScale();
+                //float currentScale = m_Editor->GetFontScale();
                 if (currentScale != 1.0f) {
                     ImGui::GetStyle().ScaleAllSizes(currentScale);
                 }

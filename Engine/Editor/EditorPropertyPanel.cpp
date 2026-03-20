@@ -415,7 +415,7 @@ namespace Engine
 	void EditorPropertyPanel::DisplayRigidBodyComponent(ImVec2& buttonSize){
 		if (m_SelectedEntity.HasComponent<RigidbodyComponent>())
 		{
-			float scale = m_Editor->GetFontScale();
+			//float scale = m_Editor->GetFontScale();
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, false);
 			ImGui::SetColumnWidth(0, headerWidth);
