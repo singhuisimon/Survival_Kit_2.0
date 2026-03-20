@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_CorruptCoreDestroyed.prefab",
-    "Prefab GUID": 16736564315721400481,
+    "Prefab GUID": 10321608859022950561,
     "version": 2,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "Corrupted Core Destroy.wav",
                             "Type": 5,
                             "State": 0,
-                            "Volume": 0.8500000238418579,
+                            "Volume": 1.399999976158142,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
