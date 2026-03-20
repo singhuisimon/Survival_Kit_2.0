@@ -124,7 +124,7 @@ namespace Game
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
 
-        // Mixer initial X scales and positions (horizontal fill, anchored right)
+        // Mixer initial X scales and positions
         private float mixerFill1InitialWidth;
         private float mixerFill2InitialWidth;
         private float mixerFill3InitialWidth;
@@ -532,9 +532,12 @@ namespace Game
             {
                 if (Instance != null)
                 {
-                    Instance.SetMasterVolume(Instance.GetMasterVolume() + 0.1f);
+                    float v = Instance.GetMasterVolume() + 0.1f;
+                    if (v > 1.0f) v = 1.0f;
+                    Instance.SetMasterVolume(v);
                     UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
                                     mixerFill1InitialWidth, mixerFill1InitialPosition);
+                    LogMessage("PauseMenuPopup: Master Volume = " + Instance.GetMasterVolume().ToString("F2"));
                 }
                 return;
             }
@@ -542,9 +545,12 @@ namespace Game
             {
                 if (Instance != null)
                 {
-                    Instance.SetMasterVolume(Instance.GetMasterVolume() - 0.1f);
+                    float v = Instance.GetMasterVolume() - 0.1f;
+                    if (v < 0.0f) v = 0.0f;
+                    Instance.SetMasterVolume(v);
                     UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
                                     mixerFill1InitialWidth, mixerFill1InitialPosition);
+                    LogMessage("PauseMenuPopup: Master Volume = " + Instance.GetMasterVolume().ToString("F2"));
                 }
                 return;
             }
@@ -554,9 +560,12 @@ namespace Game
             {
                 if (Instance != null)
                 {
-                    Instance.SetBGMVolume(Instance.GetBGMVolume() + 0.1f);
+                    float v = Instance.GetBGMVolume() + 0.1f;
+                    if (v > 1.0f) v = 1.0f;
+                    Instance.SetBGMVolume(v);
                     UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
                                     mixerFill2InitialWidth, mixerFill2InitialPosition);
+                    LogMessage("PauseMenuPopup: BGM Volume = " + Instance.GetBGMVolume().ToString("F2"));
                 }
                 return;
             }
@@ -564,9 +573,12 @@ namespace Game
             {
                 if (Instance != null)
                 {
-                    Instance.SetBGMVolume(Instance.GetBGMVolume() - 0.1f);
+                    float v = Instance.GetBGMVolume() - 0.1f;
+                    if (v < 0.0f) v = 0.0f;
+                    Instance.SetBGMVolume(v);
                     UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
                                     mixerFill2InitialWidth, mixerFill2InitialPosition);
+                    LogMessage("PauseMenuPopup: BGM Volume = " + Instance.GetBGMVolume().ToString("F2"));
                 }
                 return;
             }
@@ -576,9 +588,12 @@ namespace Game
             {
                 if (Instance != null)
                 {
-                    Instance.SetSFXVolume(Instance.GetSFXVolume() + 0.1f);
+                    float v = Instance.GetSFXVolume() + 0.1f;
+                    if (v > 1.0f) v = 1.0f;
+                    Instance.SetSFXVolume(v);
                     UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
                                     mixerFill3InitialWidth, mixerFill3InitialPosition);
+                    LogMessage("PauseMenuPopup: SFX Volume = " + Instance.GetSFXVolume().ToString("F2"));
                 }
                 return;
             }
@@ -586,9 +601,12 @@ namespace Game
             {
                 if (Instance != null)
                 {
-                    Instance.SetSFXVolume(Instance.GetSFXVolume() - 0.1f);
+                    float v = Instance.GetSFXVolume() - 0.1f;
+                    if (v < 0.0f) v = 0.0f;
+                    Instance.SetSFXVolume(v);
                     UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
                                     mixerFill3InitialWidth, mixerFill3InitialPosition);
+                    LogMessage("PauseMenuPopup: SFX Volume = " + Instance.GetSFXVolume().ToString("F2"));
                 }
                 return;
             }
@@ -601,6 +619,7 @@ namespace Game
                     Instance.IncrementGamma();
                     UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
                                     mixerFill4InitialWidth, mixerFill4InitialPosition);
+                    LogMessage("PauseMenuPopup: Gamma = " + Instance.GetGamma().ToString("F1"));
                 }
                 return;
             }
@@ -611,6 +630,7 @@ namespace Game
                     Instance.DecrementGamma();
                     UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
                                     mixerFill4InitialWidth, mixerFill4InitialPosition);
+                    LogMessage("PauseMenuPopup: Gamma = " + Instance.GetGamma().ToString("F1"));
                 }
                 return;
             }
@@ -634,6 +654,7 @@ namespace Game
                     Instance.SetMouseSensitivityUp();
                     UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
                                     mixerFill5InitialWidth, mixerFill5InitialPosition);
+                    LogMessage("PauseMenuPopup: MouseSens = " + Instance.GetMouseSensitivity().ToString("F2"));
                 }
                 return;
             }
@@ -644,6 +665,7 @@ namespace Game
                     Instance.SetMouseSensitivityDown();
                     UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
                                     mixerFill5InitialWidth, mixerFill5InitialPosition);
+                    LogMessage("PauseMenuPopup: MouseSens = " + Instance.GetMouseSensitivity().ToString("F2"));
                 }
                 return;
             }
@@ -707,7 +729,7 @@ namespace Game
         }
 
         // =====================================================================
-        // MIXER FILL - matches SettingsPopup logic exactly
+        // MIXER FILL - matches SettingsPopup logic
         // Shrinks X scale, shifts X by full widthDiff to anchor right edge
         // =====================================================================
         private void UpdateMixerFill(uint fillId, float volume, float initialWidth, Vector3 initialPosition)
