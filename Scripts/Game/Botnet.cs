@@ -117,6 +117,7 @@ namespace Game
 
         // Damage
         private bool deliveredDamage = false;
+        private bool hasPublishedBotnetDeath = false;
 
         // ===== Lifecycle =====
 
@@ -124,16 +125,13 @@ namespace Game
         {
             LogMessage("=== Botnet started (EntityID = " + EntityID.ToString() + ") ===");
 
-            // Seed RNG
             s_RngState ^= (uint)EntityID * 747796405u + 2891336453u;
 
-            // Setup rigidbody (wrapped)
             EntityAddRigidBody((uint)EntityID);
             RigidbodySetIsKinematic((uint)EntityID, false);
             RigidbodySetUseGravity((uint)EntityID, false);
             RigidbodySetMass((uint)EntityID, 1.0f);
 
-            // Reset runtime state
             isDead = false;
             isExploding = false;
             isMoving = false;
@@ -143,11 +141,10 @@ namespace Game
             stunTimer = 0.0f;
 
             hasChosenInitialTarget = false;
+            hasPublishedBotnetDeath = false;
 
-            // Register itself into the enemy registry
             EnemyRegistry.Register(EntityID);
 
-            // Immediate attempt (no busy-wait loops)
             chooseTargetTimer = 0.0f;
             ChooseTarget();
             hasChosenInitialTarget = true;
@@ -160,7 +157,6 @@ namespace Game
             else
             {
                 isMoving = false;
-                // keep chooseTargetTimer at 0 so OnUpdate retries next frame
             }
 
             EVENT_BULLET_HIT += EntityID.ToString();
@@ -168,7 +164,6 @@ namespace Game
             Subscribe(EVENT_BULLET_HIT, OnBulletHit);
             Subscribe(EVENT_GAME_OVER, OnGameEnd);
             Subscribe(EVENT_GAME_WIN, OnGameEnd);
-            //Subscribe(EVENT_SPAWN_DISABLE, OnSpawnDisable);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -258,41 +253,31 @@ namespace Game
 
         private void OnBulletHit(string eventName, string payload)
         {
-            // if (isDead || eventName != EVENT_BULLET_HIT)
-            //     return;
-
-            // if (!uint.TryParse(payload, out uint hitId))
-            //     return;
-
-            // if (hitId != (uint)EntityID){
-            //     LogMessage("[Botnet] ID DOESN'T MATCH HIT!");
-            //     return;
-            // }
-
-            // HP -= 1.0f;
+            if (isDead)
+                return;
 
             float damage = DamageSystem.ParseAmount(payload);
             HP -= damage;
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
-            if(attackerId != INVALID_ENTITY){
+            if (attackerId != INVALID_ENTITY)
+            {
                 string attackerTag = TagGetTag(attackerId);
-                if(attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET){
-                    //add the lastKillerTag for Vampirisim
+                if (attackerTag == TAG_PRIMARY_BULLET || attackerTag == TAG_SECONDARY_BULLET)
+                {
                     lastKillerTag = attackerTag;
-                    //instantiate the hitmarker audio
 
-                    if(HP > 0.0f){
-                        uint hitmarkerID = 0;
-                        hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
-                        if(hitmarkerID == 0){
+                    if (HP > 0.0f)
+                    {
+                        uint hitmarkerID = PrefabInstantiate(hitmarkerAudioPrefab);
+                        if (hitmarkerID == 0)
+                        {
                             LogMessage("[Botnet] Player Hit! But hitmarkerID fail to instantiate");
                         }
                     }
                 }
             }
 
-            // Reset hit sparks timer and begin new cycle of hit sparks
             if (hitSparksTimer <= 0.0f)
             {
                 hitSparksTimer = 0.3f;
@@ -302,28 +287,35 @@ namespace Game
                 isHitSparks = false;
             }
 
-            // Enemy hit sparks VFX
             if (enemyHitSparksID == INVALID_ENTITY && isHitSparks == false)
             {
                 enemyHitSparksID = PrefabInstantiate(enemyHitSparksPrefabPath);
                 isHitSparks = true;
             }
+
             Vector3 botnetID = GetPosition(EntityID);
             Transform.SetPosition(enemyHitSparksID, ref botnetID);
-
 
             LogMessage("[Botnet] CurrentBotnetHP is: " + HP.ToString());
             LogMessage("[Botnet] SUCCESS MATCH! REDUCING HEALTH!");
 
             if (HP <= 0.0f)
             {
-                uint playerkillID = 0;
-                playerkillID = PrefabInstantiate(playerKillPrefab);
-                if(playerkillID == 0){
-                    LogMessage("[Botnet] Player Kill Botnet! But playerkillID fail to instantiate");
+                HP = 0.0f;
+
+                if (!hasPublishedBotnetDeath)
+                {
+                    hasPublishedBotnetDeath = true;
+
+                    uint playerkillID = PrefabInstantiate(playerKillPrefab);
+                    if (playerkillID == 0)
+                    {
+                        LogMessage("[Botnet] Player Kill Botnet! But playerkillID fail to instantiate");
+                    }
+
+                    Publish("BotnetDeath", "killer=" + lastKillerTag);
                 }
 
-                Publish("BotnetDeath","killer=" + lastKillerTag);
                 Explode();
             }
         }

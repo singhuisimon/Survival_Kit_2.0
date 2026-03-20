@@ -1,0 +1,119 @@
+{
+    "Prefab Name": "Prefab: Audio_PrimaryFire.prefab",
+    "Prefab GUID": 3756987878261866661,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Audio_PrimaryFire",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15185355717120606371",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17112887561703625017",
+                            "Name": "Audio_PrimaryFire",
+                            "Tag": "Audio_PrimaryFire"
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "395525744904950095",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1926758414142439589",
+                            "FilePath": "Player Primary Fire 6.wav",
+                            "Type": 5,
+                            "State": 2,
+                            "Volume": 0.45100000500679016,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 201.9600067138672,
+                            "MaxDistance": 610.239013671875,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12879512707907649703",
+                            "ScriptClassName": "Game.GameDelaySoundPrefab",
+                            "Started": false,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

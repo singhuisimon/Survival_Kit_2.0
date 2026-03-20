@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Prefab: Audio_DestructableWall.prefab",
+    "Prefab GUID": 14273455959270113441,
+    "version": 2,
+    "entities": [
+        {
+            "Name": "Audio_DestructableWall",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3959597086063100103",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9147743856793911493",
+                            "Name": "Audio_DestructableWall",
+                            "Tag": "Audio_DestructableWall"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17218194389042200777",
+                            "FilePath": "Destructible Wall Destroyed.wav",
+                            "Type": 5,
+                            "State": 0,
+                            "Volume": 2.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 10.302000045776367,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13182969122918334667",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

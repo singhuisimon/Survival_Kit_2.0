@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 15036701734329761987,
-    "version": 1,
+    "Prefab GUID": 10130689659718419969,
+    "version": 2,
     "entities": [
         {
             "Name": "botnet",
@@ -108,14 +108,14 @@
                             "FilePath": "Botnet_Ambient.wav",
                             "Type": 5,
                             "State": 0,
-                            "Volume": 1.0329999923706057,
+                            "Volume": 1.3049999475479126,
                             "Pitch": 1.0,
                             "Loop": true,
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 31.780000686645508,
-                            "MaxDistance": 276.7699890136719,
+                            "MinDistance": 1.8960000276565552,
+                            "MaxDistance": 10.347000122070313,
                             "RolloffMode": 0,
                             "DopplerLevel": 1.003999948501587,
                             "Pan2D": 0.0
@@ -130,7 +130,7 @@
                             "ComponentGUID": "11007352189747626285",
                             "ScriptClassName": "Game.Botnet",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 2499
                         }
                     }
                 }

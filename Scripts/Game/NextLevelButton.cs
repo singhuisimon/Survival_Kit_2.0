@@ -10,7 +10,7 @@ namespace Game
 {
     public class NextLevelButton : ScriptBehaviour
     {
-        private const string LEVEL_2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
+        private const string LEVEL_2_SCENE_PATH = "Resources/Sources/Scenes/level2_graphic_card.json";
         private const string FALLBACK_SCENE_PATH = "Resources/Sources/Scenes/MainMenu.json";
         private const string EVENT_WIN_SHOW = "WinScreenShow";
         private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
