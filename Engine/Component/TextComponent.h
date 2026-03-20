@@ -91,15 +91,15 @@ namespace Engine {
 		}
 
 		void setVisible(bool visible) {
+			setAlpha(visible ? 1.0f : 0.0f);
+		}
 
-			isVisible = visible;
-			if (visible) {
-				//can see -> restore alpha to 1
-				color[3] = 1.0f; 
+		void setAlpha(float value) {
+			color[3] = glm::clamp(value, 0.0f, 1.0f);
+			if (color[3] == 0.0f) {
+				isVisible = false;
 			}
-			else {
-				color[3] = 0.0f; //invisible
-			}
+			else isVisible = true;
 		}
 
 		bool isShown() const {
@@ -113,6 +113,10 @@ namespace Engine {
 
 		float getWidth() const {
 			return bounds.z;
+		}
+
+		float getAlpha() const {
+			return color[3];
 		}
 
 		const std::string& getText() const { return text; }
