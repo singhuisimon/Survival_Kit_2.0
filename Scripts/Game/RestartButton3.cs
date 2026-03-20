@@ -8,9 +8,9 @@ using static Engine.Transform;
 
 namespace Game
 {
-    public class RestartButton2 : ScriptBehaviour
+    public class RestartButton3 : ScriptBehaviour
     {
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level2_graphic_card.json";
+        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/level3_motherboard.json";
         //private const string EVENT_WIN_SHOW = "WinScreenShow";
         //private const string EVENT_BUTTONS_FADED = "WinButtonsFaded";
         private const string EVENT_LOSE_SHOW = "LoseScreenShow";
@@ -25,22 +25,22 @@ namespace Game
 
         public override void OnStart()
         {
-            LogMessage("=== RestartButton2 OnStart ===");
+            LogMessage("=== RestartButton3 OnStart ===");
             //Event.Subscribe(EVENT_WIN_SHOW, OnWinCondition);
             Event.Subscribe(EVENT_LOSE_SHOW, OnLoseCondition);
             SetIsVisible((uint)EntityID, false);
-            LogMessage("[RestartButton2] Initialized");
+            LogMessage("[RestartButton3] Initialized");
         }
 
         private void OnLoseCondition(string eventName, string payload)
         {
-            LogMessage("[RestartButton2] Lose condition - starting fade");
+            LogMessage("[RestartButton3] Lose condition - starting fade");
             StartFade();
         }
 
         private void OnWinCondition(string eventName, string payload)
         {
-            LogMessage("[RestartButton2] Win condition - starting fade");
+            LogMessage("[RestartButton3] Win condition - starting fade");
             StartFade();
         }
 
@@ -67,7 +67,7 @@ namespace Game
                     isFading = false;
                     isButtonActive = true;
                     //Event.Publish(EVENT_BUTTONS_FADED, "");
-                    LogMessage("[RestartButton2] Fade complete");
+                    LogMessage("[RestartButton3] Fade complete");
                 }
             }
 
@@ -87,7 +87,7 @@ namespace Game
 
             if (Collision2D.IsMouseCollidingWithEntity((uint)EntityID))
             {
-                LogMessage("[RestartButton2] Clicked - reloading scene");
+                LogMessage("[RestartButton3] Clicked - reloading scene");
                 AudioManager.StopGroup(AudioType.BGM);
                 AudioManager.StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
@@ -99,7 +99,7 @@ namespace Game
         {
             Event.Unsubscribe(EVENT_LOSE_SHOW, OnLoseCondition);
            // Event.Unsubscribe(EVENT_WIN_SHOW, OnWinCondition);
-            LogMessage("=== RestartButton2 Destroyed ===");
+            LogMessage("=== RestartButton3 Destroyed ===");
         }
     }
 }
