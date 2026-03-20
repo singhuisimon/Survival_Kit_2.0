@@ -20,6 +20,7 @@ namespace Game
         //private bool isInvulnerable = true;
 
         private string EnemyCore_ExplosionPrefab = "Sources/Prefabs/EnemyCoreExplosion.prefab";
+        private string EnemyCore_CorruptAudioPrefab = "Sources/Prefabs/Audio_CorruptCoreDestroyed.prefab";
 
         private string EVENT_ENEMYCORE_HIT = "Damage:";
 
@@ -110,6 +111,15 @@ namespace Game
                 return;
             } else {
                 LogMessage("[EnemyCore] Instantiating EnemyCore_ExplosionPrefab success! ID is: " + explosion.ToString());
+            }
+
+            // Spawn the audio
+            uint audioID = 0;
+            audioID = PrefabInstantiate(EnemyCore_CorruptAudioPrefab);
+            if(audioID == 0){
+                LogMessage("[EnemyCore] Failed to instantiate audio after death");
+            } else {
+                LogMessage("[EnemyCore] Succeed in intantiating EnemyCore_CorruptAudioPrefab");
             }
 
             Publish("EnemyCoreDeath", "");

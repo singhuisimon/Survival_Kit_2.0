@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: EnemyCoreExplosion.prefab",
-    "Prefab GUID": 15936084598191899897,
+    "Prefab GUID": 10790607742838505635,
     "version": 1,
     "entities": [
         {
@@ -40,30 +40,8 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "3557307703596712125",
+                            "Name": "EnemyCoreExplosion",
                             "Tag": "EnemyCoreExplosion"
-                        }
-                    }
-                },
-                {
-                    "type": 9,
-                    "typeName": "AudioComponent",
-                    "data": {
-                        "Properties": {
-                            "ComponentGUID": "98543189776515265",
-                            "FilePath": "Core Destruction.wav",
-                            "Type": 1,
-                            "State": 0,
-                            "Volume": 1.0,
-                            "Pitch": 1.0,
-                            "Loop": false,
-                            "Mute": false,
-                            "ReverbProperties": 1.0,
-                            "Is3D": true,
-                            "MinDistance": 51.75299835205078,
-                            "MaxDistance": 552.2169799804688,
-                            "RolloffMode": 0,
-                            "DopplerLevel": 1.0,
-                            "Pan2D": 0.0
                         }
                     }
                 },
@@ -75,7 +53,7 @@
                             "ComponentGUID": "17968826511183839471",
                             "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 187
+                            "GCHandle": 0
                         }
                     }
                 }

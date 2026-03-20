@@ -12,6 +12,7 @@ namespace Game
     {
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
+        private const string EVENT_ENDSOUND1 = "EndSound1Played";
         private const string GAMEWIN = "GameWin";
         private const string WIN_SCREEN_SHOW = "WinScreenShow";
 
@@ -46,6 +47,7 @@ namespace Game
 
             Event.Subscribe(EVENT_TIMER_FINISHED, OnLevel2Win);
             Event.Subscribe(ENEMY_CORE_DEATH, OnTrenchWin);
+            Event.Subscribe(EVENT_ENDSOUND1, OnTrenchAudioEnd);
 
             SetIsVisible((uint)EntityID, false);
 
@@ -100,10 +102,10 @@ namespace Game
         private void OnTrenchWin(string eventName, string payload)
         {
             LogMessage("[WinScreen] Win! Trench run finished!");
-            StopGroup(AudioType.MASTER);
-            winVOPrefab = winTrenchVOPrefab;
-            countdownstart = true;
-            countdown = countdowntrench;
+            // StopGroup(AudioType.MASTER);
+            // winVOPrefab = winTrenchVOPrefab;
+            // countdownstart = true;
+            // countdown = countdowntrench;
             Input.SetCursorVisible(true);
 
             SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
@@ -139,10 +141,19 @@ namespace Game
             showDelayTimer = showDelay;
         }
 
+        private void OnTrenchAudioEnd(string eventName, string payload){
+            LogMessage("[WinScreen] Trench ended already stopping audio then playing");
+            StopGroup(AudioType.MASTER);
+            winVOPrefab = winTrenchVOPrefab;
+            countdownstart = true;
+            countdown = countdowntrench;
+        }
+
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnLevel2Win);
             Event.Unsubscribe(ENEMY_CORE_DEATH, OnTrenchWin);
+            Event.Unsubscribe(EVENT_ENDSOUND1, OnTrenchAudioEnd);
             LogMessage("=== WinScreen Destroyed ===");
         }
     }
