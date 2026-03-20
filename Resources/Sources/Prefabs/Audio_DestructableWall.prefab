@@ -1,7 +1,7 @@
 {
-    "Prefab Name": "Audio_DestructableWall",
-    "Prefab GUID": 2806675581457891535,
-    "version": 1,
+    "Prefab Name": "Prefab: Audio_DestructableWall.prefab",
+    "Prefab GUID": 14273455959270113441,
+    "version": 2,
     "entities": [
         {
             "Name": "Audio_DestructableWall",
@@ -54,11 +54,11 @@
                             "FilePath": "Destructible Wall Destroyed.wav",
                             "Type": 5,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 2.0,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
-                            "ReverbProperties": 0.0,
+                            "ReverbProperties": 1.0,
                             "Is3D": true,
                             "MinDistance": 10.302000045776367,
                             "MaxDistance": 100.0,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "13182969122918334667",
                             "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 19
                         }
                     }
                 }
