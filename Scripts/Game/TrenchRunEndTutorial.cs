@@ -29,7 +29,7 @@ namespace Game
         [SerializeField] private string upgradeModuleLabelPrefab = "Sources/Prefabs/UpgradeModuleLabel.prefab";
         private string sentryPrefab = "Sources/Prefabs/NormalSentry.prefab";
         private string sentrySpawnPrefab = "Sources/Prefabs/SentrySpawn.prefab";
-        private string turretPrefab = "Sources/Prefabs/EnemyTurret.prefab";
+        private string turretPrefab = "Sources/Prefabs/Keylogger_TrenchEnd.prefab";
         private uint spawnedPayloadID = INVALID_ENTITY;
         private uint labelEntityID = INVALID_ENTITY;
 
@@ -38,7 +38,7 @@ namespace Game
         private bool hasSpawnedSentry = false;
         private bool hasSpawnedTurret = false;
         private float countdown = 3.0f;
-        private float turretWaitCountdown = 25.0f;
+        private float turretWaitCountdown = 5.0f;
 
         // Lifecycle
        public override void OnStart()
@@ -66,7 +66,12 @@ namespace Game
 
             if (hasSpawnedSentry && !hasSpawnedTurret)
             {
-                SpawnTurret();
+                turretWaitCountdown -= deltaTime;
+
+                if (turretWaitCountdown <= 0.0f)
+                {
+                    SpawnTurret();
+                }
                 
             }
         }
@@ -121,13 +126,13 @@ namespace Game
             RigidbodySetBoxHalfExtents(payload, ref halfboxExtend);
 
             // Spawn label
-            Vector3 labelPos = new Vector3(spawnPos.X, spawnPos.Y + 30f, spawnPos.Z);
+            Vector3 labelPos = new Vector3(spawnPos.X, -375.182f , spawnPos.Z);
             Quat identityRot = new Quat(0f, 0f, 0f, 1f);
             Vector3 labelScale = new Vector3(50.0f, 21.0f, 1.0f);
 
             labelEntityID = PrefabInstantiateWithTransform(
                 upgradeModuleLabelPrefab,
-                ref spawnPos,
+                ref labelPos,
                 ref identityRot,
                 ref labelScale,
                 false

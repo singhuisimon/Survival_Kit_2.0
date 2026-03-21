@@ -148,7 +148,7 @@ namespace Game
                 LogMessage("[EnemyCore] Succeed in intantiating EnemyCore_CorruptAudioPrefab");
             }
 
-            Publish("EnemyCoreDeath", "");
+            //Publish("EnemyCoreDeath", "");
 
             SceneDestroyEntity((uint)EntityID);            
         }

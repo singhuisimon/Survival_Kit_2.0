@@ -40,7 +40,7 @@ namespace Game
         private bool initialized = false;
 
         // List of enemies to verify and target
-        private readonly string[] enemyTags = { "botnet" , "WormHost" , "loveletter" };
+        private readonly string[] enemyTags = { "botnet" , "WormHost" , "loveletter", "EnemyTurret" };
         
         private string GAMEOVEREVENT = "GameOver";
         private string GAMEWINEVENT = "GameWin";
