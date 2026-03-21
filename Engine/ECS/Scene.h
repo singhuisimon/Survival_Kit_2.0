@@ -198,7 +198,7 @@ namespace Engine {
 
         // Get scene setting
         SceneSettings& GetSceneSetting() { return m_Settings; }
-
+        const std::string& GetFilePath() const { return m_CurrentFilePath; }
         /**
   * @brief Find an entity by its tag/name
   * @param name The tag/name to search for
@@ -213,7 +213,7 @@ namespace Engine {
         entt::registry m_Registry;
         SystemRegistry m_SystemRegistry;
         SceneSettings m_Settings;
-
+        std::string m_CurrentFilePath;
         friend class SceneSerializer;
     };
 

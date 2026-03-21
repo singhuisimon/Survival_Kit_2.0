@@ -53,10 +53,10 @@ namespace Engine
 
 		PlayState GetPlayState() const { return m_PlayState; }
 
-		void SetOriginalScene(const std::string& path, const std::string& name) {
+		/*void SetOriginalScene(const std::string& path, const std::string& name) {
 			m_OriginalScenePath = path;
 			m_OriginalSceneName = name;
-		}
+		}*/
 
 		ImGuizmo::OPERATION GetOperation() { return m_Operation; }
 		void SetOperation(ImGuizmo::OPERATION operation) { m_Operation = operation; }

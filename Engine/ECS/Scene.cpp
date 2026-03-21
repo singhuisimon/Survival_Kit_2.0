@@ -50,38 +50,42 @@ namespace Engine {
         Engine::m_AnimatorControllerStorage.clear();
 
         //// Reload animation clips for new scene
-        //const std::string clipsDir = Engine::getAssetFilePath("Sources/AnimationClips");
-        //if (std::filesystem::exists(clipsDir))
-        //{
-        //    for (const auto& entry : std::filesystem::directory_iterator(clipsDir))
-        //    {
-        //        if (!entry.is_regular_file()) continue;
-        //        if (entry.path().extension() == ".animclip")
-        //        {
-        //            Engine::AnimationClip clip;
-        //            if (Engine::DeserializeAnimationClip(entry.path().string(), clip))
-        //                Engine::m_AnimationClipStorage[clip.id] = clip;
-        //        }
-        //    }
-        //}
+        const std::string clipsDir = Engine::getAssetFilePath("Sources/AnimationClips");
+        if (std::filesystem::exists(clipsDir))
+        {
+            for (const auto& entry : std::filesystem::directory_iterator(clipsDir))
+            {
+                if (!entry.is_regular_file()) continue;
+                if (entry.path().extension() == ".animclip")
+                {
+                    Engine::AnimationClip clip;
+                    if (Engine::DeserializeAnimationClip(entry.path().string(), clip))
+                        Engine::m_AnimationClipStorage[clip.id] = clip;
+                }
+            }
+        }
 
-        //const std::string ctrlDir = Engine::getAssetFilePath("Sources/AnimationControllers");
-        //if (std::filesystem::exists(ctrlDir))
-        //{
-        //    for (const auto& entry : std::filesystem::directory_iterator(ctrlDir))
-        //    {
-        //        if (!entry.is_regular_file()) continue;
-        //        if (entry.path().extension() == ".animcontroller")
-        //        {
-        //            Engine::AnimatorController ctrl;
-        //            if (Engine::DeserializeAnimationController(entry.path().string(), ctrl))
-        //                Engine::m_AnimatorControllerStorage[ctrl.id] = ctrl;
-        //        }
-        //    }
-        //}
-
+        const std::string ctrlDir = Engine::getAssetFilePath("Sources/AnimationControllers");
+        if (std::filesystem::exists(ctrlDir))
+        {
+            for (const auto& entry : std::filesystem::directory_iterator(ctrlDir))
+            {
+                if (!entry.is_regular_file()) continue;
+                if (entry.path().extension() == ".animcontroller")
+                {
+                    Engine::AnimatorController ctrl;
+                    if (Engine::DeserializeAnimationController(entry.path().string(), ctrl))
+                        Engine::m_AnimatorControllerStorage[ctrl.id] = ctrl;
+                }
+            }
+        }
         SceneSerializer serializer(this);
-        return serializer.Deserialize(filepath);
+        bool result = serializer.Deserialize(filepath);
+        if (result) {
+            m_CurrentFilePath = filepath; 
+        }
+        return result;
+
     }
 
     //Entity Scene::CreateEntityFromPrefab(
@@ -145,16 +149,16 @@ namespace Engine {
 
  
     Entity Scene::InstantiateScenePrefab(std::string filepath, Entity parent) {
-        Engine::m_AnimationClipStorage.clear();
-        Engine::m_AnimatorControllerStorage.clear();
+        //Engine::m_AnimationClipStorage.clear();
+        //Engine::m_AnimatorControllerStorage.clear();
 
         return PrefabInstantiator::InstantiatePrefabFromFile(this, filepath, parent);
     }
 
     bool Scene::LoadPrefabSceneFromFile(std::string filepath)
     {
-        Engine::m_AnimationClipStorage.clear();
-        Engine::m_AnimatorControllerStorage.clear();
+        //Engine::m_AnimationClipStorage.clear();
+        //Engine::m_AnimatorControllerStorage.clear();
 
         Prefab loadedPrefab;
         return PrefabRegistry::Get().LoadPrefabFromFile(filepath, loadedPrefab);

@@ -32,6 +32,9 @@ namespace Game
         private const string wormHostPrefabPath = "Sources/Prefabs/WormHost.prefab";
         [SerializeField] private string enemyPrefabPath;
 
+        // =================== Audio ======================
+        private const string warpingInPrefab = "Sources/Prefabs/Loveletter_warping.prefab";
+
         // ======================== EVENT ================================
         private const string EVENT_GAMEOVER = "GameOver";
         private const string EVENT_GAMEWIN = "GameWin";
@@ -51,9 +54,9 @@ namespace Game
         // ============== RNG Setting =================
         private static uint seed = 123;
 
-        [SerializeField] private float botnetSpawnWeight = 50.0f;
+        [SerializeField] private float botnetSpawnWeight = 55.0f;
         [SerializeField] private float wormHostSpawnWeight = 40.0f;
-        [SerializeField] private float loveletterSpawnWeight = 10.0f;
+        [SerializeField] private float loveletterSpawnWeight = 5.0f;
 
         public override void OnStart(){
             initialize();
@@ -195,6 +198,12 @@ namespace Game
             else if(enemyDex == 2){
                 currentLoveletterSpawned++;
                 //spawn warping in audio
+                Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
+                uint warpingInID = PrefabInstantiateWithTransform(warpingInPrefab, ref spawnPos, ref spawnRot, ref scale, false);
+                if(warpingInID == 0){
+                    LogMessage("[LoveletterSpawn] loveletter warping in entity fail to instantiate");
+                    return;
+                }
             }
         }
 

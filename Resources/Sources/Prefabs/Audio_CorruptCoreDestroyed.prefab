@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Prefab: Audio_CorruptCoreDestroyed.prefab",
+    "Prefab GUID": 10321608859022950561,
+    "version": 2,
+    "entities": [
+        {
+            "Name": "Audio_CorruptCoreDestroyed",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14013487430020415665",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14013487430020415663",
+                            "Name": "Audio_CorruptCoreDestroyed",
+                            "Tag": "Audio_CorruptCoreDestroyed"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "754890127042330803",
+                            "FilePath": "Corrupted Core Destroy.wav",
+                            "Type": 5,
+                            "State": 0,
+                            "Volume": 1.399999976158142,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15742869686932881589",
+                            "ScriptClassName": "Game.EndGameSoundBeforeScreen1",
+                            "Started": false,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

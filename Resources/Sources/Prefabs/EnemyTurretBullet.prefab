@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: EnemyTurretBullet.prefab",
-    "Prefab GUID": 15015995743935217827,
+    "Prefab GUID": 16086216382057562289,
     "version": 2,
     "entities": [
         {
@@ -108,7 +108,7 @@
                             "FilePath": "Trojan Shoot.wav",
                             "Type": 5,
                             "State": 0,
-                            "Volume": 0.5,
+                            "Volume": 0.35100001096725464,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
