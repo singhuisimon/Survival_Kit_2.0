@@ -125,42 +125,34 @@ namespace Engine
 	private:
 		/*****************************************************************************/
 		/*!
-		\brief      Maps rigidbody authored state to Jolt motion type.
+		\brief      Maps rigidbody kinematic flag to Jolt motion type.
 		\param      rb  Rigidbody component.
 		\return     JPH motion type (Static, Kinematic, or Dynamic).
 		*/
 		/*****************************************************************************/
 		static JPH::EMotionType ToMotionType(RigidbodyComponent const &rb)
 		{
-			// Kinematic wins even when mass is zero so that "immovable but moving"
-			// objects (e.g. rotating fan walls) are supported cleanly.
-			if (rb.IsKinematic)
-				return JPH::EMotionType::Kinematic;
-
+			// Mass <= 0 means immovable/static regardless of other flags.
 			if (rb.Mass <= 0.0f)
 				return JPH::EMotionType::Static;
 
-			return JPH::EMotionType::Dynamic;
+			return rb.IsKinematic ? JPH::EMotionType::Kinematic : JPH::EMotionType::Dynamic;
 		}
 
 		/*****************************************************************************/
 		/*!
-		\brief      Maps rigidbody authored state to engine object layer.
+		\brief      Maps rigidbody kinematic flag to engine object layer.
 		\param      rb  Rigidbody component.
 		\return     Object layer used for broadphase and pair filtering.
 		*/
 		/*****************************************************************************/
 		static JPH::ObjectLayer ToObjectLayer(RigidbodyComponent const &rb)
 		{
-			// Kinematic movers are still treated like environment objects from the
-			// broadphase perspective.
-			if (rb.IsKinematic)
-				return Layers::NON_MOVING;
-
+			// Keep static bodies in the NON_MOVING layer.
 			if (rb.Mass <= 0.0f)
 				return Layers::NON_MOVING;
 
-			return Layers::MOVING;
+			return rb.IsKinematic ? Layers::NON_MOVING : Layers::MOVING;
 		}
 
 		/*****************************************************************************/

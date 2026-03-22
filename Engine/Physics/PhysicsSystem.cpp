@@ -358,6 +358,7 @@ namespace Engine
 	/*****************************************************************************/
 	static inline JPH::EMotionQuality ChooseMotionQuality(RigidbodyComponent const &rb)
 	{
+		// Jolt sensors / triggers are discrete-only.
 		if (rb.Mass <= 0.0f || rb.IsKinematic || rb.IsTrigger)
 			return JPH::EMotionQuality::Discrete;
 
@@ -497,9 +498,15 @@ namespace Engine
 
 		mAccumulatorSeconds += static_cast<double>(frameDt);
 
+		// High-FPS fix:
+		// Do NOT clear the collision frame unless we are actually going to step
+		// physics this update. Otherwise, render frames that take 0 fixed steps
+		// will wipe all contact data and scripts will observe "no collision".
 		if ((mAccumulatorSeconds + ACCUMULATOR_EPS) < mFixedStepSeconds)
 			return;
 
+		// Clear once per actual physics tick batch, then accumulate/dedupe contacts
+		// across all fixed substeps performed in this update.
 		PhysicsAPI::BeginCollisionFrame();
 
 		std::uint32_t stepsTaken = 0u;
@@ -517,12 +524,14 @@ namespace Engine
 			++stepsTaken;
 		}
 
+		// Prevent unbounded backlog growth under severe hitching.
 		if (stepsTaken == mMaxCatchUpSteps && mAccumulatorSeconds > mFixedStepSeconds)
 			mAccumulatorSeconds = mFixedStepSeconds;
 
 		if (mAccumulatorSeconds < 0.0)
 			mAccumulatorSeconds = 0.0;
 
+		// We know at least one fixed step ran, so pull physics state back to ECS.
 		SyncPhysicsBodiesToECS(scene);
 	}
 
@@ -595,21 +604,21 @@ namespace Engine
 					return;
 				}
 
-				bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
-
+				bool const immovable = (rb.Mass <= 0.0f);
+				if (immovable)
 				{
-					JPH::EMotionType const targetMotionType = ToMotionType(rb);
-					JPH::ObjectLayer const targetLayer = ToObjectLayer(rb);
-
-					mBodyInterface->SetMotionType(
-						id,
-						targetMotionType,
-						targetMotionType == JPH::EMotionType::Static
-						? JPH::EActivation::DontActivate
-						: JPH::EActivation::Activate
-					);
-					mBodyInterface->SetObjectLayer(id, targetLayer);
+					mBodyInterface->SetMotionType(id, JPH::EMotionType::Static, JPH::EActivation::DontActivate);
+					mBodyInterface->SetObjectLayer(id, Layers::NON_MOVING);
 					ap.isKinematic = rb.IsKinematic;
+				}
+				else
+				{
+					if (rb.IsKinematic != ap.isKinematic)
+					{
+						mBodyInterface->SetMotionType(id, ToMotionType(rb), JPH::EActivation::Activate);
+						mBodyInterface->SetObjectLayer(id, ToObjectLayer(rb));
+						ap.isKinematic = rb.IsKinematic;
+					}
 				}
 
 				if (rb.UseGravity != ap.useGravity)
@@ -677,9 +686,15 @@ namespace Engine
 						bool const isSensor = body.IsSensor();
 						if (rb.IsTrigger != isSensor)
 							body.SetIsSensor(rb.IsTrigger);
+					}
+				}
 
-						if (!immovable)
-							body.SetEnhancedInternalEdgeRemoval(true);
+				if (!immovable)
+				{
+					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
+					if (lock.Succeeded())
+					{
+						lock.GetBody().SetEnhancedInternalEdgeRemoval(true);
 					}
 				}
 
@@ -691,74 +706,26 @@ namespace Engine
 
 				glm::vec3 curPos = ExtractWorldPosition(tc.WorldTransform);
 				glm::quat curRot = ExtractWorldRotation(tc.WorldTransform);
-
 				float dotq = std::abs(glm::dot(curRot, ap.lastRot));
 				bool rotChanged = (1.0f - dotq) > 1e-4f;
 				bool posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
 
-				if (!immovable)
+				if (!immovable && (posChanged || rotChanged))
 				{
-					if (rb.IsKinematic)
-					{
-						float const fixedStep = static_cast<float>(mFixedStepSeconds);
+					mBodyInterface->SetPositionAndRotation(
+						id,
+						ToJPHRVec3(curPos),
+						ToJPHQuat(curRot),
+						JPH::EActivation::Activate
+					);
+					ap.lastPos = curPos;
+					ap.lastRot = curRot;
+				}
 
-						glm::vec3 targetPos = curPos;
-						glm::quat targetRot = curRot;
-
-						// If gameplay code did not author a new pose this frame, allow
-						// kinematic bodies to advance using their authored velocities.
-						if (!posChanged)
-						{
-							float const linearSpeedSq = glm::dot(rb.Velocity, rb.Velocity);
-							if (linearSpeedSq > 1e-8f)
-							{
-								targetPos = ap.lastPos + rb.Velocity * fixedStep;
-								posChanged = true;
-							}
-						}
-
-						if (!rotChanged)
-						{
-							float const angSpeed = glm::length(rb.AngularVelocity);
-							if (angSpeed > 1e-6f)
-							{
-								glm::vec3 axis = rb.AngularVelocity / angSpeed;
-								glm::quat delta = glm::angleAxis(angSpeed * fixedStep, axis);
-								targetRot = glm::normalize(delta * ap.lastRot);
-								rotChanged = true;
-							}
-						}
-
-						if (posChanged || rotChanged)
-						{
-							mBodyInterface->MoveKinematic(
-								id,
-								ToJPHRVec3(targetPos),
-								ToJPHQuat(targetRot),
-								fixedStep
-							);
-
-							ap.lastPos = targetPos;
-							ap.lastRot = targetRot;
-						}
-					}
-					else
-					{
-						if (posChanged || rotChanged)
-						{
-							mBodyInterface->SetPositionAndRotation(
-								id,
-								ToJPHRVec3(curPos),
-								ToJPHQuat(curRot),
-								JPH::EActivation::Activate
-							);
-							ap.lastPos = curPos;
-							ap.lastRot = curRot;
-						}
-
-						mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
-						mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
-					}
+				if (!immovable && !rb.IsKinematic)
+				{
+					mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
+					mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
 				}
 			}
 		);
@@ -854,12 +821,12 @@ namespace Engine
 			hasMesh = wantGeom && TryBuildMeshInfoFromEntity(scene, e, info, true);
 		}
 
-		bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
+		bool const immovable = (rb.Mass <= 0.0f);
 		ColliderType effectiveShape = rb.Shape;
 
-		// Only force true dynamic mesh bodies onto BOX.
-		// Static mesh and zero-mass kinematic mesh are allowed to stay as MESH.
-		if (!immovable && !rb.IsKinematic && effectiveShape == ColliderType::MESH)
+		// Dynamic mesh colliders are poor for player/controller response.
+		// Force movable MESH bodies onto BOX unless explicitly authored otherwise.
+		if (!immovable && effectiveShape == ColliderType::MESH)
 			effectiveShape = ColliderType::BOX;
 
 		switch (effectiveShape)
@@ -1035,7 +1002,7 @@ namespace Engine
 		auto &tc = reg.get<TransformComponent>(e);
 		auto &rb = reg.get<RigidbodyComponent>(e);
 
-		bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
+		bool const immovable = (rb.Mass <= 0.0f);
 
 		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
 		glm::vec3 worldPos = ExtractWorldPosition(tc.WorldTransform);
@@ -1077,7 +1044,6 @@ namespace Engine
 			if (lock.Succeeded())
 			{
 				JPH::Body &body = lock.GetBody();
-
 				if (!immovable)
 					body.SetEnhancedInternalEdgeRemoval(true);
 
