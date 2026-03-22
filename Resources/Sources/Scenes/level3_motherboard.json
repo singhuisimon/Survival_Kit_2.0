@@ -3,22 +3,22 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 1048710,
+            "ID": 51048604,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "mainmenubuttonWin1",
-                        "Tag": "mainmenubuttonWin"
+                        "Name": "Paused_DefaultButton_5",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "11440067269282481327",
+                        "ComponentGUID": "10708258720298596911",
                         "Position": [
-                            622.9000244140625,
-                            476.0,
+                            463.3999938964844,
+                            279.79998779296875,
                             0.0
                         ],
                         "Rotation": [
@@ -27,8 +27,8 @@
                             0.0
                         ],
                         "Scale": [
-                            77.0,
-                            33.0,
+                            50.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -36,16 +36,9 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "10287145764675634355",
-                        "ScriptClassName": "Game.MainMenuButtonWin"
-                    }
-                },
-                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Button_BackToMainMenu.png",
+                        "Texture": "PauseMenu_ButtonDefault.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -53,7 +46,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 6,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -61,22 +54,22 @@
             ]
         },
         {
-            "ID": 133,
+            "ID": 1048713,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "WinPopup1",
+                        "Name": "Paused_DefaultButton_4_Hovered",
                         "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "13169449526192342143",
+                        "ComponentGUID": "11284719472602511925",
                         "Position": [
-                            623.4000244140625,
-                            380.3999938964844,
+                            465.20001220703125,
+                            191.0,
                             0.0
                         ],
                         "Rotation": [
@@ -85,8 +78,8 @@
                             0.0
                         ],
                         "Scale": [
-                            650.0,
-                            450.0,
+                            50.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -94,16 +87,9 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11440067269282071683",
-                        "ScriptClassName": "Game.WinScreenPopup"
-                    }
-                },
-                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess_PopUpWindow_Lvl2.png",
+                        "Texture": "PauseMenu_ButtonDefault_Hovered.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -111,7 +97,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -854,7 +840,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1232,7 +1218,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1319,7 +1305,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5303,7 +5289,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5738,22 +5724,22 @@
             ]
         },
         {
-            "ID": 76,
+            "ID": 51048605,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "mainmenubuttonWin",
-                        "Tag": "mainmenubuttonWin"
+                        "Name": "Paused_DefaultButton_4",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "15427608859292877731",
+                        "ComponentGUID": "14743483986421660201",
                         "Position": [
-                            622.9000244140625,
-                            476.0,
+                            463.3999938964844,
+                            190.39999389648438,
                             0.0
                         ],
                         "Rotation": [
@@ -5762,8 +5748,8 @@
                             0.0
                         ],
                         "Scale": [
-                            77.0,
-                            33.0,
+                            50.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -5771,16 +5757,9 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4474854565527929765",
-                        "ScriptClassName": "Game.MainMenuButtonWin"
-                    }
-                },
-                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Button_BackToMainMenu.png",
+                        "Texture": "PauseMenu_ButtonDefault.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -5788,8 +5767,8 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 6,
-                        "IsActive": false,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
                         "IsVisible": false
                     }
                 }
@@ -5883,23 +5862,11 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "2435849824408339295",
-                        "ScriptClassName": "Game.WinScreen"
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "DefenceSuccess_Level2Cutscene.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "ScriptClassName": "Game.WinScreen",
+                        "Fields": {
+                            "IsLevel2": false,
+                            "IsLevel3": true
+                        }
                     }
                 }
             ]
@@ -6533,7 +6500,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7536,7 +7503,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -1.0177775099486433e-13,
+                            -0.0,
                             90.0
                         ],
                         "Scale": [
@@ -7636,7 +7603,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7783,7 +7750,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/huish/Downloads/SITY3SEM2/SEP5/SepPrj/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -9200,22 +9167,22 @@
             ]
         },
         {
-            "ID": 132,
+            "ID": 12583367,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "WinPopup",
+                        "Name": "Paused_DefaultButton_5_Hovered",
                         "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12138908054631613553",
+                        "ComponentGUID": "4367190444961790523",
                         "Position": [
-                            623.4000244140625,
-                            380.3999938964844,
+                            463.3999938964844,
+                            279.79998779296875,
                             0.0
                         ],
                         "Rotation": [
@@ -9224,8 +9191,8 @@
                             0.0
                         ],
                         "Scale": [
-                            650.0,
-                            450.0,
+                            50.0,
+                            12.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -9233,16 +9200,9 @@
                     }
                 },
                 {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11562447302328190069",
-                        "ScriptClassName": "Game.WinScreenPopup"
-                    }
-                },
-                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "DefenceSuccess_PopUpWindow_Lvl2.png",
+                        "Texture": "PauseMenu_ButtonDefault_Hovered.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -9250,8 +9210,8 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
-                        "IsActive": false,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
                         "IsVisible": false
                     }
                 }
@@ -9865,210 +9825,6 @@
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "Paused_MinusButton_Hovered.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 51048605,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Paused_DefaultButton_4",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14743483986421660201",
-                        "Position": [
-                            463.3999938964844,
-                            190.39999389648438,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            50.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "PauseMenu_ButtonDefault.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 51048604,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Paused_DefaultButton_5",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "10708258720298596911",
-                        "Position": [
-                            463.3999938964844,
-                            279.79998779296875,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            50.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "PauseMenu_ButtonDefault.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1048713,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Paused_DefaultButton_4_Hovered",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "11284719472602511925",
-                        "Position": [
-                            465.20001220703125,
-                            191.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            50.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "PauseMenu_ButtonDefault_Hovered.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 12583367,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Paused_DefaultButton_5_Hovered",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "4367190444961790523",
-                        "Position": [
-                            463.3999938964844,
-                            279.79998779296875,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            50.0,
-                            12.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "PauseMenu_ButtonDefault_Hovered.png",
                         "Color": [
                             1.0,
                             1.0,
