@@ -1085,8 +1085,8 @@
                             0.0
                         ],
                         "Scale": [
-                            9.0,
-                            9.0,
+                            0.0,
+                            0.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1136,8 +1136,8 @@
                             0.0
                         ],
                         "Scale": [
-                            500.0,
-                            300.0,
+                            0.0,
+                            0.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -1193,13 +1193,6 @@
                         ],
                         "Parent": 4294967295,
                         "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4030106531365863931",
-                        "ScriptClassName": "Game.HighScorePopup"
                     }
                 }
             ]
@@ -3882,22 +3875,6 @@
                         "Parent": 4294967295,
                         "Children": []
                     }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "HighscoreButton.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 1,
-                        "IsActive": true,
-                        "IsVisible": true
-                    }
                 }
             ]
         },
@@ -4978,8 +4955,8 @@
                     "Properties": {
                         "ComponentGUID": "7777805086158956285",
                         "Position": [
-                            805.5,
-                            445.0,
+                            805.0999755859375,
+                            546.2000122070313,
                             -0.5
                         ],
                         "Rotation": [
