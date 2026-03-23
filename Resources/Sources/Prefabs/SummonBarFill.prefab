@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: SummonBarFill.prefab",
     "Prefab GUID": 827941671562215759,
-    "version": 1,
+    "version": 6,
     "entities": [
         {
             "Name": "SummonBarFill",
@@ -25,7 +25,7 @@
                                 0.0
                             ],
                             "Scale": [
-                                12.0,
+                                15.300000190734863,
                                 1.0,
                                 1.0
                             ],

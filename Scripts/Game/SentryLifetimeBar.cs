@@ -16,7 +16,7 @@ namespace Game
         // ===== Settings =====
         [SerializeField] private float maxDuration = 90.0f; // original is 90.0f for 90 seconds
         [SerializeField] private float heightOffset = 10.0f;
-        [SerializeField] private float fullScaleX  = 12.0f;
+        [SerializeField] private float fullScaleX  = 15.3f;
         [SerializeField] private float barScaleY   = 1.0f;
 
         // ===== Entity IDs =====
@@ -65,7 +65,7 @@ namespace Game
             Vector3 barPos = new Vector3(sentryPos.X, sentryPos.Y + heightOffset, sentryPos.Z);
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID, ref barPos);
             if (labelID != 0 && labelID != INVALID_ENTITY) {
-                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.0f, barPos.Z);
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.7f, barPos.Z);
                 SetPosition(labelID, ref labelPos);
             }
 
@@ -102,7 +102,7 @@ namespace Game
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID,    ref barPos);
             if (labelID != 0 && labelID != INVALID_ENTITY)
             {
-                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.0f, barPos.Z);
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.7f, barPos.Z);
                 SetPosition(labelID, ref labelPos);
             }
             countdown -= deltaTime;
