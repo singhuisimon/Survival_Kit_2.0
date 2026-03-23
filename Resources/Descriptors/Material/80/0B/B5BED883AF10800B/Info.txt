@@ -2,6 +2,6 @@
   "name": "NormalTurretBullet.mat",
   "guid": "B5BED883AF10800B",
   "tags": [],
-  "lastImported": "0000000069A6D3E2",
+  "lastImported": "0000000069C11AA7",
   "resourceLinks": []
 }

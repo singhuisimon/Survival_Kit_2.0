@@ -2,6 +2,6 @@
   "name": "UI_DetectionRange_Pickup_UpgradeModule.png",
   "guid": "71C0D08ED8090003",
   "tags": [],
-  "lastImported": "0000000069AFE5A4",
+  "lastImported": "0000000069C11AA6",
   "resourceLinks": []
 }

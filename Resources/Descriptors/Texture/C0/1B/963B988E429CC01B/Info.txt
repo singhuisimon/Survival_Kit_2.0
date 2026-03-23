@@ -2,6 +2,6 @@
   "name": "Destructible wall_v001_v001_Roughness.png",
   "guid": "963B988E429CC01B",
   "tags": [],
-  "lastImported": "0000000069AD8FF3",
+  "lastImported": "0000000069C11AA5",
   "resourceLinks": []
 }

@@ -2,6 +2,6 @@
   "name": "Obstacle_Wall_Destructable.mat",
   "guid": "35D5D08C93988065",
   "tags": [],
-  "lastImported": "0000000069A6D3E2",
+  "lastImported": "0000000069C11AA7",
   "resourceLinks": []
 }

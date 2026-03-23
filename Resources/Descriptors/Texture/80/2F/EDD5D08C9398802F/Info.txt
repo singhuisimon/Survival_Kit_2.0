@@ -2,6 +2,6 @@
   "name": "E001_worm_host_v004_BaseColor.png",
   "guid": "EDD5D08C9398802F",
   "tags": [],
-  "lastImported": "0000000069A6D3E2",
+  "lastImported": "0000000069C11AA5",
   "resourceLinks": []
 }

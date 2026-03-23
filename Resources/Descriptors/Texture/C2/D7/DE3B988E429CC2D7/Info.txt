@@ -2,6 +2,6 @@
   "name": "Spiral5.png",
   "guid": "DE3B988E429CC2D7",
   "tags": [],
-  "lastImported": "0000000069AD8FF3",
+  "lastImported": "0000000069C11AA7",
   "resourceLinks": []
 }

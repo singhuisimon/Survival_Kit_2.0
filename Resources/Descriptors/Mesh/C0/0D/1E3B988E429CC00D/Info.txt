@@ -2,6 +2,6 @@
   "name": "Corrupted Core_v001.fbx",
   "guid": "1E3B988E429CC00D",
   "tags": [],
-  "lastImported": "0000000069AD8FF3",
+  "lastImported": "0000000069C11AA5",
   "resourceLinks": []
 }

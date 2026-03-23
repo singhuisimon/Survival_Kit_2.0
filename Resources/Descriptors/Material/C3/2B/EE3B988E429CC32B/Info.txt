@@ -2,6 +2,6 @@
   "name": "vampirismVFX.mat",
   "guid": "EE3B988E429CC32B",
   "tags": [],
-  "lastImported": "0000000069AD8FF3",
+  "lastImported": "0000000069C11AA8",
   "resourceLinks": []
 }

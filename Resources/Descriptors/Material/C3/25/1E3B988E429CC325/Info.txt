@@ -2,6 +2,6 @@
   "name": "SpawnEffect1.mat",
   "guid": "1E3B988E429CC325",
   "tags": [],
-  "lastImported": "0000000069AD8FF3",
+  "lastImported": "0000000069C11AA7",
   "resourceLinks": []
 }

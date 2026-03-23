@@ -2,6 +2,6 @@
   "name": "Cutscene_3.png",
   "guid": "DF0F708349BDC0AD",
   "tags": [],
-  "lastImported": "000000006981B6AA",
+  "lastImported": "0000000069C11AA5",
   "resourceLinks": []
 }

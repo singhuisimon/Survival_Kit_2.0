@@ -2,6 +2,6 @@
   "name": "EnemyCoreHP_Window.png",
   "guid": "AE3B988E429CC01D",
   "tags": [],
-  "lastImported": "0000000069AD8FF3",
+  "lastImported": "0000000069C11AA5",
   "resourceLinks": []
 }
