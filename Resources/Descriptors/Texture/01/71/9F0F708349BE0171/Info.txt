@@ -1,0 +1,7 @@
+{
+  "name": "squirrel_kenny.png",
+  "guid": "9F0F708349BE0171",
+  "tags": [],
+  "lastImported": "000000006981AC78",
+  "resourceLinks": []
+}

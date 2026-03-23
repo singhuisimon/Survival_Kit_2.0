@@ -1,0 +1,7 @@
+{
+  "name": "M4TempCoreHP_Window.png",
+  "guid": "D1D4F083042480F3",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

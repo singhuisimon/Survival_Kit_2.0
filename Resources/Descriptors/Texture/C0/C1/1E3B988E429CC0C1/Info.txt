@@ -1,0 +1,7 @@
+{
+  "name": "DigitalSquare.png",
+  "guid": "1E3B988E429CC0C1",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

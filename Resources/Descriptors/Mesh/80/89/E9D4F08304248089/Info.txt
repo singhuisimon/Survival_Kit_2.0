@@ -1,0 +1,7 @@
+{
+  "name": "Temp_PlayerPrimaryBullet.fbx",
+  "guid": "E9D4F08304248089",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

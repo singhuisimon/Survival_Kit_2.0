@@ -1,0 +1,7 @@
+{
+  "name": "Corrupted Core_v001_v001_Emissive.png",
+  "guid": "0E3B988E429CC045",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}
