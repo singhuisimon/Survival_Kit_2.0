@@ -1,0 +1,7 @@
+{
+  "name": "Non destructible wall_v001_v001_Roughness.png",
+  "guid": "463B988E429CC031",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

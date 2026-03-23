@@ -1,0 +1,7 @@
+{
+  "name": "Muzzle6.png",
+  "guid": "F63B988E429CC233",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

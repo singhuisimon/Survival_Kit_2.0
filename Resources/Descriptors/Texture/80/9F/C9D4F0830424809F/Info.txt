@@ -1,0 +1,7 @@
+{
+  "name": "Checkbox_Unticked.png",
+  "guid": "C9D4F0830424809F",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

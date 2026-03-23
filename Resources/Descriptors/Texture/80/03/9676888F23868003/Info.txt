@@ -1,0 +1,7 @@
+{
+  "name": "DreadnoughtLabel.png",
+  "guid": "9676888F23868003",
+  "tags": [],
+  "lastImported": "0000000069B1139A",
+  "resourceLinks": []
+}

@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/A1001_turret_v005_Roughness.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}

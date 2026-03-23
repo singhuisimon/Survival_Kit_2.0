@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModel_Purple_v003_Emissive.png",
+  "guid": "6FE6188F2A988003",
+  "tags": [],
+  "lastImported": "0000000069B29AB1",
+  "resourceLinks": []
+}

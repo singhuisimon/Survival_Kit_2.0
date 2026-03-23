@@ -1,0 +1,7 @@
+{
+  "name": "A9005_gunship_v001.fbx",
+  "guid": "5F0F708349BDC061",
+  "tags": [],
+  "lastImported": "000000006981AC77",
+  "resourceLinks": []
+}
