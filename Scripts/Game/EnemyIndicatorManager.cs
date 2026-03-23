@@ -59,10 +59,18 @@ namespace Game
         // 0.6 == 53° half-angle (suits a ~90 degree FOV). Raise toward 1.0 to make
         // the indicator disappear only when the enemy is near dead-centre.
         [SerializeField("On Screen Threshold")]
-        private float onScreenThreshold = 0.58f;
+        private float onScreenThreshold = 0.35f;
 
         [SerializeField("Max Indicators")]
-        private int maxIndicators = 8;
+        private int maxIndicators = 16;
+
+        [SerializeField("Close Threshold")]
+        private float closeThreshold = 500.0f;
+
+        [SerializeField("Flash Frequency")]
+        private float flashFrequency = 4.0f;
+
+        private float flashTimer = 0.0f;
 
         [SerializeField("Indicator Prefab Path")]
         private string indicatorPrefabPath = "Sources/Prefabs/EnemyIndicator.prefab";
@@ -115,6 +123,8 @@ namespace Game
                 HideAllIndicators();
                 return;
             }
+
+            flashTimer += deltaTime;
 
             UpdateIndicators();
         }
@@ -202,10 +212,13 @@ namespace Game
                 float screenX = screenHalfWidth + sx * circleRadius;
                 float screenY = screenHalfHeight - sy * circleRadius;
 
-                // Alpha by proximity
-                // Full opacity at distance 0, transparent at detectionRadius.
-                float alpha = 1.0f - (distance / detectionRadius);
-                alpha = SimpleMath.Clamp(alpha, 0.0f, 1.0f);
+                float alpha = 1.0f;
+                if (distance < closeThreshold)
+                {
+                    // Oscillate between 0.3 and 1.0 using a sine wave
+                    float flash = SimpleMath.Sin(flashTimer * flashFrequency * 2.0f * 3.14159f);
+                    alpha = 0.65f + 0.35f * flash;
+                }
 
                 // Apply to indicator sprite
                 uint indicatorID = indicatorPool[indicatorIndex];

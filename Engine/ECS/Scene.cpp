@@ -46,6 +46,7 @@ namespace Engine {
     }
 
     bool Scene::LoadFromFile(const std::string& filepath) {
+        m_Registry.clear();
         Engine::m_AnimationClipStorage.clear();
         Engine::m_AnimatorControllerStorage.clear();
 
