@@ -3,6 +3,669 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 99,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayCrossButton",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9941142655542822535",
+                        "Position": [
+                            982.9000244140625,
+                            92.19999694824219,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            12.0,
+                            12.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "XButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 97,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayEnemiesTabButtonSelected",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18011593187786425985",
+                        "Position": [
+                            630.9000244140625,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_EnemiesButton_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 96,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayCombatTabButtonSelected",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13976367921661838971",
+                        "Position": [
+                            537.7000122070313,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_CombatButton_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 95,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayMovementTabButtonSelected",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10517603407840609909",
+                        "Position": [
+                            443.70001220703125,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_MovementButton_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 93,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayGeneralTabButtonSelected",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "4176535132501984879",
+                        "Position": [
+                            348.8999938964844,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_GeneralButton_Selected.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 92,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayCombatTabButton",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7635299646321690217",
+                        "Position": [
+                            537.7000122070313,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_CombatButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 91,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayEnemiesTabButton",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11670524912444982883",
+                        "Position": [
+                            630.9000244140625,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_EnemiesButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 90,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayMovementTabButton",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9364681903230404189",
+                        "Position": [
+                            443.70001220703125,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_MovementButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 89,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayGeneralTabButton",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12246985664746538583",
+                        "Position": [
+                            348.8999938964844,
+                            130.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            45.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "HowToPlay_GeneralButton.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 11,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 88,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayEnemiesPopUp",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14552828673959528017",
+                        "Position": [
+                            641.7000122070313,
+                            360.0,
+                            -0.4000000059604645
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            378.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_HowToPlay_EnemiesWindow.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 87,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayCombatPopUp",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11094064160138053195",
+                        "Position": [
+                            641.7000122070313,
+                            360.0,
+                            -0.4000000059604645
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            378.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_HowToPlay_CombatWindow.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 86,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayMovementPopUp",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "7058838894013335109",
+                        "Position": [
+                            641.7000122070313,
+                            360.0,
+                            -0.4000000059604645
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            378.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_HowToPlay_MovementWindow.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 85,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayGeneralPopUp",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "1870692123280967231",
+                        "Position": [
+                            641.7000122070313,
+                            360.0,
+                            0.4000000059604645
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            638.0,
+                            378.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "MainMenu_HowToPlay_GeneralWindow.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 10,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
             "ID": 84,
             "Components": [
                 {
@@ -1839,7 +2502,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1890,7 +2553,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1941,7 +2604,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -1992,7 +2655,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -2114,7 +2777,7 @@
                     "Properties": {
                         "ComponentGUID": "80001000000000001",
                         "Position": [
-                            1215.0,
+                            1205.0,
                             416.6000061035156,
                             -0.10000000149011612
                         ],
@@ -5766,7 +6429,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5817,7 +6480,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5868,7 +6531,7 @@
                         "Quad": 3,
                         "Sprite Layer": 12,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5919,7 +6582,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -5970,7 +6633,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6021,7 +6684,7 @@
                         "Quad": 3,
                         "Sprite Layer": 11,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6124,6 +6787,48 @@
                         "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 100,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "HowToPlayController",
+                        "Tag": "Default"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12648984708062593973",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "12072523955759399863",
+                        "ScriptClassName": "Game.HowToPlayPopup"
                     }
                 }
             ]
