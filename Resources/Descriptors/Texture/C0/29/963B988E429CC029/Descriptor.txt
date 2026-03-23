@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/Non Destructable wall/Non destructible wall_v001_v001_BaseColor.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}
