@@ -456,6 +456,16 @@ namespace Game
             {
                 playerHitSparksID = PrefabInstantiate(playerHitSparksPrefabPath);
                 isHitSparks = true;
+
+                // Apply skin colors to hit sparks
+                int skinIdx = ProgressTracker.EquippedSkin;
+                if (skinIdx >= 0 && skinIdx < SkinApplier.TRAIL_START_COLOR.Length)
+                {
+                    Vector4 startC = SkinApplier.TRAIL_START_COLOR[skinIdx];
+                    Vector4 endC = SkinApplier.TRAIL_END_COLOR[skinIdx];
+                    SetColorMin(playerHitSparksID, ref startC);
+                    SetColorMax(playerHitSparksID, ref endC);
+                }
             }
 
             if (playerHitSparksID != INVALID_ENTITY)
