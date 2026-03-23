@@ -9,11 +9,22 @@ using static Engine.Rigidbody;
 using static Engine.Audio;
 using static Engine.Tag;
 using static Engine.Transform;
+using System.Net.NetworkInformation;
+using System.Collections.Concurrent;
 
 namespace Game
 {
     public class WormHost : ScriptBehaviour
     {
+        //Target mode
+        private enum TargetMode { PlayerAndGunship, Core}
+        private TargetMode targetMode;
+        
+        //weighted prob for core targeting
+        //current 30% chance to target the core, 70% chance to target the player/gunship
+        [SerializeField] private float coreTargetChance = 0.30f;
+
+
         // Movement / AI
         [SerializeField] private bool isStationary = false;
         [SerializeField] private bool hasSplit = false;
@@ -25,9 +36,13 @@ namespace Game
         private const uint INVALID_ENTITY = 0xffffffffu;
         private uint playerID = INVALID_ENTITY;
         private uint gunshipID = INVALID_ENTITY;
+        private uint coreID = INVALID_ENTITY;
         private uint currentTargetID = INVALID_ENTITY;
+
+        
         private const string TAG_PLAYER = "Player";
         private const string TAG_GUNSHIP = "Gunship";
+        private const string TAG_SEMICONDUCTOR = "SEMICONDUCTOR";
 
         private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
@@ -67,12 +82,37 @@ namespace Game
         {
             LogMessage("======= WormHost started (EntityID = " + EntityID + ") =======");
 
-            // Find both player and gunship
-            playerID = SceneFindEntityByName(TAG_PLAYER);
-            LogMessage("======= playerID: " + playerID + " =======");
+            //roll target
+            float roll = RNG.RandFloat(0.0f, 1.0f);
+            if (roll < coreTargetChance)
+            {
+                targetMode = TargetMode.Core;
+                LogMessage("[WormHost] EntityID=" + EntityID + " -> TargetMode: CORE (roll=" + roll + ", threshold=" + coreTargetChance + ")");
+            }
+            else
+            {
+                targetMode = TargetMode.PlayerAndGunship;
+                LogMessage("[WormHost] EntityID=" + EntityID + " -> TargetMode: PLAYER/GUNSHIP (roll=" + roll + ", threshold=" + coreTargetChance + ")");
+            }
+            
+            //find the targets
 
-            gunshipID = SceneFindEntityByName(TAG_GUNSHIP);
-            LogMessage("======= gunshipID: " + gunshipID + " =======");
+            if(targetMode == TargetMode.Core)
+            {
+                coreID = SceneFindEntityByTag(TAG_SEMICONDUCTOR);
+                LogMessage("[WormHost] Core entity found. EntityID=" + coreID);
+            }
+
+            if (targetMode == TargetMode.PlayerAndGunship)
+            {
+                
+                // Find both player and gunship
+                playerID = SceneFindEntityByName(TAG_PLAYER);
+                LogMessage("======= playerID: " + playerID + " =======");
+
+                gunshipID = SceneFindEntityByName(TAG_GUNSHIP);
+                LogMessage("======= gunshipID: " + gunshipID + " =======");
+            }
 
             isStationary = false;
             hasSplit = false;
@@ -188,6 +228,43 @@ namespace Game
         
         private void UpdateTarget()
         {
+            if(targetMode == TargetMode.Core)
+            {
+                UpdateTargetCore();
+            }
+            else
+            {
+                UpdateTargetPlayerAndGunship();
+            }
+        }
+
+        // Core targeting: verify the core entity is still alive.
+        // If the core is gone, set currentTargetID to INVALID_ENTITY so OnUpdate destroys this worm.
+        private void UpdateTargetCore()
+        {
+            if (coreID != INVALID_ENTITY && EntityExists(coreID))
+            {
+                // Core is alive - lock onto it
+                if (currentTargetID != coreID)
+                {
+                    currentTargetID = coreID;
+                    LogMessage("[WormHost] EntityID=" + EntityID + " locked onto CORE (EntityID=" + coreID + ")");
+                }
+            }
+            else
+            {
+                // Core no longer exists - clear target so OnUpdate destroys this worm
+                if (currentTargetID != INVALID_ENTITY)
+                {
+                    LogMessage("[WormHost] EntityID=" + EntityID + " core destroyed, clearing target.");
+                }
+                currentTargetID = INVALID_ENTITY;
+            }
+        }
+
+        //OG UpdateTarget() for player and gunship
+        private void UpdateTargetPlayerAndGunship()
+        {
             Vector3 wormPos = GetPosition(EntityID);
             
             uint selectedTarget = INVALID_ENTITY;
@@ -285,7 +362,7 @@ namespace Game
 
             float damage = DamageSystem.ParseAmount(payload);
             health -= damage;
-            LogMessage("WormHost hit! Health: " + health);
+            LogMessage("[WormHost] hit! Health: " + health);
 
             uint attackerId = DamageSystem.ParseAttackerId(payload);
             if(attackerId != INVALID_ENTITY){
@@ -361,7 +438,7 @@ namespace Game
             SceneDestroyEntity(EntityID);
         }
 
-        // MODIFIED: Shoot at current target (player or gunship)
+        // MODIFIED: Shoot at current target (player or gunship ir core)
         public void ShootAtTarget()
         {
             if (currentTargetID == INVALID_ENTITY)
