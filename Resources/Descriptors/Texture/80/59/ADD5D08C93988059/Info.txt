@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModel_v003_Opacity.png",
+  "guid": "ADD5D08C93988059",
+  "tags": [],
+  "lastImported": "0000000069A6D3E2",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "hdr.vert",
+  "guid": "A9D4F08304248043",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

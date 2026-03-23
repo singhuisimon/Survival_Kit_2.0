@@ -1,0 +1,7 @@
+{
+  "name": "PlayerHitSparks.mat",
+  "guid": "92F0088C9F988005",
+  "tags": [],
+  "lastImported": "0000000069A703E2",
+  "resourceLinks": []
+}

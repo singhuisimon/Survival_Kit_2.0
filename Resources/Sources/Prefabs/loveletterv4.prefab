@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: loveletterv4.prefab",
     "Prefab GUID": 1460547829938344025,
-    "version": 1,
+    "version": 2,
     "entities": [
         {
             "Name": "loveletter",
@@ -71,8 +71,8 @@
                         "Properties": {
                             "ComponentGUID": "16597761899937005763",
                             "Mass": 1.0,
-                            "IsKinematic": true,
-                            "IsTrigger": false,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
                                 0.0,

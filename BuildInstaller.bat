@@ -4,7 +4,7 @@ setlocal
 cd /d %~dp0
 
 echo ===========================================
-echo [INSTALLER] Step 1/4: Applying Patches
+echo [INSTALLER] Step 1/5: Applying Patches
 echo ===========================================
 
 xcopy /Y "InstallerStepModifiedFiles\AssetManager.h"        "Engine\Asset\"
@@ -46,7 +46,7 @@ if %ERRORLEVEL% NEQ 0 (echo [ERROR] Failed to copy Main.cpp & exit /b 1)
 echo [OK] All patches applied.
 
 echo ===========================================
-echo [INSTALLER] Step 2/4: Building
+echo [INSTALLER] Step 2/5: Building
 echo ===========================================
 
 call BuildJenkins.bat
@@ -55,7 +55,19 @@ if %ERRORLEVEL% NEQ 0 (echo [ERROR] Build failed & exit /b %ERRORLEVEL%)
 echo [OK] Build complete.
 
 echo ===========================================
-echo [INSTALLER] Step 3/4: Staging Game Files
+echo [INSTALLER] Step 3/5: Compiling Assets
+echo ===========================================
+
+"build\bin\Release\AssetCompiler.exe" --force --verbose --input "%CD%\Resources\Descriptors" --output "%CD%\Resources\Compiled"
+if %ERRORLEVEL% NEQ 0 (echo [ERROR] Asset compilation failed & exit /b %ERRORLEVEL%)
+
+robocopy "Resources\Compiled" "build\bin\Release\Resources\Compiled" /E /IS /IT /NP /NJH /NJS
+if %ERRORLEVEL% GEQ 8 (echo [ERROR] Failed to copy compiled assets & exit /b 1)
+
+echo [OK] Assets compiled.
+
+echo ===========================================
+echo [INSTALLER] Step 4/5: Staging Game Files
 echo ===========================================
 
 if not exist "Installer\GAMEDIRECTORY" mkdir "Installer\GAMEDIRECTORY"
@@ -66,7 +78,7 @@ if %ERRORLEVEL% GEQ 8 (echo [ERROR] robocopy failed & exit /b 1)
 echo [OK] Files staged.
 
 echo ===========================================
-echo [INSTALLER] Step 4/4: Building Installer
+echo [INSTALLER] Step 5/5: Building Installer
 echo ===========================================
 
 "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "Installer\InstallScript.iss"

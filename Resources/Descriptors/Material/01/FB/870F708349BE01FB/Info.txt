@@ -1,0 +1,7 @@
+{
+  "name": "Obstacle_Wall_WallofDeath.mat",
+  "guid": "870F708349BE01FB",
+  "tags": [],
+  "lastImported": "000000006981AC78",
+  "resourceLinks": []
+}

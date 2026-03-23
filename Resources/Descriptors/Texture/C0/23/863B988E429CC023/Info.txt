@@ -1,0 +1,7 @@
+{
+  "name": "EnemyHPBar_RedFill.png",
+  "guid": "863B988E429CC023",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

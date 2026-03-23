@@ -1,0 +1,7 @@
+{
+  "name": "SummonBarLabel.mat",
+  "guid": "BBEBF88FBC4A802F",
+  "tags": [],
+  "lastImported": "0000000069B376AA",
+  "resourceLinks": []
+}
