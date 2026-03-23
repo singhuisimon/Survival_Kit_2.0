@@ -1,0 +1,7 @@
+{
+  "name": "Temp_PrimarySecondaryBullet.fbx",
+  "guid": "61D4F0830424808B",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

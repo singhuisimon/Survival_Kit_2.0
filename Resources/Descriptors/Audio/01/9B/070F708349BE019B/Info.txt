@@ -1,0 +1,7 @@
+{
+  "name": "Loveletter_Ambient.wav",
+  "guid": "070F708349BE019B",
+  "tags": [],
+  "lastImported": "000000006981AC78",
+  "resourceLinks": []
+}

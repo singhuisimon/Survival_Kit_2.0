@@ -1,0 +1,7 @@
+{
+  "name": "E005_loveletter_v003_Opacity.png",
+  "guid": "C859208D7F38011B",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

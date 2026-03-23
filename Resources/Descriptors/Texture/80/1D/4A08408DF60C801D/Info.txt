@@ -1,0 +1,7 @@
+{
+  "name": "Non destructible wall_v001_v001_Opacity.png",
+  "guid": "4A08408DF60C801D",
+  "tags": [],
+  "lastImported": "0000000069AC5DB2",
+  "resourceLinks": []
+}

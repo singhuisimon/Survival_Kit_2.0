@@ -1,0 +1,7 @@
+{
+  "name": "LightRays.png",
+  "guid": "E859208D7F3843AF",
+  "tags": [],
+  "lastImported": "0000000069AA8261",
+  "resourceLinks": []
+}

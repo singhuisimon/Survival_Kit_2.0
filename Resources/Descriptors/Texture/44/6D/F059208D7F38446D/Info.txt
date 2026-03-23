@@ -1,0 +1,7 @@
+{
+  "name": "Spiral.png",
+  "guid": "F059208D7F38446D",
+  "tags": [],
+  "lastImported": "0000000069AA8261",
+  "resourceLinks": []
+}

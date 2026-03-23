@@ -1,0 +1,7 @@
+{
+  "name": "shadow_depth.vert",
+  "guid": "99D4F0830424804B",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Splash24.png",
+  "guid": "8E3B988E429CC303",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

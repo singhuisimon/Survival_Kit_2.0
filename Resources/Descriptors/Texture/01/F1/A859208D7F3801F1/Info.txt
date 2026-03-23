@@ -1,0 +1,7 @@
+{
+  "name": "SentryWindows.png",
+  "guid": "A859208D7F3801F1",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

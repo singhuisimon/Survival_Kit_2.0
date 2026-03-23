@@ -1,0 +1,7 @@
+{
+  "name": "MainMenu_Settings.png",
+  "guid": "C9D4F08304248105",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

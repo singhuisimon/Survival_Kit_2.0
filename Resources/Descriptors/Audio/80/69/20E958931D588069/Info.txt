@@ -1,0 +1,7 @@
+{
+  "name": "Upgrade Module Pickup.wav",
+  "guid": "20E958931D588069",
+  "tags": [],
+  "lastImported": "0000000069C0FAE2",
+  "resourceLinks": []
+}

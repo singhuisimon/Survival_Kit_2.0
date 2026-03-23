@@ -1,0 +1,7 @@
+{
+  "name": "E005_loveletterCombined_v004.fbx",
+  "guid": "A9D4F0830424806F",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

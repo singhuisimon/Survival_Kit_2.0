@@ -1,0 +1,7 @@
+{
+  "name": "EpilepsyWarning.png",
+  "guid": "E059208D7F38011F",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

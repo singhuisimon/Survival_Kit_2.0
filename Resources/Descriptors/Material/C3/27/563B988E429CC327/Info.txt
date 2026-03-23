@@ -1,0 +1,7 @@
+{
+  "name": "SpawnEffect2.mat",
+  "guid": "563B988E429CC327",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

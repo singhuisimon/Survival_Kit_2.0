@@ -1,0 +1,7 @@
+{
+  "name": "Particle_Ring6.png",
+  "guid": "A059208D7F3801AD",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

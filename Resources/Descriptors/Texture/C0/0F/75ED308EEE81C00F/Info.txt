@@ -1,0 +1,7 @@
+{
+  "name": "Tooltip_DescriptionTurret.png",
+  "guid": "75ED308EEE81C00F",
+  "tags": [],
+  "lastImported": "0000000069B0514C",
+  "resourceLinks": []
+}

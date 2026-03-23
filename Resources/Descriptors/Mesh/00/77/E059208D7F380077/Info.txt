@@ -1,0 +1,7 @@
+{
+  "name": "A1001_turret_v005.fbx",
+  "guid": "E059208D7F380077",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

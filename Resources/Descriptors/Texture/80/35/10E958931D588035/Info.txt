@@ -1,0 +1,7 @@
+{
+  "name": "DismissTooltipText.png",
+  "guid": "10E958931D588035",
+  "tags": [],
+  "lastImported": "0000000069C0FAE2",
+  "resourceLinks": []
+}

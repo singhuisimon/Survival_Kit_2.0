@@ -1,0 +1,7 @@
+{
+  "name": "level_design_v003.fbx",
+  "guid": "D9D4F0830424807B",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

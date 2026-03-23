@@ -1,0 +1,7 @@
+{
+  "name": "Circle16.png",
+  "guid": "B059208D7F380227",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Mat_DestructibleWall.mat",
+  "guid": "4208408DF60C8031",
+  "tags": [],
+  "lastImported": "0000000069AC5DB2",
+  "resourceLinks": []
+}

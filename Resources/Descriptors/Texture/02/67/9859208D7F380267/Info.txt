@@ -1,0 +1,7 @@
+{
+  "name": "CylinderScrew.png",
+  "guid": "9859208D7F380267",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

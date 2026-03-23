@@ -1,0 +1,7 @@
+{
+  "name": "Particle_Mesh_Cube.fbx",
+  "guid": "8059208D7F3800A9",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

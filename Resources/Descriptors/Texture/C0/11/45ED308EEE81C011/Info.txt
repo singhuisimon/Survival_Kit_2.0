@@ -1,0 +1,7 @@
+{
+  "name": "Tooltip_InstructionsLvl1.png",
+  "guid": "45ED308EEE81C011",
+  "tags": [],
+  "lastImported": "0000000069B0514C",
+  "resourceLinks": []
+}

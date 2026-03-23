@@ -1,0 +1,7 @@
+{
+  "name": "VFX_EnemyTurretAura.mat",
+  "guid": "CB2F808F8A9C804B",
+  "tags": [],
+  "lastImported": "0000000069B2AFF2",
+  "resourceLinks": []
+}

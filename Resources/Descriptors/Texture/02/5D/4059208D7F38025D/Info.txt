@@ -1,0 +1,7 @@
+{
+  "name": "CircleFireball.png",
+  "guid": "4059208D7F38025D",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Corrupted Core_v002_Metallic.png",
+  "guid": "31E5008D813A4005",
+  "tags": [],
+  "lastImported": "0000000069AA8A69",
+  "resourceLinks": []
+}

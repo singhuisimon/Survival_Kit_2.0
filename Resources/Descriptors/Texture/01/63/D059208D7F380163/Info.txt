@@ -1,0 +1,7 @@
+{
+  "name": "lvl1_level_design_v003_lvl1_level_design_v003_Emissive.png",
+  "guid": "D059208D7F380163",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

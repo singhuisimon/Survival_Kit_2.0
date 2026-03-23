@@ -1,0 +1,7 @@
+{
+  "name": "A1001_turret_v005_Metallic.png",
+  "guid": "C859208D7F3800BD",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

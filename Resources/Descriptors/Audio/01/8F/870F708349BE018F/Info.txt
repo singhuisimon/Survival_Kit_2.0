@@ -1,0 +1,7 @@
+{
+  "name": "Core_Ambient.wav",
+  "guid": "870F708349BE018F",
+  "tags": [],
+  "lastImported": "000000006981AC78",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "SubExplosion3.mat",
+  "guid": "263B988E429CC329",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModel_v003_BaseColor.png",
+  "guid": "55D5D08C93988051",
+  "tags": [],
+  "lastImported": "0000000069A6D3E2",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "DefenceSuccess_PopUpWindow_Lvl2.png",
+  "guid": "E8E958931D588031",
+  "tags": [],
+  "lastImported": "0000000069C0FAE2",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "E001_worm_host_v004_Emissive.png",
+  "guid": "C059208D7F380105",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}
