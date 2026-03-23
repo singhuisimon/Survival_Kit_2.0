@@ -866,3 +866,10 @@ e11e50932549c037|3|/Resources/Sources/Audio/Small Laser_4.wav|.wav||1774282467|1
 311e50932549c03b|3|/Resources/Sources/Audio/Small Laser_6.wav|.wav||1774282467|1|0|0|0
 11e50932549c041|3|/Resources/Sources/Audio/Trojan Shoot.wav|.wav||1774282467|1|0|0|0
 7acdf89339414003|0|/Resources/Sources/Textures/RotatingWall/Rotating_fan_v001_v001_Emissive.png|.png||1774283203|1|1774284247|134187578474944265|0
+311e50932549c03b|3|/Resources/Sources/Audio/Small Laser_6.wav|.wav||1774008410|1|0|0|0
+11e50932549c041|3|/Resources/Sources/Audio/Trojan Shoot.wav|.wav||1774008410|1|0|0|0
+a4a928933b9fc003|0|/Resources/Sources/Textures/RotatingWall/Rotating_fan_v001_v001_Emissive.png|.png||1774285459|1|0|0|0
+1ca928933b9fc007|0|/Resources/Sources/Textures/RotatingWall/Rotating_fan_v001_v001_Opacity.png|.png||1774285459|1|0|0|0
+4ca928933b9fc009|0|/Resources/Sources/Textures/RotatingWall/Rotating_fan_v001_v001_Roughness.png|.png||1774285459|1|0|0|0
+4a928933b9fc00b|2|/Resources/Sources/Material/MAT_Obstacle_RotatingWallFan.mat|.mat||1774285459|1|0|0|0
+bca928933b9fc00d|2|/Resources/Sources/Material/Obstacle_RotatingWallFan.mat|.mat||1774285459|1|0|0|0
