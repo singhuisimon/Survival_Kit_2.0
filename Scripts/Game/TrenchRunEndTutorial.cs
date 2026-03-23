@@ -39,11 +39,18 @@ namespace Game
         private bool hasSpawnedTurret = false;
         private float countdown = 3.0f;
         private float turretWaitCountdown = 5.0f;
+        private Vector3[] keyloggerPositions = new Vector3[4];
+
 
         // Lifecycle
        public override void OnStart()
         {
             playerID = SceneFindEntityByName(TAG_PLAYER);
+
+            keyloggerPositions[0] = new Vector3(-5935.0f, -430.0f, 682.0f);
+            keyloggerPositions[1] = new Vector3(-5935.0f, -385.0f, 682.0f);
+            keyloggerPositions[2] = new Vector3(-5935.0f, -385.0f, 605.0f);
+            keyloggerPositions[3] = new Vector3(-5935.0f, -430.0f, 605.0f);
 
             Subscribe(COREDEAD, OnCoreDeath);
             Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
@@ -184,20 +191,21 @@ namespace Game
 
         private void SpawnTurret()
         {
-            uint turretID = PrefabInstantiate(turretPrefab);
-            if (turretID == 0)
+            for (int i = 0; i < keyloggerPositions.Length; i++)
             {
-                LogMessage("[TrenchRunEndTutorial] Failed to spawn Turret");
-                return;
+                uint turretID = PrefabInstantiate(turretPrefab);
+                if (turretID == 0)
+                {
+                    LogMessage("[TrenchRunEndTutorial] Failed to spawn Turret");
+                    return;
+                }
+
+                SetPosition(turretID, ref keyloggerPositions[i]);
+
+                hasSpawnedTurret = true;
+                LogMessage("[TrenchRunEndTutorial] Turret spawned successfully");
             }
-
-            Vector3 spawnPos = GetPosition(playerID);
-            Quat spawnRot = GetRotation(playerID);
-            SetPosition(turretID, ref spawnPos);
-            SetRotation(turretID, ref spawnRot);
-
-            hasSpawnedTurret = true;
-            LogMessage("[TrenchRunEndTutorial] Turret spawned successfully");
+            
         }
 
         // Transform Serialization
