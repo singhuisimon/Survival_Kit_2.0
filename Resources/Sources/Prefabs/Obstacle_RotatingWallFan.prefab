@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Obstacle_RotatingWallFan",
-    "Prefab GUID": 6144097996637110461,
+    "Prefab Name": "Prefab: Obstacle_RotatingWallFan.prefab",
+    "Prefab GUID": 965486190788514879,
     "version": 1,
     "entities": [
         {
@@ -96,6 +96,18 @@
                                 0.5
                             ],
                             "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18259308759888434235",
+                            "ScriptClassName": "Game.TickDamage",
+                            "Started": false,
+                            "GCHandle": 2307
                         }
                     }
                 }
