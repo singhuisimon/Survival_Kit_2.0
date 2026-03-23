@@ -87,6 +87,7 @@ Makefile
 # Executables
 # ==================================
 *.exe
+!Installer/REDIST/VC_redist.x64.exe
 *.out
 *.app
 
