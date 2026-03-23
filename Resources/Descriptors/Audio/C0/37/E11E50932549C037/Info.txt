@@ -1,7 +1,0 @@
-{
-  "name": "Small Laser_4.wav",
-  "guid": "E11E50932549C037",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "SpawningSentryLabel.png",
-  "guid": "CBEBF88FBC4A801B",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

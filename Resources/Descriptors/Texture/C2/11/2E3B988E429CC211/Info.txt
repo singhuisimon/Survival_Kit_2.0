@@ -1,7 +1,0 @@
-{
-  "name": "Magic2.png",
-  "guid": "2E3B988E429CC211",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

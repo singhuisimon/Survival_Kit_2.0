@@ -1,7 +1,0 @@
-{
-  "name": "SpikeBall.png",
-  "guid": "F63B988E429CC2B9",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

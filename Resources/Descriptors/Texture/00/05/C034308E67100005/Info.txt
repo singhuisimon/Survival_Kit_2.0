@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_CreditsResources.png",
-  "guid": "C034308E67100005",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "lvl1_level_design_v004_Metallic.png",
-  "guid": "7DD5D08C93988047",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

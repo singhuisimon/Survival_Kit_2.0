@@ -1,7 +1,0 @@
-{
-  "name": "UI Main Menu BSOD Error.wav",
-  "guid": "1F0F708349BE01C3",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

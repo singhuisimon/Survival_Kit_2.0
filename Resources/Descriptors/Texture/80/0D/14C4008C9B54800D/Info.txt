@@ -1,7 +1,0 @@
-{
-  "name": "Monetisation_Packs_Window.png",
-  "guid": "14C4008C9B54800D",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

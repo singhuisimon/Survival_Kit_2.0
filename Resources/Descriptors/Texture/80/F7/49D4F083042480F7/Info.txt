@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_BSOD_002.jpg",
-  "guid": "49D4F083042480F7",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

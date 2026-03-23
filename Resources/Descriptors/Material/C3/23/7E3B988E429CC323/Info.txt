@@ -1,7 +1,0 @@
-{
-  "name": "payload.mat",
-  "guid": "7E3B988E429CC323",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

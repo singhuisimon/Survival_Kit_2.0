@@ -1,7 +1,0 @@
-{
-  "name": "Sentry Despawn.wav",
-  "guid": "65D5D08C93988061",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

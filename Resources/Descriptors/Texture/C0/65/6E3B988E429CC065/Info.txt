@@ -1,7 +1,0 @@
-{
-  "name": "trench_run_v006_Roughness.png",
-  "guid": "6E3B988E429CC065",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "Level1_M4.mat",
-  "guid": "FDBED883AF108009",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

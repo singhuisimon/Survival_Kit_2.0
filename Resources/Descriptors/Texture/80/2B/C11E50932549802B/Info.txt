@@ -1,7 +1,0 @@
-{
-  "name": "PauseMenu_ButtonDefault_Hovered.png",
-  "guid": "C11E50932549802B",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

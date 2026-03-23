@@ -1,7 +1,0 @@
-{
-  "name": "DefenceFailed_MainMenuButton.png",
-  "guid": "DDD5D08C93988021",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

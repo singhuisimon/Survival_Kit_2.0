@@ -1,7 +1,0 @@
-{
-  "name": "E004_botnet_v003_Botnet_v001_Emissive.png",
-  "guid": "870F708349BDC0BB",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

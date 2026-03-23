@@ -1,7 +1,0 @@
-{
-  "name": "WormBullet.mat",
-  "guid": "1F42E88F854C4033",
-  "tags": [],
-  "lastImported": "0000000069C11AA8",
-  "resourceLinks": []
-}

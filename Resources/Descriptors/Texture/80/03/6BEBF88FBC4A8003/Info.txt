@@ -1,7 +1,0 @@
-{
-  "name": "Checkbox_Mute.png",
-  "guid": "6BEBF88FBC4A8003",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

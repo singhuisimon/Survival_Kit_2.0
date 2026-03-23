@@ -1,7 +1,0 @@
-{
-  "name": "MAT_PlayerDeathExplosion1.mat",
-  "guid": "C676888F2386800B",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

@@ -182,6 +182,7 @@ Resources/Compiled/
 # Tracked - needed by AssetCompiler on CI
 # Resources/DB/
 # Resources/Descriptors/
+Resources/Descriptors/*/*/*/*/Info.txt
 
 # ==================================
 # Scripting (Future)

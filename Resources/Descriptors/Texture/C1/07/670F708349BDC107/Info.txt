@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_PlusButton.png",
-  "guid": "670F708349BDC107",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

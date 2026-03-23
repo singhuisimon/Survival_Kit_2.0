@@ -1,7 +1,0 @@
-{
-  "name": "Core Destruction.wav",
-  "guid": "8F0F708349BE018D",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

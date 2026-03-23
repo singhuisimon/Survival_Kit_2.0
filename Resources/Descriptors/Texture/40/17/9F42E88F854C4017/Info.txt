@@ -1,7 +1,0 @@
-{
-  "name": "DefenceFailed_Cutscene.png",
-  "guid": "9F42E88F854C4017",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

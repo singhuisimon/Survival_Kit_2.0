@@ -1,7 +1,0 @@
-{
-  "name": "Corrupted Core Destroy.wav",
-  "guid": "391E50932549C02D",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

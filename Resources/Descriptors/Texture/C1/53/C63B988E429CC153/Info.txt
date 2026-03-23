@@ -1,7 +1,0 @@
-{
-  "name": "Flower1.png",
-  "guid": "C63B988E429CC153",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

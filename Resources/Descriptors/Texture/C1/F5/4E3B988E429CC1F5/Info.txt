@@ -1,7 +1,0 @@
-{
-  "name": "Leaf2.png",
-  "guid": "4E3B988E429CC1F5",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

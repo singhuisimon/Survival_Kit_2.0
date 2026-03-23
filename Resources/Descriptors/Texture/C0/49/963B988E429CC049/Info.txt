@@ -1,7 +1,0 @@
-{
-  "name": "Corrupted Core_v001_v001_Opacity.png",
-  "guid": "963B988E429CC049",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

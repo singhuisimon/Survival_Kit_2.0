@@ -1,7 +1,0 @@
-{
-  "name": "Sentry Normal Spawn.wav",
-  "guid": "2DD5D08C93988063",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

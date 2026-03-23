@@ -1,7 +1,0 @@
-{
-  "name": "BlackOverlay.png",
-  "guid": "CE3B988E429CC011",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

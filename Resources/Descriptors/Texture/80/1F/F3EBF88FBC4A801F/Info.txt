@@ -1,7 +1,0 @@
-{
-  "name": "Worldspace_BarBackground.png",
-  "guid": "F3EBF88FBC4A801F",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

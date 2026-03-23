@@ -1,7 +1,0 @@
-{
-  "name": "Tooltip_DescriptionBotnet.png",
-  "guid": "3742E88F854C4025",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

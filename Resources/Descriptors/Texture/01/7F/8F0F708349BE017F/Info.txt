@@ -1,7 +1,0 @@
-{
-  "name": "XButton.png",
-  "guid": "8F0F708349BE017F",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

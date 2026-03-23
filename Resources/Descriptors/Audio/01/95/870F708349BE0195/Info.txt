@@ -1,7 +1,0 @@
-{
-  "name": "ErrorPopUp2.wav",
-  "guid": "870F708349BE0195",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

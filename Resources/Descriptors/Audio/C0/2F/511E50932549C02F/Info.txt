@@ -1,7 +1,0 @@
-{
-  "name": "Destructible Wall Destroyed.wav",
-  "guid": "511E50932549C02F",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

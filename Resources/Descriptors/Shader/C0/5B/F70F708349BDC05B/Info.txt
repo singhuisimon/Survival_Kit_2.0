@@ -1,7 +1,0 @@
-{
-  "name": "ui.vert",
-  "guid": "F70F708349BDC05B",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

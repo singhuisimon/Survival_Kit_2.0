@@ -1,7 +1,0 @@
-{
-  "name": "Cutscene_SkipButton.png",
-  "guid": "311E509325494015",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

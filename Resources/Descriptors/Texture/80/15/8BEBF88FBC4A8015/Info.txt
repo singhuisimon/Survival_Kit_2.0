@@ -1,7 +1,0 @@
-{
-  "name": "E009_keylogger_v005_v002_Opacity.png",
-  "guid": "8BEBF88FBC4A8015",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

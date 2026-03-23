@@ -1,7 +1,0 @@
-{
-  "name": "laserSmall_001.ogg",
-  "guid": "D70F708349BE0199",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

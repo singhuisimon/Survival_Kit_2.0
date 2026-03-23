@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Defence Success.wav",
-  "guid": "21C0D08ED8090011",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

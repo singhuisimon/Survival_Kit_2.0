@@ -1,7 +1,0 @@
-{
-  "name": "ErrorPopUp.png",
-  "guid": "A70F708349BDC0CD",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

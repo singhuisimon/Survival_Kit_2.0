@@ -1,7 +1,0 @@
-{
-  "name": "corepad.mat",
-  "guid": "85BED883AF108007",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

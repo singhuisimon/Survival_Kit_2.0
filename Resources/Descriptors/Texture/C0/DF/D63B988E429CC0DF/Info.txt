@@ -1,7 +1,0 @@
-{
-  "name": "Fire2.png",
-  "guid": "D63B988E429CC0DF",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

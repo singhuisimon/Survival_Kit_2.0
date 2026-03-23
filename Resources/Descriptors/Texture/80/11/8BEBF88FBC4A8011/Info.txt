@@ -1,7 +1,0 @@
-{
-  "name": "E009_keylogger_v005_v002_Emissive.png",
-  "guid": "8BEBF88FBC4A8011",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

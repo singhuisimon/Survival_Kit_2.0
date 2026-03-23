@@ -1,7 +1,0 @@
-{
-  "name": "PlayerMaterial.mat",
-  "guid": "FF0F708349BE0201",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

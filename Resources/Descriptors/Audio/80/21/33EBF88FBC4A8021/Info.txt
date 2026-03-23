@@ -1,7 +1,0 @@
-{
-  "name": "Turret Normal Fire.wav",
-  "guid": "33EBF88FBC4A8021",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

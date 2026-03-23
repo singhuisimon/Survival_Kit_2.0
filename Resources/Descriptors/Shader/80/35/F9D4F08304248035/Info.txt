@@ -1,7 +1,0 @@
-{
-  "name": "bloom_downsample.frag",
-  "guid": "F9D4F08304248035",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

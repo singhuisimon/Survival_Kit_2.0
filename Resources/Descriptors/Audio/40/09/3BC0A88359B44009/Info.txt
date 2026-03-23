@@ -1,7 +1,0 @@
-{
-  "name": "Enemy Deal Damage.wav",
-  "guid": "3BC0A88359B44009",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

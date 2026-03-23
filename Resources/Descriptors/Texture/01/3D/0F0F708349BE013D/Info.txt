@@ -1,7 +1,0 @@
-{
-  "name": "Paused_RestartButton.png",
-  "guid": "0F0F708349BE013D",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

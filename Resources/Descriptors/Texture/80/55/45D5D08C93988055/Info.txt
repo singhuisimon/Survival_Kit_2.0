@@ -1,7 +1,0 @@
-{
-  "name": "PlayerModel_v003_Emissive_Dark.png",
-  "guid": "45D5D08C93988055",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

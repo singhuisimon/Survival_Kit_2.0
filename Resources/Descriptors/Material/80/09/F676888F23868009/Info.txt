@@ -1,7 +1,0 @@
-{
-  "name": "gunship1name.mat",
-  "guid": "F676888F23868009",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

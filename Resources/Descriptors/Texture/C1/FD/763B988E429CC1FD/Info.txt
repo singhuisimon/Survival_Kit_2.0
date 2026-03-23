@@ -1,7 +1,0 @@
-{
-  "name": "LightingShape.png",
-  "guid": "763B988E429CC1FD",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

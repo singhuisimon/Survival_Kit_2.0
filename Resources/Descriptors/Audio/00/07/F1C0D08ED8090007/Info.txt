@@ -1,7 +1,0 @@
-{
-  "name": "Player Heal.wav",
-  "guid": "F1C0D08ED8090007",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

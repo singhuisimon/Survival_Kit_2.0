@@ -1,7 +1,0 @@
-{
-  "name": "MouseClick1.wav",
-  "guid": "B70F708349BE01A3",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

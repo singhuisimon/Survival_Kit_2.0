@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_MinusButton.png",
-  "guid": "C70F708349BDC103",
-  "tags": [],
-  "lastImported": "0000000069C11AA6",
-  "resourceLinks": []
-}

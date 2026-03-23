@@ -1,7 +1,0 @@
-{
-  "name": "playerv2.mat",
-  "guid": "DDBED883AF10800D",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

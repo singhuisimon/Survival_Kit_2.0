@@ -1,7 +1,0 @@
-{
-  "name": "SnowFlake2.png",
-  "guid": "E63B988E429CC2B5",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

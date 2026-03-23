@@ -1,7 +1,0 @@
-{
-  "name": "SpikeBallTwirl.png",
-  "guid": "B63B988E429CC2BB",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

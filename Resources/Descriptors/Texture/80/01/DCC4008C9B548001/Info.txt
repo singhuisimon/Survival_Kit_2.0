@@ -1,7 +1,0 @@
-{
-  "name": "ByteChipsButton.png",
-  "guid": "DCC4008C9B548001",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "Botnet_Ambient.wav",
-  "guid": "270F708349BE0183",
-  "tags": [],
-  "lastImported": "0000000069C11AA7",
-  "resourceLinks": []
-}

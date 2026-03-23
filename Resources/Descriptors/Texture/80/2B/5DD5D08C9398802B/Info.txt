@@ -1,7 +1,0 @@
-{
-  "name": "DefenceSuccess_MainMenuButton.png",
-  "guid": "5DD5D08C9398802B",
-  "tags": [],
-  "lastImported": "0000000069C11AA5",
-  "resourceLinks": []
-}
