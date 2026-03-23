@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_HighScore.png",
-  "guid": "0859208D7F38017D",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

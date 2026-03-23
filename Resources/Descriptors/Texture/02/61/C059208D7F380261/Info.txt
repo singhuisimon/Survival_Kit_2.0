@@ -1,7 +1,0 @@
-{
-  "name": "Coin1.png",
-  "guid": "C059208D7F380261",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

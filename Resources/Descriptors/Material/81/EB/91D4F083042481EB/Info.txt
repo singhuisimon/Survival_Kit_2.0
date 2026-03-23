@@ -1,7 +1,0 @@
-{
-  "name": "Mat_Level2_LevelDesign.mat",
-  "guid": "91D4F083042481EB",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

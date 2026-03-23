@@ -1,7 +1,0 @@
-{
-  "name": "Tooltip_CombatAlternateFire.png",
-  "guid": "363B988E429CC035",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "TestUVAnimationMat.mat",
-  "guid": "F859208D7F38858B",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

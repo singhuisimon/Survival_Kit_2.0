@@ -1,7 +1,0 @@
-{
-  "name": "Sparks4.png",
-  "guid": "0059208D7F384467",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

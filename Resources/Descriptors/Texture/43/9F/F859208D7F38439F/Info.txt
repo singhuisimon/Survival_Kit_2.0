@@ -1,7 +1,0 @@
-{
-  "name": "ImpactToon6.png",
-  "guid": "F859208D7F38439F",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

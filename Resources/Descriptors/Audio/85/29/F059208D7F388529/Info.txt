@@ -1,7 +1,0 @@
-{
-  "name": "Worm_Host_Ambient.wav",
-  "guid": "F059208D7F388529",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

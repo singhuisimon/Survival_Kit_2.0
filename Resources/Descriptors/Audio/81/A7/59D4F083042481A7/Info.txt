@@ -1,7 +1,0 @@
-{
-  "name": "Player_Kill.wav",
-  "guid": "59D4F083042481A7",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

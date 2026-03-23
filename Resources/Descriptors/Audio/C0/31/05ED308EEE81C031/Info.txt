@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Trench Run Success.wav",
-  "guid": "05ED308EEE81C031",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

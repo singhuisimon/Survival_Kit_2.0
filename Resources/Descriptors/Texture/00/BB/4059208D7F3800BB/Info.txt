@@ -1,7 +1,0 @@
-{
-  "name": "A1001_turret_v005_Emissive.png",
-  "guid": "4059208D7F3800BB",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

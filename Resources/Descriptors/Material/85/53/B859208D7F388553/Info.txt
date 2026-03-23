@@ -1,7 +1,0 @@
-{
-  "name": "Gunship_Allies.mat",
-  "guid": "B859208D7F388553",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

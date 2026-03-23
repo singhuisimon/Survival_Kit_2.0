@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Trench Run Briefing.wav",
-  "guid": "EDED308EEE81C02B",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "Non destructible wall_v001_v001_Emissive.png",
-  "guid": "1208408DF60C8019",
-  "tags": [],
-  "lastImported": "0000000069AC5DB2",
-  "resourceLinks": []
-}

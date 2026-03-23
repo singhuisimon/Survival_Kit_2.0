@@ -1,7 +1,0 @@
-{
-  "name": "Player_Move.wav",
-  "guid": "99D4F083042481A9",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

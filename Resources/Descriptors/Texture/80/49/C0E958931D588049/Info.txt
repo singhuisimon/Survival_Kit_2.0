@@ -1,7 +1,0 @@
-{
-  "name": "SentryLabel.png",
-  "guid": "C0E958931D588049",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

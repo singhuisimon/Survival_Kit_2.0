@@ -1,7 +1,0 @@
-{
-  "name": "DefenceSuccess_TransCutscene.png",
-  "guid": "70E958931D588033",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

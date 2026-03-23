@@ -1,7 +1,0 @@
-{
-  "name": "Scratch.png",
-  "guid": "2859208D7F384421",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

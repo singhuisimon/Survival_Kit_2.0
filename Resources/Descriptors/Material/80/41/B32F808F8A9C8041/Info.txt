@@ -1,7 +1,0 @@
-{
-  "name": "MAT_Enemy_Keylogger.mat",
-  "guid": "B32F808F8A9C8041",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

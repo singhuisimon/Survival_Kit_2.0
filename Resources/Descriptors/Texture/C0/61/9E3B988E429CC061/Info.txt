@@ -1,7 +1,0 @@
-{
-  "name": "trench_run_v006_Metallic.png",
-  "guid": "9E3B988E429CC061",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "lvl1_level_design_v004_BaseColor.png",
-  "guid": "CDD5D08C93988043",
-  "tags": [],
-  "lastImported": "0000000069A6D3E2",
-  "resourceLinks": []
-}

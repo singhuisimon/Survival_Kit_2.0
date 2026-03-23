@@ -1,7 +1,0 @@
-{
-  "name": "Example_PlayerHPTakeDamage.png",
-  "guid": "CF0F708349BDC0D3",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

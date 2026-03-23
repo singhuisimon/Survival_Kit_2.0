@@ -1,7 +1,0 @@
-{
-  "name": "CirclePentagram.png",
-  "guid": "563B988E429CC0AF",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "ExchangeButton.png",
-  "guid": "2859208D7F38012D",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

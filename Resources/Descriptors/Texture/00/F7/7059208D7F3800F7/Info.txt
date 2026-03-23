@@ -1,7 +1,0 @@
-{
-  "name": "DefenceSuccess_Level2Button.png",
-  "guid": "7059208D7F3800F7",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

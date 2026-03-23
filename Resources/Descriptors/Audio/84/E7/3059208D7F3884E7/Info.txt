@@ -1,7 +1,0 @@
-{
-  "name": "Enemy_Death.wav",
-  "guid": "3059208D7F3884E7",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

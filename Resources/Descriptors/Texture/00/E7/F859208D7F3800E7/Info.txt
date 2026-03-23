@@ -1,7 +1,0 @@
-{
-  "name": "Cutscene_3.png",
-  "guid": "F859208D7F3800E7",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

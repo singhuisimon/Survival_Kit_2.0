@@ -1,7 +1,0 @@
-{
-  "name": "Corrupted Core_v001_v001_Roughness.png",
-  "guid": "E859208D7F380213",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

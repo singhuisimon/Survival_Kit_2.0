@@ -1,7 +1,0 @@
-{
-  "name": "Impact11.png",
-  "guid": "C059208D7F38433F",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

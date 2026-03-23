@@ -1,7 +1,0 @@
-{
-  "name": "E001_worm_host_v006.fbx",
-  "guid": "8B2F808F8A9C800B",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

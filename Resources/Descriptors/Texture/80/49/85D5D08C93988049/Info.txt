@@ -1,7 +1,0 @@
-{
-  "name": "lvl1_level_design_v004_Opacity.png",
-  "guid": "85D5D08C93988049",
-  "tags": [],
-  "lastImported": "0000000069A6D3E2",
-  "resourceLinks": []
-}

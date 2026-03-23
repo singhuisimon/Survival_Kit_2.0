@@ -1,7 +1,0 @@
-{
-  "name": "BeamShape.png",
-  "guid": "F059208D7F380219",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

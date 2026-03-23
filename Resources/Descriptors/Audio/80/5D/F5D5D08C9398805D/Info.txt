@@ -1,7 +1,0 @@
-{
-  "name": "Flotilla Gunship Death.wav",
-  "guid": "F5D5D08C9398805D",
-  "tags": [],
-  "lastImported": "0000000069A6D3E2",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "EnemyHitSparks.mat",
-  "guid": "DAF0088C9F988001",
-  "tags": [],
-  "lastImported": "0000000069A703E2",
-  "resourceLinks": []
-}

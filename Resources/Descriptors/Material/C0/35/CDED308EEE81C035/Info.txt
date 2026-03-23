@@ -1,7 +1,0 @@
-{
-  "name": "UpgradeModuleLabelMaterial.mat",
-  "guid": "CDED308EEE81C035",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

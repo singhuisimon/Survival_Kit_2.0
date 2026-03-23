@@ -1,7 +1,0 @@
-{
-  "name": "UI_DetectionRange_Enemy.png",
-  "guid": "D208408DF60C802D",
-  "tags": [],
-  "lastImported": "0000000069AC5DB2",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "PlayerHPWindow.png",
-  "guid": "F70F708349BE014F",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

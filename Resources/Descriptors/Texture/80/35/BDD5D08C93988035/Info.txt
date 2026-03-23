@@ -1,7 +1,0 @@
-{
-  "name": "E001_worm_host_v004_Roughness.png",
-  "guid": "BDD5D08C93988035",
-  "tags": [],
-  "lastImported": "0000000069A6D3E2",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "Paused_MainMenuButton_Hovered.png",
-  "guid": "E059208D7F3801B7",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

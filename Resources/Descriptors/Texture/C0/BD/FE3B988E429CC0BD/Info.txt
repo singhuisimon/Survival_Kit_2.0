@@ -1,7 +1,0 @@
-{
-  "name": "DigitalShapes1.png",
-  "guid": "FE3B988E429CC0BD",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

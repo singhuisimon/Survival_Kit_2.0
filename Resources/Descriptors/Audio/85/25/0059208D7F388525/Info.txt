@@ -1,7 +1,0 @@
-{
-  "name": "UI Pause Button Press.wav",
-  "guid": "0059208D7F388525",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

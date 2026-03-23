@@ -1,7 +1,0 @@
-{
-  "name": "AlternateFire_Window.png",
-  "guid": "470F708349BDC093",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

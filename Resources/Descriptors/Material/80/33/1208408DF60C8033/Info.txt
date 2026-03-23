@@ -1,7 +1,0 @@
-{
-  "name": "Mat_IndestructibleWall.mat",
-  "guid": "1208408DF60C8033",
-  "tags": [],
-  "lastImported": "0000000069AC5DB2",
-  "resourceLinks": []
-}

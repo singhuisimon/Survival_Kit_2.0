@@ -1,7 +1,0 @@
-{
-  "name": "Player Death.wav",
-  "guid": "CF0F708349BE01A7",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "InstallButton.mat",
-  "guid": "370F708349BE01F1",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

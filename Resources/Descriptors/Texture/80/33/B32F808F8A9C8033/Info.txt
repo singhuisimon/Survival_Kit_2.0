@@ -1,7 +1,0 @@
-{
-  "name": "Tooltip_DescriptionLoveLetter.png",
-  "guid": "B32F808F8A9C8033",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

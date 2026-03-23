@@ -1,7 +1,0 @@
-{
-  "name": "PlayerHPFrame.png",
-  "guid": "470F708349BE014D",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

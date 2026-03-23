@@ -1,7 +1,0 @@
-{
-  "name": "RandomPieces.png",
-  "guid": "C059208D7F38440F",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

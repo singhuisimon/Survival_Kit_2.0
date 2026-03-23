@@ -1,7 +1,0 @@
-{
-  "name": "Destructible wall_v001_v001_Metallic.png",
-  "guid": "9208408DF60C8007",
-  "tags": [],
-  "lastImported": "0000000069AC5DB2",
-  "resourceLinks": []
-}

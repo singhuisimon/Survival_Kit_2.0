@@ -1,7 +1,0 @@
-{
-  "name": "Corrupted Core_v002_BaseColor.png",
-  "guid": "BE3B988E429CC04D",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "Loveletter_Warping_In.wav",
-  "guid": "670F708349BE019F",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

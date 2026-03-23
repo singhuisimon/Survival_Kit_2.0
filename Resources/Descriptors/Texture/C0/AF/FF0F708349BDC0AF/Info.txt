@@ -1,7 +1,0 @@
-{
-  "name": "DefenceFailed.png",
-  "guid": "FF0F708349BDC0AF",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "SettingsButton.png",
-  "guid": "2F0F708349BE0161",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

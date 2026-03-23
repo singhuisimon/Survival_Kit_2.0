@@ -1,7 +1,0 @@
-{
-  "name": "Splash15.png",
-  "guid": "463B988E429CC2EF",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}
