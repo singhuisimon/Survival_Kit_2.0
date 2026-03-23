@@ -9,7 +9,7 @@ namespace Engine
     /// </summary>
     public static class ProgressTracker
     {
-        private const string SAVEFILE = "ResourcesSources/SaveData/progress.json";
+        private const string SAVEFILE = "Resources/Sources/SaveData/progress.json";
 
         public static bool HasWonTrenchRun { get; private set; } = false;
         public static bool HasWonLevel2 { get; private set; } = false;
@@ -52,23 +52,23 @@ namespace Engine
             {
                 if (!FileIO.FileExists(SAVEFILE))
                 {
-                    LogMessage("ProgressTracker No progress file found, starting fresh");
+                    LogMessage("ProgressTracker: No progress file found, starting fresh");
                     return;
                 }
 
                 string json = FileIO.ReadAllText(SAVEFILE);
-                LogMessage("ProgressTracker Loaded progress: " + json);
+                LogMessage("ProgressTracker: Loaded progress: " + json);
 
-                // Parse simple JSON
-                if (json.Contains("trenchrunwon:true") || json.Contains("trenchrunwon: true"))
+                // Parse level wins
+                if (json.Contains("\"trench_run_won\":true") || json.Contains("\"trench_run_won\": true"))
                     HasWonTrenchRun = true;
-                if (json.Contains("level2won:true") || json.Contains("level2won: true"))
+                if (json.Contains("\"level2_won\":true") || json.Contains("\"level2_won\": true"))
                     HasWonLevel2 = true;
-                if (json.Contains("level3won:true") || json.Contains("level3won: true"))
+                if (json.Contains("\"level3_won\":true") || json.Contains("\"level3_won\": true"))
                     HasWonLevel3 = true;
 
-                // Parse cumulativescore
-                int csIdx = json.IndexOf("cumulativescore");
+                // Parse cumulative_score
+                int csIdx = json.IndexOf("\"cumulative_score\"");
                 if (csIdx >= 0)
                 {
                     int colonIdx = json.IndexOf(':', csIdx);
@@ -83,11 +83,12 @@ namespace Engine
                 }
 
                 // Parse shop state
-                if (json.Contains("skin1purchased:true") || json.Contains("skin1purchased: true")) Skin1Purchased = true;
-                if (json.Contains("skin2purchased:true") || json.Contains("skin2purchased: true")) Skin2Purchased = true;
-                if (json.Contains("skin3purchased:true") || json.Contains("skin3purchased: true")) Skin3Purchased = true;
+                if (json.Contains("\"skin1_purchased\":true") || json.Contains("\"skin1_purchased\": true")) Skin1Purchased = true;
+                if (json.Contains("\"skin2_purchased\":true") || json.Contains("\"skin2_purchased\": true")) Skin2Purchased = true;
+                if (json.Contains("\"skin3_purchased\":true") || json.Contains("\"skin3_purchased\": true")) Skin3Purchased = true;
 
-                int esIdx = json.IndexOf("equippedskin");
+                // Parse equipped_skin
+                int esIdx = json.IndexOf("\"equipped_skin\"");
                 if (esIdx >= 0)
                 {
                     int eColonIdx = json.IndexOf(':', esIdx);
@@ -101,8 +102,8 @@ namespace Engine
                     }
                 }
 
-                // Parse bytechips
-                int bcIdx = json.IndexOf("bytechips");
+                // Parse byte_chips
+                int bcIdx = json.IndexOf("\"byte_chips\"");
                 if (bcIdx >= 0)
                 {
                     int bcColonIdx = json.IndexOf(':', bcIdx);
@@ -116,35 +117,35 @@ namespace Engine
                     }
                 }
 
-                // Parse byte pack first-purchase flags
-                if (json.Contains("bytepack1bought:true") || json.Contains("bytepack1bought: true")) BytePack1Bought = true;
-                if (json.Contains("bytepack2bought:true") || json.Contains("bytepack2bought: true")) BytePack2Bought = true;
-                if (json.Contains("bytepack3bought:true") || json.Contains("bytepack3bought: true")) BytePack3Bought = true;
-                if (json.Contains("bytepack4bought:true") || json.Contains("bytepack4bought: true")) BytePack4Bought = true;
+                // Parse byte pack flags
+                if (json.Contains("\"byte_pack1_bought\":true") || json.Contains("\"byte_pack1_bought\": true")) BytePack1Bought = true;
+                if (json.Contains("\"byte_pack2_bought\":true") || json.Contains("\"byte_pack2_bought\": true")) BytePack2Bought = true;
+                if (json.Contains("\"byte_pack3_bought\":true") || json.Contains("\"byte_pack3_bought\": true")) BytePack3Bought = true;
+                if (json.Contains("\"byte_pack4_bought\":true") || json.Contains("\"byte_pack4_bought\": true")) BytePack4Bought = true;
 
-                LogMessage("ProgressTracker HasWonTrenchRun: " + HasWonTrenchRun +
-                           " HasWonLevel2: " + HasWonLevel2 +
-                           " HasWonLevel3: " + HasWonLevel3 +
-                           " CumulativeScore: " + CumulativeScore +
-                           " ByteChips: " + ByteChips +
-                           " EquippedSkin: " + EquippedSkin);
+                LogMessage("ProgressTracker: HasWonTrenchRun=" + HasWonTrenchRun +
+                           " HasWonLevel2=" + HasWonLevel2 +
+                           " HasWonLevel3=" + HasWonLevel3 +
+                           " CumulativeScore=" + CumulativeScore +
+                           " ByteChips=" + ByteChips +
+                           " EquippedSkin=" + EquippedSkin);
             }
             catch (Exception e)
             {
-                LogError("ProgressTracker LoadProgress error: " + e.Message);
+                LogError("ProgressTracker: LoadProgress error: " + e.Message);
             }
         }
 
         /// <summary>Marks a level as won and saves to disk.</summary>
         public static void MarkLevelWon(string levelName)
         {
-            LogMessage("ProgressTracker Marking level won: " + levelName);
-            LoadProgress(); // Load existing progress first so we don't overwrite other level wins
+            LogMessage("ProgressTracker: Marking level won: " + levelName);
+            LoadProgress();
 
             if (levelName == "trenchrun") HasWonTrenchRun = true;
             else if (levelName == "level2") HasWonLevel2 = true;
             else if (levelName == "level3") HasWonLevel3 = true;
-            else LogMessage("ProgressTracker Unknown level name: " + levelName);
+            else LogMessage("ProgressTracker: Unknown level name: " + levelName);
 
             SaveProgress();
         }
@@ -154,7 +155,7 @@ namespace Engine
         {
             LoadProgress();
             CumulativeScore = 0;
-            LogMessage("ProgressTracker Cumulative score reset to 0");
+            LogMessage("ProgressTracker: Cumulative score reset to 0");
             SaveProgress();
         }
 
@@ -175,10 +176,9 @@ namespace Engine
             BytePack3Bought = false;
             BytePack4Bought = false;
 
-            LogMessage("ProgressTracker All progress reset");
+            LogMessage("ProgressTracker: All progress reset");
             SaveProgress();
             Event.Publish("ProgressReset", "");
-
         }
 
         /// <summary>Adds points to the cumulative score and saves to disk.</summary>
@@ -186,7 +186,7 @@ namespace Engine
         {
             LoadProgress();
             CumulativeScore += amount;
-            LogMessage("ProgressTracker Added " + amount + " to cumulative score. Total: " + CumulativeScore);
+            LogMessage("ProgressTracker: Added " + amount + " to cumulative score. Total: " + CumulativeScore);
             SaveProgress();
         }
 
@@ -196,29 +196,29 @@ namespace Engine
             {
                 string json =
                     "{" +
-                    "\"trenchrunwon\":" + (HasWonTrenchRun ? "true" : "false") + "," +
-                    "\"level2won\":" + (HasWonLevel2 ? "true" : "false") + "," +
-                    "\"level3won\":" + (HasWonLevel3 ? "true" : "false") + "," +
-                    "\"cumulativescore\":" + CumulativeScore + "," +
-                    "\"skin1purchased\":" + (Skin1Purchased ? "true" : "false") + "," +
-                    "\"skin2purchased\":" + (Skin2Purchased ? "true" : "false") + "," +
-                    "\"skin3purchased\":" + (Skin3Purchased ? "true" : "false") + "," +
-                    "\"equippedskin\":" + EquippedSkin + "," +
-                    "\"bytechips\":" + ByteChips + "," +
-                    "\"bytepack1bought\":" + (BytePack1Bought ? "true" : "false") + "," +
-                    "\"bytepack2bought\":" + (BytePack2Bought ? "true" : "false") + "," +
-                    "\"bytepack3bought\":" + (BytePack3Bought ? "true" : "false") + "," +
-                    "\"bytepack4bought\":" + (BytePack4Bought ? "true" : "false") +
+                    "\"trench_run_won\":" + (HasWonTrenchRun ? "true" : "false") + "," +
+                    "\"level2_won\":" + (HasWonLevel2 ? "true" : "false") + "," +
+                    "\"level3_won\":" + (HasWonLevel3 ? "true" : "false") + "," +
+                    "\"cumulative_score\":" + CumulativeScore + "," +
+                    "\"skin1_purchased\":" + (Skin1Purchased ? "true" : "false") + "," +
+                    "\"skin2_purchased\":" + (Skin2Purchased ? "true" : "false") + "," +
+                    "\"skin3_purchased\":" + (Skin3Purchased ? "true" : "false") + "," +
+                    "\"equipped_skin\":" + EquippedSkin + "," +
+                    "\"byte_chips\":" + ByteChips + "," +
+                    "\"byte_pack1_bought\":" + (BytePack1Bought ? "true" : "false") + "," +
+                    "\"byte_pack2_bought\":" + (BytePack2Bought ? "true" : "false") + "," +
+                    "\"byte_pack3_bought\":" + (BytePack3Bought ? "true" : "false") + "," +
+                    "\"byte_pack4_bought\":" + (BytePack4Bought ? "true" : "false") +
                     "}";
 
                 if (FileIO.WriteAllText(SAVEFILE, json))
-                    LogMessage("ProgressTracker Progress saved successfully");
+                    LogMessage("ProgressTracker: Progress saved successfully");
                 else
-                    LogError("ProgressTracker Failed to write progress file");
+                    LogError("ProgressTracker: Failed to write progress file");
             }
             catch (Exception e)
             {
-                LogError("ProgressTracker SaveProgress error: " + e.Message);
+                LogError("ProgressTracker: SaveProgress error: " + e.Message);
             }
         }
     }
