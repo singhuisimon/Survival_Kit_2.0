@@ -183,7 +183,7 @@ namespace Game
             Quat identityRot = new Quat(0f, 0f, 0f, 1f);
             Vector3 defaultScale = new Vector3(1f, 1f, 1f);     // Not in use
 
-            Vector3 bgScale = new Vector3(12.5f, 1.5f, 1.0f);
+            Vector3 bgScale = new Vector3(15.5f, 1.5f, 1.0f);
             Vector3 labelScale = new Vector3(10.0f, 3.3f, 1.0f);
             Vector3 fillScale  = new Vector3(0f, 0f, 0f); 
 
@@ -250,8 +250,8 @@ namespace Game
             Quat    identityRot  = new Quat(0f, 0f, 0f, 1f);
             Vector3 defaultScale = new Vector3(1f, 1f, 1f);     // Not in use
 
-            Vector3 bgScale    = new Vector3(12.5f, 1.5f, 1.0f);
-            Vector3 labelScale = new Vector3(10.0f, 2.5f, 1.0f);
+            Vector3 bgScale    = new Vector3(15.5f, 1.5f, 1.0f);
+            Vector3 labelScale = new Vector3(14.0f, 3.3f, 1.0f);
             Vector3 fillScale  = new Vector3(0f, 0f, 0f);
 
             uint sentryBGID    = PrefabInstantiateWithTransform(sentryBarBG,    ref barSpawnPos, ref identityRot, ref bgScale, false);

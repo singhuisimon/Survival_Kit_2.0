@@ -16,7 +16,7 @@ namespace Game
         private string playerName = "Player";
 
         [SerializeField] private float heightOffset = 10.0f;
-        [SerializeField] private float fullScaleX   = 12.0f;
+        [SerializeField] private float fullScaleX   = 15.3f;
         [SerializeField] private float barScaleY    = 1.0f;
         //[SerializeField] private float labelOffsetY = 4.0f;
 
@@ -58,7 +58,7 @@ namespace Game
             Vector3 barPos = new Vector3(playerPos.X, playerPos.Y + heightOffset, playerPos.Z);
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID, ref barPos);
             if (labelID != 0 && labelID != INVALID_ENTITY) {
-                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 5.0f, barPos.Z);
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 2.0f, barPos.Z);
                 SetPosition(labelID, ref labelPos);
             }
 
@@ -111,7 +111,7 @@ namespace Game
             if (bgID    != 0 && bgID    != INVALID_ENTITY) SetPosition(bgID,    ref barPos);
             if (labelID != 0 && labelID != INVALID_ENTITY)
             {
-                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 5.0f, barPos.Z);
+                Vector3 labelPos = new Vector3(barPos.X, barPos.Y + 3.0f, barPos.Z);
                 SetPosition(labelID, ref labelPos);
             }
 

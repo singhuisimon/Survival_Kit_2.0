@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: SummonBarBG.prefab",
     "Prefab GUID": 13831311540064305313,
-    "version": 1,
+    "version": 4,
     "entities": [
         {
             "Name": "SummonBarBG",
@@ -25,7 +25,7 @@
                                 0.0
                             ],
                             "Scale": [
-                                12.5,
+                                15.5,
                                 1.5,
                                 1.0
                             ],
