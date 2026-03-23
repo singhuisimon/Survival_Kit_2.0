@@ -52,9 +52,10 @@ namespace Engine
 	static constexpr float  MAX_FRAME_DT_SECONDS = 0.25f;
 	static constexpr double ACCUMULATOR_EPS = 1e-9;
 	static constexpr std::uint32_t DEFAULT_MAX_CATCH_UP_STEPS = 8u;
-	static constexpr int   DEFAULT_COLLISION_STEPS = 2;
-	static constexpr float SMALL_BODY_CCD_EXTENT = 0.25f;
-	static constexpr float FAST_BODY_CCD_SPEED = 12.0f;
+
+	static constexpr float MAX_SAFE_POSITION_COMPONENT = 1000000.0f;
+	static constexpr float MAX_SAFE_LINEAR_VELOCITY_COMPONENT = 100000.0f;
+	static constexpr float MAX_SAFE_ANGULAR_VELOCITY_COMPONENT = 10000.0f;
 
 	/*****************************************************************************/
 	/*!
@@ -94,15 +95,15 @@ namespace Engine
 		float lx = glm::length(x);
 		float ly = glm::length(y);
 		float lz = glm::length(z);
-		if (lx >= WORLD_SCALE_EPS) x /= lx;
-		if (ly >= WORLD_SCALE_EPS) y /= ly;
-		if (lz >= WORLD_SCALE_EPS) z /= lz;
+		if (lx >= WORLD_SCALE_EPS) x /= lx; else x = glm::vec3(1.0f, 0.0f, 0.0f);
+		if (ly >= WORLD_SCALE_EPS) y /= ly; else y = glm::vec3(0.0f, 1.0f, 0.0f);
+		if (lz >= WORLD_SCALE_EPS) z /= lz; else z = glm::vec3(0.0f, 0.0f, 1.0f);
 
 		glm::mat3 r(1.0f);
 		r[0] = x;
 		r[1] = y;
 		r[2] = z;
-		return glm::quat_cast(r);
+		return glm::normalize(glm::quat_cast(r));
 	}
 
 	/*****************************************************************************/
@@ -115,6 +116,43 @@ namespace Engine
 	static inline glm::vec3 ExtractWorldPosition(glm::mat4 const &m)
 	{
 		return glm::vec3(m[3]);
+	}
+
+	static inline bool IsFiniteFloat(float v)
+	{
+		return std::isfinite(v);
+	}
+
+	static inline bool Vec3NeedsSanitization(glm::vec3 const &v, float maxAbs)
+	{
+		return !IsFiniteFloat(v.x) || !IsFiniteFloat(v.y) || !IsFiniteFloat(v.z) ||
+			std::fabs(v.x) > maxAbs || std::fabs(v.y) > maxAbs || std::fabs(v.z) > maxAbs;
+	}
+
+	static inline bool QuatNeedsSanitization(glm::quat const &q)
+	{
+		if (!IsFiniteFloat(q.w) || !IsFiniteFloat(q.x) || !IsFiniteFloat(q.y) || !IsFiniteFloat(q.z))
+			return true;
+
+		float const len2 = glm::dot(q, q);
+		return !IsFiniteFloat(len2) || len2 <= 1e-12f;
+	}
+
+	static inline glm::vec3 SanitizeVec3(glm::vec3 const &v, float maxAbs)
+	{
+		return glm::vec3(
+			IsFiniteFloat(v.x) ? std::clamp(v.x, -maxAbs, maxAbs) : 0.0f,
+			IsFiniteFloat(v.y) ? std::clamp(v.y, -maxAbs, maxAbs) : 0.0f,
+			IsFiniteFloat(v.z) ? std::clamp(v.z, -maxAbs, maxAbs) : 0.0f
+		);
+	}
+
+	static inline glm::quat SanitizeQuat(glm::quat const &q)
+	{
+		if (QuatNeedsSanitization(q))
+			return glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+
+		return glm::normalize(q);
 	}
 
 	/*****************************************************************************/
@@ -249,7 +287,7 @@ namespace Engine
 		if constexpr (std::is_same_v<std::decay_t<R>, glm::vec3>)
 			return ToJPHQuat(EulerDegToQuat(r));
 		else
-			return ToJPHQuat(r);
+			return ToJPHQuat(glm::normalize(r));
 	}
 
 	/*****************************************************************************/
@@ -316,64 +354,10 @@ namespace Engine
 			NearlyEqual(a.z, b.z, eps);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Computes the smallest authored extent of a body for CCD heuristics.
-	\param      rb   Rigidbody component.
-	\return     Smallest positive extent/radius, or negative if unavailable.
-	*/
-	/*****************************************************************************/
-	static inline float ComputeSmallestBodyExtent(RigidbodyComponent const &rb)
+	static inline bool NearlyEqualQuat(glm::quat const &a, glm::quat const &b, float eps = 1e-4f)
 	{
-		switch (rb.Shape)
-		{
-		case ColliderType::BOX:
-		case ColliderType::AABB:
-		{
-			glm::vec3 he = rb.BoxHalfExtents;
-			if (he.x > 0.0f && he.y > 0.0f && he.z > 0.0f)
-				return std::min(he.x, std::min(he.y, he.z));
-			break;
-		}
-
-		case ColliderType::SPHERE:
-			if (rb.SphereRadius > 0.0f)
-				return rb.SphereRadius;
-			break;
-
-		default:
-			break;
-		}
-
-		return -1.0f;
-	}
-
-	/*****************************************************************************/
-	/*!
-	\brief      Chooses motion quality for a body using size/speed heuristics.
-	\details    Small, fast dynamic bodies use LinearCast to reduce tunneling.
-	\param      rb   Rigidbody component.
-	\return     Jolt motion quality for the body.
-	*/
-	/*****************************************************************************/
-	static inline JPH::EMotionQuality ChooseMotionQuality(RigidbodyComponent const &rb)
-	{
-		// Jolt sensors / triggers are discrete-only.
-		if (rb.Mass <= 0.0f || rb.IsKinematic || rb.IsTrigger)
-			return JPH::EMotionQuality::Discrete;
-
-		float const smallestExtent = ComputeSmallestBodyExtent(rb);
-		float const linearSpeed = glm::length(rb.Velocity);
-
-		bool const smallBody = (smallestExtent > 0.0f && smallestExtent <= SMALL_BODY_CCD_EXTENT);
-		bool const fastBody = (linearSpeed >= FAST_BODY_CCD_SPEED);
-		bool const canCrossOwnThicknessInStep =
-			(smallestExtent > 0.0f) &&
-			(linearSpeed * static_cast<float>(DEFAULT_FIXED_STEP_SECONDS) >= (smallestExtent * 2.0f));
-
-		return (smallBody || fastBody || canCrossOwnThicknessInStep)
-			? JPH::EMotionQuality::LinearCast
-			: JPH::EMotionQuality::Discrete;
+		float const dotq = std::min(1.0f, std::fabs(glm::dot(a, b)));
+		return (1.0f - dotq) <= eps;
 	}
 
 	/*****************************************************************************/
@@ -413,9 +397,9 @@ namespace Engine
 		)
 
 #ifdef _DEBUG
-			mTempAllocator = new JPH::TempAllocatorMalloc();
+		mTempAllocator = new JPH::TempAllocatorMalloc();
 #else
-			mTempAllocator = new JPH::TempAllocatorImpl(64u * 1024u * 1024u);
+		mTempAllocator = new JPH::TempAllocatorImpl(64u * 1024u * 1024u);
 #endif
 
 		unsigned const hw = std::max(1u, std::thread::hardware_concurrency());
@@ -513,9 +497,11 @@ namespace Engine
 		while ((mAccumulatorSeconds + ACCUMULATOR_EPS) >= mFixedStepSeconds &&
 			stepsTaken < mMaxCatchUpSteps)
 		{
+			ApplyKinematicTargetsForStep(scene, static_cast<float>(mFixedStepSeconds));
+
 			mPhysics.Update(
 				static_cast<float>(mFixedStepSeconds),
-				DEFAULT_COLLISION_STEPS,
+				1,
 				mTempAllocator,
 				mJobSystem
 			);
@@ -604,22 +590,20 @@ namespace Engine
 					return;
 				}
 
-				bool const immovable = (rb.Mass <= 0.0f);
-				if (immovable)
-				{
-					mBodyInterface->SetMotionType(id, JPH::EMotionType::Static, JPH::EActivation::DontActivate);
-					mBodyInterface->SetObjectLayer(id, Layers::NON_MOVING);
-					ap.isKinematic = rb.IsKinematic;
-				}
-				else
-				{
-					if (rb.IsKinematic != ap.isKinematic)
-					{
-						mBodyInterface->SetMotionType(id, ToMotionType(rb), JPH::EActivation::Activate);
-						mBodyInterface->SetObjectLayer(id, ToObjectLayer(rb));
-						ap.isKinematic = rb.IsKinematic;
-					}
-				}
+				bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
+
+				rb.Velocity = SanitizeVec3(rb.Velocity, MAX_SAFE_LINEAR_VELOCITY_COMPONENT);
+				rb.AngularVelocity = SanitizeVec3(rb.AngularVelocity, MAX_SAFE_ANGULAR_VELOCITY_COMPONENT);
+
+				JPH::EMotionType const targetMotionType = ToMotionType(rb);
+				JPH::ObjectLayer const targetLayer = ToObjectLayer(rb);
+				mBodyInterface->SetMotionType(
+					id,
+					targetMotionType,
+					targetMotionType == JPH::EMotionType::Static ? JPH::EActivation::DontActivate : JPH::EActivation::Activate
+				);
+				mBodyInterface->SetObjectLayer(id, targetLayer);
+				ap.isKinematic = rb.IsKinematic;
 
 				if (rb.UseGravity != ap.useGravity)
 				{
@@ -689,26 +673,11 @@ namespace Engine
 					}
 				}
 
-				if (!immovable)
-				{
-					JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
-					if (lock.Succeeded())
-					{
-						lock.GetBody().SetEnhancedInternalEdgeRemoval(true);
-					}
-				}
+				glm::vec3 curPos = SanitizeVec3(ExtractWorldPosition(tc.WorldTransform), MAX_SAFE_POSITION_COMPONENT);
+				glm::quat curRot = SanitizeQuat(ExtractWorldRotation(tc.WorldTransform));
 
-				if (!immovable)
-				{
-					JPH::EMotionQuality const targetMotionQuality = ChooseMotionQuality(rb);
-					mBodyInterface->SetMotionQuality(id, targetMotionQuality);
-				}
-
-				glm::vec3 curPos = ExtractWorldPosition(tc.WorldTransform);
-				glm::quat curRot = ExtractWorldRotation(tc.WorldTransform);
-				float dotq = std::abs(glm::dot(curRot, ap.lastRot));
-				bool rotChanged = (1.0f - dotq) > 1e-4f;
-				bool posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
+				bool const posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
+				bool const rotChanged = !NearlyEqualQuat(curRot, ap.lastRot);
 
 				if (!immovable && (posChanged || rotChanged))
 				{
@@ -733,8 +702,82 @@ namespace Engine
 
 	/*****************************************************************************/
 	/*!
+	\brief      Applies authored kinematic velocity targets for a single fixed
+				physics step.
+	\param      scene       Scene pointer.
+	\param      fixedStep   Fixed physics step duration in seconds.
+	*/
+	/*****************************************************************************/
+	void PhysicsSystem::ApplyKinematicTargetsForStep(Scene *scene, float fixedStep)
+	{
+		assert(scene != nullptr);
+
+		if (fixedStep <= 0.0f)
+			return;
+
+		auto &reg = scene->GetRegistry();
+
+		reg.view<TransformComponent, RigidbodyComponent>().each(
+			[&](EntityID e, TransformComponent &, RigidbodyComponent &rb)
+			{
+				if (!rb.IsKinematic)
+					return;
+
+				auto it = mBodyOf.find(e);
+				if (it == mBodyOf.end())
+					return;
+
+				JPH::BodyID const id = it->second;
+				AppliedProps &ap = mApplied[e];
+
+				glm::vec3 stepVelocity = SanitizeVec3(rb.Velocity, MAX_SAFE_LINEAR_VELOCITY_COMPONENT);
+				glm::vec3 stepOmega = SanitizeVec3(rb.AngularVelocity, MAX_SAFE_ANGULAR_VELOCITY_COMPONENT);
+
+				bool const hasLinearMotion = glm::dot(stepVelocity, stepVelocity) > 1e-8f;
+				bool const hasAngularMotion = glm::dot(stepOmega, stepOmega) > 1e-8f;
+
+				if (!hasLinearMotion && !hasAngularMotion)
+					return;
+
+				glm::vec3 targetPos = ap.lastPos;
+				glm::quat targetRot = ap.lastRot;
+
+				if (hasLinearMotion)
+				{
+					targetPos = SanitizeVec3(
+						ap.lastPos + stepVelocity * fixedStep,
+						MAX_SAFE_POSITION_COMPONENT
+					);
+				}
+
+				if (hasAngularMotion)
+				{
+					float const omegaMag = glm::length(stepOmega);
+					if (omegaMag > 1e-6f)
+					{
+						glm::vec3 axis = stepOmega / omegaMag;
+						glm::quat delta = glm::angleAxis(omegaMag * fixedStep, axis);
+						targetRot = SanitizeQuat(delta * ap.lastRot);
+					}
+				}
+
+				mBodyInterface->MoveKinematic(
+					id,
+					ToJPHRVec3(targetPos),
+					ToJPHQuat(targetRot),
+					fixedStep
+				);
+
+				ap.lastPos = targetPos;
+				ap.lastRot = targetRot;
+			}
+		);
+	}
+
+	/*****************************************************************************/
+	/*!
 	\brief      Pulls latest transform and velocity state from Jolt into ECS
-				after fixed-step simulation.
+				after one or more fixed simulation steps.
 	\param      scene   Scene pointer.
 	*/
 	/*****************************************************************************/
@@ -755,29 +798,58 @@ namespace Engine
 				JPH::Quat q{};
 				mBodyInterface->GetPositionAndRotation(id, p, q);
 
-				tc.Position = glm::vec3(
+				glm::vec3 rawPos(
 					static_cast<float>(p.GetX()),
 					static_cast<float>(p.GetY()),
 					static_cast<float>(p.GetZ())
 				);
-				FromJPHRotation(q, tc.Rotation);
+				glm::quat rawRot = ToGLM(q);
+
+				glm::vec3 safePos = SanitizeVec3(rawPos, MAX_SAFE_POSITION_COMPONENT);
+				glm::quat safeRot = SanitizeQuat(rawRot);
+
+				if (Vec3NeedsSanitization(rawPos, MAX_SAFE_POSITION_COMPONENT) ||
+					QuatNeedsSanitization(rawRot))
+				{
+					mBodyInterface->SetPositionAndRotation(
+						id,
+						ToJPHRVec3(safePos),
+						ToJPHQuat(safeRot),
+						JPH::EActivation::Activate
+					);
+
+					if (!rb.IsKinematic)
+					{
+						mBodyInterface->SetLinearVelocity(id, JPH::Vec3(0.0f, 0.0f, 0.0f));
+						mBodyInterface->SetAngularVelocity(id, JPH::Vec3(0.0f, 0.0f, 0.0f));
+					}
+				}
+
+				tc.Position = safePos;
+				FromJPHRotation(ToJPHQuat(safeRot), tc.Rotation);
 				tc.IsDirty = true;
 
 				AppliedProps &ap = mApplied[e];
-				ap.lastPos = glm::vec3(
-					static_cast<float>(p.GetX()),
-					static_cast<float>(p.GetY()),
-					static_cast<float>(p.GetZ())
-				);
-				ap.lastRot = ToGLM(q);
+				ap.lastPos = safePos;
+				ap.lastRot = safeRot;
 
 				if (!rb.IsKinematic)
 				{
-					JPH::Vec3 v = mBodyInterface->GetLinearVelocity(id);
-					rb.Velocity = glm::vec3(v.GetX(), v.GetY(), v.GetZ());
+					glm::vec3 rawV = ToGLM(mBodyInterface->GetLinearVelocity(id));
+					glm::vec3 rawW = ToGLM(mBodyInterface->GetAngularVelocity(id));
 
-					JPH::Vec3 w = mBodyInterface->GetAngularVelocity(id);
-					rb.AngularVelocity = glm::vec3(w.GetX(), w.GetY(), w.GetZ());
+					glm::vec3 safeV = SanitizeVec3(rawV, MAX_SAFE_LINEAR_VELOCITY_COMPONENT);
+					glm::vec3 safeW = SanitizeVec3(rawW, MAX_SAFE_ANGULAR_VELOCITY_COMPONENT);
+
+					if (Vec3NeedsSanitization(rawV, MAX_SAFE_LINEAR_VELOCITY_COMPONENT) ||
+						Vec3NeedsSanitization(rawW, MAX_SAFE_ANGULAR_VELOCITY_COMPONENT))
+					{
+						mBodyInterface->SetLinearVelocity(id, ToJPHVec3(safeV));
+						mBodyInterface->SetAngularVelocity(id, ToJPHVec3(safeW));
+					}
+
+					rb.Velocity = safeV;
+					rb.AngularVelocity = safeW;
 				}
 			}
 		);
@@ -821,12 +893,12 @@ namespace Engine
 			hasMesh = wantGeom && TryBuildMeshInfoFromEntity(scene, e, info, true);
 		}
 
-		bool const immovable = (rb.Mass <= 0.0f);
+		bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
 		ColliderType effectiveShape = rb.Shape;
 
-		// Dynamic mesh colliders are poor for player/controller response.
-		// Force movable MESH bodies onto BOX unless explicitly authored otherwise.
-		if (!immovable && effectiveShape == ColliderType::MESH)
+		// Keep mesh colliders for static and kinematic bodies.
+		// Only true dynamic non-kinematic mesh bodies fall back to BOX.
+		if (!immovable && !rb.IsKinematic && effectiveShape == ColliderType::MESH)
 			effectiveShape = ColliderType::BOX;
 
 		switch (effectiveShape)
@@ -1002,11 +1074,14 @@ namespace Engine
 		auto &tc = reg.get<TransformComponent>(e);
 		auto &rb = reg.get<RigidbodyComponent>(e);
 
-		bool const immovable = (rb.Mass <= 0.0f);
+		bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
+
+		rb.Velocity = SanitizeVec3(rb.Velocity, MAX_SAFE_LINEAR_VELOCITY_COMPONENT);
+		rb.AngularVelocity = SanitizeVec3(rb.AngularVelocity, MAX_SAFE_ANGULAR_VELOCITY_COMPONENT);
 
 		JPH::Ref<JPH::Shape> shape = MakeShapeForEntity(scene, e, tc, rb);
-		glm::vec3 worldPos = ExtractWorldPosition(tc.WorldTransform);
-		glm::quat worldRot = ExtractWorldRotation(tc.WorldTransform);
+		glm::vec3 worldPos = SanitizeVec3(ExtractWorldPosition(tc.WorldTransform), MAX_SAFE_POSITION_COMPONENT);
+		glm::quat worldRot = SanitizeQuat(ExtractWorldRotation(tc.WorldTransform));
 
 		JPH::BodyCreationSettings settings(
 			shape,
@@ -1023,7 +1098,6 @@ namespace Engine
 		}
 
 		settings.mFriction = 0.6f;
-		settings.mMotionQuality = ChooseMotionQuality(rb);
 		settings.mRestitution = std::clamp(rb.Restitution, 0.0f, 1.0f);
 		settings.mLinearDamping = rb.LinearDamping;
 		settings.mAngularDamping = rb.AngularDamping;
@@ -1039,19 +1113,13 @@ namespace Engine
 			mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
 		}
 
+		if (!rb.UseGravity)
 		{
 			JPH::BodyLockWrite lock(mPhysics.GetBodyLockInterface(), id);
 			if (lock.Succeeded())
 			{
-				JPH::Body &body = lock.GetBody();
-				if (!immovable)
-					body.SetEnhancedInternalEdgeRemoval(true);
-
-				if (!rb.UseGravity)
-				{
-					if (JPH::MotionProperties *mp = body.GetMotionProperties())
-						mp->SetGravityFactor(0.0f);
-				}
+				if (JPH::MotionProperties *mp = lock.GetBody().GetMotionProperties())
+					mp->SetGravityFactor(0.0f);
 			}
 		}
 
