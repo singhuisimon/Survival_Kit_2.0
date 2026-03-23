@@ -165,6 +165,7 @@ namespace Game
             HidePopup();
             LogMessage("ShopPopup: Ready! Skin1Purchased=" + ProgressTracker.Skin1Purchased +
                        " Skin2Purchased=" + ProgressTracker.Skin2Purchased +
+                       " Skin3Purchased=" + ProgressTracker.Skin3Purchased +
                        " EquippedSkin=" + ProgressTracker.EquippedSkin);
         }
 
@@ -390,11 +391,18 @@ namespace Game
                            " - have " + ProgressTracker.CumulativeScore + ", need " + SKINCOST);
                 return;
             }
+
             ProgressTracker.CumulativeScore -= SKINCOST;
+
             if (skinIndex == 1) ProgressTracker.Skin1Purchased = true;
             else if (skinIndex == 2) ProgressTracker.Skin2Purchased = true;
+
+            // Save immediately so purchase persists even if score later drops below threshold
             ProgressTracker.SaveProgress();
-            LogMessage("ShopPopup: Purchased skin " + skinIndex + "! Remaining points: " + ProgressTracker.CumulativeScore);
+            LogMessage("ShopPopup: Purchased skin " + skinIndex +
+                       "! Remaining points: " + ProgressTracker.CumulativeScore +
+                       " | Skin" + skinIndex + "Purchased saved to progress.json");
+
             UpdateScoreDisplay();
             UpdatePacksButtonStates();
         }
@@ -407,10 +415,15 @@ namespace Game
                            ProgressTracker.ByteChips + ", need " + SKIN3BYTECHIPCOST);
                 return;
             }
+
             ProgressTracker.ByteChips -= SKIN3BYTECHIPCOST;
             ProgressTracker.Skin3Purchased = true;
+
+            // Save immediately
             ProgressTracker.SaveProgress();
-            LogMessage("ShopPopup: Purchased skin 3! Remaining ByteChips: " + ProgressTracker.ByteChips);
+            LogMessage("ShopPopup: Purchased skin 3! Remaining ByteChips: " + ProgressTracker.ByteChips +
+                       " | Skin3Purchased saved to progress.json");
+
             UpdateByteChipsDisplay();
             UpdatePacksButtonStates();
         }
@@ -448,6 +461,7 @@ namespace Game
             isPacksTab = true;
             Event.Publish(EVENTPOPUPOPENED, POPUPID);
 
+            // Load from disk to restore purchased skin state across sessions
             ProgressTracker.LoadProgress();
 
             if (closeButtonId != 0) SetPosition(closeButtonId, ref closeButtonVisiblePos);
