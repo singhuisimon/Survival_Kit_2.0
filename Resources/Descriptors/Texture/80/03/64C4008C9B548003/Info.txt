@@ -1,7 +1,0 @@
-{
-  "name": "EquipButton.png",
-  "guid": "64C4008C9B548003",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

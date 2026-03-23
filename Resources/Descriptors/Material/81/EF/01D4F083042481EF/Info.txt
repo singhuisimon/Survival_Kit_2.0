@@ -1,7 +1,0 @@
-{
-  "name": "OOB.mat",
-  "guid": "01D4F083042481EF",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

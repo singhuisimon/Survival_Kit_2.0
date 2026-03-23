@@ -1,7 +1,0 @@
-{
-  "name": "Paused_HowToPlayButton.png",
-  "guid": "D70F708349BE012B",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "DefenceFailed.mat",
-  "guid": "8F0F708349BE01D5",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

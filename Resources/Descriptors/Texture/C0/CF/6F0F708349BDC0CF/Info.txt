@@ -1,7 +1,0 @@
-{
-  "name": "Example_PlayerHPDefault.png",
-  "guid": "6F0F708349BDC0CF",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

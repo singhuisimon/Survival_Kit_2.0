@@ -1,7 +1,0 @@
-{
-  "name": "PauseMenu_EngineBG.png",
-  "guid": "070F708349BE0145",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

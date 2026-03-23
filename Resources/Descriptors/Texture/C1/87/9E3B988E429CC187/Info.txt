@@ -1,7 +1,0 @@
-{
-  "name": "Heart2.png",
-  "guid": "9E3B988E429CC187",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

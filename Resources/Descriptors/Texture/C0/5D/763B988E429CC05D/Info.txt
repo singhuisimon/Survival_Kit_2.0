@@ -1,7 +1,0 @@
-{
-  "name": "trench_run_v006_BaseColor.png",
-  "guid": "763B988E429CC05D",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

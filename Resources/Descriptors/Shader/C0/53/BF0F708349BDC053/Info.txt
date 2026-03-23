@@ -1,7 +1,0 @@
-{
-  "name": "survival_kit_obj.vert",
-  "guid": "BF0F708349BDC053",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

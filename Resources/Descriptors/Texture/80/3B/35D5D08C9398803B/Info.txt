@@ -1,7 +1,0 @@
-{
-  "name": "Level2Button.png",
-  "guid": "35D5D08C9398803B",
-  "tags": [],
-  "lastImported": "0000000069A6D3E2",
-  "resourceLinks": []
-}

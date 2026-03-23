@@ -1,7 +1,0 @@
-{
-  "name": "HowToPlayButton.png",
-  "guid": "F70F708349BDC0ED",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

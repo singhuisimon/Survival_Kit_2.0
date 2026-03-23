@@ -1,7 +1,0 @@
-{
-  "name": "DefenceSuccess.png",
-  "guid": "C1D4F083042480AB",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

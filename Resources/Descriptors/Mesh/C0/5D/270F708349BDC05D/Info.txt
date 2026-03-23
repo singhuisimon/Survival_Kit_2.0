@@ -1,7 +1,0 @@
-{
-  "name": "A9003_dreadnought_v002.fbx",
-  "guid": "270F708349BDC05D",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}
