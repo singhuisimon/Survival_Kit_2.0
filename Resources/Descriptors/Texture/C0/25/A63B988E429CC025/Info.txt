@@ -1,0 +1,7 @@
+{
+  "name": "ExclamationIcon.png",
+  "guid": "A63B988E429CC025",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "MuzzleFlashBurst.mat",
+  "guid": "EAF0088C9F988003",
+  "tags": [],
+  "lastImported": "0000000069A703E2",
+  "resourceLinks": []
+}

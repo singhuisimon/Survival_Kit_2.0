@@ -1,0 +1,7 @@
+{
+  "name": "MainMenu_QuitConfirmation.png",
+  "guid": "29D4F08304248103",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "Splash19.png",
+  "guid": "363B988E429CC2F7",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

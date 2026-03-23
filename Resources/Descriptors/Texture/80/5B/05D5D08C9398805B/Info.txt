@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModel_v003_Roughness.png",
+  "guid": "05D5D08C9398805B",
+  "tags": [],
+  "lastImported": "0000000069A6D3E2",
+  "resourceLinks": []
+}

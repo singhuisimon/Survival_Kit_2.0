@@ -1,0 +1,7 @@
+{
+  "name": "Ring2.png",
+  "guid": "F63B988E429CC263",
+  "tags": [],
+  "lastImported": "0000000069AD8FF3",
+  "resourceLinks": []
+}

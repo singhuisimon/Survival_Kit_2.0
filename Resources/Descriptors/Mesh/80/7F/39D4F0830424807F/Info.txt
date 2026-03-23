@@ -1,0 +1,7 @@
+{
+  "name": "lvl1_OOB_walls.fbx",
+  "guid": "39D4F0830424807F",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

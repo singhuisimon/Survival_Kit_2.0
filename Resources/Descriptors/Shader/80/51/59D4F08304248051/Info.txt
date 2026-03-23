@@ -1,0 +1,7 @@
+{
+  "name": "survival_kit_obj.frag",
+  "guid": "59D4F08304248051",
+  "tags": [],
+  "lastImported": "0000000069809612",
+  "resourceLinks": []
+}

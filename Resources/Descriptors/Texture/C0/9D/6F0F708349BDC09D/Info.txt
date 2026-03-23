@@ -1,0 +1,7 @@
+{
+  "name": "Checkbox_Ticked.png",
+  "guid": "6F0F708349BDC09D",
+  "tags": [],
+  "lastImported": "000000006981AC77",
+  "resourceLinks": []
+}
