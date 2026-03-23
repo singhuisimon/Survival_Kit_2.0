@@ -51,17 +51,14 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            if (hasCollectedUpgrade && !hasSpawnedSentry)
-            {
-                if (GameState.IsPaused)
+            if (GameState.IsPaused)
                     return;
 
-                countdown -= deltaTime;  // ticks automatically, no key hold needed
+            if (hasCollectedUpgrade && !hasSpawnedSentry)
+            {
 
-                if (countdown <= 0.0f)
-                {
-                    SpawnSentry();
-                }
+                SpawnSentry();
+                
             }
 
             if (hasSpawnedSentry && !hasSpawnedTurret)

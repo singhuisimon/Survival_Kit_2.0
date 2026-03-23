@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Keylogger_TrenchEnd",
     "Prefab GUID": 15425594612788693537,
-    "version": 1,
+    "version": 2,
     "entities": [
         {
             "Name": "Keylogger_TrenchEnd",
@@ -153,9 +153,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "16002055365082794519",
-                            "ScriptClassName": "Game.EnemyTurret",
+                            "ScriptClassName": "Game.EndEnemyTurret",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 17699
                         }
                     }
                 }
