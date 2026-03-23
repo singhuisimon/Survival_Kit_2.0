@@ -716,7 +716,7 @@ namespace Engine
 			descriptorEditor.Clear();
 			return;
 		}
-
+		ImGui::SetNextWindowSize(ImVec2(800, 600));
 		if (ImGui::Begin("Descriptor Editor Panel", &showDescriptorEditorPanel, ImGuiWindowFlags_NoDocking))
 		{
 			LOG_DEBUG("displayDescriptorEditorPanel OPEN");

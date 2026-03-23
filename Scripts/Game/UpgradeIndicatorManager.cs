@@ -54,10 +54,10 @@ namespace Game
         private float edgePadding = 20.0f;
 
         [SerializeField("On Screen Threshold")]
-        private float onScreenThreshold = 0.58f;
+        private float onScreenThreshold = 0.35f;
 
         [SerializeField("Max Indicators")]
-        private int maxIndicators = 8;
+        private int maxIndicators = 16;
 
         [SerializeField("Indicator Prefab Path")]
         private string indicatorPrefabPath = "Sources/Prefabs/UpgradeIndicator.prefab";
@@ -148,6 +148,12 @@ namespace Game
                 float sx = Vector3.Dot(dir, camRight);
                 float sy = Vector3.Dot(dir, camUp);
                 float sz = Vector3.Dot(dir, camFwd);
+
+                // Hide indicator when module is visible on screen
+                if (sz > 0.0f && SimpleMath.Abs(sx) < onScreenThreshold && SimpleMath.Abs(sy) < onScreenThreshold)
+                {
+                    continue;
+                }
 
                 if (sz > 0.0f)
                     sy += sz;

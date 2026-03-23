@@ -112,6 +112,7 @@ namespace Game
         //sfx swap weapon
         [SerializeField] private float primaryPitchMin = 0.95f;
         [SerializeField] private float primaryPitchMax = 1.0f;
+        [SerializeField] private string primarybulletbasepath = "Small Laser_";
 
         #endregion
 
@@ -487,6 +488,9 @@ namespace Game
                 // NEW: bullet audio velocity uses bullet velocity
                 RigidbodySetVelocity(bulletaudioID, ref bulletVel);
 
+                // NEW: Randomize AudioFilepath (M6)
+                AudioSetFile(bulletaudioID, RandomizeAudioPath());
+
                 // NEW: Adjust the bullet pitch
                 float newPitch = RandFloat(primaryPitchMin, primaryPitchMax);
                 AudioSetPitch(bulletaudioID, newPitch);
@@ -666,6 +670,12 @@ namespace Game
             }
 
             return vel;
+        }
+
+        private string RandomizeAudioPath(){
+            int randomint = RandInt(1, 8);
+            string filepath = primarybulletbasepath + randomint.ToString() + ".wav";
+            return filepath;
         }
 
     }
