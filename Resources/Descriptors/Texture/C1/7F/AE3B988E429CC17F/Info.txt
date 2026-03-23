@@ -1,7 +1,0 @@
-{
-  "name": "GroundCrack7.png",
-  "guid": "AE3B988E429CC17F",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

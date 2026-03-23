@@ -1,7 +1,0 @@
-{
-  "name": "FireEmbers3.png",
-  "guid": "9059208D7F3842A9",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

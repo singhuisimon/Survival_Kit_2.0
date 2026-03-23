@@ -1,7 +1,0 @@
-{
-  "name": "PacksButton_Selected.png",
-  "guid": "F0E958931D588043",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

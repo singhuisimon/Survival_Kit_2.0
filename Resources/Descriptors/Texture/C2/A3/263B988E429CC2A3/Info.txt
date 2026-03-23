@@ -1,7 +1,0 @@
-{
-  "name": "Smoke2.png",
-  "guid": "263B988E429CC2A3",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

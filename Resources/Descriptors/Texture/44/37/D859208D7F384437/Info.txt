@@ -1,7 +1,0 @@
-{
-  "name": "Shield7.png",
-  "guid": "D859208D7F384437",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

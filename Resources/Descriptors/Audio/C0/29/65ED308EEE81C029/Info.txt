@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Game Failure.wav",
-  "guid": "65ED308EEE81C029",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

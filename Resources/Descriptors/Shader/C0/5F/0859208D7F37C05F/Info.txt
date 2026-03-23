@@ -1,7 +1,0 @@
-{
-  "name": "object_picking.frag",
-  "guid": "0859208D7F37C05F",
-  "tags": [],
-  "lastImported": "0000000069AA825F",
-  "resourceLinks": []
-}

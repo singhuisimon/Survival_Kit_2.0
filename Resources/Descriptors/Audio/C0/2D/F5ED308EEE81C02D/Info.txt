@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Trench Run Corrupted Core.wav",
-  "guid": "F5ED308EEE81C02D",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

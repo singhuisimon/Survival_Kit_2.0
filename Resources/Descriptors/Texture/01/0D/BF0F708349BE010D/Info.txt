@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_StartGamePopUp.png",
-  "guid": "BF0F708349BE010D",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

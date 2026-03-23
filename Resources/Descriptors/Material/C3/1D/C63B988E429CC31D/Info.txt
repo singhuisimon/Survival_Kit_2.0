@@ -1,7 +1,0 @@
-{
-  "name": "Firewall_Shimmer.mat",
-  "guid": "C63B988E429CC31D",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

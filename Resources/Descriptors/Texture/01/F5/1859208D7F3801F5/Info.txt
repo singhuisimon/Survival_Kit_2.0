@@ -1,7 +1,0 @@
-{
-  "name": "ShutdownButton.png",
-  "guid": "1859208D7F3801F5",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

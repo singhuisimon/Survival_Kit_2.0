@@ -1,7 +1,0 @@
-{
-  "name": "Button_RestartLevel1.png",
-  "guid": "5F42E88F854C4013",
-  "tags": [],
-  "lastImported": "0000000069B29AB1",
-  "resourceLinks": []
-}

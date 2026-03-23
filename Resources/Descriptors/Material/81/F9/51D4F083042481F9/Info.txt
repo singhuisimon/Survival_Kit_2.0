@@ -1,7 +1,0 @@
-{
-  "name": "PrimaryUltBullet.mat",
-  "guid": "51D4F083042481F9",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

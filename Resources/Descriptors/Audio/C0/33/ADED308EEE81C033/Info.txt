@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Trench Run Walls.wav",
-  "guid": "ADED308EEE81C033",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "System AI_VO_Core Damage 1.wav",
-  "guid": "75ED308EEE81C01F",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

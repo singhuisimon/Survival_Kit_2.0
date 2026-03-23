@@ -1,7 +1,0 @@
-{
-  "name": "Tooltip_DescriptionWorms.png",
-  "guid": "232F808F8A9C8035",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

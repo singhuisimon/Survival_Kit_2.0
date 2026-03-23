@@ -1,7 +1,0 @@
-{
-  "name": "Projectile9.png",
-  "guid": "C859208D7F38440D",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

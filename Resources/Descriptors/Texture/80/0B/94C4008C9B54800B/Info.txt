@@ -1,7 +1,0 @@
-{
-  "name": "Monetisation_ByteChips_Window.png",
-  "guid": "94C4008C9B54800B",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

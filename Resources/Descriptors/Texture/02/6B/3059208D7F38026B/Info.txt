@@ -1,7 +1,0 @@
-{
-  "name": "DigitalProjectileHead.png",
-  "guid": "3059208D7F38026B",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

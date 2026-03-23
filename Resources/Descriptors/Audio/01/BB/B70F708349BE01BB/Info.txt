@@ -1,7 +1,0 @@
-{
-  "name": "Player_Secondary_Fire.wav",
-  "guid": "B70F708349BE01BB",
-  "tags": [],
-  "lastImported": "000000006981AC78",
-  "resourceLinks": []
-}

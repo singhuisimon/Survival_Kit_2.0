@@ -1,7 +1,0 @@
-{
-  "name": "Circle19.png",
-  "guid": "A859208D7F38022D",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

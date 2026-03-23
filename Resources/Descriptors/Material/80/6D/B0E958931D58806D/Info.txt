@@ -1,7 +1,0 @@
-{
-  "name": "SentryBarFill.mat",
-  "guid": "B0E958931D58806D",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

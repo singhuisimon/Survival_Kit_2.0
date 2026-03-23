@@ -1,7 +1,0 @@
-{
-  "name": "Button_NextLevel.png",
-  "guid": "D32F808F8A9C8013",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

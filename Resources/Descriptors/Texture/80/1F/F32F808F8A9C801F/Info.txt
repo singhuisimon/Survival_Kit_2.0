@@ -1,7 +1,0 @@
-{
-  "name": "E009_keylogger_v005_v001_BaseColor.png",
-  "guid": "F32F808F8A9C801F",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

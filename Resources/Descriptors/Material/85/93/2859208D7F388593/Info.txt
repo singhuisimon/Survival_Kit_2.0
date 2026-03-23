@@ -1,7 +1,0 @@
-{
-  "name": "WormHost.mat",
-  "guid": "2859208D7F388593",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

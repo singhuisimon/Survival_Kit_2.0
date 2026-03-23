@@ -1,7 +1,0 @@
-{
-  "name": "SummonBarFill.mat",
-  "guid": "08E958931D588073",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

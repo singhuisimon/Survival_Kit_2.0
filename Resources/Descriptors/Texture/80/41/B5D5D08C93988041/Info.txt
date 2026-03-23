@@ -1,7 +1,0 @@
-{
-  "name": "LevelSelectionPopup_Level2.png",
-  "guid": "B5D5D08C93988041",
-  "tags": [],
-  "lastImported": "0000000069AD9B97",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "PlayerModel_Blue_v003_Emissive.png",
-  "guid": "6FE6188F2A988001",
-  "tags": [],
-  "lastImported": "0000000069B29AB1",
-  "resourceLinks": []
-}

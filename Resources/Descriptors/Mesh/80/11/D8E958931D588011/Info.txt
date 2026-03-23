@@ -1,7 +1,0 @@
-{
-  "name": "lvl2redesign_level_design_v002.fbx",
-  "guid": "D8E958931D588011",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

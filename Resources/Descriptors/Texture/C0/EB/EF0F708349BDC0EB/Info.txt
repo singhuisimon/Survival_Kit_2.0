@@ -1,7 +1,0 @@
-{
-  "name": "HighscoreButton.png",
-  "guid": "EF0F708349BDC0EB",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

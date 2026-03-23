@@ -1,7 +1,0 @@
-{
-  "name": "MainMenu_Settings_DefaultButton.png",
-  "guid": "0676888F23868005",
-  "tags": [],
-  "lastImported": "0000000069B1139A",
-  "resourceLinks": []
-}

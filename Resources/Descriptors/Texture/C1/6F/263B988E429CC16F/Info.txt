@@ -1,7 +1,0 @@
-{
-  "name": "Glow9.png",
-  "guid": "263B988E429CC16F",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

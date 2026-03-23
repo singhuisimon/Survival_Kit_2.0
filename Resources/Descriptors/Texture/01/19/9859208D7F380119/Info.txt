@@ -1,7 +1,0 @@
-{
-  "name": "E005_loveletter_v003_Metallic.png",
-  "guid": "9859208D7F380119",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

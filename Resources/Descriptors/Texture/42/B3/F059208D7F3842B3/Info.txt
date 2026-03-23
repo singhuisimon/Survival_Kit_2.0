@@ -1,7 +1,0 @@
-{
-  "name": "FlameMaskTrail.png",
-  "guid": "F059208D7F3842B3",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

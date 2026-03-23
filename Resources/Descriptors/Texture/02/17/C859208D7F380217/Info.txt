@@ -1,7 +1,0 @@
-{
-  "name": "trench_run_v005_Emissive.png",
-  "guid": "C859208D7F380217",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

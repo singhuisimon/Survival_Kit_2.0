@@ -1,7 +1,0 @@
-{
-  "name": "UI Pause Button Hover.wav",
-  "guid": "B059208D7F388523",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

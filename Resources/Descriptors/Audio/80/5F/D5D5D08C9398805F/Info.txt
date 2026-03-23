@@ -1,7 +1,0 @@
-{
-  "name": "Sentry Ambient.wav",
-  "guid": "D5D5D08C9398805F",
-  "tags": [],
-  "lastImported": "0000000069A6D3E2",
-  "resourceLinks": []
-}

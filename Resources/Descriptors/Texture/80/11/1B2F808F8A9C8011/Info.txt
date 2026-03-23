@@ -1,7 +1,0 @@
-{
-  "name": "Button_BackToMainMenu.png",
-  "guid": "1B2F808F8A9C8011",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "PlayerParticleTrail.mat",
-  "guid": "E059208D7F388575",
-  "tags": [],
-  "lastImported": "0000000069AA8262",
-  "resourceLinks": []
-}

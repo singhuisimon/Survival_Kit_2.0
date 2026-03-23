@@ -1,7 +1,0 @@
-{
-  "name": "trails.vert",
-  "guid": "4F0F708349BDC057",
-  "tags": [],
-  "lastImported": "0000000069B2AD66",
-  "resourceLinks": []
-}

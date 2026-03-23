@@ -1,7 +1,0 @@
-{
-  "name": "TimerBarMat.mat",
-  "guid": "B1D4F08304248205",
-  "tags": [],
-  "lastImported": "0000000069809612",
-  "resourceLinks": []
-}

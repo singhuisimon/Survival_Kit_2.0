@@ -1,7 +1,0 @@
-{
-  "name": "Crosshair_HitBorder.png",
-  "guid": "370F708349BDC0A5",
-  "tags": [],
-  "lastImported": "000000006981AC77",
-  "resourceLinks": []
-}

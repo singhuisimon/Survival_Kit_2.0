@@ -1,7 +1,0 @@
-{
-  "name": "IOExchangeButton.png",
-  "guid": "F5ED308EEE818005",
-  "tags": [],
-  "lastImported": "0000000069B0514C",
-  "resourceLinks": []
-}

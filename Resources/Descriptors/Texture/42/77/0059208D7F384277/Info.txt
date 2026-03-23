@@ -1,7 +1,0 @@
-{
-  "name": "ElectricMask.png",
-  "guid": "0059208D7F384277",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

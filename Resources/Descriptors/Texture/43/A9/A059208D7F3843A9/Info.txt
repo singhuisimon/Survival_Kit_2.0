@@ -1,7 +1,0 @@
-{
-  "name": "LightingErode1.png",
-  "guid": "A059208D7F3843A9",
-  "tags": [],
-  "lastImported": "0000000069AA8261",
-  "resourceLinks": []
-}

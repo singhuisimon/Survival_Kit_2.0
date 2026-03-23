@@ -1,7 +1,0 @@
-{
-  "name": "EnemyHPBar_Frame.png",
-  "guid": "9A08408DF60C8011",
-  "tags": [],
-  "lastImported": "0000000069AC5DB2",
-  "resourceLinks": []
-}

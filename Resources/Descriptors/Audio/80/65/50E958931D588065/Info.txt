@@ -1,7 +1,0 @@
-{
-  "name": "Trojan Shoot.wav",
-  "guid": "50E958931D588065",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}

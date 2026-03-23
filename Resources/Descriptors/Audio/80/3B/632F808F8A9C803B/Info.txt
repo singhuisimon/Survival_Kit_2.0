@@ -1,7 +1,0 @@
-{
-  "name": "Player Collide Damage.wav",
-  "guid": "632F808F8A9C803B",
-  "tags": [],
-  "lastImported": "0000000069B2AFF2",
-  "resourceLinks": []
-}

@@ -1,7 +1,0 @@
-{
-  "name": "A1001_turret_v005_Roughness.png",
-  "guid": "A059208D7F3800C1",
-  "tags": [],
-  "lastImported": "0000000069AA8260",
-  "resourceLinks": []
-}

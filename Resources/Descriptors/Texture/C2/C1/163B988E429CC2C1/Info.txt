@@ -1,7 +1,0 @@
-{
-  "name": "Spiral11.png",
-  "guid": "163B988E429CC2C1",
-  "tags": [],
-  "lastImported": "0000000069AD8FF3",
-  "resourceLinks": []
-}

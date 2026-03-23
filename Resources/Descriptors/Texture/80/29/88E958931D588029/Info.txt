@@ -1,7 +1,0 @@
-{
-  "name": "DefenceSuccess_Level2Cutscene_07.png",
-  "guid": "88E958931D588029",
-  "tags": [],
-  "lastImported": "0000000069C0FAE2",
-  "resourceLinks": []
-}
