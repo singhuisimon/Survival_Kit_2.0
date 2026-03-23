@@ -1,0 +1,7 @@
+{
+  "name": "lvl1_level_design_v004_Roughness.png",
+  "guid": "B859208D7F38016D",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

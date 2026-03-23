@@ -1,0 +1,7 @@
+{
+  "name": "SummonBarBG.mat",
+  "guid": "58E958931D588071",
+  "tags": [],
+  "lastImported": "0000000069C0FAE2",
+  "resourceLinks": []
+}

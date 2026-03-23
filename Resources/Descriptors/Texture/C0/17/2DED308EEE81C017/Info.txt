@@ -1,0 +1,7 @@
+{
+  "name": "Tooltip_Objective_KillEnemy.png",
+  "guid": "2DED308EEE81C017",
+  "tags": [],
+  "lastImported": "0000000069B0514C",
+  "resourceLinks": []
+}

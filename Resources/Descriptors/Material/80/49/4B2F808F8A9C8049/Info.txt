@@ -1,0 +1,7 @@
+{
+  "name": "PayloadIndicator.mat",
+  "guid": "4B2F808F8A9C8049",
+  "tags": [],
+  "lastImported": "0000000069B2AFF2",
+  "resourceLinks": []
+}

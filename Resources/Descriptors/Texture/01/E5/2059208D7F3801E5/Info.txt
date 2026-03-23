@@ -1,0 +1,7 @@
+{
+  "name": "PrimaryWeapBar_Frame.png",
+  "guid": "2059208D7F3801E5",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

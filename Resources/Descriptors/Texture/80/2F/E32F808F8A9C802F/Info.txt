@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModel_Rainbow_v003_Emissive.png",
+  "guid": "E32F808F8A9C802F",
+  "tags": [],
+  "lastImported": "0000000069B2AFF2",
+  "resourceLinks": []
+}

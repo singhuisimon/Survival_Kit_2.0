@@ -1,0 +1,7 @@
+{
+  "name": "Destructible wall_v001_v001_BaseColor.png",
+  "guid": "CA08408DF60C8003",
+  "tags": [],
+  "lastImported": "0000000069AC5DB2",
+  "resourceLinks": []
+}

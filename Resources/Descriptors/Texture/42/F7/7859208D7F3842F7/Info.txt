@@ -1,0 +1,7 @@
+{
+  "name": "Flare40.png",
+  "guid": "7859208D7F3842F7",
+  "tags": [],
+  "lastImported": "0000000069AA8261",
+  "resourceLinks": []
+}

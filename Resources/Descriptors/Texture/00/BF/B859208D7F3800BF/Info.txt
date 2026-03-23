@@ -1,0 +1,7 @@
+{
+  "name": "A1001_turret_v005_Opacity.png",
+  "guid": "B859208D7F3800BF",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

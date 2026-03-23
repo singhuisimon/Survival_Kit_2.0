@@ -1,0 +1,7 @@
+{
+  "name": "DigitalShapes2.png",
+  "guid": "B059208D7F38426F",
+  "tags": [],
+  "lastImported": "0000000069AA8261",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "E009_keylogger_v005_v002_Roughness.png",
+  "guid": "08E958931D58803F",
+  "tags": [],
+  "lastImported": "0000000069C0FAE2",
+  "resourceLinks": []
+}

@@ -1,0 +1,7 @@
+{
+  "name": "RingGlow.png",
+  "guid": "4059208D7F38441F",
+  "tags": [],
+  "lastImported": "0000000069AA8261",
+  "resourceLinks": []
+}

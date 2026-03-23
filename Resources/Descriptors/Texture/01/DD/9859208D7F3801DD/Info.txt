@@ -1,0 +1,7 @@
+{
+  "name": "PlayerModel_v003_Metallic.png",
+  "guid": "9859208D7F3801DD",
+  "tags": [],
+  "lastImported": "0000000069AA8260",
+  "resourceLinks": []
+}

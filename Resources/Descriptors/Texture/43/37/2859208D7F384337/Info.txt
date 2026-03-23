@@ -1,0 +1,7 @@
+{
+  "name": "Heart2.png",
+  "guid": "2859208D7F384337",
+  "tags": [],
+  "lastImported": "0000000069AA8261",
+  "resourceLinks": []
+}

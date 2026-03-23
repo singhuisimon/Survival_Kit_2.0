@@ -1,0 +1,7 @@
+{
+  "name": "Rotating_fan_v001.fbx",
+  "guid": "88E958931D588013",
+  "tags": [],
+  "lastImported": "0000000069C0FAE2",
+  "resourceLinks": []
+}

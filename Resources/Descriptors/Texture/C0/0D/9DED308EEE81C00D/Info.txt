@@ -1,0 +1,7 @@
+{
+  "name": "Tooltip_CombatPrimary.png",
+  "guid": "9DED308EEE81C00D",
+  "tags": [],
+  "lastImported": "0000000069B0514C",
+  "resourceLinks": []
+}

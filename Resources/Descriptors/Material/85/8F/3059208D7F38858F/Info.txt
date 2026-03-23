@@ -1,0 +1,7 @@
+{
+  "name": "VFX_MuzzleFlash1.mat",
+  "guid": "3059208D7F38858F",
+  "tags": [],
+  "lastImported": "0000000069AA8262",
+  "resourceLinks": []
+}
