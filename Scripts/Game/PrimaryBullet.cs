@@ -124,8 +124,23 @@ namespace Game
             DamageSystem.DealDamage(targetEntityID, Damage, bulletEntityID);
 
             Publish("BulletHit", targetEntityID.ToString());
-            Publish("BulletHitEnemy", true.ToString());
-            Publish("GainUlt", UltRecharged.ToString());
+
+            string tag = Tag.TagGetTag(targetEntityID);
+            string normalizedTag = tag == null ? "" : tag.ToLower();
+
+            bool givesUlt =
+                normalizedTag == "loveletter" ||
+                normalizedTag == "botnet" ||
+                normalizedTag == "enemy_core" ||
+                normalizedTag == "enemy_keylogger" ||
+                normalizedTag == "wormhost" ||
+                normalizedTag == "enemyturret" ||
+                normalizedTag == "destructablewall";
+
+            if (givesUlt)
+            {
+                Publish("GainUlt", UltRecharged.ToString());
+            }
 
             LogMessage(
                 "BulletHit: target=" + targetEntityID +
@@ -133,7 +148,7 @@ namespace Game
                 " damage=" + Damage
             );
 
-            BeginDeferredDestroy();
+            BeginDeferredDestroy(); 
         }
 
         private void OnEnvironmentHit(string eventName, string payload)
