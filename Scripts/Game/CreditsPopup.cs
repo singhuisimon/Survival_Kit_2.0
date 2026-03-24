@@ -1,7 +1,3 @@
-// Copyright (C) 2024-2025 DigiPen Institute of Technology.
-// Reproduction or disclosure of this file or its contents without the prior
-// written consent of DigiPen Institute of Technology is prohibited.
-
 using Engine;
 using System;
 using static Engine.Scene;
@@ -13,23 +9,23 @@ namespace Game
 {
     public class CreditsPopup : ScriptBehaviour
     {
-        // Entity names to find
-        private const string CREDITS_BUTTON_NAME = "Credits Button";
-        private const string POPUP_MAIN_NAME = "Credits Popup Main";
-        private const string POPUP_RESOURCES_NAME = "Credits Popup Resources";
-        private const string CLOSE_BUTTON_NAME = "Credits Close Button";
-        private const string CLOSE_BUTTON_2_NAME = "Credits Close Button 2";
+        // Entity names
+        private const string CREDITSBUTTONNAME = "Credits Button";
+        private const string POPUPMAINNAME = "Credits Popup Main";
+        private const string POPUPRESOURCESNAME = "Credits Popup Resources";
+        private const string CLOSEBUTTONNAME = "Credits Close Button";
+        private const string CLOSEBUTTON2NAME = "Credits Close Button 2";
 
         // Positions
-        private const float HIDDEN_Y = -500.0f;
-        private const float VISIBLE_Y = 360.0f;
-        private const float CENTER_X = 640.0f;
+        private const float HIDDENY = -500.0f;
+        private const float VISIBLEY = 360.0f;
+        private const float CENTERX = 640.0f;
 
         // Absolute button positions when visible
-        private const float CLOSE_BUTTON_X = 766.0f;
-        private const float CLOSE_BUTTON_Y = 50.0f;
-        private const float CLOSE_BUTTON_2_X = 1243.0f;
-        private const float CLOSE_BUTTON_2_Y = 269.0f;
+        private const float CLOSEBUTTONX = 766.0f;
+        private const float CLOSEBUTTONY = 50.0f;
+        private const float CLOSEBUTTON2X = 1243.0f;
+        private const float CLOSEBUTTON2Y = 269.0f;
 
         // Entity IDs
         private uint creditsButtonId;
@@ -39,157 +35,167 @@ namespace Game
         private uint closeButton2Id;
 
         // Event names for popup coordination
-        private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
-        private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";
-        private const string POPUP_ID = "Credits";
+        private const string EVENTPOPUPOPENED = "MainMenuPopupOpened";
+        private const string EVENTPOPUPCLOSED = "MainMenuPopupClosed";
+        private const string POPUPID = "Credits";
 
         // State
-        private bool isPopupVisible = false;
+        private bool isMainVisible = false;
+        private bool isResourcesVisible = false;
         private bool entitiesFound = false;
         private bool wasMousePressed = false;
 
         public override void OnStart()
         {
-            LogMessage("CreditsPopup: Initializing...");
+            LogMessage("CreditsPopup Initializing...");
 
-            creditsButtonId = SceneFindEntityByName(CREDITS_BUTTON_NAME);
-            popupMainId = SceneFindEntityByName(POPUP_MAIN_NAME);
-            popupResourcesId = SceneFindEntityByName(POPUP_RESOURCES_NAME);
-            closeButtonId = SceneFindEntityByName(CLOSE_BUTTON_NAME);
-            closeButton2Id = SceneFindEntityByName(CLOSE_BUTTON_2_NAME);
+            creditsButtonId = SceneFindEntityByName(CREDITSBUTTONNAME);
+            popupMainId = SceneFindEntityByName(POPUPMAINNAME);
+            popupResourcesId = SceneFindEntityByName(POPUPRESOURCESNAME);
+            closeButtonId = SceneFindEntityByName(CLOSEBUTTONNAME);
+            closeButton2Id = SceneFindEntityByName(CLOSEBUTTON2NAME);
 
-            if (creditsButtonId == 0)
-            {
-                LogError("CreditsPopup: Could not find entity: " + CREDITS_BUTTON_NAME);
-                return;
-            }
-            if (popupMainId == 0)
-            {
-                LogError("CreditsPopup: Could not find entity: " + POPUP_MAIN_NAME);
-                return;
-            }
-            if (popupResourcesId == 0)
-            {
-                LogError("CreditsPopup: Could not find entity: " + POPUP_RESOURCES_NAME);
-                return;
-            }
-            if (closeButtonId == 0)
-            {
-                LogError("CreditsPopup: Could not find entity: " + CLOSE_BUTTON_NAME);
-                return;
-            }
-            if (closeButton2Id == 0)
-            {
-                LogError("CreditsPopup: Could not find entity: " + CLOSE_BUTTON_2_NAME);
-                return;
-            }
+
+            if (creditsButtonId == 0) { LogError("CreditsPopup Could not find entity: " + CREDITSBUTTONNAME); return; }
+            if (popupMainId == 0) { LogError("CreditsPopup Could not find entity: " + POPUPMAINNAME); return; }
+            if (popupResourcesId == 0) { LogError("CreditsPopup Could not find entity: " + POPUPRESOURCESNAME); return; }
+            if (closeButtonId == 0) { LogError("CreditsPopup Could not find entity: " + CLOSEBUTTONNAME); return; }
+            if (closeButton2Id == 0) { LogError("CreditsPopup Could not find entity: " + CLOSEBUTTON2NAME); return; }
 
             entitiesFound = true;
-            isPopupVisible = false;
+            isMainVisible = false;
+            isResourcesVisible = false;
             wasMousePressed = false;
 
-            // Subscribe to popup coordination events
-            Event.Subscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
-
-            LogMessage("CreditsPopup: All entities found, ready!");
+            Event.Subscribe(EVENTPOPUPOPENED, OnOtherPopupOpened);
+            LogMessage("CreditsPopup All entities found, ready!");
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            if (!entitiesFound)
-                return;
+            if (!entitiesFound) return;
 
             bool isMousePressed = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
 
-            if (mouseJustPressed)
-            {
-                HandleMouseClick();
-            }
+            if (mouseJustPressed) HandleMouseClick();
         }
 
         private void HandleMouseClick()
         {
-            if (isPopupVisible)
+            // Close button 1 closes ONLY Credits Popup Main
+            if (isMainVisible && Collision2D.IsMouseCollidingWithEntity(closeButtonId))
             {
-                bool closeHit = Collision2D.IsMouseCollidingWithEntity(closeButtonId);
-                bool close2Hit = Collision2D.IsMouseCollidingWithEntity(closeButton2Id);
-
-                if (closeHit || close2Hit)
-                {
-                    LogMessage("CreditsPopup: Close button clicked - hiding popup");
-                    HidePopup();
-                }
+                LogMessage("CreditsPopup Close button 1 clicked - hiding Main popup");
+                HideMain();
+                return;
             }
-            else
-            {
-                bool creditsHit = Collision2D.IsMouseCollidingWithEntity(creditsButtonId);
 
-                if (creditsHit)
-                {
-                    LogMessage("CreditsPopup: Credits button clicked - showing popup");
-                    ShowPopup();
-                }
+            // Close button 2 closes ONLY Credits Popup Resources
+            if (isResourcesVisible && Collision2D.IsMouseCollidingWithEntity(closeButton2Id))
+            {
+                LogMessage("CreditsPopup Close button 2 clicked - hiding Resources popup");
+                HideResources();
+                return;
+            }
+
+            // Credits button opens both popups
+            if (!isMainVisible && !isResourcesVisible && Collision2D.IsMouseCollidingWithEntity(creditsButtonId))
+            {
+                LogMessage("CreditsPopup Credits button clicked - showing popup");
+                ShowPopup();
             }
         }
 
         private void OnOtherPopupOpened(string eventName, string payload)
         {
-            if (payload != POPUP_ID && isPopupVisible)
+            if (payload != POPUPID && (isMainVisible || isResourcesVisible))
             {
-                LogMessage("CreditsPopup: Another popup opened (" + payload + ") - closing credits");
-                HidePopup();
+                LogMessage("CreditsPopup Another popup opened: " + payload + " - closing credits");
+                HideAll();
             }
         }
 
         private void ShowPopup()
         {
-            isPopupVisible = true;
-            Event.Publish(EVENT_POPUP_OPENED, POPUP_ID);
+            isMainVisible = true;
+            isResourcesVisible = true;
+            Event.Publish(EVENTPOPUPOPENED, POPUPID);
 
-            // Show both popups (Resources in front of Main)
-            Vector3 mainPos = new Vector3(CENTER_X, VISIBLE_Y, -0.5f);
+            // Resources in front of Main
+            Vector3 mainPos = new Vector3(CENTERX, VISIBLEY, -0.5f);
             SetPosition(popupMainId, ref mainPos);
 
-            Vector3 resPos = new Vector3(CENTER_X, VISIBLE_Y, -0.51f);
+            Vector3 resPos = new Vector3(CENTERX, VISIBLEY, -0.51f);
             SetPosition(popupResourcesId, ref resPos);
 
-            Vector3 closePos = new Vector3(CLOSE_BUTTON_X, CLOSE_BUTTON_Y, -0.6f);
+            Vector3 closePos = new Vector3(CLOSEBUTTONX, CLOSEBUTTONY, -0.6f);
             SetPosition(closeButtonId, ref closePos);
 
-            Vector3 close2Pos = new Vector3(CLOSE_BUTTON_2_X, CLOSE_BUTTON_2_Y, -0.6f);
+            Vector3 close2Pos = new Vector3(CLOSEBUTTON2X, CLOSEBUTTON2Y, -0.6f);
             SetPosition(closeButton2Id, ref close2Pos);
 
-            LogMessage("CreditsPopup: Popup shown");
+            LogMessage("CreditsPopup Popup shown");
         }
 
-        private void HidePopup()
+        private void HideMain()
         {
-            bool wasVisible = isPopupVisible;
-            isPopupVisible = false;
-            if (wasVisible)
-                Event.Publish(EVENT_POPUP_CLOSED, POPUP_ID);
+            isMainVisible = false;
 
-            Vector3 mainHiddenPos = new Vector3(CENTER_X, HIDDEN_Y, -0.5f);
+            Vector3 mainHiddenPos = new Vector3(CENTERX, HIDDENY, -0.5f);
             SetPosition(popupMainId, ref mainHiddenPos);
 
-            Vector3 resHiddenPos = new Vector3(CENTER_X, HIDDEN_Y, -0.51f);
+            Vector3 closeHiddenPos = new Vector3(CLOSEBUTTONX, HIDDENY, -0.6f);
+            SetPosition(closeButtonId, ref closeHiddenPos);
+
+            if (!isResourcesVisible)
+                Event.Publish(EVENTPOPUPCLOSED, POPUPID);
+
+            LogMessage("CreditsPopup Main popup hidden");
+        }
+
+        private void HideResources()
+        {
+            isResourcesVisible = false;
+
+            Vector3 resHiddenPos = new Vector3(CENTERX, HIDDENY, -0.51f);
             SetPosition(popupResourcesId, ref resHiddenPos);
 
-            Vector3 closePos = new Vector3(CLOSE_BUTTON_X, HIDDEN_Y, -0.6f);
-            SetPosition(closeButtonId, ref closePos);
+            Vector3 close2HiddenPos = new Vector3(CLOSEBUTTON2X, HIDDENY, -0.6f);
+            SetPosition(closeButton2Id, ref close2HiddenPos);
 
-            Vector3 close2Pos = new Vector3(CLOSE_BUTTON_2_X, HIDDEN_Y, -0.6f);
-            SetPosition(closeButton2Id, ref close2Pos);
+            if (!isMainVisible)
+                Event.Publish(EVENTPOPUPCLOSED, POPUPID);
 
-            LogMessage("CreditsPopup: Popup hidden");
+            LogMessage("CreditsPopup Resources popup hidden");
+        }
+
+        private void HideAll()
+        {
+            isMainVisible = false;
+            isResourcesVisible = false;
+
+            Vector3 mainHiddenPos = new Vector3(CENTERX, HIDDENY, -0.5f);
+            SetPosition(popupMainId, ref mainHiddenPos);
+
+            Vector3 resHiddenPos = new Vector3(CENTERX, HIDDENY, -0.51f);
+            SetPosition(popupResourcesId, ref resHiddenPos);
+
+            Vector3 closeHiddenPos = new Vector3(CLOSEBUTTONX, HIDDENY, -0.6f);
+            SetPosition(closeButtonId, ref closeHiddenPos);
+
+            Vector3 close2HiddenPos = new Vector3(CLOSEBUTTON2X, HIDDENY, -0.6f);
+            SetPosition(closeButton2Id, ref close2HiddenPos);
+
+            Event.Publish(EVENTPOPUPCLOSED, POPUPID);
+            LogMessage("CreditsPopup All popups hidden");
         }
 
         public override void OnDestroy()
         {
-            Event.Unsubscribe(EVENT_POPUP_OPENED, OnOtherPopupOpened);
-            LogMessage("CreditsPopup: Destroyed");
+            Event.Unsubscribe(EVENTPOPUPOPENED, OnOtherPopupOpened);
+            LogMessage("CreditsPopup Destroyed");
         }
     }
 }
