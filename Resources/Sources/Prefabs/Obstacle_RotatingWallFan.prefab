@@ -1,0 +1,117 @@
+{
+    "Prefab Name": "Prefab: Obstacle_RotatingWallFan.prefab",
+    "Prefab GUID": 965486190788514879,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Obstacle_RotatingWallFan",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17235003726765954623",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                7.793065071105957
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8449941005842366635",
+                            "Name": "Obstacle_RotatingWallFan",
+                            "Tag": "Fan"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1670563414573700675",
+                            "Mesh": "Rotating_fan_v001.fbx",
+                            "Material": "MAT_Obstacle_RotatingWallFan.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11470396203731867201",
+                            "Mass": -1.0,
+                            "IsKinematic": true,
+                            "IsTrigger": false,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                2.0
+                            ],
+                            "LinearDamping": 0.0,
+                            "AngularDamping": 0.0,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 3,
+                            "BoxHalfExtent": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18259308759888434235",
+                            "ScriptClassName": "Game.TickDamage",
+                            "Started": false,
+                            "GCHandle": 2307
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

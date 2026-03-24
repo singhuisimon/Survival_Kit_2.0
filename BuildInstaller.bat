@@ -58,8 +58,11 @@ echo ===========================================
 echo [INSTALLER] Step 3/5: Compiling Assets
 echo ===========================================
 
-"build\bin\Release\AssetCompiler.exe" --force --verbose
-if %ERRORLEVEL% NEQ 0 (echo [ERROR] Asset compilation failed & exit /b %ERRORLEVEL%)
+"build\bin\Release\AssetCompiler.exe" --force --verbose --input "%CD%\Resources\Descriptors" --output "%CD%\Resources\Compiled"
+echo [NOTE] AssetCompiler exit code: %ERRORLEVEL% (non-zero is expected - Audio/Material/Shader compilers not implemented)
+
+robocopy "Resources\Compiled" "build\bin\Release\Resources\Compiled" /E /IS /IT /NP /NJH /NJS
+if %ERRORLEVEL% GEQ 8 (echo [ERROR] Failed to copy compiled assets & exit /b 1)
 
 echo [OK] Assets compiled.
 

@@ -1,0 +1,10 @@
+{
+    "sourcePath": "/Resources/Sources/Textures/RotatingWall/Rotating_fan_v001_v001_Metallic.png",
+    "textureSettings": {
+        "usageType": "COLOR",
+        "compression": "BC7",
+        "quality": 1.0,
+        "generateMipmaps": true,
+        "srgb": true
+    }
+}

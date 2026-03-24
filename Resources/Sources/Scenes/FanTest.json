@@ -3,6 +3,89 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Obstacle_RotatingWallFan",
+                        "Tag": "Fan"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17235003726765954623",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            7.793065071105957
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "1670563414573700675",
+                        "Mesh": "Rotating_fan_v001.fbx",
+                        "Material": "MAT_Obstacle_RotatingWallFan.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "11470396203731867201",
+                        "Mass": -1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            2.0
+                        ],
+                        "LinearDamping": 0.0,
+                        "AngularDamping": 0.0,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                }
+            ]
+        },
+        {
             "ID": 1,
             "Components": [
                 {
@@ -84,89 +167,6 @@
                     }
                 }
             ]
-        },
-        {
-            "ID": 0,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Fan",
-                        "Tag": "Fan"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "17235003726765954623",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            7.793065071105957
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "1670563414573700675",
-                        "Mesh": "Rotating_fan_v001.fbx",
-                        "Material": "",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "11470396203731867201",
-                        "Mass": -1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            2.0
-                        ],
-                        "LinearDamping": 0.0,
-                        "AngularDamping": 0.0,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 3,
-                        "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                }
-            ]
         }
     ],
     "Settings": [
@@ -174,7 +174,7 @@
             "BloomToggle": false,
             "BloomStrength": 0.009999999776482582,
             "BloomFilterRadius": 0.0024999999441206455,
-            "Exposure": 1.0,
+            "Exposure": 5.0,
             "GlobalBias": 0.004999999888241291,
             "MasterVolume": 1.0,
             "SFXVolume": 1.0,

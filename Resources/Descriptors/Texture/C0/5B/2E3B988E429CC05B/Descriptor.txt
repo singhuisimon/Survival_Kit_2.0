@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/Trenchrun LevelDesign/trench_run_v005_Emissive.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}
