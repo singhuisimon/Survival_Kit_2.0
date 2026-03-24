@@ -2,7 +2,7 @@
 /*!
 \file       PhysicsSystem.cpp
 \author     Low Yue Jun (yuejun.low)
-\par        email: yuejun.low@digipen.edu
+\par        email       yuejun.low@digipen.edu
 \date       2025/10/25
 \brief      Jolt Physics runtime integration:
 			- World bootstrap (Factory, allocators, job system)
@@ -10,7 +10,7 @@
 			- Body lifecycle mirroring ECS (create/refresh/destroy)
 			- Kinematic pose push & dynamic velocity push/pull
 			- Mesh collider support (triangle mesh / convex hull) with
-				scaled-shape wrapping and shape caching
+			  scaled-shape wrapping and shape caching
 			- Rotation helpers supporting glm::quat and Euler-deg vec3
 			- Internal accumulator-based fixed timestep stepping
 
@@ -48,22 +48,19 @@ namespace Engine
 	static constexpr float DEFAULT_HALF_EXT = 0.5f;
 	static constexpr float WORLD_SCALE_EPS = 1e-6f;
 
-	static constexpr double DEFAULT_FIXED_STEP_SECONDS = 1.0 / 60.0;
+	static constexpr double DEFAULT_FIXED_STEP_SECONDS = 1.0 / 240.0;
 	static constexpr float  MAX_FRAME_DT_SECONDS = 0.25f;
 	static constexpr double ACCUMULATOR_EPS = 1e-9;
-	static constexpr std::uint32_t DEFAULT_MAX_CATCH_UP_STEPS = 8u;
+	static constexpr std::uint32_t DEFAULT_MAX_CATCH_UP_STEPS = 16u;
+	static constexpr int   DEFAULT_COLLISION_STEPS = 4;
+
+	static constexpr float SMALL_BODY_CCD_EXTENT = 0.25f;
+	static constexpr float FAST_BODY_CCD_SPEED = 12.0f;
 
 	static constexpr float MAX_SAFE_POSITION_COMPONENT = 1000000.0f;
 	static constexpr float MAX_SAFE_LINEAR_VELOCITY_COMPONENT = 100000.0f;
 	static constexpr float MAX_SAFE_ANGULAR_VELOCITY_COMPONENT = 10000.0f;
 
-	/*****************************************************************************/
-	/*!
-	\brief      Extracts world-space scale from a 4x4 transform matrix.
-	\param      m   World transform matrix.
-	\return     Per-axis scale (absolute), with near-zero axes clamped to 1.
-	*/
-	/*****************************************************************************/
 	static inline glm::vec3 ExtractWorldScale(glm::mat4 const &m)
 	{
 		glm::vec3 sx = glm::vec3(m[0]);
@@ -78,14 +75,6 @@ namespace Engine
 		return glm::vec3(std::fabs(lx), std::fabs(ly), std::fabs(lz));
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Extracts a pure rotation quaternion from a world transform matrix.
-	\details    Normalizes the basis vectors to remove scale before casting.
-	\param      m   World transform matrix.
-	\return     Rotation quaternion.
-	*/
-	/*****************************************************************************/
 	static inline glm::quat ExtractWorldRotation(glm::mat4 const &m)
 	{
 		glm::vec3 x = glm::vec3(m[0]);
@@ -95,6 +84,7 @@ namespace Engine
 		float lx = glm::length(x);
 		float ly = glm::length(y);
 		float lz = glm::length(z);
+
 		if (lx >= WORLD_SCALE_EPS) x /= lx; else x = glm::vec3(1.0f, 0.0f, 0.0f);
 		if (ly >= WORLD_SCALE_EPS) y /= ly; else y = glm::vec3(0.0f, 1.0f, 0.0f);
 		if (lz >= WORLD_SCALE_EPS) z /= lz; else z = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -103,16 +93,10 @@ namespace Engine
 		r[0] = x;
 		r[1] = y;
 		r[2] = z;
+
 		return glm::normalize(glm::quat_cast(r));
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Extracts world translation from a 4x4 transform matrix.
-	\param      m   World transform matrix.
-	\return     Translation component.
-	*/
-	/*****************************************************************************/
 	static inline glm::vec3 ExtractWorldPosition(glm::mat4 const &m)
 	{
 		return glm::vec3(m[3]);
@@ -155,14 +139,6 @@ namespace Engine
 		return glm::normalize(q);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Builds a stable cache key for a mesh instance + submesh.
-	\param      meshGuid     xresource instance GUID.
-	\param      submeshIndex Optional submesh index.
-	\return     64-bit key suitable for PhysicsBridge::CacheKey.
-	*/
-	/*****************************************************************************/
 	static inline std::uint64_t MakeMeshKey(xresource::instance_guid const &meshGuid, std::uint32_t submeshIndex)
 	{
 		std::uint64_t h = static_cast<std::uint64_t>(meshGuid.m_Value);
@@ -170,17 +146,6 @@ namespace Engine
 		return h;
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Populates MeshBuildInfo from engine resources for an entity.
-	\details    When needGeometry is false, only key/scale/doubleSided are filled.
-	\param      scene        Scene pointer.
-	\param      e            Entity id.
-	\param      out          Output mesh build info.
-	\param      needGeometry True to also populate vertices/indices.
-	\return     True if mesh reference (and geometry, if requested) was found.
-	*/
-	/*****************************************************************************/
 	static bool TryBuildMeshInfoFromEntity(Scene *scene, EntityID e, MeshBuildInfo &out, bool needGeometry)
 	{
 		assert(scene != nullptr);
@@ -210,7 +175,7 @@ namespace Engine
 		if (mesh == nullptr)
 			return false;
 
-		constexpr std::size_t STRIDE = 11; // pos3 + nrm3 + col3 + uv2
+		constexpr std::size_t STRIDE = 11;
 		if (mesh->vertices.size() < STRIDE || (mesh->vertices.size() % STRIDE) != 0)
 		{
 			assert(false && "Mesh vertex data has invalid stride");
@@ -273,14 +238,6 @@ namespace Engine
 		return !out.vertices.empty() && out.indices.size() >= 3;
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Converts a rotation to Jolt quaternion.
-	\tparam     R   Either glm::vec3 (Euler degrees) or glm::quat.
-	\param      r   Rotation in Euler degrees (glm::vec3) or quaternion (glm::quat).
-	\return     JPH::Quat constructed from the input.
-	*/
-	/*****************************************************************************/
 	template<typename R>
 	static inline JPH::Quat ToJPHRotation(R const &r)
 	{
@@ -290,14 +247,6 @@ namespace Engine
 			return ToJPHQuat(glm::normalize(r));
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Converts a Jolt quaternion back to the requested rotation type.
-	\tparam     R   Either glm::vec3 (Euler degrees) or glm::quat.
-	\param      q       Jolt quaternion.
-	\param      out     Output rotation in the requested type.
-	*/
-	/*****************************************************************************/
 	template<typename R>
 	static inline void FromJPHRotation(JPH::Quat const &q, R &out)
 	{
@@ -307,46 +256,11 @@ namespace Engine
 			out = ToGLM(q);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Returns a glm::quat from either Euler degrees or an existing quat.
-	\tparam     R   Either glm::vec3 (Euler degrees) or glm::quat.
-	\param      r   Input rotation.
-	\return     glm::quat representation.
-	*/
-	/*****************************************************************************/
-	template<typename R>
-	static inline glm::quat AsQuat(R const &r)
-	{
-		if constexpr (std::is_same_v<std::decay_t<R>, glm::vec3>)
-			return EulerDegToQuat(r);
-		else
-			return r;
-	}
-
-	/*****************************************************************************/
-	/*!
-	\brief      Float comparison with tolerance.
-	\param      a       First value.
-	\param      b       Second value.
-	\param      eps     Tolerance.
-	\return     True if |a - b| <= eps.
-	*/
-	/*****************************************************************************/
 	static inline bool NearlyEqual(float a, float b, float eps = 1e-5f)
 	{
 		return std::fabs(a - b) <= eps;
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      3D vector comparison with component-wise tolerance.
-	\param      a       First vector.
-	\param      b       Second vector.
-	\param      eps     Tolerance per component.
-	\return     True if all components are within tolerance.
-	*/
-	/*****************************************************************************/
 	static inline bool NearlyEqualVec3(glm::vec3 const &a, glm::vec3 const &b, float eps = 1e-4f)
 	{
 		return NearlyEqual(a.x, b.x, eps) &&
@@ -360,12 +274,50 @@ namespace Engine
 		return (1.0f - dotq) <= eps;
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Initializes Jolt world components and mirrors existing ECS bodies.
-	\param      scene   Scene pointer used to enumerate entities and components.
-	*/
-	/*****************************************************************************/
+	static inline float ComputeSmallestBodyExtent(RigidbodyComponent const &rb)
+	{
+		switch (rb.Shape)
+		{
+		case ColliderType::BOX:
+		case ColliderType::AABB:
+		{
+			glm::vec3 he = rb.BoxHalfExtents;
+			if (he.x > 0.0f && he.y > 0.0f && he.z > 0.0f)
+				return std::min(he.x, std::min(he.y, he.z));
+			break;
+		}
+
+		case ColliderType::SPHERE:
+			if (rb.SphereRadius > 0.0f)
+				return rb.SphereRadius;
+			break;
+
+		default:
+			break;
+		}
+
+		return -1.0f;
+	}
+
+	static inline JPH::EMotionQuality ChooseMotionQuality(RigidbodyComponent const &rb)
+	{
+		if (rb.Mass <= 0.0f || rb.IsKinematic || rb.IsTrigger)
+			return JPH::EMotionQuality::Discrete;
+
+		float const smallestExtent = ComputeSmallestBodyExtent(rb);
+		float const linearSpeed = glm::length(rb.Velocity);
+
+		bool const smallBody = (smallestExtent > 0.0f && smallestExtent <= SMALL_BODY_CCD_EXTENT);
+		bool const fastBody = (linearSpeed >= FAST_BODY_CCD_SPEED);
+		bool const canCrossOwnThicknessInStep =
+			(smallestExtent > 0.0f) &&
+			(linearSpeed * static_cast<float>(DEFAULT_FIXED_STEP_SECONDS) >= (smallestExtent * 2.0f));
+
+		return (smallBody || fastBody || canCrossOwnThicknessInStep)
+			? JPH::EMotionQuality::LinearCast
+			: JPH::EMotionQuality::Discrete;
+	}
+
 	void PhysicsSystem::OnInit(Scene *scene)
 	{
 		assert(scene != nullptr);
@@ -397,9 +349,9 @@ namespace Engine
 		)
 
 #ifdef _DEBUG
-		mTempAllocator = new JPH::TempAllocatorMalloc();
+			mTempAllocator = new JPH::TempAllocatorMalloc();
 #else
-		mTempAllocator = new JPH::TempAllocatorImpl(64u * 1024u * 1024u);
+			mTempAllocator = new JPH::TempAllocatorImpl(64u * 1024u * 1024u);
 #endif
 
 		unsigned const hw = std::max(1u, std::thread::hardware_concurrency());
@@ -424,15 +376,9 @@ namespace Engine
 		mBodyInterface = &mPhysics.GetBodyInterface();
 
 		BuildOrRefreshBodies(scene);
-		Engine::PhysicsAPI::EnableCollisionEvents();
+		PhysicsAPI::EnableCollisionEvents();
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Shuts down Jolt world and releases owned resources.
-	\param      scene   Unused; present for signature symmetry.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::OnShutdown(Scene * /*scene*/)
 	{
 		for (auto const &kv : mBodyOf)
@@ -446,8 +392,11 @@ namespace Engine
 		mShapeCache.clear();
 		mApplied.clear();
 
-		delete mJobSystem;     mJobSystem = nullptr;
-		delete mTempAllocator; mTempAllocator = nullptr;
+		delete mJobSystem;
+		mJobSystem = nullptr;
+
+		delete mTempAllocator;
+		mTempAllocator = nullptr;
 
 		JPH::UnregisterTypes();
 		delete JPH::Factory::sInstance;
@@ -458,14 +407,6 @@ namespace Engine
 		mMaxCatchUpSteps = DEFAULT_MAX_CATCH_UP_STEPS;
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Simulation step: sync ECS -> physics, advance using a fixed
-				internal timestep accumulator, then sync physics -> ECS.
-	\param      scene   Scene pointer.
-	\param      dt      Variable frame time step.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::OnUpdate(Scene *scene, Timestep dt)
 	{
 		assert(scene != nullptr);
@@ -482,15 +423,9 @@ namespace Engine
 
 		mAccumulatorSeconds += static_cast<double>(frameDt);
 
-		// High-FPS fix:
-		// Do NOT clear the collision frame unless we are actually going to step
-		// physics this update. Otherwise, render frames that take 0 fixed steps
-		// will wipe all contact data and scripts will observe "no collision".
 		if ((mAccumulatorSeconds + ACCUMULATOR_EPS) < mFixedStepSeconds)
 			return;
 
-		// Clear once per actual physics tick batch, then accumulate/dedupe contacts
-		// across all fixed substeps performed in this update.
 		PhysicsAPI::BeginCollisionFrame();
 
 		std::uint32_t stepsTaken = 0u;
@@ -501,7 +436,7 @@ namespace Engine
 
 			mPhysics.Update(
 				static_cast<float>(mFixedStepSeconds),
-				1,
+				DEFAULT_COLLISION_STEPS,
 				mTempAllocator,
 				mJobSystem
 			);
@@ -510,24 +445,15 @@ namespace Engine
 			++stepsTaken;
 		}
 
-		// Prevent unbounded backlog growth under severe hitching.
 		if (stepsTaken == mMaxCatchUpSteps && mAccumulatorSeconds > mFixedStepSeconds)
 			mAccumulatorSeconds = mFixedStepSeconds;
 
 		if (mAccumulatorSeconds < 0.0)
 			mAccumulatorSeconds = 0.0;
 
-		// We know at least one fixed step ran, so pull physics state back to ECS.
 		SyncPhysicsBodiesToECS(scene);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Mirrors ECS entities with RigidbodyComponent to Jolt bodies.
-				Creates missing bodies and destroys bodies for removed entities.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::BuildOrRefreshBodies(Scene *scene)
 	{
 		assert(scene != nullptr);
@@ -548,6 +474,7 @@ namespace Engine
 
 		std::vector<EntityID> to_remove;
 		to_remove.reserve(mBodyOf.size());
+
 		for (auto const &kv : mBodyOf)
 		{
 			if (seen.find(kv.first) == seen.end())
@@ -555,18 +482,9 @@ namespace Engine
 		}
 
 		for (EntityID e : to_remove)
-		{
 			DestroyBodyFor(e);
-		}
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Pushes ECS-authored transform/property/velocity changes into
-				Jolt bodies before fixed-step simulation.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::SyncECSBodiesToPhysics(Scene *scene)
 	{
 		assert(scene != nullptr);
@@ -577,9 +495,10 @@ namespace Engine
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
 			{
 				auto it = mBodyOf.find(e);
-				if (it == mBodyOf.end()) return;
-				JPH::BodyID const id = it->second;
+				if (it == mBodyOf.end())
+					return;
 
+				JPH::BodyID const id = it->second;
 				AppliedProps &ap = mApplied[e];
 
 				std::uint8_t const currentShapeKind = static_cast<std::uint8_t>(rb.Shape);
@@ -597,6 +516,7 @@ namespace Engine
 
 				JPH::EMotionType const targetMotionType = ToMotionType(rb);
 				JPH::ObjectLayer const targetLayer = ToObjectLayer(rb);
+
 				mBodyInterface->SetMotionType(
 					id,
 					targetMotionType,
@@ -673,41 +593,56 @@ namespace Engine
 					}
 				}
 
+				if (!immovable)
+				{
+					JPH::EMotionQuality const targetMotionQuality = ChooseMotionQuality(rb);
+					mBodyInterface->SetMotionQuality(id, targetMotionQuality);
+				}
+
 				glm::vec3 curPos = SanitizeVec3(ExtractWorldPosition(tc.WorldTransform), MAX_SAFE_POSITION_COMPONENT);
 				glm::quat curRot = SanitizeQuat(ExtractWorldRotation(tc.WorldTransform));
 
 				bool const posChanged = !NearlyEqualVec3(curPos, ap.lastPos);
 				bool const rotChanged = !NearlyEqualQuat(curRot, ap.lastRot);
 
-				if (!immovable && (posChanged || rotChanged))
+				if (!immovable)
 				{
-					mBodyInterface->SetPositionAndRotation(
-						id,
-						ToJPHRVec3(curPos),
-						ToJPHQuat(curRot),
-						JPH::EActivation::Activate
-					);
-					ap.lastPos = curPos;
-					ap.lastRot = curRot;
-				}
+					if (rb.IsKinematic)
+					{
+						if (posChanged || rotChanged)
+						{
+							mBodyInterface->SetPositionAndRotation(
+								id,
+								ToJPHRVec3(curPos),
+								ToJPHQuat(curRot),
+								JPH::EActivation::Activate
+							);
+							ap.lastPos = curPos;
+							ap.lastRot = curRot;
+						}
+					}
+					else
+					{
+						if (posChanged || rotChanged)
+						{
+							mBodyInterface->SetPositionAndRotation(
+								id,
+								ToJPHRVec3(curPos),
+								ToJPHQuat(curRot),
+								JPH::EActivation::Activate
+							);
+							ap.lastPos = curPos;
+							ap.lastRot = curRot;
+						}
 
-				if (!immovable && !rb.IsKinematic)
-				{
-					mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
-					mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
+						mBodyInterface->SetLinearVelocity(id, ToJPHVec3(rb.Velocity));
+						mBodyInterface->SetAngularVelocity(id, ToJPHVec3(rb.AngularVelocity));
+					}
 				}
 			}
 		);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Applies authored kinematic velocity targets for a single fixed
-				physics step.
-	\param      scene       Scene pointer.
-	\param      fixedStep   Fixed physics step duration in seconds.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::ApplyKinematicTargetsForStep(Scene *scene, float fixedStep)
 	{
 		assert(scene != nullptr);
@@ -718,7 +653,7 @@ namespace Engine
 		auto &reg = scene->GetRegistry();
 
 		reg.view<TransformComponent, RigidbodyComponent>().each(
-			[&](EntityID e, TransformComponent &, RigidbodyComponent &rb)
+			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
 			{
 				if (!rb.IsKinematic)
 					return;
@@ -730,27 +665,33 @@ namespace Engine
 				JPH::BodyID const id = it->second;
 				AppliedProps &ap = mApplied[e];
 
+				glm::vec3 authoredPos = SanitizeVec3(
+					ExtractWorldPosition(tc.WorldTransform),
+					MAX_SAFE_POSITION_COMPONENT
+				);
+				glm::quat authoredRot = SanitizeQuat(ExtractWorldRotation(tc.WorldTransform));
+
 				glm::vec3 stepVelocity = SanitizeVec3(rb.Velocity, MAX_SAFE_LINEAR_VELOCITY_COMPONENT);
 				glm::vec3 stepOmega = SanitizeVec3(rb.AngularVelocity, MAX_SAFE_ANGULAR_VELOCITY_COMPONENT);
 
-				bool const hasLinearMotion = glm::dot(stepVelocity, stepVelocity) > 1e-8f;
-				bool const hasAngularMotion = glm::dot(stepOmega, stepOmega) > 1e-8f;
+				bool const posAuthored = !NearlyEqualVec3(authoredPos, ap.lastPos);
+				bool const rotAuthored = !NearlyEqualQuat(authoredRot, ap.lastRot);
 
-				if (!hasLinearMotion && !hasAngularMotion)
-					return;
+				glm::vec3 targetPos = posAuthored ? authoredPos : ap.lastPos;
+				glm::quat targetRot = rotAuthored ? authoredRot : ap.lastRot;
 
-				glm::vec3 targetPos = ap.lastPos;
-				glm::quat targetRot = ap.lastRot;
-
-				if (hasLinearMotion)
+				if (!posAuthored)
 				{
-					targetPos = SanitizeVec3(
-						ap.lastPos + stepVelocity * fixedStep,
-						MAX_SAFE_POSITION_COMPONENT
-					);
+					if (glm::dot(stepVelocity, stepVelocity) > 1e-8f)
+					{
+						targetPos = SanitizeVec3(
+							ap.lastPos + stepVelocity * fixedStep,
+							MAX_SAFE_POSITION_COMPONENT
+						);
+					}
 				}
 
-				if (hasAngularMotion)
+				if (!rotAuthored)
 				{
 					float const omegaMag = glm::length(stepOmega);
 					if (omegaMag > 1e-6f)
@@ -760,6 +701,12 @@ namespace Engine
 						targetRot = SanitizeQuat(delta * ap.lastRot);
 					}
 				}
+
+				bool const targetPosChanged = !NearlyEqualVec3(targetPos, ap.lastPos);
+				bool const targetRotChanged = !NearlyEqualQuat(targetRot, ap.lastRot);
+
+				if (!targetPosChanged && !targetRotChanged)
+					return;
 
 				mBodyInterface->MoveKinematic(
 					id,
@@ -774,13 +721,6 @@ namespace Engine
 		);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Pulls latest transform and velocity state from Jolt into ECS
-				after one or more fixed simulation steps.
-	\param      scene   Scene pointer.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::SyncPhysicsBodiesToECS(Scene *scene)
 	{
 		assert(scene != nullptr);
@@ -791,7 +731,9 @@ namespace Engine
 			[&](EntityID e, TransformComponent &tc, RigidbodyComponent &rb)
 			{
 				auto it = mBodyOf.find(e);
-				if (it == mBodyOf.end()) return;
+				if (it == mBodyOf.end())
+					return;
+
 				JPH::BodyID const id = it->second;
 
 				JPH::RVec3 p{};
@@ -826,7 +768,7 @@ namespace Engine
 				}
 
 				tc.Position = safePos;
-				FromJPHRotation(ToJPHQuat(safeRot), tc.Rotation);
+				FromJPHRotation(q, tc.Rotation);
 				tc.IsDirty = true;
 
 				AppliedProps &ap = mApplied[e];
@@ -855,17 +797,6 @@ namespace Engine
 		);
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Produces a shape for an entity, using hooks and mesh cache when
-				possible. Falls back to a unit box when no mesh data is available.
-	\param      scene   Scene pointer.
-	\param      e       Entity id.
-	\param      tc      Transform component.
-	\param      rb      Rigidbody component.
-	\return     Ref-counted Jolt Shape to be used for body creation.
-	*/
-	/*****************************************************************************/
 	JPH::Ref<JPH::Shape> PhysicsSystem::MakeShapeForEntity(
 		Scene *scene,
 		EntityID e,
@@ -896,8 +827,6 @@ namespace Engine
 		bool const immovable = (rb.Mass <= 0.0f && !rb.IsKinematic);
 		ColliderType effectiveShape = rb.Shape;
 
-		// Keep mesh colliders for static and kinematic bodies.
-		// Only true dynamic non-kinematic mesh bodies fall back to BOX.
 		if (!immovable && !rb.IsKinematic && effectiveShape == ColliderType::MESH)
 			effectiveShape = ColliderType::BOX;
 
@@ -1056,13 +985,6 @@ namespace Engine
 			new JPH::BoxShape(JPH::Vec3::sReplicate(DEFAULT_HALF_EXT)));
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Creates and registers a Jolt body for the given entity.
-	\param      scene   Scene pointer.
-	\param      e       Entity id.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::CreateBodyFor(Scene *scene, EntityID e)
 	{
 		assert(scene != nullptr);
@@ -1098,6 +1020,7 @@ namespace Engine
 		}
 
 		settings.mFriction = 0.6f;
+		settings.mMotionQuality = ChooseMotionQuality(rb);
 		settings.mRestitution = std::clamp(rb.Restitution, 0.0f, 1.0f);
 		settings.mLinearDamping = rb.LinearDamping;
 		settings.mAngularDamping = rb.AngularDamping;
@@ -1158,16 +1081,11 @@ namespace Engine
 		mApplied[e] = ap;
 	}
 
-	/*****************************************************************************/
-	/*!
-	\brief      Destroys the Jolt body and removes cached state for the entity.
-	\param      e   Entity id.
-	*/
-	/*****************************************************************************/
 	void PhysicsSystem::DestroyBodyFor(EntityID e)
 	{
 		auto it = mBodyOf.find(e);
-		if (it == mBodyOf.end()) return;
+		if (it == mBodyOf.end())
+			return;
 
 		JPH::BodyID const id = it->second;
 		mBodyInterface->RemoveBody(id);
