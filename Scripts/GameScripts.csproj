@@ -1,29 +1,19 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<OutputType>Library</OutputType>
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<EnableDefaultCompileItems>true</EnableDefaultCompileItems>
 		<RootNamespace>GameScripts</RootNamespace>
 	</PropertyGroup>
 
-	<!-- OutputPath for Debug configuration -->
 	<PropertyGroup Condition="'$(Configuration)'=='Debug'">
 		<OutputPath>../build/bin/Debug/</OutputPath>
 	</PropertyGroup>
 
-	<!-- OutputPath for Release configuration -->
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<OutputPath>../build/bin/Release/</OutputPath>
 	</PropertyGroup>
-
-	<!--
-    SDK includes .cs files by default.
-    If you want to exclude, use:
-    <ItemGroup>
-      <Compile Remove="SomeFile.cs" />
-    </ItemGroup>
-  -->
 
 </Project>

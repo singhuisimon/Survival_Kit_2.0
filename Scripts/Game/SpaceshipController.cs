@@ -9,7 +9,6 @@ using static Engine.Input;
 using static Engine.Rigidbody;
 using static Engine.Event;
 using static Engine.ParticleSystem;
-using System.Collections.Specialized;
 using static Game.AudioSettings;
 
 namespace Game
@@ -52,6 +51,7 @@ namespace Game
 
         // ===== Cursor Control =====
         [SerializeField("Toggle Cursor Key")] private KeyCode toggleCursorKey = KeyCode.F3;
+        [SerializeField("Spawn Period")] private float spawnTimer = 0.05f;
         [SerializeField("Start With Cursor Locked")] private bool startWithCursorLocked = true;
 
         [SerializeField] private float playerHP = 100.0f;
@@ -64,32 +64,34 @@ namespace Game
         private string EVENT_GAMEEND = "GameEnd";
 
         // Inbound HP command events (any system can publish these)
-        private const string EVENT_PLAYER_HEAL   = "PlayerHeal";
+        private const string EVENT_PLAYER_HEAL = "PlayerHeal";
         private const string EVENT_PLAYER_DAMAGE_INBOUND = "PlayerDamage";
-        //Vampirism
-        private const string EVENT_WORMHOST_DEAD   = "WormHostDead";
-        private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
-        private const string EVENT_BOTNET_DEAD     = "BotnetDeath";
-        private const string EVENT_KEYLOGGER_DEAD  = "KeyloggerDeath";
 
-        private const float VAMPIRISM_WORMHOST    = 2.0f;
-        private const float VAMPIRISM_LOVELETTER  = 2.0f;
-        private const float VAMPIRISM_BOTNET      = 2.0f;
-        private const float VAMPIRISM_KEYLOGGER   = 2.0f;
-        private const float HEAL_VFX_DURATION     = 2.0f;
-        private float       HEAL_VFX_ACCUMULATOR  = 0.0f;
-        private float       DEATH_TIMER = 0.0f;
-        private const float DEATH_DELAY = 3.0f;      
+        // Vampirism
+        private const string EVENT_WORMHOST_DEAD = "WormHostDead";
+        private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
+        private const string EVENT_BOTNET_DEAD = "BotnetDeath";
+        private const string EVENT_KEYLOGGER_DEAD = "KeyloggerDeath";
+
+        private const float VAMPIRISM_WORMHOST = 2.0f;
+        private const float VAMPIRISM_LOVELETTER = 2.0f;
+        private const float VAMPIRISM_BOTNET = 2.0f;
+        private const float VAMPIRISM_KEYLOGGER = 2.0f;
+        private const float HEAL_VFX_DURATION = 2.0f;
+        private float HEAL_VFX_ACCUMULATOR = 0.0f;
+        private float DEATH_TIMER = 0.0f;
+        private const float DEATH_DELAY = 3.0f;
 
         private const string HEAL_VFX_ENTITY_NAME = "HealingVFX";
 
-        private const string TAG_PRIMARY_BULLET   = "PrimaryBullet";
+        private const string TAG_PRIMARY_BULLET = "PrimaryBullet";
         private const string TAG_SECONDARY_BULLET = "PrimaryUltBullet";
 
-        private bool endscene          = false;
+        private bool endscene = false;
         private bool startHealVFXTimer = false;
 
-        
+        private float controlLockTimer = 0.0f;
+        private bool controlsEnabled = false;
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -141,14 +143,14 @@ namespace Game
         [SerializeField] private float CAMSHAKE_DamageTakenDuration = 0.1f;
 
         // ===== Mouse Sensitivity =====
-        [SerializeField] private float mouseSensitivity = 1.0f; // Default = 1.0f, range = [0.25 - 2.5]
+        [SerializeField] private float mouseSensitivity = 1.0f;
 
         public override void OnStart()
         {
             playerHP = playerOriginalHP;
             countdownOOB = originalCountdownOOB;
             inEnvironment = true;
-             
+
             cameraEntityID = SceneFindEntityByName(cameraName);
             playerEntityID = SceneFindEntityByName(playerName);
             healingVFXEntityID = SceneFindEntityByName(HEAL_VFX_ENTITY_NAME);
@@ -165,7 +167,8 @@ namespace Game
                 return;
             }
 
-
+            controlLockTimer = 0.0f;
+            controlsEnabled = spawnTimer <= 0.0f;
 
             RigidbodySetUseGravity(playerEntityID, false);
             RigidbodySetIsKinematic(playerEntityID, false);
@@ -173,6 +176,7 @@ namespace Game
             Vector3 zero = Vector3.Zero;
             commandedVelocity = Vector3.Zero;
             RigidbodySetVelocity(playerEntityID, ref zero);
+            RigidbodySetAngularVelocity(playerEntityID, ref zero);
 
             cursorWasVisible = IsCursorVisible();
             if (startWithCursorLocked)
@@ -180,9 +184,13 @@ namespace Game
                 SetCursorVisible(false);
             }
 
-            Quat initialCamRot = GetRotation(cameraEntityID);
-            SetRotation(playerEntityID, ref initialCamRot);
-            targetPlayerRotation = initialCamRot;
+            InitializeCameraRotationStateFromCurrentTransform();
+
+            smoothCamPos = GetPosition(cameraEntityID);
+            camFollowInit = true;
+
+            // Keep the player's editor-set spawn rotation.
+            targetPlayerRotation = GetRotation(playerEntityID);
 
             EVENT_PLAYER_DAMAGE += playerEntityID.ToString();
             EVENT_PLAYER_OOB += playerEntityID.ToString();
@@ -192,22 +200,19 @@ namespace Game
             Subscribe(EVENT_GAMEEND, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
 
-            // Vampirism - heal player on player kills
-            Subscribe(EVENT_WORMHOST_DEAD,   OnVampirismKill);
+            Subscribe(EVENT_WORMHOST_DEAD, OnVampirismKill);
             Subscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
-            Subscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
-            Subscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
+            Subscribe(EVENT_BOTNET_DEAD, OnVampirismKill);
+            Subscribe(EVENT_KEYLOGGER_DEAD, OnVampirismKill);
 
-            // Inbound HP command events
-            Subscribe(EVENT_PLAYER_HEAL,           OnPlayerHeal);
+            Subscribe(EVENT_PLAYER_HEAL, OnPlayerHeal);
             Subscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
 
             SetEmissionRate(healingVFXEntityID, 0.0f);
-             mouseSensitivity = (AudioSettings.Instance != null)
-? AudioSettings.Instance.GetMouseSensitivity()
-: mouseSensitivity;
+            mouseSensitivity = (AudioSettings.Instance != null) ? AudioSettings.Instance.GetMouseSensitivity() : mouseSensitivity;
+
             initialized = true;
-            LogMessage("[SpaceshipController] Initialized - smoothed rigidbody movement in FixedUpdate");
+            LogMessage("[SpaceshipController] Initialized - preserving editor rotation and applying spawn movement lock");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -228,6 +233,17 @@ namespace Game
             if (GameState.IsPaused)
                 return;
 
+            if (!controlsEnabled)
+            {
+                controlLockTimer += deltaTime;
+
+                if (controlLockTimer >= spawnTimer)
+                {
+                    controlsEnabled = true;
+                    LogMessage("[SpaceshipController] Controls enabled after spawn delay");
+                }
+            }
+
             HandleCursorToggle();
 
             if (!IsCursorVisible())
@@ -239,23 +255,21 @@ namespace Game
             {
                 HEAL_VFX_ACCUMULATOR += deltaTime;
 
-                if(HEAL_VFX_ACCUMULATOR >= HEAL_VFX_DURATION)
+                if (HEAL_VFX_ACCUMULATOR >= HEAL_VFX_DURATION)
                 {
                     HEAL_VFX_ACCUMULATOR = 0.0f;
                     StopHealVFX();
                 }
             }
 
-            // For hit sparks VFX
             hitSparksTimer -= deltaTime;
-
-            
         }
 
         public override void OnFixedUpdate(float deltaTime)
         {
-            if (isPlayerDead) return;
-            
+            if (isPlayerDead)
+                return;
+
             if (!initialized || cameraEntityID == 0 || playerEntityID == 0)
                 return;
 
@@ -264,6 +278,19 @@ namespace Game
                 commandedVelocity = Vector3.Zero;
                 Vector3 zero = Vector3.Zero;
                 RigidbodySetVelocity(playerEntityID, ref zero);
+                RigidbodySetAngularVelocity(playerEntityID, ref zero);
+                return;
+            }
+
+            if (!controlsEnabled)
+            {
+                commandedVelocity = Vector3.Zero;
+
+                Vector3 zero = Vector3.Zero;
+                RigidbodySetVelocity(playerEntityID, ref zero);
+                RigidbodySetAngularVelocity(playerEntityID, ref zero);
+
+                emitParticles(Vector3.Zero);
                 return;
             }
 
@@ -278,15 +305,34 @@ namespace Game
             Unsubscribe(EVENT_GAMEEND, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
 
-            //unsubscribe for vampirism
-            Unsubscribe(EVENT_WORMHOST_DEAD,   OnVampirismKill);
+            Unsubscribe(EVENT_WORMHOST_DEAD, OnVampirismKill);
             Unsubscribe(EVENT_LOVELETTER_DEAD, OnVampirismKill);
-            Unsubscribe(EVENT_BOTNET_DEAD,     OnVampirismKill);
-            Unsubscribe(EVENT_KEYLOGGER_DEAD,  OnVampirismKill);
+            Unsubscribe(EVENT_BOTNET_DEAD, OnVampirismKill);
+            Unsubscribe(EVENT_KEYLOGGER_DEAD, OnVampirismKill);
 
-            // unsubscribe inbound HP command events
-            Unsubscribe(EVENT_PLAYER_HEAL,           OnPlayerHeal);
+            Unsubscribe(EVENT_PLAYER_HEAL, OnPlayerHeal);
             Unsubscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
+        }
+
+        private void InitializeCameraRotationStateFromCurrentTransform()
+        {
+            Quat camRot = GetRotation(cameraEntityID);
+
+            cameraForward = camRot.Forward;
+            if (cameraForward.SqrMagnitude < 1e-8f) cameraForward = Vector3.Forward;
+            else cameraForward = cameraForward.Normalized;
+
+            cameraRight = camRot.Right;
+            if (cameraRight.SqrMagnitude < 1e-8f) cameraRight = Vector3.Right;
+            else cameraRight = cameraRight.Normalized;
+
+            cameraUp = camRot.Up;
+            if (cameraUp.SqrMagnitude < 1e-8f) cameraUp = Vector3.Up;
+            else cameraUp = cameraUp.Normalized;
+
+            float clampedY = SimpleMath.Clamp(cameraForward.Y, -1.0f, 1.0f);
+            pitchRad = (float)Math.Asin(clampedY);
+            yawRad = (float)Math.Atan2(-cameraForward.X, -cameraForward.Z);
         }
 
         private void HandleCursorToggle()
@@ -305,15 +351,12 @@ namespace Game
         {
             GetMouseDelta(out float dx, out float dy);
 
-            // Update dx and dy with sensitivity value
             dx *= mouseSensitivity;
             dy *= mouseSensitivity;
 
             yawRad += -dx * yawSpeed * deltaTime;
             pitchRad += -dy * pitchSpeed * deltaTime;
-            float sensitivity = (AudioSettings.Instance != null)
-    ? AudioSettings.Instance.GetMouseSensitivity()
-    : mouseSensitivity;
+
             float limit = pitchLimitDegrees * SimpleMath.DEG_TO_RAD;
             pitchRad = SimpleMath.Clamp(pitchRad, -limit, limit);
 
@@ -352,8 +395,6 @@ namespace Game
                 moveDir = Vector3.Zero;
 
             Vector3 desiredVel = moveDir * spaceshipSpeed;
-
-            // Use actual rigidbody velocity, not only cached commanded velocity.
             Vector3 currentVel = RigidbodyGetVelocity(playerEntityID);
 
             float maxDelta;
@@ -378,11 +419,9 @@ namespace Game
             commandedVelocity = MoveTowards(currentVel, desiredVel, maxDelta);
             RigidbodySetVelocity(playerEntityID, ref commandedVelocity);
 
-            // Kill collision-induced spin.
             Vector3 zeroAngular = Vector3.Zero;
             RigidbodySetAngularVelocity(playerEntityID, ref zeroAngular);
 
-            // Keep facing under controller control.
             Quat playerRot = GetRotation(playerEntityID);
             playerRot = RotateTowards(playerRot, targetPlayerRotation, playerRotationSpeed, deltaTime);
             SetRotation(playerEntityID, ref playerRot);
@@ -425,8 +464,8 @@ namespace Game
 
             Vector3 camPos = GetPosition(cameraEntityID);
             Quat camRot = GetRotation(cameraEntityID);
-            Vector3 camForward = camRot.Forward;
-            camAimTarget = camPos + camForward * cameraLookDistance;
+            Vector3 camForwardNow = camRot.Forward;
+            camAimTarget = camPos + camForwardNow * cameraLookDistance;
             SetTarget(cameraEntityID, ref camAimTarget);
         }
 
@@ -457,7 +496,6 @@ namespace Game
                 playerHitSparksID = PrefabInstantiate(playerHitSparksPrefabPath);
                 isHitSparks = true;
 
-                // Apply skin colors to hit sparks
                 int skinIdx = ProgressTracker.EquippedSkin;
                 if (skinIdx >= 0 && skinIdx < SkinApplier.TRAIL_START_COLOR.Length)
                 {
@@ -479,22 +517,16 @@ namespace Game
             LogMessage("[SPACESHIP CONTROLLER] OnDamageReceived player from payload" + payload);
 
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
-            Publish("HealthBarDamaged", playerHP.ToString()); // ADD
+            Publish("HealthBarDamaged", playerHP.ToString());
 
-            // if (playerHP <= 0)
-            // {
-            //     Publish("PlayerDead", "");
-            // }
             if (playerHP <= 0 && !isPlayerDead)
             {
                 isPlayerDead = true;
-                DEATH_TIMER   = 0.0f;
+                DEATH_TIMER = 0.0f;
                 Vector3 playerPos = GetPosition(playerEntityID);
-                Quat    playerRot = GetRotation(playerEntityID);
 
                 SceneDestroyEntity(playerEntityID);
-                //Vector3 explosionScale = new Vector3(20.0f, 20.0f, 20.0f);
-                // Spawn explosion VFX at player position
+
                 uint playerDeathExplosion = PrefabInstantiate(VFX_PlayerDeathExplosionPrefab);
                 if (playerDeathExplosion == INVALID_ENTITY)
                 {
@@ -607,7 +639,6 @@ namespace Game
             return Quat.Slerp(current, target, t).Normalized();
         }
 
-        
         private void OnPlayerHeal(string eventName, string payload)
         {
             if (endscene || playerHP <= 0)
@@ -634,7 +665,7 @@ namespace Game
             if (playerHP < 0.0f) playerHP = 0.0f;
 
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
-            Publish("HealthBarDamaged", playerHP.ToString()); // ADD
+            Publish("HealthBarDamaged", playerHP.ToString());
 
             LogMessage("[SpaceshipController] PlayerDamage -" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
 
@@ -655,31 +686,28 @@ namespace Game
                 Publish("PlayerDead", "");
             }
         }
-        
-        //vampirism
+
         private void OnVampirismKill(string eventName, string payload)
         {
             if (endscene || playerHP <= 0)
                 return;
 
-            // Only heal if the killing blow was a player bullet
             bool isPlayerKill = payload.Contains(TAG_PRIMARY_BULLET) || payload.Contains(TAG_SECONDARY_BULLET);
             if (!isPlayerKill)
                 return;
 
             float healAmount = 0.0f;
-            if      (eventName == EVENT_WORMHOST_DEAD)   healAmount = VAMPIRISM_WORMHOST;
+            if (eventName == EVENT_WORMHOST_DEAD) healAmount = VAMPIRISM_WORMHOST;
             else if (eventName == EVENT_LOVELETTER_DEAD) healAmount = VAMPIRISM_LOVELETTER;
-            else if (eventName == EVENT_BOTNET_DEAD)     healAmount = VAMPIRISM_BOTNET;
-            else if (eventName == EVENT_KEYLOGGER_DEAD)  healAmount = VAMPIRISM_KEYLOGGER;
+            else if (eventName == EVENT_BOTNET_DEAD) healAmount = VAMPIRISM_BOTNET;
+            else if (eventName == EVENT_KEYLOGGER_DEAD) healAmount = VAMPIRISM_KEYLOGGER;
 
             if (healAmount > 0.0f)
-            { 
+            {
                 HealPlayer(healAmount);
                 PlayHealAudio();
                 PlayHealVFX();
             }
-                
         }
 
         private void HealPlayer(float amount)
@@ -690,8 +718,7 @@ namespace Game
 
             LogMessage("[SpaceshipController] Vampirism healed player +" + amount + " | HP: " + playerHP + "/" + playerOriginalHP);
             Publish(EVENT_PLAYER_HEALTHCHANGE, playerHP.ToString());
-            Publish("HealthBarHealing", playerHP.ToString()); // ADD
-
+            Publish("HealthBarHealing", playerHP.ToString());
         }
 
         private void PlayHealVFX()
@@ -705,16 +732,15 @@ namespace Game
             SetEmissionRate(healingVFXEntityID, 0.0f);
         }
 
-        private void PlayHealAudio(){
-            
-            uint healsound = 0;
-            healsound = PrefabInstantiate(playerHealAudioPrefab);
+        private void PlayHealAudio()
+        {
+            uint healsound = PrefabInstantiate(playerHealAudioPrefab);
 
-            if(healsound == 0){
+            if (healsound == 0)
+            {
                 LogMessage("[SpaceshipController] failed to play playerheal audio upon vapirism");
                 return;
             }
         }
-
     }
 }
