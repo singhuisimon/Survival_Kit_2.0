@@ -3,64 +3,22 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 3,
+            "ID": 1048576,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EndCreditController",
-                        "Tag": "EndCreditController"
+                        "Name": "CreditsContent",
+                        "Tag": "CreditsContent"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "14116648014824309395",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "15269569519431385749",
-                        "ScriptClassName": "Game.CreditsScroller"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "CreditFrame",
-                        "Tag": "CreditFrame"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6622658234852131463",
+                        "ComponentGUID": "7182828622914077155",
                         "Position": [
                             640.0,
-                            360.0,
+                            1896.5999755859375,
                             0.0
                         ],
                         "Rotation": [
@@ -69,8 +27,8 @@
                             0.0
                         ],
                         "Scale": [
-                            655.7999877929688,
-                            360.0,
+                            640.0,
+                            2505.330078125,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -80,7 +38,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "EndCredits_ComputerFrame.png",
+                        "Texture": "EndCredits_Content.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -88,7 +46,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 3,
+                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -147,22 +105,22 @@
             ]
         },
         {
-            "ID": 1048576,
+            "ID": 1,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "CreditsContent",
-                        "Tag": "CreditsContent"
+                        "Name": "CreditFrame",
+                        "Tag": "CreditFrame"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "7182828622914077155",
+                        "ComponentGUID": "6622658234852131463",
                         "Position": [
                             640.0,
-                            1896.5999755859375,
+                            360.0,
                             0.0
                         ],
                         "Rotation": [
@@ -171,8 +129,8 @@
                             0.0
                         ],
                         "Scale": [
-                            640.0,
-                            2505.330078125,
+                            655.7999877929688,
+                            360.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -182,7 +140,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "EndCredits_Content.png",
+                        "Texture": "EndCredits_ComputerFrame.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -190,9 +148,51 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 1,
+                        "Sprite Layer": 3,
                         "IsActive": true,
                         "IsVisible": true
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EndCreditController",
+                        "Tag": "EndCreditController"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14116648014824309395",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15269569519431385749",
+                        "ScriptClassName": "Game.CreditsScroller"
                     }
                 }
             ]
