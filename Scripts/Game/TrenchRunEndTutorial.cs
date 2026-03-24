@@ -22,9 +22,8 @@ namespace Game
         // Event
         private const string COREDEAD = "CoreDeadTriggerPostTrenchRun";
         private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
-         private const string EVENT_END_COOLDOWN = "DemoSentryCooldown";
-        private const string EVENT_END_FIRE = "DemoSentryFinishCooldown";
-
+        private const string EVENT_SENTRY_WAIT_TRENCH = "WaitingSentryTrench";
+        private const string EVENT_SENTRY_SPAWNED_TRENCH = "SentrySpawnedTrench";
         [SerializeField] private string payloadPrefab = "Sources/Prefabs/Payload.prefab";
         [SerializeField] private string upgradeModuleLabelPrefab = "Sources/Prefabs/UpgradeModuleLabel.prefab";
         private string sentryPrefab = "Sources/Prefabs/NormalSentry.prefab";
@@ -54,6 +53,7 @@ namespace Game
 
             Subscribe(COREDEAD, OnCoreDeath);
             Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
+            Subscribe(EVENT_SENTRY_SPAWNED_TRENCH, OnSentrySpawned);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -61,12 +61,12 @@ namespace Game
             if (GameState.IsPaused)
                     return;
 
-            if (hasCollectedUpgrade && !hasSpawnedSentry)
-            {
+            // if (hasCollectedUpgrade && !hasSpawnedSentry)
+            // {
 
-                SpawnSentry();
+            //     SpawnSentry();
                 
-            }
+            // }
 
             if (hasSpawnedSentry && !hasSpawnedTurret)
             {
@@ -84,6 +84,7 @@ namespace Game
         {
             Unsubscribe(COREDEAD, OnCoreDeath);
             Unsubscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
+            Unsubscribe(EVENT_SENTRY_SPAWNED_TRENCH, OnSentrySpawned);
         }
 
         // Event
@@ -161,29 +162,38 @@ namespace Game
             spawnedPayloadID = INVALID_ENTITY;
             
             hasCollectedUpgrade = true;
+            Publish(EVENT_SENTRY_WAIT_TRENCH, EntityID.ToString());
+        }
+
+        private void OnSentrySpawned(string eventName, string payload)
+        {
+            if (hasCollectedUpgrade && !hasSpawnedSentry)
+            {
+                hasSpawnedSentry = true;   
+            }
         }
 
         private void SpawnSentry()
         {
-            uint sentryID = PrefabInstantiate(sentryPrefab);
-            if (sentryID == 0)
-            {
-                LogMessage("[TrenchRunEndTutorial] Failed to spawn Sentry");
-                return;
-            }
+            // uint sentryID = PrefabInstantiate(sentryPrefab);
+            // if (sentryID == 0)
+            // {
+            //     LogMessage("[TrenchRunEndTutorial] Failed to spawn Sentry");
+            //     return;
+            // }
 
-            Vector3 spawnPos = GetPosition(playerID);
-            Quat spawnRot = GetRotation(playerID);
-            SetPosition(sentryID, ref spawnPos);
-            SetRotation(sentryID, ref spawnRot);
+            // Vector3 spawnPos = GetPosition(playerID);
+            // Quat spawnRot = GetRotation(playerID);
+            // SetPosition(sentryID, ref spawnPos);
+            // SetRotation(sentryID, ref spawnRot);
 
-            // Spawn audio
-            uint sentrySpawnID = PrefabInstantiate(sentrySpawnPrefab);
-            if (sentrySpawnID != 0)
-            {
-                SetPosition(sentrySpawnID, ref spawnPos);
-                SetRotation(sentrySpawnID, ref spawnRot);
-            }
+            // // Spawn audio
+            // uint sentrySpawnID = PrefabInstantiate(sentrySpawnPrefab);
+            // if (sentrySpawnID != 0)
+            // {
+            //     SetPosition(sentrySpawnID, ref spawnPos);
+            //     SetRotation(sentrySpawnID, ref spawnRot);
+            // }
 
             hasSpawnedSentry = true;
             LogMessage("[TrenchRunEndTutorial] Sentry spawned successfully");
@@ -201,10 +211,10 @@ namespace Game
                 }
 
                 SetPosition(turretID, ref keyloggerPositions[i]);
-
-                hasSpawnedTurret = true;
                 LogMessage("[TrenchRunEndTutorial] Turret spawned successfully");
             }
+
+            hasSpawnedTurret = true;
             
         }
 
