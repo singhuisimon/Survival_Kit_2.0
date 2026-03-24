@@ -22,10 +22,10 @@ namespace Game
         // Target tags - entities this bullet can damage
         //private string[] TargetTags = { "Player", "Gunship" };
         // Rio - Even though technically, Gunship is sufficient, adding GunshipHelper is extra caution
-        private string[] TargetTags = { "Player", "Gunship", "GunshipHelper" };
+        private string[] TargetTags = { "Player", "Gunship", "GunshipHelper" ,"SEMICONDUCTOR" };
 
         // This bullet's own tag
-        private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" };
+        private string[] BulletTags = { "WormBullet", "EnemyTurretBullet" , "WormHost"};
 
         private float elapsedTime = 0.0f;
         private Vector3 savedVelocity = Vector3.Zero;
@@ -137,9 +137,13 @@ namespace Game
                 {
                     LogMessage("Other entity tag: '" + otherTag + "'");
                 }
-
-                // Check if it's a valid target
-                if (IsTargetTag(otherTag))
+                
+                if (IsBulletTag(otherTag))
+                {
+                    // Skip self, other worm bullets, and worm hosts
+                    continue;
+                }
+                else if (IsTargetTag(otherTag))
                 {
                     OnBulletHitTarget(self, other);
                     return; // Exit after first hit
