@@ -20,6 +20,9 @@ namespace Game
         private const string ENEMY_CORE_DEATH = "EnemyCoreDeath";
         private const string GAMEWIN = "GameWin";
 
+        private const string EVENT_GAME_PAUSED = "GamePaused";
+        private const string EVENT_GAME_RESUMED = "ResumeGame";
+
         private uint playerID = 0;
         private uint coreID = 0;
 
@@ -49,6 +52,8 @@ namespace Game
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Subscribe(ENEMY_CORE_DEATH, OnGameEnd);
             Event.Subscribe(GAMEWIN, OnGameEnd);
+            Event.Subscribe(EVENT_GAME_PAUSED, OnGamePaused);
+            Event.Subscribe(EVENT_GAME_RESUMED, OnGameResumed);
 
             SetHUDVisible(false);
             LogMessage("[EnemyCoreHUDManager] Initialized. VisibilityRange: " + visibilityRange);
@@ -105,12 +110,31 @@ namespace Game
             LogMessage("[EnemyCoreHUDManager] Game ended - HUD hidden");
         }
 
+        private void OnGamePaused(string eventName, string payload)
+        {
+            if(hpCountID != 0)
+            {
+                Text.SetIsVisible(hpCountID, false);
+            }
+            LogMessage("[EnemyCoreHUDManager] Game paused - hpCount hidden");
+        }
+
+        private void OnGameResumed(string eventName, string payload)
+        {
+            if(!gameEnded && isVisible && hpCountID != 0)
+            {
+                Text.SetIsVisible(hpCountID, true);
+            }
+            LogMessage("[EnemyCoreHUDManager] Game resumed - hpCount restored");
+        }
         public override void OnDestroy()
         {
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Unsubscribe(ENEMY_CORE_DEATH, OnGameEnd);
             Event.Unsubscribe(GAMEWIN, OnGameEnd);
+            Event.Unsubscribe(EVENT_GAME_PAUSED, OnGamePaused);
+            Event.Unsubscribe(EVENT_GAME_RESUMED, OnGameResumed);
         }
     }
 }
