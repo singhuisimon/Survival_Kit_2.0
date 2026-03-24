@@ -1,15 +1,15 @@
-/Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_BaseColor.png|1773297911|27028
-/Resources/Sources/Textures/vfx/Spiral13.png|1773297912|123299
-/Resources/Sources/Scenes/lvl2_moreTesting.json|1773588183|342308
-/Resources/Sources/Textures/vfx/Fire21.png|1773297911|110233
 /Resources/Sources/Audio/Player_Secondary_Fire.wav|1772740683|1152044
 /Resources/Sources/Textures/E009_keylogger_v005_v001_Opacity.png|1773384208|7109
 /Resources/Sources/Textures/EnemyHPBar_RedFill.png|1773297934|2440
-/Resources/Sources/Textures/DefenceSuccess_Level2Button.png|1773297910|4325
-/Resources/Sources/Scenes/level2_graphic_card.json|1774197631|406009
-/Resources/Sources/Textures/Particle_Circle30.png|1773297911|135716
-/Resources/Sources/Textures/PrimaryWeapBar_Fill.png|1773297911|3060
 /Resources/Sources/Textures/vfx/Impact41.png|1773297911|110797
+/Resources/Sources/Textures/PrimaryWeapBar_Fill.png|1773297911|3060
+/Resources/Sources/Textures/Particle_Circle30.png|1773297911|135716
+/Resources/Sources/Scenes/level2_graphic_card.json|1774197631|406009
+/Resources/Sources/Textures/DefenceSuccess_Level2Button.png|1773297910|4325
+/Resources/Sources/Textures/vfx/Fire21.png|1773297911|110233
+/Resources/Sources/Scenes/lvl2_moreTesting.json|1773588183|342308
+/Resources/Sources/Textures/vfx/Spiral13.png|1773297912|123299
+/Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_BaseColor.png|1773297911|27028
 /Resources/Sources/Textures/vfx/Fire9.png|1773297911|52409
 /Resources/Sources/Textures/vfx/Spiral8.png|1773297912|118512
 /Resources/Sources/Textures/Tooltip_Objective_KillEnemy.png|1773297934|53427
@@ -40,9 +40,9 @@
 /Resources/Sources/Shaders/trails.frag|1773384207|1716
 /Resources/Sources/Textures/lvl1_level_design_v004_Opacity.png|1773297911|5024
 /Resources/Sources/Textures/vfx/Smoke6.png|1773297911|61303
-/Resources/Sources/Textures/LevelSelectionPopup_Level3.png|1774343125|295761
+/Resources/Sources/Textures/LevelSelectionPopup_Level3.png|1774343682|295761
 /Resources/Sources/Audio/COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav|1772740683|17070698
-/Resources/Sources/Textures/MainMenu_HowToPlay_MovementWindow.png|1774343125|552015
+/Resources/Sources/Textures/MainMenu_HowToPlay_MovementWindow.png|1774343682|552015
 /Resources/Sources/Textures/DefenceSuccess_Background.png|1773297910|1855512
 /Resources/Sources/Textures/vfx/Muzzle8.png|1773297911|75810
 /Resources/Sources/Textures/vfx/Impact3.png|1773297911|100217
@@ -58,14 +58,14 @@
 /Resources/Sources/Scenes/TestingWorms.json|1774192337|36422
 /Resources/Sources/Audio/Player_Hitmarker.wav|1772740683|174264
 /Resources/Sources/Textures/vfx/Circle32.png|1773297911|3030324
-/Resources/Sources/Textures/vfx/Splash6.png|1773297912|78291
-/Resources/Sources/Textures/vfx/Muzzle13.png|1773297911|65087
 /Resources/Sources/Textures/Destructible Wall/Destructible wall_v001_v001_BaseColor.png|1773297934|92202
 /Resources/Sources/Textures/vfx/Fire10.png|1773297911|17678
 /Resources/Sources/Textures/NormalSentryWindow.png|1773297911|300044
 /Resources/Sources/Textures/DefenceSuccess_Level2Cutscene_07.png|1774197631|2120210
-/Resources/Sources/Textures/vfx/Splash15.png|1773297912|79556
 /Resources/Sources/Textures/M4TempCoreHP_Fill.png|1773297911|3064
+/Resources/Sources/Textures/vfx/Splash15.png|1773297912|79556
+/Resources/Sources/Textures/vfx/Muzzle13.png|1773297911|65087
+/Resources/Sources/Textures/vfx/Splash6.png|1773297912|78291
 /Resources/Sources/Textures/vfx/Impact21.png|1773297911|80036
 /Resources/Sources/Textures/MainMenu_Settings.png|1773384208|95467
 /Resources/Sources/Textures/Checkbox_Ticked.png|1774009313|2752
@@ -73,7 +73,7 @@
 /Resources/Sources/Textures/vfx/Flare9.png|1773297911|3221
 /Resources/Sources/Textures/vfx/Circle3.png|1773297911|100114
 /Resources/Sources/Textures/vfx/Magic15.png|1773297911|81999
-/Resources/Sources/Textures/HowToPlay_EnemiesButton_Selected.png|1774343125|3334
+/Resources/Sources/Textures/HowToPlay_EnemiesButton_Selected.png|1774343682|3334
 /Resources/Sources/Meshes/E005_loveletter_v004.fbx|1773297910|59952
 /Resources/Sources/Material/Explosion3.mat|1773297910|763
 /Resources/Sources/Textures/vfx/Circle16.png|1773297911|124756
@@ -102,7 +102,7 @@
 /Resources/Sources/Textures/vfx/Spiral6.png|1773297912|156234
 /Resources/Sources/Textures/Destructible Wall/Destructible wall_v001_v001_Roughness.png|1773297934|87415
 /Resources/Sources/Textures/Trenchrun LevelDesign/trench_run_v006_BaseColor.png|1773297934|2038372
-/Resources/Sources/Textures/MainMenu_CreditsMain.png|1774343125|295075
+/Resources/Sources/Textures/MainMenu_CreditsMain.png|1774343682|295075
 /Resources/Sources/Textures/vfx/Muzzle2.png|1773297911|64729
 /Resources/Sources/Textures/vfx/Impact9.png|1773297911|113563
 /Resources/Sources/Textures/PlayerModel_v003_Opacity.png|1773297911|3178
@@ -110,9 +110,9 @@
 /Resources/Sources/Audio/RoomAmbience.wav|1772740683|12379780
 /Resources/Sources/Shaders/debug.frag|1773297910|126
 /Resources/Sources/Textures/Trenchrun CorruptedCore/Corrupted Core_v002_Roughness.png|1773297911|120321
-/Resources/Sources/Scenes/MainMenu.json|1774343125|241415
+/Resources/Sources/Scenes/MainMenu.json|1774343682|241415
 /Resources/Sources/Textures/vfx/Glow11.png|1773297911|4263299
-/Resources/Sources/Shaders/survival_kit_obj.frag|1774343125|12654
+/Resources/Sources/Shaders/survival_kit_obj.frag|1774343682|12654
 /Resources/Sources/Textures/WindowsBG.png|1773297911|59132
 /Resources/Sources/Textures/vfx/Splash8.png|1773297912|113159
 /Resources/Sources/Audio/Turret Normal Fire.wav|1773384207|96048
@@ -206,7 +206,7 @@
 /Resources/Sources/Material/corepad.mat|1773297910|767
 /Resources/Sources/Textures/vfx/Smoke17_1.png|1773297911|108569
 /Resources/Sources/Scenes/SpriteRendererTest.json|1773297934|2319
-/Resources/Sources/Scenes/trench_run.json|1774343125|1151821
+/Resources/Sources/Scenes/trench_run.json|1774343682|1151821
 /Resources/Sources/Textures/A1001_turret_v005_Metallic.png|1773297910|3178
 /Resources/Sources/Textures/E005_loveletter_v003_BaseColor.png|1773297911|160385
 /Resources/Sources/Textures/Cutscene_SkipButton.png|1774197631|6704
@@ -301,7 +301,7 @@
 /Resources/Sources/Textures/vfx/Shield6.png|1773297911|22962
 /Resources/Sources/Textures/DefenceFailed_Cutscene.png|1773297934|3628478
 /Resources/Sources/Audio/Sentry Despawn.wav|1773297910|960104
-/Resources/Sources/Scenes/WinCutScene.json|1774197631|30356
+/Resources/Sources/Scenes/WinCutScene.json|1774368582|30342
 /Resources/Sources/Textures/vfx/DigitalShapes1.png|1773297911|1071
 /Resources/Sources/Scenes/Test.json|1773297934|6453
 /Resources/Sources/Scenes/level2.json|1773991188|395137
@@ -317,7 +317,7 @@
 /Resources/Sources/Meshes/PlayerModel_v002.fbx|1772740684|46108
 /Resources/Sources/Textures/Checkbox_Mute.png|1773384207|425
 /Resources/Sources/Scenes/TestNewEditor.json|1773297934|13033
-/Resources/Sources/Textures/MainMenu_HowToPlay_EnemiesWindow.png|1774343125|185812
+/Resources/Sources/Textures/MainMenu_HowToPlay_EnemiesWindow.png|1774343682|185812
 /Resources/Sources/Textures/vfx/Ring2.png|1773297911|80700
 /Resources/Sources/Textures/vfx/Circle4.png|1773297911|279292
 /Resources/Sources/Textures/Destructible Wall/Destructible wall_v001_v001_Emissive.png|1773297934|281724
@@ -368,7 +368,7 @@
 /Resources/Sources/Textures/GAM3_VFX_PlayerHeal.png|1772740684|878179
 /Resources/Sources/Material/WormHost.mat|1773297910|991
 /Resources/Sources/Material/InstallButton.mat|1772743024|778
-/Resources/Sources/Textures/Level3Button_Selected.png|1774343125|2443
+/Resources/Sources/Textures/Level3Button_Selected.png|1774343682|2443
 /Resources/Sources/Scenes/Level1_Worm.json|1773297934|92556
 /Resources/Sources/Textures/vfx/Impact4.png|1773297911|99832
 /Resources/Sources/Material/Gunship1.mat|1773297934|811
@@ -431,7 +431,7 @@
 /Resources/Sources/Textures/vfx/Flare11.png|1773297911|94829
 /Resources/Sources/Material/Obstacle_RotatingWallFan.mat|1774343125|920
 /Resources/Sources/Material/PayloadIndicator.mat|1773384207|837
-/Resources/Sources/Textures/HowToPlay_MovementButton_Selected.png|1774343125|3938
+/Resources/Sources/Textures/HowToPlay_MovementButton_Selected.png|1774343682|3938
 /Resources/Sources/Audio/Loveletter_Warp_Warning.wav|1772740683|1344170
 /Resources/Sources/Textures/E009_keylogger_v005_v002_Emissive.png|1773384208|181934
 /Resources/Sources/Textures/DefenceSuccess.png|1772743024|10033311
@@ -472,7 +472,7 @@
 /Resources/Sources/Textures/Bounds2.png|1772740684|646938
 /Resources/Sources/Textures/Example_PlayerHPTakeDamage.png|1773297911|40429
 /Resources/Sources/Textures/vfx/Flare10.png|1773297911|100337
-/Resources/Sources/Textures/HowToPlay_GeneralButton_Selected.png|1774343125|3335
+/Resources/Sources/Textures/HowToPlay_GeneralButton_Selected.png|1774343682|3335
 /Resources/Sources/Meshes/A9004_cruiser_v001.fbx|1772740684|52480
 /Resources/Sources/Textures/DefenceSuccess_ReferenceImage.png|1773297911|1696760
 /Resources/Sources/Meshes/E001_worm_host_v006.fbx|1773297934|28016
@@ -500,7 +500,7 @@
 /Resources/Sources/Textures/vfx/Spiral15.png|1773297912|125769
 /Resources/Sources/Audio/Botnet_Ambient.wav|1772740683|384110
 /Resources/Sources/Textures/Firewall-active-void.png|1772740684|791742
-/Resources/Sources/Textures/LevelSelectionPopup_Level1.png|1774343125|392080
+/Resources/Sources/Textures/LevelSelectionPopup_Level1.png|1774343682|392080
 /Resources/Sources/Audio/System AI_VO_Core Damage 1.wav|1773297934|840206
 /Resources/Sources/Textures/vfx/Fire16.png|1773297911|72233
 /Resources/Sources/Textures/vfx/Circle5.png|1773297911|40484
@@ -527,6 +527,7 @@
 /Resources/Sources/Textures/ByteChipsButton.png|1773384207|3203
 /Resources/Sources/Textures/vfx/Splash9.png|1773297912|70734
 /Resources/Sources/Scenes/trench_run_core_shoot_and_aabb.json|1773297934|474672
+/Resources/Sources/Textures/Button_Credits.png|1774359253|5282
 /Resources/Sources/Textures/vfx/Projectile1.png|1773297911|55922
 /Resources/Sources/Material/PlayerParticleTrail.mat|1773297910|844
 /Resources/Sources/Material/WormBullet.mat|1773297934|816
@@ -554,7 +555,7 @@
 /Resources/Sources/Textures/Non Destructable wall/Non destructible wall_v001_v001_Metallic.png|1773297934|355
 /Resources/Sources/Textures/PlayerModel_Purple_v003_Emissive.png|1773297934|105965
 /Resources/Sources/Textures/UpgradeModuleLabel.png|1773297934|40438
-/Resources/Sources/Textures/HowToPlay_CombatButton_Selected.png|1774343125|3352
+/Resources/Sources/Textures/HowToPlay_CombatButton_Selected.png|1774343682|3352
 /Resources/Sources/Audio/System AI_VO_Core Damage 3.wav|1773297934|845890
 /Resources/Sources/Meshes/E002_worm_child_v001.fbx|1772740684|28464
 /Resources/Sources/Textures/vfx/Diamond.png|1773297911|61947
@@ -614,17 +615,17 @@
 /Resources/Sources/Textures/vfx/Flare13.png|1773297911|103513
 /Resources/Sources/Material/PrimaryUltBullet.mat|1773297910|799
 /Resources/Sources/Audio/Primary_Reload.wav|1773297910|577188
-/Resources/Sources/Textures/LevelSelectionPopup_Level2.png|1774343125|260417
+/Resources/Sources/Textures/LevelSelectionPopup_Level2.png|1774343682|260417
 /Resources/Sources/Material/NormalTurretBullet.mat|1773297910|862
 /Resources/Sources/Material/SummonBarBG.mat|1773384207|852
 /Resources/Sources/Meshes/E004_botnet_v006.fbx|1773297934|21312
 /Resources/Sources/Textures/PlayerModel_v003_Emissive_Dark.png|1773297911|57474
 /Resources/Sources/Material/Firewall_Active.mat|1773297910|800
 /Resources/Sources/Textures/Non Destructable wall/Non destructible wall_v001_v001_Emissive.png|1773297934|29319
-/Resources/Sources/Scenes/trench_run_with_rotatingWalls.json|1774343125|1166959
+/Resources/Sources/Scenes/trench_run_with_rotatingWalls.json|1774343682|1166959
 /Resources/Sources/Textures/vfx/Heart2.png|1773297911|16636
 /Resources/Sources/Textures/vfx/Impact20.png|1773297911|72607
-/Resources/Sources/Textures/MainMenu_HowToPlay_CombatWindow.png|1774343125|753093
+/Resources/Sources/Textures/MainMenu_HowToPlay_CombatWindow.png|1774343682|753093
 /Resources/Sources/Textures/vfx/Smoke5.png|1773297911|58671
 /Resources/Sources/Textures/vfx/Impact26.png|1773297911|116601
 /Resources/Sources/Audio/Small Laser_7.wav|1774009313|68294
@@ -643,11 +644,11 @@
 /Resources/Sources/Textures/Firewall-active-logo.png|1772740684|43569
 /Resources/Sources/Textures/vfx/FireEmbers6.png|1773297911|6068991
 /Resources/Sources/Textures/vfx/Glow9.png|1773297911|98887
-/Resources/Sources/Textures/HowToPlay_EnemiesButton.png|1774343125|2561
+/Resources/Sources/Textures/HowToPlay_EnemiesButton.png|1774343682|2561
 /Resources/Sources/Material/Firewall_Logo.mat|1772743024|785
 /Resources/Sources/Textures/vfx/Flare14.png|1773297911|85873
 /Resources/Sources/Textures/vfx/Coin2.png|1773297911|137498
-/Resources/Sources/Textures/HowToPlay_GeneralButton.png|1774343125|2556
+/Resources/Sources/Textures/HowToPlay_GeneralButton.png|1774343682|2556
 /Resources/Sources/Textures/vfx/Projectile4.png|1773297911|8267
 /Resources/Sources/Textures/vfx/Projectile15.png|1773297911|43600
 /Resources/Sources/Audio/System AI_VO_Trench Run Enemies.wav|1773297934|989078
@@ -719,7 +720,7 @@
 /Resources/Sources/Material/CoreInner.mat|1773297910|776
 /Resources/Sources/Textures/vfx/Ring4.png|1773297911|63412
 /Resources/Sources/Material/PlayerBackWings.mat|1772743024|812
-/Resources/Sources/Textures/MainMenu_CreditsResources.png|1774343125|102449
+/Resources/Sources/Textures/MainMenu_CreditsResources.png|1774343682|102449
 /Resources/Sources/Textures/ErrorPopUp.png|1773297911|45985
 /Resources/Sources/Textures/vfx/Splash21.png|1773297912|114726
 /Resources/Sources/Audio/UI Pause Button Hover.wav|1773297910|15952
@@ -812,7 +813,7 @@
 /Resources/Sources/Textures/PlayerModel_Blue_v003_Emissive.png|1773297934|103658
 /Resources/Sources/Textures/vfx/Splash16.png|1773297912|86116
 /Resources/Sources/Textures/vfx/Smoke16.png|1773297911|105340
-/Resources/Sources/Textures/EndCredits_Content.png|1774343327|716202
+/Resources/Sources/Textures/EndCredits_Content.png|1774343682|716202
 /Resources/Sources/Textures/PlayerModel_v003_Emissive_Bright.png|1773297911|52331
 /Resources/Sources/Textures/Tooltip_DescriptionBotnet.png|1773297934|76328
 /Resources/Sources/Textures/vfx/Circle11.png|1773297911|35549
@@ -876,11 +877,13 @@
 /Resources/Sources/Audio/System AI_VO_Defence BGM.wav|1773297934|38361164
 /Resources/Sources/Audio/Small Laser_3.wav|1774009313|68618
 /Resources/Sources/Textures/ByteChipsButton_Selected.png|1773384207|4322
-/Resources/Sources/Textures/EndCredits_ComputerFrame.png|1774343318|269060
-/Resources/Sources/Textures/EndCredits_SkipButton.png|1774343335|6457
-/Resources/Sources/Textures/ExchangeButton_Unclickable.png|1774343125|3749
-/Resources/Sources/Textures/HowToPlay_CombatButton.png|1774343125|2551
-/Resources/Sources/Textures/HowToPlay_MovementButton.png|1774343125|3082
-/Resources/Sources/Textures/Level3Button.png|1774343125|2376
-/Resources/Sources/Textures/MainMenu_HowToPlay_GeneralWindow.png|1774343125|484553
-/Resources/Sources/Textures/MainMenu_HowToPlay_References.png|1774343125|329946
+/Resources/Sources/Textures/EndCredits_ComputerFrame.png|1774343682|269060
+/Resources/Sources/Textures/EndCredits_SkipButton.png|1774343682|6457
+/Resources/Sources/Textures/ExchangeButton_Unclickable.png|1774343682|3749
+/Resources/Sources/Textures/HowToPlay_CombatButton.png|1774343682|2551
+/Resources/Sources/Textures/HowToPlay_MovementButton.png|1774343682|3082
+/Resources/Sources/Textures/Level3Button.png|1774343682|2376
+/Resources/Sources/Textures/MainMenu_HowToPlay_GeneralWindow.png|1774343682|484553
+/Resources/Sources/Textures/MainMenu_HowToPlay_References.png|1774343682|329946
+/Resources/Sources/Scenes/CreditEndTransitionLvl3.json|1774360928|2831
+/Resources/Sources/Scenes/EndCreditTransition.json|1774367218|7226
