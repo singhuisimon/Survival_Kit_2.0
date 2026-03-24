@@ -59,7 +59,7 @@
                     "Properties": {
                         "ComponentGUID": "6622658234852131463",
                         "Position": [
-                            655.7999877929688,
+                            640.0,
                             360.0,
                             0.0
                         ],
@@ -139,7 +139,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 3,
+                        "Sprite Layer": 5,
                         "IsActive": true,
                         "IsVisible": true
                     }
