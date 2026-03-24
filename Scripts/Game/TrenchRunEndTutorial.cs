@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Audio;
 using static Engine.Tag;
 using static Engine.Transform;
+using System.Collections.Generic;
 
 namespace Game
 {
@@ -24,6 +25,7 @@ namespace Game
         private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
         private const string EVENT_SENTRY_WAIT_TRENCH = "WaitingSentryTrench";
         private const string EVENT_SENTRY_SPAWNED_TRENCH = "SentrySpawnedTrench";
+        private const string EVENT_TURRET_DESTROYED = "EnemyTurretDestroyed";
         [SerializeField] private string payloadPrefab = "Sources/Prefabs/Payload.prefab";
         [SerializeField] private string upgradeModuleLabelPrefab = "Sources/Prefabs/UpgradeModuleLabel.prefab";
         private string sentryPrefab = "Sources/Prefabs/NormalSentry.prefab";
@@ -36,10 +38,11 @@ namespace Game
         private bool hasCollectedUpgrade = false;
         private bool hasSpawnedSentry = false;
         private bool hasSpawnedTurret = false;
-        private float countdown = 3.0f;
+        private bool postTrenchRun = false;
+        private float postTrenchCountdown = 5.0f;
         private float turretWaitCountdown = 5.0f;
         private Vector3[] keyloggerPositions = new Vector3[4];
-
+        private List<uint> activeTurrets = new List<uint>();
 
         // Lifecycle
        public override void OnStart()
@@ -54,6 +57,7 @@ namespace Game
             Subscribe(COREDEAD, OnCoreDeath);
             Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
             Subscribe(EVENT_SENTRY_SPAWNED_TRENCH, OnSentrySpawned);
+            Subscribe(EVENT_TURRET_DESTROYED, OnTurretDestroyed);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -78,6 +82,15 @@ namespace Game
                 }
                 
             }
+
+            if (postTrenchRun) {
+                postTrenchCountdown -= deltaTime;
+
+                if (postTrenchCountdown <= 0) {
+                    Publish("EnemyCoreDeath", "");
+                    postTrenchRun = false;
+                }
+            }
         }
 
         public override void OnDestroy()
@@ -85,6 +98,7 @@ namespace Game
             Unsubscribe(COREDEAD, OnCoreDeath);
             Unsubscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
             Unsubscribe(EVENT_SENTRY_SPAWNED_TRENCH, OnSentrySpawned);
+            Unsubscribe(EVENT_TURRET_DESTROYED, OnTurretDestroyed);
         }
 
         // Event
@@ -211,6 +225,7 @@ namespace Game
                 }
 
                 SetPosition(turretID, ref keyloggerPositions[i]);
+                activeTurrets.Add(turretID);
                 LogMessage("[TrenchRunEndTutorial] Turret spawned successfully");
             }
 
@@ -238,6 +253,22 @@ namespace Game
                 float.Parse(rotParts[2]),
                 float.Parse(rotParts[3])
             );
+        }
+
+        private void OnTurretDestroyed(string eventName, string payload)
+        {
+            uint destroyedID = uint.Parse(payload);
+
+            if(!activeTurrets.Contains(destroyedID)){
+                return;
+            }
+
+            activeTurrets.Remove(destroyedID);
+
+            if (activeTurrets.Count == 0)
+            {
+                postTrenchRun = true;
+            }
         }
     }
 }
