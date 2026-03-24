@@ -370,7 +370,11 @@ void main()
         if(hasEmissionMap){
             color += (texture(emissionMap, TexCoord * tiling + offset).rgb) * material_.emissionStrength;
         }else{
-            color += (material_.emissionColor * material_.emissionStrength);
+            if (uParticle) {
+                color += (uColor.rgb * material_.emissionStrength);
+            } else {
+                color += (material_.emissionColor * material_.emissionStrength);
+            }
         }
     }
 

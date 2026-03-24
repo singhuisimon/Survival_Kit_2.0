@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/lvl1_level_design_v004_Opacity.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}

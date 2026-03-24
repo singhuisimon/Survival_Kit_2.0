@@ -24,20 +24,20 @@ namespace Game
             "PlayerModel_Rainbow_v003_Emissive.png"   // 3 = Rainbow
         };
 
-        // Skin index -> trail StartColor (RGBA)
-        private static readonly Vector4[] TRAIL_START_COLOR = {
-            new Vector4(0.0f,  1.0f, 0.24f, 0.2f),   // 0 = Default (green)
-            new Vector4(0.0f,  0.3f, 1.0f,  0.2f),    // 1 = Blue
-            new Vector4(0.5f,  0.0f, 1.0f,  0.2f),    // 2 = Purple
-            new Vector4(1.0f,  0.0f, 0.0f,  0.2f)     // 3 = Rainbow (red start)
+        // Skin index -> trail StartColor / base color (RGBA)
+        public static readonly Vector4[] TRAIL_START_COLOR = {
+            new Vector4(0.0196f, 1.0f,   0.0f, 0.2f),  // 0 = Default (green)  R:5   G:255 B:0
+            new Vector4(0.0f,    0.368f,  1.0f, 0.2f),  // 1 = Blue             R:0   G:94  B:255
+            new Vector4(0.776f,  0.0f,    1.0f, 0.2f),  // 2 = Purple           R:198 G:0   B:255
+            new Vector4(1.0f,    0.490f,  0.0f, 0.2f)   // 3 = Rainbow          R:255 G:125 B:0
         };
 
-        // Skin index -> trail EndColor (RGBA)
-        private static readonly Vector4[] TRAIL_END_COLOR = {
-            new Vector4(0.09f, 1.0f, 0.0f, 0.0f),    // 0 = Default (green, faded)
-            new Vector4(0.0f,  0.5f, 1.0f, 0.0f),     // 1 = Blue (faded)
-            new Vector4(0.7f,  0.0f, 1.0f, 0.0f),     // 2 = Purple (faded)
-            new Vector4(1.0f,  1.0f, 0.0f, 0.0f)      // 3 = Rainbow (yellow end, faded)
+        // Skin index -> trail EndColor / emission color (RGBA)
+        public static readonly Vector4[] TRAIL_END_COLOR = {
+            new Vector4(0.102f, 1.0f,   0.0f, 0.0f),   // 0 = Default (green)  R:26  G:255 B:0
+            new Vector4(0.0f,   0.675f, 1.0f, 0.0f),   // 1 = Blue             R:0   G:172 B:255
+            new Vector4(0.937f, 0.0f,   1.0f, 0.0f),   // 2 = Purple           R:239 G:0   B:255
+            new Vector4(1.0f,   0.631f, 0.0f, 0.0f)    // 3 = Rainbow          R:255 G:161 B:0
         };
 
         public override void OnStart()
@@ -74,9 +74,11 @@ namespace Game
             TrailSystem.SetEndColor(playerId, ref endColor);
             LogMessage("SkinApplier: Trail colors set - Start(" + startColor.X + "," + startColor.Y + "," + startColor.Z + "," + startColor.W + ") End(" + endColor.X + "," + endColor.Y + "," + endColor.Z + "," + endColor.W + ")");
 
-            // Also update particle colors to match
-            ParticleSystem.SetColorMin(playerId, ref startColor);
-            ParticleSystem.SetColorMax(playerId, ref endColor);
+            // Also update particle colors to match (use alpha 1.0 for particles, not trail alpha)
+            Vector4 particleMin = new Vector4(startColor.X, startColor.Y, startColor.Z, 1.0f);
+            Vector4 particleMax = new Vector4(endColor.X, endColor.Y, endColor.Z, 1.0f);
+            ParticleSystem.SetColorMin(playerId, ref particleMin);
+            ParticleSystem.SetColorMax(playerId, ref particleMax);
 
             LogMessage("SkinApplier: Skin applied successfully!");
         }
