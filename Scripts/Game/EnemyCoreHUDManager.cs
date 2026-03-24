@@ -36,6 +36,7 @@ namespace Game
         private float pollTimer = 0.0f;
         private bool isVisible = false;
         private bool gameEnded = false;
+        private bool wasPaused = false;
 
         public override void OnStart()
         {
@@ -62,8 +63,21 @@ namespace Game
         public override void OnUpdate(float deltaTime)
         {
             if (gameEnded) return;
-            if (GameState.IsPaused) return;
+            if (GameState.IsPaused){
+                wasPaused = true;
+                return;
+            }
 
+            //just resumed
+            if (wasPaused)
+            {
+                wasPaused = false;
+                if(isVisible && hpCountID != 0)
+                {
+                    Text.SetIsVisible(hpCountID, true);
+                }
+            }
+            
             pollTimer -= deltaTime;
             if (pollTimer > 0.0f) return;
             pollTimer = pollInterval;
