@@ -10,7 +10,7 @@ namespace Engine
     /// </summary>
     public static class ProgressTracker
     {
-        private const string SAVE_FILE = "Resources/Sources/SaveData/progress.json";
+        private const string SAVE_FILE = "SaveData/progress.json";
 
         public static bool HasWonTrenchRun { get; private set; } = false;
         public static bool HasWonLevel2 { get; private set; } = false;
