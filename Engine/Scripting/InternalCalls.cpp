@@ -1982,6 +1982,38 @@ namespace Engine
 			mono_free(utf8);
 		}
 
+		void MeshRenderer_SetOpacity(uint64_t entityID, float opacity)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
+
+			auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+			MaterialResource* material =
+				RM.loadResource<MaterialResource>(convertToMaterialGuid(meshRenderer.MaterialGuid));
+			if (material) {
+				material->opacity = opacity;
+
+			} else {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetOpacity: Material not found for entity ", entityID);
+			}
+		}
+
+		void MeshRenderer_SetBaseColor(uint64_t entityID, float r, float g, float b)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
+
+			auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+			MaterialResource* material =
+				RM.loadResource<MaterialResource>(convertToMaterialGuid(meshRenderer.MaterialGuid));
+			if (material) {
+				material->baseColor = { r, g, b };
+			}
+			else {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetBaseColor: Material not found for entity ", entityID);
+			}
+		}
+
 		/**************************************************************************
 		 * @brief
 		 * Return the gamma value from the render settings
