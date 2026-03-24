@@ -32,6 +32,7 @@ namespace Game
         private const string EVENT_2MIN = "2MIN";
         private const string EVENT_BOTSPAWN = "BOTSPAWN";
         private const string EVENT_WORMSPAWN = "WORMSPAWN";
+        private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
 
         // ===== State =====
         private bool initialized = false;
@@ -52,6 +53,9 @@ namespace Game
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameOver);
             Event.Subscribe(GAMEWIN, OnGameOver);
             Event.Subscribe(EVENT_DEBUG_SET_TIMER, OnDebugSetTimer);
+            Event.Subscribe(EVENT_TUTORIALOVER, OnTutorialOver);
+
+            // Subscribe to 
 
             // Initialize with starting time
             remainingTime = startingTime;
@@ -60,7 +64,7 @@ namespace Game
             // Display initial time
             UpdateTimerDisplay();
 
-            initialized = true;
+            //initialized = true;
             LogMessage("[TimerUI2] Initialized - Starting at " + startingTime + " seconds");
         }
 
@@ -113,6 +117,12 @@ namespace Game
             if (timeSurvived < 0.0f) timeSurvived = 0.0f;
             Publish("ShowTimeSurvived", timeSurvived.ToString("F2"));
             LogMessage("[TimerUI2] Time survived: " + timeSurvived);
+        }
+
+        private void OnTutorialOver(string eventName, string payload)
+        {
+            initialized = true;
+            LogMessage("[TimerUI2] Level 2 tutorial is over, begin main game timer");
         }
 
 

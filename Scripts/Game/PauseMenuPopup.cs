@@ -81,6 +81,7 @@ namespace Game
 
         private const string EVENT_GAME_PAUSED = "GamePaused";
         private const string EVENT_GAME_RESUMED = "GameResumed";
+        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPauseMenu";
 
         // Entity IDs
         private uint bgId;
@@ -123,6 +124,7 @@ namespace Game
         private bool wasMousePressed = false;
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
+        private bool pauseForTutorial = false;
 
         // Mixer initial X scales and positions
         private float mixerFill1InitialWidth;
@@ -263,6 +265,7 @@ namespace Game
             Event.Subscribe("GameOver", OnGameEnded);
             Event.Subscribe("GameWin", OnGameEnded);
             Event.Subscribe("GameRestart", OnGameRestart);
+            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
 
             LogMessage("PauseMenuPopup: Ready!");
         }
@@ -441,7 +444,8 @@ namespace Game
 
             if (entitiesFound)
             {
-                GameState.IsPaused = false;
+                // Game state resumes fully only if tutorial pause is not ongoing
+                if(!pauseForTutorial) GameState.IsPaused = false;
                 Event.Publish(EVENT_GAME_RESUMED, "");
                 Input.SetCursorVisible(false);
             }
@@ -768,11 +772,23 @@ namespace Game
             gameEnded = false;
         }
 
+        private void OnLevel2Pause(string eventName, string payload)
+        {
+            if (bool.TryParse(payload, out bool state))
+            {
+                // Update state for pause during tutorial
+                pauseForTutorial = state;
+
+                LogMessage("[PauseMenuPopup] Level 2 pause for tutorial");
+            }
+        }
+
         public override void OnDestroy()
         {
             Event.Unsubscribe("GameOver", OnGameEnded);
             Event.Unsubscribe("GameWin", OnGameEnded);
             Event.Unsubscribe("GameRestart", OnGameRestart);
+            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
             LogMessage("PauseMenuPopup: Destroyed");
         }
     }
