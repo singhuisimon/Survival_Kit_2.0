@@ -1,0 +1,20 @@
+{
+    "sourcePath": "/Resources/Sources/Meshes/Level2_Graphics_Card/lvl2redesign_level_design_v004.fbx",
+    "meshSettings": {
+        "outputFormat": "CUSTOM",
+        "includePos": true,
+        "includeNormals": true,
+        "includeColors": true,
+        "includeTexCoords": true,
+        "indexType": "UINT32",
+        "scale": 1.0,
+        "positionX": 0.0,
+        "positionY": 0.0,
+        "positionZ": 0.0,
+        "rotationX": 0.0,
+        "rotationY": 0.0,
+        "rotationZ": 0.0,
+        "optimizeVertices": true,
+        "generateNormals": false
+    }
+}
