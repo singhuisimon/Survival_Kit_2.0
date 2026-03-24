@@ -1982,6 +1982,38 @@ namespace Engine
 			mono_free(utf8);
 		}
 
+		void MeshRenderer_SetOpacity(uint64_t entityID, float opacity)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
+
+			auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+			MaterialResource* material =
+				RM.loadResource<MaterialResource>(convertToMaterialGuid(meshRenderer.MaterialGuid));
+			if (material) {
+				material->opacity = opacity;
+
+			} else {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetOpacity: Material not found for entity ", entityID);
+			}
+		}
+
+		void MeshRenderer_SetBaseColor(uint64_t entityID, float r, float g, float b)
+		{
+			Entity e = GetEntityOrNull(entityID);
+			if (!e || !e.HasComponent<MeshRendererComponent>()) return;
+
+			auto& meshRenderer = e.GetComponent<MeshRendererComponent>();
+			MaterialResource* material =
+				RM.loadResource<MaterialResource>(convertToMaterialGuid(meshRenderer.MaterialGuid));
+			if (material) {
+				material->baseColor = { r, g, b };
+			}
+			else {
+				LOG_WARNING("[InternalCalls] MeshRenderer_SetBaseColor: Material not found for entity ", entityID);
+			}
+		}
+
 		/**************************************************************************
 		 * @brief
 		 * Return the gamma value from the render settings
@@ -3316,30 +3348,42 @@ namespace Engine
 				return;
 			}
 
-			if (registry.all_of<TextComponent>(entity))
+			if (!registry.all_of<TextComponent>(entity))
 			{
-				auto &textComp = registry.get<TextComponent>(entity);
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				return;
+			}
 
-				// Convert MonoString to C++ string
-				char *utf8 = mono_string_to_utf8(text);
-				if (utf8)
-				{
-					textComp.setText(std::string(utf8));
-					mono_free(utf8);
-				}
+			auto &textComp = registry.get<TextComponent>(entity);
+
+			if (text == nullptr)
+			{
+				textComp.setText(std::string());
+				return;
+			}
+
+			char *utf8 = mono_string_to_utf8(text);
+			if (utf8)
+			{
+				textComp.setText(std::string(utf8));
+				mono_free(utf8);
 			}
 			else
 			{
-				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				textComp.setText(std::string());
 			}
 		}
 
 		MonoString *Text_GetText(uint32_t entityID)
 		{
+			MonoDomain *domain = mono_domain_get();
+			if (!domain)
+				return nullptr;
+
 			if (!s_CurrentScene)
 			{
 				LOG_ERROR("[InternalCalls] Text_GetText: No scene set");
-				return nullptr;
+				return mono_string_new(domain, "");
 			}
 
 			auto &registry = s_CurrentScene->GetRegistry();
@@ -3348,18 +3392,17 @@ namespace Engine
 			if (!registry.valid(entity))
 			{
 				LOG_ERROR("[InternalCalls] Text_GetText: Invalid entity ID ", entityID);
-				return nullptr;
+				return mono_string_new(domain, "");
 			}
 
-			if (registry.all_of<TextComponent>(entity))
+			if (!registry.all_of<TextComponent>(entity))
 			{
-				auto &textComp = registry.get<TextComponent>(entity);
-
-				MonoDomain *domain = mono_domain_get();
-				return mono_string_new(domain, textComp.getText().c_str());
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				return mono_string_new(domain, "");
 			}
 
-			return nullptr;
+			auto &textComp = registry.get<TextComponent>(entity);
+			return mono_string_new(domain, textComp.getText().c_str());
 		}
 
 		void Text_SetFontSize(uint32_t entityID, float size)
@@ -3379,11 +3422,14 @@ namespace Engine
 				return;
 			}
 
-			if (registry.all_of<TextComponent>(entity))
+			if (!registry.all_of<TextComponent>(entity))
 			{
-				auto &textComp = registry.get<TextComponent>(entity);
-				textComp.setFontSize(size);
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				return;
 			}
+
+			auto &textComp = registry.get<TextComponent>(entity);
+			textComp.setFontSize(size);
 		}
 
 		float Text_GetFontSize(uint32_t entityID)
@@ -3403,36 +3449,79 @@ namespace Engine
 				return 0.0f;
 			}
 
-			if (registry.all_of<TextComponent>(entity))
+			if (!registry.all_of<TextComponent>(entity))
 			{
-				auto &textComp = registry.get<TextComponent>(entity);
-				return textComp.getFontSize();
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				return 0.0f;
 			}
 
-			return 0.0f;
+			auto &textComp = registry.get<TextComponent>(entity);
+			return textComp.getFontSize();
 		}
 
-		void Text_SetIsVisible(uint32_t entityID, bool visible)
+		void Text_SetVisible(uint32_t entityID, bool visible)
 		{
+			if (!s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCalls] Text_SetVisible: No scene set");
+				return;
+			}
+
 			auto &registry = s_CurrentScene->GetRegistry();
 			entt::entity entity = static_cast<entt::entity>(entityID);
-			if (registry.all_of<TextComponent>(entity))
+
+			if (!registry.valid(entity))
 			{
-				auto &text = registry.get<TextComponent>(entity);
-				text.setVisible(visible);
+				LOG_ERROR("[InternalCalls] Text_SetVisible: Invalid entity ID ", entityID);
+				return;
 			}
+
+			if (!registry.all_of<TextComponent>(entity))
+			{
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				return;
+			}
+
+			auto &text = registry.get<TextComponent>(entity);
+			text.setVisible(visible);
+		}
+
+		bool Text_IsShown(uint32_t entityID)
+		{
+			if (!s_CurrentScene)
+			{
+				LOG_ERROR("[InternalCalls] Text_IsShown: No scene set");
+				return false;
+			}
+
+			auto &registry = s_CurrentScene->GetRegistry();
+			entt::entity entity = static_cast<entt::entity>(entityID);
+
+			if (!registry.valid(entity))
+			{
+				LOG_ERROR("[InternalCalls] Text_IsShown: Invalid entity ID ", entityID);
+				return false;
+			}
+
+			if (!registry.all_of<TextComponent>(entity))
+			{
+				LOG_WARNING("[InternalCalls] Entity ", entityID, " has no TextComponent");
+				return false;
+			}
+
+			auto &text = registry.get<TextComponent>(entity);
+			return text.isShown();
+		}
+
+		// Backward-compatible aliases
+		void Text_SetIsVisible(uint32_t entityID, bool visible)
+		{
+			Text_SetVisible(entityID, visible);
 		}
 
 		bool Text_GetIsVisible(uint32_t entityID)
 		{
-			auto &registry = s_CurrentScene->GetRegistry();
-			entt::entity entity = static_cast<entt::entity>(entityID);
-			if (registry.all_of<TextComponent>(entity))
-			{
-				auto &text = registry.get<TextComponent>(entity);
-				return text.isShown();
-			}
-			return false;
+			return Text_IsShown(entityID);
 		}
 
 		// ===== BeamComponent =====

@@ -1405,6 +1405,12 @@ namespace Engine {
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetEmissiveTexture",
 						 reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetEmissiveTexture));
 
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetOpacity",
+			reinterpret_cast<void*>(InternalCalls::MeshRenderer_SetOpacity));
+
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetBaseColor",
+			reinterpret_cast<void*>(InternalCalls::MeshRenderer_SetBaseColor));
+
 		// =====================================================================
 		// RenderSettings
 		// =====================================================================
@@ -1616,19 +1622,28 @@ namespace Engine {
 			reinterpret_cast<void*>(InternalCalls::Trail_SetEndColor));
 
 		// =====================================================================
-// TextComponent
-// =====================================================================
+		// TextComponent
+		// =====================================================================
 		BindInternalCall("Engine.Text::Text_SetText",
-			reinterpret_cast<void*>(InternalCalls::Text_SetText));
+			reinterpret_cast<void *>(InternalCalls::Text_SetText));
 		BindInternalCall("Engine.Text::Text_GetText",
-			reinterpret_cast<void*>(InternalCalls::Text_GetText));
+			reinterpret_cast<void *>(InternalCalls::Text_GetText));
 		BindInternalCall("Engine.Text::Text_SetFontSize",
-			reinterpret_cast<void*>(InternalCalls::Text_SetFontSize));
+			reinterpret_cast<void *>(InternalCalls::Text_SetFontSize));
 		BindInternalCall("Engine.Text::Text_GetFontSize",
-			reinterpret_cast<void*>(InternalCalls::Text_GetFontSize));
+			reinterpret_cast<void *>(InternalCalls::Text_GetFontSize));
 
-		BindInternalCall("Engine.Text::Text_SetIsVisible", reinterpret_cast<void*>(InternalCalls::Text_SetIsVisible));
-		BindInternalCall("Engine.Text::Text_GetIsVisible", reinterpret_cast<void*>(InternalCalls::Text_GetIsVisible));
+		// Canonical names matching TextComponent.h
+		BindInternalCall("Engine.Text::Text_SetVisible",
+			reinterpret_cast<void *>(InternalCalls::Text_SetVisible));
+		BindInternalCall("Engine.Text::Text_IsShown",
+			reinterpret_cast<void *>(InternalCalls::Text_IsShown));
+
+		// Backward-compatible aliases
+		BindInternalCall("Engine.Text::Text_SetIsVisible",
+			reinterpret_cast<void *>(InternalCalls::Text_SetIsVisible));
+		BindInternalCall("Engine.Text::Text_GetIsVisible",
+			reinterpret_cast<void *>(InternalCalls::Text_GetIsVisible));
 
 		// BeamComponent
 		BindInternalCall("Engine.BeamRenderer::Beam_SetActive",

@@ -4,6 +4,7 @@ namespace Engine
 {
     /// <summary>
     /// TextComponent bindings for controlling UI text
+    /// Mirrors native TextComponent naming where applicable.
     /// </summary>
     public static class Text
     {
@@ -20,10 +21,10 @@ namespace Engine
         private static extern float Text_GetFontSize(uint entityID);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern void Text_SetIsVisible(uint entityID, bool visible);
+        private static extern void Text_SetVisible(uint entityID, bool visible);
 
         [MethodImpl(MethodImplOptions.InternalCall)]
-        private static extern bool Text_GetIsVisible(uint entityID);
+        private static extern bool Text_IsShown(uint entityID);
 
         /// <summary>
         /// Set the text content
@@ -58,19 +59,30 @@ namespace Engine
         }
 
         /// <summary>
-        /// Set text visibility (hides by setting alpha to 0, shows by restoring alpha to 1)
+        /// Match native TextComponent::setVisible(bool)
         /// </summary>
-        public static void SetIsVisible(uint entityID, bool visible)
+        public static void SetVisible(uint entityID, bool visible)
         {
-            Text_SetIsVisible(entityID, visible);
+            Text_SetVisible(entityID, visible);
         }
 
         /// <summary>
-        /// Get text visibility state
+        /// Match native TextComponent::isShown() const
         /// </summary>
+        public static bool IsShown(uint entityID)
+        {
+            return Text_IsShown(entityID);
+        }
+
+        // Backward-compatible wrappers for existing scripts.
+        public static void SetIsVisible(uint entityID, bool visible)
+        {
+            SetVisible(entityID, visible);
+        }
+
         public static bool GetIsVisible(uint entityID)
         {
-            return Text_GetIsVisible(entityID);
+            return IsShown(entityID);
         }
     }
 }

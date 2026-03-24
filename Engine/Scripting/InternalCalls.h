@@ -862,6 +862,26 @@ namespace Engine {
 		***************************************************************************/
 		void MeshRenderer_SetEmissiveTexture(uint64_t entityID, MonoString* textureName);
 
+		/**************************************************************************
+		 * @brief
+		 * Sets the opacity on the entity's material.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param opacity
+		 * Float value for material opacity (0.0 fully transparent, 1.0 fully opaque).
+		***************************************************************************/
+		void MeshRenderer_SetOpacity(uint64_t entityID, float opacity);
+
+		/**************************************************************************
+		 * @brief
+		 * Sets the base color on the entity's material.
+		 * @param entityID
+		 * Entity identifier (stored as uint64_t; corresponds to an entt::entity).
+		 * @param r, g, b
+		 * Float components of the base color.
+		***************************************************************************/
+		void MeshRenderer_SetBaseColor(uint64_t entityID, float r, float g, float b);
+
 		// ===== RenderSettings =====
 		/**************************************************************************
 		 * @brief
@@ -1571,12 +1591,17 @@ namespace Engine {
 		 void SpriteRenderer_GetColor(uint32_t entityID, float* r, float* g, float* b, float* a);
 
 		 // TextComponent
-		  void Text_SetText(uint32_t entityID, MonoString* text);
-		  MonoString* Text_GetText(uint32_t entityID);
-		  void Text_SetFontSize(uint32_t entityID, float size);
-		  float Text_GetFontSize(uint32_t entityID);
+		 void Text_SetText(uint32_t entityID, MonoString *text);
+		 MonoString *Text_GetText(uint32_t entityID);
+		 void Text_SetFontSize(uint32_t entityID, float size);
+		 float Text_GetFontSize(uint32_t entityID);
 
-		  void Text_SetIsVisible(uint32_t entityID, bool visible);
-		  bool Text_GetIsVisible(uint32_t entityID);
+		 // Canonical names matching TextComponent.h
+		 void Text_SetVisible(uint32_t entityID, bool visible);
+		 bool Text_IsShown(uint32_t entityID);
+
+		 // Backward-compatible aliases
+		 void Text_SetIsVisible(uint32_t entityID, bool visible);
+		 bool Text_GetIsVisible(uint32_t entityID);
 	} // namespace InternalCalls
 } // namespace Engine

@@ -397,7 +397,6 @@ namespace Game
             if (skinIndex == 1) ProgressTracker.Skin1Purchased = true;
             else if (skinIndex == 2) ProgressTracker.Skin2Purchased = true;
 
-            // Save immediately so purchase persists even if score later drops below threshold
             ProgressTracker.SaveProgress();
             LogMessage("ShopPopup: Purchased skin " + skinIndex +
                        "! Remaining points: " + ProgressTracker.CumulativeScore +
@@ -419,7 +418,6 @@ namespace Game
             ProgressTracker.ByteChips -= SKIN3BYTECHIPCOST;
             ProgressTracker.Skin3Purchased = true;
 
-            // Save immediately
             ProgressTracker.SaveProgress();
             LogMessage("ShopPopup: Purchased skin 3! Remaining ByteChips: " + ProgressTracker.ByteChips +
                        " | Skin3Purchased saved to progress.json");
@@ -461,14 +459,15 @@ namespace Game
             isPacksTab = true;
             Event.Publish(EVENTPOPUPOPENED, POPUPID);
 
-            // Load from disk to restore purchased skin state across sessions
             ProgressTracker.LoadProgress();
 
             if (closeButtonId != 0) SetPosition(closeButtonId, ref closeButtonVisiblePos);
-            if (packsButtonId != 0) SetPosition(packsButtonId, ref packsButtonVisiblePos);
-            if (packsButtonSelectedId != 0) { SetIsVisible(packsButtonSelectedId, true); SetPosition(packsButtonSelectedId, ref packsButtonVisiblePos); }
-            if (byteChipsButtonId != 0) SetPosition(byteChipsButtonId, ref byteChipsButtonVisiblePos);
-            if (byteChipsButtonSelectedId != 0) { SetIsVisible(byteChipsButtonSelectedId, true); SetPosition(byteChipsButtonSelectedId, ref byteChipsButtonVisiblePos); }
+
+            // Activate all tab buttons before positioning/coloring
+            if (packsButtonId != 0) SetIsVisible(packsButtonId, true);
+            if (packsButtonSelectedId != 0) SetIsVisible(packsButtonSelectedId, true);
+            if (byteChipsButtonId != 0) SetIsVisible(byteChipsButtonId, true);
+            if (byteChipsButtonSelectedId != 0) SetIsVisible(byteChipsButtonSelectedId, true);
 
             UpdateScoreDisplay();
             UpdateByteChipsDisplay();
@@ -516,19 +515,26 @@ namespace Game
 
         private void UpdateTabButtonVisuals()
         {
+            // Move all 4 tab buttons to their visible positions first
+            if (packsButtonId != 0) SetPosition(packsButtonId, ref packsButtonVisiblePos);
+            if (packsButtonSelectedId != 0) SetPosition(packsButtonSelectedId, ref packsButtonVisiblePos);
+            if (byteChipsButtonId != 0) SetPosition(byteChipsButtonId, ref byteChipsButtonVisiblePos);
+            if (byteChipsButtonSelectedId != 0) SetPosition(byteChipsButtonSelectedId, ref byteChipsButtonVisiblePos);
+
+            // Swap which one is visible via alpha
             if (isPacksTab)
             {
-                if (packsButtonId != 0) SetColor(packsButtonId, 1.0f, 1.0f, 1.0f, 0.0f);
-                if (packsButtonSelectedId != 0) SetColor(packsButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f);
-                if (byteChipsButtonId != 0) SetColor(byteChipsButtonId, 1.0f, 1.0f, 1.0f, 1.0f);
-                if (byteChipsButtonSelectedId != 0) SetColor(byteChipsButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
+                if (packsButtonId != 0) SetColor(packsButtonId, 1.0f, 1.0f, 1.0f, 0.0f); // hide normal
+                if (packsButtonSelectedId != 0) SetColor(packsButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f); // show selected
+                if (byteChipsButtonId != 0) SetColor(byteChipsButtonId, 1.0f, 1.0f, 1.0f, 1.0f); // show normal
+                if (byteChipsButtonSelectedId != 0) SetColor(byteChipsButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f); // hide selected
             }
             else
             {
-                if (packsButtonId != 0) SetColor(packsButtonId, 1.0f, 1.0f, 1.0f, 1.0f);
-                if (packsButtonSelectedId != 0) SetColor(packsButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f);
-                if (byteChipsButtonId != 0) SetColor(byteChipsButtonId, 1.0f, 1.0f, 1.0f, 0.0f);
-                if (byteChipsButtonSelectedId != 0) SetColor(byteChipsButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f);
+                if (packsButtonId != 0) SetColor(packsButtonId, 1.0f, 1.0f, 1.0f, 1.0f); // show normal
+                if (packsButtonSelectedId != 0) SetColor(packsButtonSelectedId, 1.0f, 1.0f, 1.0f, 0.0f); // hide selected
+                if (byteChipsButtonId != 0) SetColor(byteChipsButtonId, 1.0f, 1.0f, 1.0f, 0.0f); // hide normal
+                if (byteChipsButtonSelectedId != 0) SetColor(byteChipsButtonSelectedId, 1.0f, 1.0f, 1.0f, 1.0f); // show selected
             }
         }
 
@@ -695,10 +701,11 @@ namespace Game
             if (packsPopupId != 0) SetPosition(packsPopupId, ref hidePos);
             if (byteChipsPopupId != 0) SetPosition(byteChipsPopupId, ref hidePos);
             if (closeButtonId != 0) SetPosition(closeButtonId, ref hidePos2);
-            if (packsButtonId != 0) SetPosition(packsButtonId, ref hidePos2);
-            if (packsButtonSelectedId != 0) SetPosition(packsButtonSelectedId, ref hidePos2);
-            if (byteChipsButtonId != 0) SetPosition(byteChipsButtonId, ref hidePos2);
-            if (byteChipsButtonSelectedId != 0) SetPosition(byteChipsButtonSelectedId, ref hidePos2);
+
+            if (packsButtonId != 0) { SetPosition(packsButtonId, ref hidePos2); SetIsVisible(packsButtonId, false); }
+            if (packsButtonSelectedId != 0) { SetPosition(packsButtonSelectedId, ref hidePos2); SetIsVisible(packsButtonSelectedId, false); }
+            if (byteChipsButtonId != 0) { SetPosition(byteChipsButtonId, ref hidePos2); SetIsVisible(byteChipsButtonId, false); }
+            if (byteChipsButtonSelectedId != 0) { SetPosition(byteChipsButtonSelectedId, ref hidePos2); SetIsVisible(byteChipsButtonSelectedId, false); }
 
             if (exchangeButton1Id != 0) SetPosition(exchangeButton1Id, ref hidePos2);
             if (exchangeButton2Id != 0) SetPosition(exchangeButton2Id, ref hidePos2);
