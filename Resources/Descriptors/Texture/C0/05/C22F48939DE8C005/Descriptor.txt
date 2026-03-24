@@ -1,5 +1,5 @@
 {
-  "sourcePath": "/Resources/Sources/Textures/Level2_Graphics_Card/lvl2redesign_level_design_v003_v001_Metallic.png",
+  "sourcePath": "/Resources/Sources/Textures/Button_Credits.png",
   "textureSettings": {
     "usageType": "COLOR",
     "compression": "BC7",
