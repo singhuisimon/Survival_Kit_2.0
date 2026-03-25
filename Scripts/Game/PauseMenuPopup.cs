@@ -138,6 +138,16 @@ namespace Game
         private Vector3 mixerFill4InitialPosition;
         private Vector3 mixerFill5InitialPosition;
 
+        // Audio track
+        private uint _lastHoveredButton = 0;
+        private uint hoverSoundId;
+        private uint clickSoundId;
+
+        private const string HOVER_AUDIO_NAME = "UI Pause Hover";
+        private const string PRESS_AUDIO_NAME = "UI Pause Press";
+
+
+
         private static void SafeSetVisible(uint id, bool visible)
         {
             if (id == 0) return;
@@ -201,6 +211,10 @@ namespace Game
             checkboxBGMTickedId = SceneFindEntityByName(CHECKBOX_BGM_TICKED_NAME);
             checkboxSFXUntickedId = SceneFindEntityByName(CHECKBOX_SFX_UNTICKED_NAME);
             checkboxSFXTickedId = SceneFindEntityByName(CHECKBOX_SFX_TICKED_NAME);
+
+            //Audio
+            hoverSoundId = SceneFindEntityByName(HOVER_AUDIO_NAME);
+            clickSoundId = SceneFindEntityByName(PRESS_AUDIO_NAME);
 
             HidePauseMenu();
 
@@ -456,31 +470,42 @@ namespace Game
         // =====================================================================
         private void HandleHoverStates()
         {
-            UpdateButtonHover(resumeButtonId, resumeButtonHoveredId);
-            UpdateButtonHover(restartButtonId, restartButtonHoveredId);
-            UpdateButtonHover(plusButtonId, plusButtonHoveredId);
-            UpdateButtonHover(minusButtonId, minusButtonHoveredId);
-            UpdateButtonHover(mainMenuButtonId, mainMenuButtonHoveredId);
-            UpdateButtonHover(howToPlayButtonId, howToPlayButtonHoveredId);
-            UpdateButtonHover(plusButtonId2, plusButtonHoveredId2);
-            UpdateButtonHover(minusButtonId2, minusButtonHoveredId2);
-            UpdateButtonHover(plusButtonId3, plusButtonHoveredId3);
-            UpdateButtonHover(minusButtonId3, minusButtonHoveredId3);
-            UpdateButtonHover(plusButtonId4, plusButtonHoveredId4);
-            UpdateButtonHover(minusButtonId4, minusButtonHoveredId4);
-            UpdateButtonHover(defaultButtonId4, defaultButtonHoveredId4);
-            UpdateButtonHover(plusButtonId5, plusButtonHoveredId5);
-            UpdateButtonHover(minusButtonId5, minusButtonHoveredId5);
-            UpdateButtonHover(defaultButtonId5, defaultButtonHoveredId5);
+            uint newHovered = 0;
+
+            newHovered = UpdateButtonHover(resumeButtonId, resumeButtonHoveredId) ? resumeButtonId : newHovered;
+            newHovered = UpdateButtonHover(restartButtonId, restartButtonHoveredId) ? restartButtonId : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId, plusButtonHoveredId) ? plusButtonId : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId, minusButtonHoveredId) ? minusButtonId : newHovered;
+            newHovered = UpdateButtonHover(mainMenuButtonId, mainMenuButtonHoveredId) ? mainMenuButtonId : newHovered;
+            newHovered = UpdateButtonHover(howToPlayButtonId, howToPlayButtonHoveredId) ? howToPlayButtonId : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId2, plusButtonHoveredId2) ? plusButtonId2 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId2, minusButtonHoveredId2) ? minusButtonId2 : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId3, plusButtonHoveredId3) ? plusButtonId3 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId3, minusButtonHoveredId3) ? minusButtonId3 : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId4, plusButtonHoveredId4) ? plusButtonId4 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId4, minusButtonHoveredId4) ? minusButtonId4 : newHovered;
+            newHovered = UpdateButtonHover(defaultButtonId4, defaultButtonHoveredId4) ? defaultButtonId4 : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId5, plusButtonHoveredId5) ? plusButtonId5 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId5, minusButtonHoveredId5) ? minusButtonId5 : newHovered;
+            newHovered = UpdateButtonHover(defaultButtonId5, defaultButtonHoveredId5) ? defaultButtonId5 : newHovered;
+
+            if(newHovered != 0 && newHovered != _lastHoveredButton)
+            {
+                Audio.AudioPlay(hoverSoundId); //fires once on enter
+            }
+
+            _lastHoveredButton = newHovered;
         }
 
-        private void UpdateButtonHover(uint normalId, uint hoveredId)
+        private bool UpdateButtonHover(uint normalId, uint hoveredId)
         {
-            if (normalId == 0 || hoveredId == 0) return;
+            if (normalId == 0 || hoveredId == 0) return false;
             bool isHovered = Collision2D.IsMouseCollidingWithEntity(normalId) ||
                              Collision2D.IsMouseCollidingWithEntity(hoveredId);
             SpriteRenderer.SetIsVisible(normalId, !isHovered);
             SpriteRenderer.SetIsVisible(hoveredId, isHovered);
+
+            return isHovered;
         }
 
         // =====================================================================
@@ -492,6 +517,15 @@ namespace Game
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
             if (!mouseJustPressed) return;
+
+            bool overCheckbox = IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId) ||
+                        IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId) ||
+                        IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId);
+
+            if(_lastHoveredButton != 0 || overCheckbox)
+            {
+                Audio.AudioPlay(clickSoundId);
+            }
 
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
             {
