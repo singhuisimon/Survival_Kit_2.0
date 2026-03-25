@@ -1,12 +1,13 @@
 using Engine;
 using System;
-using static Engine.Scene;
-using static Engine.Logger;
-using static Engine.Transform;
 using static Engine.AudioManager;
+using static Engine.Logger;
+using static Engine.Scene;
 using static Engine.SpriteRenderer;
 using static Engine.Text;
+using static Engine.Transform;
 using static Game.AudioSettings;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Game
 {
@@ -82,6 +83,7 @@ namespace Game
         private const string EVENT_GAME_PAUSED = "GamePaused";
         private const string EVENT_GAME_RESUMED = "GameResumed";
         private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPauseMenu";
+        private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
 
         // Entity IDs
         private uint bgId;
@@ -116,6 +118,7 @@ namespace Game
         private uint checkboxSFXUntickedId, checkboxSFXTickedId;
 
         private uint[] hudElementIds;
+        private uint timerUILevel2ID;
 
         // State
         private bool isPaused = false;
@@ -125,6 +128,7 @@ namespace Game
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
         private bool pauseForTutorial = false;
+        private bool isTutorialOver = false;
 
         // Mixer initial X scales and positions
         private float mixerFill1InitialWidth;
@@ -142,7 +146,7 @@ namespace Game
         {
             if (id == 0) return;
             SpriteRenderer.SetIsVisible(id, visible);
-            Text.SetIsVisible(id, visible);
+            Engine.Text.SetIsVisible(id, visible);
         }
 
         // =====================================================================
@@ -266,6 +270,10 @@ namespace Game
             Event.Subscribe("GameWin", OnGameEnded);
             Event.Subscribe("GameRestart", OnGameRestart);
             Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Subscribe(EVENT_TUTORIALOVER, OnTutorialOver);
+
+            // Save timer UI ID in level 2
+            timerUILevel2ID = SceneFindEntityByName("TImer");
 
             LogMessage("PauseMenuPopup: Ready!");
         }
@@ -439,8 +447,17 @@ namespace Game
             SafeSetVisible(checkboxSFXTickedId, false);
 
             if (hudElementIds != null)
-                for (int i = 0; i < hudElementIds.Length; i++)
-                    SafeSetVisible(hudElementIds[i], true);
+                for (int i = 0; i < hudElementIds.Length; i++) {
+
+                    // Exception for timer UI in Level 2
+                    if(hudElementIds[i] == timerUILevel2ID) {
+                        if(isTutorialOver) {
+                            SafeSetVisible(hudElementIds[i], true);
+                        }
+                    } else {
+                        SafeSetVisible(hudElementIds[i], true);
+                    }
+                }
 
             if (entitiesFound)
             {
@@ -783,12 +800,19 @@ namespace Game
             }
         }
 
+        private void OnTutorialOver(string eventName, string payload)
+        {
+            isTutorialOver = true;
+            LogMessage("[PauseMenuPopup] Level 2 tutorial is over, allow to show timer UI");
+        }
+
         public override void OnDestroy()
         {
             Event.Unsubscribe("GameOver", OnGameEnded);
             Event.Unsubscribe("GameWin", OnGameEnded);
             Event.Unsubscribe("GameRestart", OnGameRestart);
             Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Unsubscribe(EVENT_TUTORIALOVER, OnTutorialOver);
             LogMessage("PauseMenuPopup: Destroyed");
         }
     }

@@ -1,8 +1,8 @@
-using System;
 using Engine;
+using System;
+using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Text;
-using static Engine.Event;
 namespace Game
 {
     /// <summary>
@@ -64,9 +64,12 @@ namespace Game
 
             // Display initial time
             UpdateTimerDisplay();
-            
+
+            // Hide timer at the start before tutorial is done
+            Text.SetIsVisible(EntityID, false);
+
             //initialized = true;
-            LogMessage("[TimerUI2] Initialized - Starting at " + startingTime + " seconds");
+            //LogMessage("[TimerUI2] Initialized - Starting at " + startingTime + " seconds");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -123,7 +126,10 @@ namespace Game
         private void OnTutorialOver(string eventName, string payload)
         {
             initialized = true;
+            // Show timer
+            Text.SetIsVisible(EntityID, true);
             LogMessage("[TimerUI2] Level 2 tutorial is over, begin main game timer");
+            LogMessage("[TimerUI2] Initialized - Starting at " + startingTime + " seconds");
         }
 
         private void UpdateTimerDisplay()
@@ -150,6 +156,7 @@ namespace Game
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
             Event.Unsubscribe(GAMEWIN, OnGameOver);
             Event.Unsubscribe(EVENT_DEBUG_SET_TIMER, OnDebugSetTimer);
+            Event.Unsubscribe(EVENT_TUTORIALOVER, OnTutorialOver);
             LogMessage("=== TimerUI2 Destroyed ===");
         }
 
