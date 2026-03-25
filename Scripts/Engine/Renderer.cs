@@ -23,6 +23,9 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetEmissiveTexture(uint entityID, string textureName);
 
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetOpacity(uint entityID, float opacity);
+        [MethodImpl(MethodImplOptions.InternalCall)] private static extern void MeshRenderer_SetBaseColor(uint entityID, float r, float g, float b);
+
         public static bool GetVisible(uint entityID) => MeshRenderer_GetVisible(entityID);
         public static void SetVisible(uint entityID, bool visible) => MeshRenderer_SetVisible(entityID, visible);
 
@@ -36,6 +39,8 @@ namespace Engine
         public static void SetGlobalIlluminate(uint entityID, bool gi) => MeshRenderer_SetGlobalIlluminate(entityID, gi);
 
         public static void SetEmissiveTexture(uint entityID, string textureName) => MeshRenderer_SetEmissiveTexture(entityID, textureName);
+        public static void SetOpacity(uint entityID, float opacity) => MeshRenderer_SetOpacity(entityID, opacity);
+        public static void SetBaseColor(uint entityID, float r, float g, float b) => MeshRenderer_SetBaseColor(entityID, r, g, b);
 
         private uint ID => Entity.EntityID;
 
@@ -61,6 +66,16 @@ namespace Engine
         {
             get => MeshRenderer_GetGlobalIlluminate(ID);
             set => MeshRenderer_SetGlobalIlluminate(ID, value);
+        }
+
+        public float Opacity
+        {
+            set => MeshRenderer_SetOpacity(ID, value);
+        }
+
+        public Vector3 BaseColor
+        {
+            set => MeshRenderer_SetBaseColor(ID, value.X, value.Y, value.Z);
         }
     }
 }

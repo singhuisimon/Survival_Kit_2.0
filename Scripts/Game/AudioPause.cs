@@ -17,6 +17,7 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
 
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
+        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPause";
 
 
         // ===== State =====
@@ -24,6 +25,7 @@ namespace Game
         [SerializeField] private bool audiostarted = false;
         private bool disabled = false;
         private bool isPaused = false;
+        private bool pauseForTutorial = false;
 
         // ===== Timer =====
         private float startaudio = 5.0f;
@@ -36,6 +38,7 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
 
             initialized = true;
 
@@ -54,13 +57,16 @@ namespace Game
                 return;
 
             if (GameState.IsPaused){
-
-                if(!isPaused && AudioIsPlaying((uint)EntityID)){
-                    LogMessage("[AudioPause] Pausing audio on entity");
-                    AudioPause((uint)EntityID);
-                    isPaused = true;
+                
+                // Continue audio if pause is for tutorial in level 2
+                if(!pauseForTutorial) {
+                    if(!isPaused && AudioIsPlaying((uint)EntityID)){
+                        LogMessage("[AudioPause] Pausing audio on entity");
+                        AudioPause((uint)EntityID);
+                        isPaused = true;
+                    }
+                    return;
                 }
-                return;
             }
 
             if(isPaused && audiostarted){
@@ -97,6 +103,7 @@ namespace Game
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
 
             LogMessage("=== AmmoBar Destroyed ===");
         }
@@ -105,6 +112,15 @@ namespace Game
             disabled = true;
             AudioStop((uint)EntityID);
             LogMessage("[AudioPause] Detect game end, stopping audio from playing");
+        }
+
+        private void OnLevel2Pause(string eventName, string payload) {
+            if(bool.TryParse(payload, out bool state)) {
+                // Update state for pause during tutorial
+                pauseForTutorial = state;
+
+                LogMessage("[AudioPause] Level 2 pause for tutorial, continue playing audio");
+            }
         }
     }
 }

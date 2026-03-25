@@ -16,6 +16,12 @@ namespace Engine
 
         [MethodImpl(MethodImplOptions.InternalCall)]
         public static extern void SetColorMax(uint entityID, ref Vector4 color);
+
+        public static void SetColor(uint entityID, ref Vector4 color)
+        {
+            SetColorMin(entityID, ref color);
+            SetColorMax(entityID, ref color);
+        }
     }
 
 }

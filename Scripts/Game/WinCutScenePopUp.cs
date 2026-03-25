@@ -29,7 +29,7 @@ namespace Game
         private uint WinPopUpID;
         private uint NextLevelButtonID;
         private uint MainMenuButtonID;
-        private uint MainMenuButtonFinalID;
+        private uint CreditEndButtonID;
         private uint WinPopUpFinalID;
 
         // // ScenePath
@@ -81,7 +81,7 @@ namespace Game
             WinPopUpID = SceneFindEntityByTag("WinPopUpLvl12");
             NextLevelButtonID = SceneFindEntityByTag("NextLevelButton");
             MainMenuButtonID = SceneFindEntityByTag("MainMenuButton");
-            MainMenuButtonFinalID = SceneFindEntityByTag("MainMenuButtonFinal");
+            CreditEndButtonID = SceneFindEntityByTag("CreditEndButton");
             WinPopUpFinalID = SceneFindEntityByTag("WinPopUpFinal");
 
             LogMessage("WinCutSceneTransition: Found entity Level2CutScene0204 "+  Level2CutScene0204ID);
@@ -93,9 +93,10 @@ namespace Game
             LogMessage("WinCutSceneTransition: Found entity WinPopUpLvl12 "+ WinPopUpID);
             LogMessage("WinCutSceneTransition: Found entity NextLevelButton "+ NextLevelButtonID);
             LogMessage("WinCutSceneTransition: Found entity MainMenuButton "+ MainMenuButtonID);
-            LogMessage("WinCutSceneTransition: Found entity MainMenuButtonFinal "+ MainMenuButtonFinalID);
+            LogMessage("WinCutSceneTransition: Found entity MainMenuButtonFinal "+ CreditEndButtonID);
             LogMessage("WinCutSceneTransition: Found entity WinPopUpFinal "+ WinPopUpFinalID);
             LogMessage("WinCutSceneTransition: Found entity Level2CutScene08 "+ Level2CutScene08ID);
+            LogMessage("WinCutSceneTransition: Found entity CreditEndButton "+ CreditEndButtonID);
 
 
             // If any entity is missing
@@ -103,8 +104,9 @@ namespace Game
                 Level2CutScene05ID    == 0 || Level2CutScene06ID    == 0 ||
                 Level2CutScene07ID    == 0 || CutSceneSkipButtonID  == 0 ||
                 WinPopUpID            == 0 || NextLevelButtonID     == 0 ||
-                MainMenuButtonID      == 0 || MainMenuButtonFinalID == 0 ||
-                WinPopUpFinalID       == 0 || Level2CutScene08ID    == 0)
+                MainMenuButtonID      == 0 || CreditEndButtonID == 0 ||
+                WinPopUpFinalID       == 0 || Level2CutScene08ID    == 0 ||
+                CreditEndButtonID     == 0)
             {
                 LogError("WinCutScenePopUp: One or more entities not found – aborting");
                 return;
@@ -128,13 +130,14 @@ namespace Game
             SetIsVisible(WinPopUpID,            false);
             SetIsVisible(NextLevelButtonID,     false);
             SetIsVisible(MainMenuButtonID,      false);
-            SetIsVisible(MainMenuButtonFinalID, false);
+            SetIsVisible(CreditEndButtonID, false);
             SetIsVisible(WinPopUpFinalID, false);
             HideAllFrames();
 
             ShowFrame(0);
             //ShowSkipButton();
             SetIsVisible(CutSceneSkipButtonID, true);
+           
             currentFrame = 0;
             frameTimer   = 0.0f;
         }
@@ -177,11 +180,11 @@ namespace Game
 
                 // Main Menu – final level layout
                 if (WinCutSceneContext.IsFinalLevel
-                    && Collision2D.IsMouseCollidingWithEntity(MainMenuButtonFinalID))
+                    && Collision2D.IsMouseCollidingWithEntity(CreditEndButtonID))
                 {
-                    LogMessage("WinCutScenePopUp: Main Menu clicked (final level)");
-                    bool ok = Scene.SceneLoadFromFile(WinCutSceneContext.MAIN_MENU_SCENE);
-                    if (!ok) LogError("WinCutScenePopUp: Failed to load main menu");
+                    LogMessage("WinCutScenePopUp: Credit End clicked (Credit)");
+                    bool ok = Scene.SceneLoadFromFile(WinCutSceneContext.CREDITS_END_SCENE);
+                    if (!ok) LogError("WinCutScenePopUp: Failed to load credit scene");
                     return;
                 }
             }
@@ -251,7 +254,7 @@ namespace Game
                 SetIsVisible(MainMenuButtonID,      false);
                 SetIsVisible(WinPopUpID, false);
                 SetIsVisible(WinPopUpFinalID, true);
-                SetIsVisible(MainMenuButtonFinalID, true);
+                SetIsVisible(CreditEndButtonID, true);
             }
             else
             {
@@ -260,7 +263,7 @@ namespace Game
                 SetIsVisible(NextLevelButtonID,     true);
                 SetIsVisible(WinPopUpID, true);
                 SetIsVisible(MainMenuButtonID,      true);
-                SetIsVisible(MainMenuButtonFinalID, false);
+                SetIsVisible(CreditEndButtonID, false);
             }
             //LogMessage("WinCutScenePopUp: Cutscene complete – hook up win popup here");
             popupVisible = true;

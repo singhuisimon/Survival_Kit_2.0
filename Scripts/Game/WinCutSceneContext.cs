@@ -40,5 +40,6 @@ namespace Game
         public const string LEVEL2_SCENE    = "Resources/Sources/Scenes/level2_graphic_card.json";
         public const string LEVEL3_SCENE    = "Resources/Sources/Scenes/level3_motherboard.json";
         public const string MAIN_MENU_SCENE = "Resources/Sources/Scenes/MainMenu.json";
+        public const string CREDITS_END_SCENE = "Resources/Sources/Scenes/EndCreditTransition.json";
     }
 }

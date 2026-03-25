@@ -54,8 +54,9 @@ namespace Game
         // ========================= TUTORIAL SETTING ======================
         [SerializeField] private bool tutorialover = false;
         private int tutorialstate = 0;
-        private float tutorialSpawnInterval = 30.0f;
-        [SerializeField] private float tutorialCountdown = 0.0f;
+        private float tutorialSpawnInterval = 5.0f;
+        [SerializeField] private float tutorialCountdown = 7.5f; // Have a short delay at the start
+        private const uint INVALID_ENTITY = 0xffffffffu;
 
         // ============== RNG Setting =================
         private static uint seed = 123;
@@ -96,7 +97,21 @@ namespace Game
 
             // TEMP
             if(!tutorialover){
-                tutorialCountdown -= deltaTime;
+
+                // Complete tutorial if loveletter is destroyed
+                if (tutorialstate > 2 && SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
+                    tutorialover = true;
+                    Publish(EVENT_TUTORIALOVER, "");
+                }
+
+                // Time delay between enemy spawns
+                if (SceneFindEntityByName("botnet") == INVALID_ENTITY &&
+                   SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
+                   SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
+                    tutorialCountdown -= deltaTime;
+                }
+
+                // Spawn enemy
                 if(tutorialCountdown <= 0.0f){
                     SpawnTutorialOnWall();
                 }  
@@ -273,22 +288,22 @@ namespace Game
             
             switch(enemyDex){
                 case 0:
-                    //loveletter
-                    enemyPrefabPath = loveletterPrefabPath;
-                    selectedWidth = smallwall_width;
-                    spawnDistance = loveletterSpawnDist;
-                    break;
-                case 1:
                     //botnet
                     enemyPrefabPath = botnetPrefabPath;
                     selectedWidth = smallwall_width;
                     spawnDistance = wormbotSpawnDist;
                     break;
-                case 2:
+                case 1:
                     //worm
                     enemyPrefabPath = wormHostPrefabPath;
                     spawnDistance = wormbotSpawnDist;
                     selectedWidth = smallwall_width;
+                    break;
+                case 2:
+                    //loveletter
+                    enemyPrefabPath = loveletterPrefabPath;
+                    selectedWidth = smallwall_width;
+                    spawnDistance = loveletterSpawnDist;
                     break;
             }
  
@@ -312,26 +327,24 @@ namespace Game
 
             //Instantiate audio if needed
             if(enemyDex == 0){
+                currentBotnetSpawned++;
+                Publish("BotnetTutorialSpawn", enemyID.ToString());
+            }
+            else if(enemyDex == 1){
+                currentWormSpawned++;
+                Publish("WormTutorialSpawn", enemyID.ToString());
+            }
+            else if(enemyDex == 2){
                 currentLoveletterSpawned++;
+                Publish("LoveletterTutorialSpawn", enemyID.ToString());
                 //spawn warping in audio
                 Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
                 uint warpingInID = PrefabInstantiateWithTransform(warpingInPrefab, ref spawnPos, ref spawnRot, ref scale, false);
-                if(warpingInID == 0){
+                if (warpingInID == 0)
+                {
                     LogMessage("[LoveletterSpawn] loveletter warping in entity fail to instantiate");
                     return;
                 }
-            }
-            else if(enemyDex == 1){
-                currentBotnetSpawned++;
-            }
-            else if(enemyDex == 2){
-                currentWormSpawned++;
-            }
-
-            if(tutorialstate > 2){
-                spawnInterval = tutorialSpawnInterval;
-                tutorialover = true;
-                Publish(EVENT_TUTORIALOVER, "");
             }
 
         }

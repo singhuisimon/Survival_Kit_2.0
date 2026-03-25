@@ -1405,6 +1405,12 @@ namespace Engine {
 		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetEmissiveTexture",
 						 reinterpret_cast<void *>(InternalCalls::MeshRenderer_SetEmissiveTexture));
 
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetOpacity",
+			reinterpret_cast<void*>(InternalCalls::MeshRenderer_SetOpacity));
+
+		BindInternalCall("Engine.MeshRenderer::MeshRenderer_SetBaseColor",
+			reinterpret_cast<void*>(InternalCalls::MeshRenderer_SetBaseColor));
+
 		// =====================================================================
 		// RenderSettings
 		// =====================================================================
