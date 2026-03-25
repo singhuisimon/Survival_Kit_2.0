@@ -58,7 +58,7 @@
                     "Properties": {
                         "ComponentGUID": "11939254352762881215",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -78,7 +78,7 @@
                         "BoxHalfExtent": [
                             3000.0,
                             4500.0,
-                            20.0
+                            50.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -160,7 +160,7 @@
                     "Properties": {
                         "ComponentGUID": "11939254352762881215",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -180,7 +180,7 @@
                         "BoxHalfExtent": [
                             3000.0,
                             4500.0,
-                            20.0
+                            50.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -262,7 +262,7 @@
                     "Properties": {
                         "ComponentGUID": "11939254352762881215",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -282,7 +282,7 @@
                         "BoxHalfExtent": [
                             5000.0,
                             2000.0,
-                            20.0
+                            50.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -364,7 +364,7 @@
                     "Properties": {
                         "ComponentGUID": "11939254352762881215",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -384,7 +384,7 @@
                         "BoxHalfExtent": [
                             5000.0,
                             2000.0,
-                            20.0
+                            50.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -466,7 +466,7 @@
                     "Properties": {
                         "ComponentGUID": "11939254352762881215",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -486,7 +486,7 @@
                         "BoxHalfExtent": [
                             3000.0,
                             2000.0,
-                            20.0
+                            50.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -568,7 +568,7 @@
                     "Properties": {
                         "ComponentGUID": "11939254352762881215",
                         "Mass": 1.0,
-                        "IsKinematic": true,
+                        "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
@@ -588,7 +588,7 @@
                         "BoxHalfExtent": [
                             3000.0,
                             2000.0,
-                            20.0
+                            50.0
                         ],
                         "SphereRadius": 0.5
                     }
