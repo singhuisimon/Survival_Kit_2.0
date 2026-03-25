@@ -1,11 +1,11 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "lvl2redesign_level_design_v003_v002_BaseColor.png",
-    "normalMap": "lvl2redesign_level_design_v003_v002_Normal.png",
-    "metallicMap": "lvl2redesign_level_design_v003_v002_Metallic.png",
-    "roughnessMap": "lvl2redesign_level_design_v003_v002_Roughness.png",
-    "emissionMap": "lvl2redesign_level_design_v003_v002_Emissive.png",
-    "occlusionMap": "lvl2redesign_level_design_v004_v003_Opacity.png",
+    "baseMap": "lvl2redesign_level_design_v005_v004_BaseColor.png",
+    "normalMap": "lvl2redesign_level_design_v005_v004_Normal.png",
+    "metallicMap": "lvl2redesign_level_design_v005_v004_Metallic.png",
+    "roughnessMap": "lvl2redesign_level_design_v005_v004_Roughness.png",
+    "emissionMap": "lvl2redesign_level_design_v005_v004_Emissive.png",
+    "occlusionMap": "lvl2redesign_level_design_v005_v004_Opacity.png",
     "baseColor": [
         1.0,
         1.0,
