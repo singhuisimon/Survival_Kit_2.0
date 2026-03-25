@@ -106,6 +106,9 @@ namespace Game
             Subscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn); 
             Subscribe(EVENT_LOVELETTER_TUTORIAL_SPAWN, OnLoveletterSpawn);
 
+            // Start the game paused for tutorial
+            pauseForTutorial = true;
+
         }
 
         public override void OnUpdate(float deltaTime)
@@ -224,34 +227,8 @@ namespace Game
             Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
             Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
 
-
-            // To begin the entire tutorial
-            if (!instructionsRead) {
-
-                // Ensure at least 3 seconds delay before first tool tip fades in
-                if(tooltipElapsed < 3.0f) {
-                    tooltipElapsed += deltaTime;
-                } else {
-                    ShowUI(instructionID, true, deltaTime);
-                }
-
-                if(fadeUpElapsed > fadeUpTime) {
-
-                    // Reset all elapsed time, 'E' pressed state, and set up for next state
-                    EPressed = false;
-                    tooltipElapsed = 0.0f;
-                    fadeOutElapsed = 0.0f;
-                    fadeUpElapsed = 0.0f;
-                    instructionsRead = true;
-                    pauseForTutorial = true;
-                    GameState.IsPaused = true;
-                    playerPauseOnTutorial = false;
-                }
-                return;
-            }
-
             // Check for enemy spawning events if tutorial is ongoing
-            if(currentState != TutorialState.Done)
+            if (currentState != TutorialState.Done)
             {
                 // Check if either enemy is seen
                 if(botnetSeen || wormSeen || loveletterSeen)
@@ -347,35 +324,42 @@ namespace Game
 
         private void HandleInstructionState(Vector3 currentPos, float dt)
         {
-            // Update tooltip elapsed time
-            tooltipElapsed += dt;
+            // Show UI when state begins (Botnet spawns)
+            ShowUI(instructionID, true, dt);
 
-            // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-            if (tooltipElapsed > tooltipMinTime) { 
+            // Ensure UI fades in fully before pausing state and waiting for interaction
+            if (fadeUpElapsed > fadeUpTime) {
 
-                // Display assistance message: "Press "E" to proceed"
-                ShowProceedText(true);
+                // Update tooltip elapsed time
+                tooltipElapsed += dt;
 
-                // Check for 'E' input
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
+                // Fade out upon pressing E only AFTER tooltip exists beyond min duration
+                if (tooltipElapsed > tooltipMinTime) {
 
-                // Begin fade out
-                if (EPressed) {
-                    ShowUI(instructionID, false, dt);
-                    ShowProceedText(false);  // Remove assistance message
-                }
+                    // Display assistance message: "Press "E" to proceed"
+                    ShowProceedText(true);
 
-                // Ensure all fading effects are completed before moving on
-                if (fadeOutElapsed > fadeOutTime) {
+                    // Check for 'E' input
+                    if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
-                    // Reset all elapsed time, 'E' pressed state, and set up for next state
-                    EPressed = false;
-                    tooltipElapsed = 0.0f;
-                    fadeOutElapsed = 0.0f;
-                    fadeUpElapsed = 0.0f;
-                    currentState = TutorialState.BotnetInfo;
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
+                    // Begin fade out
+                    if (EPressed) {
+                        ShowUI(instructionID, false, dt);
+                        ShowProceedText(false);  // Remove assistance message
+                    }
+
+                    // Ensure all fading effects are completed before moving on
+                    if (fadeOutElapsed > fadeOutTime) {
+
+                        // Reset all elapsed time, 'E' pressed state, and set up for next state
+                        EPressed = false;
+                        tooltipElapsed = 0.0f;
+                        fadeOutElapsed = 0.0f;
+                        fadeUpElapsed = 0.0f;
+                        currentState = TutorialState.BotnetInfo;
+                        pauseForTutorial = false;
+                        GameState.IsPaused = false;
+                    }
                 }
             }
         }
