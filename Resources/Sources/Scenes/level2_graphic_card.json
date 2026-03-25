@@ -9032,7 +9032,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "351043840617595705",
-                        "Mesh": "lvl2redesign_level_design_v004.fbx",
+                        "Mesh": "lvl2redesign_level_design_v005.fbx",
                         "Material": "MAT_lvl2redesign_v003.mat",
                         "Texture": "",
                         "Visible": true,
