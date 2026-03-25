@@ -22,13 +22,12 @@ namespace Game
         private const string TAG_PLAYER = "Player";
 
         // Events
-        private const string GAMEOVER = "GameOver";
-        private const string GAMEWIN = "GameWin";
+        private const string COREDEAD = "CoreDeadTriggerPostTrenchRun";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.1f;
         private float shootingTimer = 0.0f;
-        private bool isDead = false;
+
         string EnemyTurretBulletPrefabPath = "Sources/Prefabs/EnemyTurretBullet.prefab";
 
         // Lifecycle
@@ -44,16 +43,12 @@ namespace Game
 
             inRange = false;
             shootingTimer = 0.0f;
-            Subscribe(GAMEOVER, OnGameOver);
-            Subscribe(GAMEWIN, OnGameOver);
+            Subscribe(COREDEAD, OnGameOver);
          
         }
 
         public override void OnUpdate(float deltaTime)
         {
-            if (GameState.IsPaused || isDead)
-                return;
-
             if (playerID == INVALID_ENTITY)
                 return;
 
@@ -90,8 +85,7 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Unsubscribe(GAMEOVER, OnGameOver);
-            Unsubscribe(GAMEWIN, OnGameOver);
+            Unsubscribe(COREDEAD, OnGameOver);
         }
 
         public void ShootAtTarget()
@@ -206,9 +200,7 @@ namespace Game
             return q;
         }
 
-        private void OnGameOver(string eventName, string payload)
-        {
-            isDead = true;
+        private void OnGameOver(string eventName, string payload){
             SceneDestroyEntity(EntityID);
         }
     }
