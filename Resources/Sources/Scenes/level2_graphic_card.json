@@ -28,7 +28,7 @@
                         ],
                         "Scale": [
                             3.0,
-                            4.0,
+                            2.799999952316284,
                             1.5
                         ],
                         "Parent": 4294967295,
@@ -3114,7 +3114,7 @@
                         "ComponentGUID": "16100272381120889775",
                         "Position": [
                             0.0,
-                            0.0,
+                            250.0,
                             0.0
                         ],
                         "Rotation": [
@@ -7051,7 +7051,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 9,
@@ -7082,7 +7085,7 @@
                         "ComponentGUID": "15900363641908576543",
                         "Position": [
                             3.0,
-                            -408.0,
+                            -250.0,
                             126.0
                         ],
                         "Rotation": [
@@ -7091,9 +7094,9 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            150.0,
-                            150.0
+                            600.0,
+                            600.0,
+                            600.0
                         ],
                         "Parent": 4294967295,
                         "Children": [
@@ -7144,9 +7147,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            75.0,
-                            75.0,
-                            75.0
+                            300.0,
+                            300.0,
+                            300.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -7504,7 +7507,7 @@
                         "ComponentGUID": "7571492693698003779",
                         "Position": [
                             0.000009495363883615937,
-                            19.97862434387207,
+                            270.0,
                             30.014230728149414
                         ],
                         "Rotation": [
@@ -7539,7 +7542,7 @@
                         "FarPlane": 5000.0,
                         "Target": [
                             0.000009495363883615937,
-                            20.69212532043457,
+                            270.0,
                             -969.9855346679688
                         ]
                     }
@@ -8180,7 +8183,10 @@
                                 "componentType": 5,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ]
                     }
@@ -8191,7 +8197,7 @@
                         "ComponentGUID": "14827864839706771731",
                         "Position": [
                             3.0,
-                            -408.0,
+                            -250.0,
                             126.0
                         ],
                         "Rotation": [
@@ -8200,9 +8206,9 @@
                             90.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            4.0,
+                            4.0,
+                            4.0
                         ],
                         "Parent": 13,
                         "Children": []
@@ -8225,9 +8231,9 @@
                             0.0
                         ],
                         "Default Size": [
-                            15.0,
-                            10.0,
-                            15.0
+                            60.0,
+                            60.0,
+                            60.0
                         ],
                         "End Size": [
                             0.0,
@@ -9027,7 +9033,7 @@
                     "Properties": {
                         "ComponentGUID": "351043840617595705",
                         "Mesh": "lvl2redesign_level_design_v004.fbx",
-                        "Material": "MAT_lvl2redesign_v002.mat",
+                        "Material": "MAT_lvl2redesign_v003.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
