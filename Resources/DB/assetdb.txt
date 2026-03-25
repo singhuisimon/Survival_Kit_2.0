@@ -54,7 +54,7 @@ cbebf88fbc4a801b|0|/Resources/Sources/Textures/SpawningSentryLabel.png|.png||177
 d70f708349bdc07f|1|/Resources/Sources/Meshes/lvl1_OOB_walls.fbx|.fbx||1769351039|1|0|0|0
 963b988e429cc0b7|0|/Resources/Sources/Textures/vfx/CylinderScrew.png|.png||1772730719|1|0|0|0
 363b988e429cc299|0|/Resources/Sources/Textures/vfx/Smoke15.png|.png||1772730720|1|0|0|0
-512d5893ba38c005|1|/Resources/Sources/Meshes/lvl2redesign_OOB_walls_v001.fbx|.fbx||1774414493|1|0|0|0
+512d5893ba38c005|1|/Resources/Sources/Meshes/lvl2redesign_OOB_walls_v001.fbx|.fbx||1774416601|1|0|0|0
 b5d5d08c93988041|0|/Resources/Sources/Textures/LevelSelectionPopup_Level2.png|.png||1774349036|1|0|0|0
 70f708349bdc0e9|0|/Resources/Sources/Textures/GlitchTextureRedTransparent.png|.png||1769755676|1|0|0|0
 ff0f708349bdc011|6|/Resources/Sources/Scenes/Level1_Worm.json|.json||1773397095|1|0|0|0
@@ -140,7 +140,7 @@ d70f708349bdc027|6|/Resources/Sources/Scenes/SpriteTestScene.json|.json||1773397
 be3b988e429cc0c9|0|/Resources/Sources/Textures/vfx/Fire1.png|.png||1772730719|1|0|0|0
 85bed883af108007|2|/Resources/Sources/Material/corepad.mat|.mat||1772730718|1|0|0|0
 3f0f708349bdc02f|6|/Resources/Sources/Scenes/TestNewEditor.json|.json||1773397095|1|0|0|0
-412d5893ba7c04db|2|/Resources/Sources/Material/MAT_lvl2redesign_v002.mat|.mat||1774415728|1|0|0|0
+412d5893ba7c04db|2|/Resources/Sources/Material/MAT_lvl2redesign_v002.mat|.mat||1774416601|1|0|0|0
 770f708349bdc033|6|/Resources/Sources/Scenes/testTextComponent.json|.json||1773397095|1|0|0|0
 3dd5d08c93988033|0|/Resources/Sources/Textures/E001_worm_host_v004_Metallic.png|.png||1772730719|1|0|0|0
 ff0f708349be01af|3|/Resources/Sources/Audio/Player_Hitmarker.wav|.wav||1769350445|1|0|0|0
@@ -176,7 +176,7 @@ cf0f708349bdc065|1|/Resources/Sources/Meshes/E001_worm_host_v001.fbx|.fbx||17693
 fdbed883af108009|2|/Resources/Sources/Material/Level1_M4.mat|.mat||1772730718|1|0|0|0
 1f0f708349bdc069|1|/Resources/Sources/Meshes/E003_trojan_v001.fbx|.fbx||1769350446|1|0|0|0
 370f708349be01f1|2|/Resources/Sources/Material/InstallButton.mat|.mat||1769350446|1|0|0|0
-592d5893ba38c00b|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Metallic.png|.png||1774414547|1|0|0|0
+592d5893ba38c00b|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Metallic.png|.png||1774416601|1|0|0|0
 f63b988e429cc233|0|/Resources/Sources/Textures/vfx/Muzzle6.png|.png||1772730720|1|0|0|0
 c70f708349bdc07b|1|/Resources/Sources/Meshes/level_design_v003.fbx|.fbx||1769350446|1|0|0|0
 1e3b988e429cc2db|0|/Resources/Sources/Textures/vfx/Spiral7.png|.png||1772730720|1|0|0|0
@@ -265,7 +265,7 @@ b70f708349be01a3|3|/Resources/Sources/Audio/MouseClick1.wav|.wav||1769755676|1|0
 9e3b988e429cc061|0|/Resources/Sources/Textures/Trenchrun LevelDesign/trench_run_v006_Metallic.png|.png||1772994879|1|0|0|0
 9f0f708349bdc0b9|0|/Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_BaseColor.png|.png||1772730719|1|0|0|0
 870f708349bdc0bb|0|/Resources/Sources/Textures/E004_botnet_v003_Botnet_v001_Emissive.png|.png||1772730719|1|0|0|0
-e12d5893ba38c009|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Emissive.png|.png||1774414546|1|0|0|0
+e12d5893ba38c009|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Emissive.png|.png||1774416601|1|0|0|0
 7f42e88f854c402d|3|/Resources/Sources/Audio/Player Collide Damage.wav|.wav||1773397095|1|0|0|0
 1f0f708349bdc0c5|0|/Resources/Sources/Textures/E005_loveletter_v003_Metallic.png|.png||1772730719|1|0|0|0
 a70f708349bdc0cd|0|/Resources/Sources/Textures/ErrorPopUp.png|.png||1769755676|1|0|0|0
@@ -398,7 +398,7 @@ f63b988e429cc0cb|0|/Resources/Sources/Textures/vfx/Fire10.png|.png||1772730719|1
 95d5d08c93988039|0|/Resources/Sources/Textures/Level1Button_Selected.png|.png||1772730719|1|0|0|0
 e63b988e429cc07f|0|/Resources/Sources/Textures/vfx/Circle2.png|.png||1772730719|1|0|0|0
 cf0f708349be0153|0|/Resources/Sources/Textures/PrimaryWeapBar_Frame.png|.png||1772730719|1|0|0|0
-892d5893ba38c007|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_BaseColor.png|.png||1774414543|1|0|0|0
+892d5893ba38c007|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_BaseColor.png|.png||1774416601|1|0|0|0
 de3b988e429cc287|0|/Resources/Sources/Textures/vfx/Shield7.png|.png||1772730720|1|0|0|0
 be3b988e429cc227|0|/Resources/Sources/Textures/vfx/Muzzle12.png|.png||1772730720|1|0|0|0
 55d5d08c9398800f|1|/Resources/Sources/Meshes/PlayerModel_v003.fbx|.fbx||1772730718|1|0|0|0
@@ -528,7 +528,7 @@ ddd5d08c93988021|0|/Resources/Sources/Textures/DefenceFailed_MainMenuButton.png|
 763b988e429cc063|0|/Resources/Sources/Textures/Trenchrun LevelDesign/trench_run_v006_Opacity.png|.png||1772994879|1|0|0|0
 1e3b988e429cc00b|6|/Resources/Sources/Scenes/trench_run_new_tooltip.json|.json||1773397095|1|0|0|0
 5d5d08c9398802d|0|/Resources/Sources/Textures/DefenceSuccess_ReferenceImage.png|.png||1772730719|1|0|0|0
-992d5893ba38c00d|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Normal.png|.png||1774414548|1|0|0|0
+992d5893ba38c00d|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Normal.png|.png||1774416601|1|0|0|0
 ee3b988e429cc06f|0|/Resources/Sources/Textures/vfx/Circle12.png|.png||1772730719|1|0|0|0
 45d5d08c93988031|0|/Resources/Sources/Textures/E001_worm_host_v004_Emissive.png|.png||1772730719|1|0|0|0
 e3b988e429cc085|0|/Resources/Sources/Textures/vfx/Circle22.png|.png||1772730719|1|0|0|0
@@ -574,7 +574,7 @@ e63b988e429cc265|0|/Resources/Sources/Textures/vfx/Ring3.png|.png||1772730720|1|
 5e3b988e429cc0e9|0|/Resources/Sources/Textures/vfx/Fire5.png|.png||1772730719|1|0|0|0
 6e3b988e429cc079|0|/Resources/Sources/Textures/vfx/Circle17.png|.png||1772730719|1|0|0|0
 763b988e429cc07d|0|/Resources/Sources/Textures/vfx/Circle19.png|.png||1772730719|1|0|0|0
-912d5893ba38c011|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Roughness.png|.png||1774414552|1|0|0|0
+912d5893ba38c011|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Roughness.png|.png||1774416601|1|0|0|0
 463b988e429cc083|0|/Resources/Sources/Textures/vfx/Circle21.png|.png||1772730719|1|0|0|0
 9e3b988e429cc087|0|/Resources/Sources/Textures/vfx/Circle23.png|.png||1772730719|1|0|0|0
 ce3b988e429cc259|0|/Resources/Sources/Textures/vfx/Projectile7.png|.png||1772730720|1|0|0|0
@@ -858,7 +858,7 @@ abebf88fbc4a8023|3|/Resources/Sources/Audio/Upgrade Module Pickup.wav|.wav||1773
 6bebf88fbc4a8025|2|/Resources/Sources/Material/SentryBarBG.mat|.mat||1773397095|1|0|0|0
 43ebf88fbc4a8027|2|/Resources/Sources/Material/SentryBarFill.mat|.mat||1773397095|1|0|0|0
 fc50889394a60009|0|/Resources/Sources/Textures/Level2_Graphics_Card/lvl2redesign_level_design_v003_v001_Normal.png|.png||1774411695|1|0|0|0
-491e509325494003|6|/Resources/Sources/Scenes/level2_graphic_card.json|.json||1774415874|1|0|0|0
+491e509325494003|6|/Resources/Sources/Scenes/level2_graphic_card.json|.json||1774416601|1|0|0|0
 991e509325494005|6|/Resources/Sources/Scenes/level2_withouthub.json|.json||1774002917|1|0|0|0
 491e509325494009|6|/Resources/Sources/Scenes/lvl2_moreTesting_2.json|.json||1773672427|1|0|0|0
 d91e50932549400b|6|/Resources/Sources/Scenes/WinCutScene.json|.json||1774411695|1|0|0|0
@@ -912,5 +912,5 @@ e7ef90939f398001|6|/Resources/Sources/Scenes/EndCreditTransition.json|.json||177
 5fef90939f398005|0|/Resources/Sources/Textures/Button_Credits.png|.png||1774411695|1|0|0|0
 d4cdd893b6ee4001|6|/Resources/Sources/Scenes/level2_graphic_card_audiotest.json|.json||1774414473|1|0|0|0
 712d5893ba38c001|11|/Resources/Sources/Meshes/desktop.ini|.ini||0|0|0|0|0
-612d5893ba38c00f|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Opacity.png|.png||1774414550|1|0|0|0
-792d5893bb0f84eb|2|/Resources/Sources/Material/OOB_v001.mat|.mat||1774416318|1|0|0|0
+612d5893ba38c00f|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Opacity.png|.png||1774416601|1|0|0|0
+792d5893bb0f84eb|2|/Resources/Sources/Material/OOB_v001.mat|.mat||1774416601|1|0|0|0
