@@ -7135,7 +7135,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -7236,8 +7239,8 @@
                     "Properties": {
                         "ComponentGUID": "16732350830320074971",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": true,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -7254,9 +7257,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -10327,9 +10330,9 @@
                     "Properties": {
                         "ComponentGUID": "17378643928610342117",
                         "Position": [
-                            0.0,
-                            -600.0,
-                            500.0
+                            -500.0,
+                            -1500.0,
+                            1000.0
                         ],
                         "Rotation": [
                             0.0,
@@ -10337,9 +10340,9 @@
                             0.0
                         ],
                         "Scale": [
-                            2.0,
-                            2.0,
-                            1.25
+                            3.0,
+                            4.0,
+                            1.5
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -10367,7 +10370,7 @@
                     "Type": "RigidbodyComponent",
                     "Properties": {
                         "ComponentGUID": "4696507377935221991",
-                        "Mass": 1.0,
+                        "Mass": -1.0,
                         "IsKinematic": false,
                         "IsTrigger": false,
                         "UseGravity": false,
@@ -10408,7 +10411,7 @@
                         "respectClipLoop": true,
                         "controller": 1,
                         "currentClipIndex": 0,
-                        "currentTime": 0.0,
+                        "currentTime": 28.242000579833984,
                         "playbackSpeed": 1.0
                     }
                 }
@@ -10422,7 +10425,7 @@
             "BloomFilterRadius": 0.0010000000474974513,
             "Exposure": 5.0,
             "GlobalBias": 0.004999999888241291,
-            "MasterVolume": 2.0,
+            "MasterVolume": 1.0,
             "SFXVolume": 1.0,
             "BGMVolume": 1.0,
             "VOVolume": 1.0,
