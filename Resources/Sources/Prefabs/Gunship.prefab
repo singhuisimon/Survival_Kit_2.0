@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: Gunship.prefab",
-    "Prefab GUID": 16316647606538423591,
-    "version": 1,
+    "Prefab GUID": 12081328846658584859,
+    "version": 2,
     "entities": [
         {
             "Name": "Gunship",
@@ -20,9 +20,9 @@
                                 0.0
                             ],
                             "Rotation": [
-                                180.0,
+                                -180.0,
                                 18.26655006408691,
-                                180.0
+                                -180.0
                             ],
                             "Scale": [
                                 0.03999999910593033,
@@ -150,7 +150,7 @@
                         "Properties": {
                             "ComponentGUID": "18330838522979176399",
                             "FilePath": "Flotilla_Gunship_Ambient.wav",
-                            "Type": 1,
+                            "Type": 5,
                             "State": 0,
                             "Volume": 0.8529999852180481,
                             "Pitch": 1.0,
@@ -160,7 +160,7 @@
                             "Is3D": true,
                             "MinDistance": 5.291999816894531,
                             "MaxDistance": 150.4429931640625,
-                            "RolloffMode": 0,
+                            "RolloffMode": 1,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
                         }

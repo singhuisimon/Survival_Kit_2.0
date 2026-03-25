@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 10130689659718419969,
+    "Prefab GUID": 12657789598961320161,
     "version": 2,
     "entities": [
         {
@@ -114,9 +114,9 @@
                             "Mute": false,
                             "ReverbProperties": 1.0,
                             "Is3D": true,
-                            "MinDistance": 1.8960000276565552,
-                            "MaxDistance": 10.347000122070313,
-                            "RolloffMode": 0,
+                            "MinDistance": 30.711999893188477,
+                            "MaxDistance": 200.51699829101565,
+                            "RolloffMode": 1,
                             "DopplerLevel": 1.003999948501587,
                             "Pan2D": 0.0
                         }
@@ -130,7 +130,7 @@
                             "ComponentGUID": "11007352189747626285",
                             "ScriptClassName": "Game.Botnet",
                             "Started": false,
-                            "GCHandle": 2499
+                            "GCHandle": 0
                         }
                     }
                 }
