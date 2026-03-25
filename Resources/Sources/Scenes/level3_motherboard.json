@@ -2014,23 +2014,23 @@
             ]
         },
         {
-            "ID": 2097183,
+            "ID": 126,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "OOB",
+                        "Name": "OOB_Walls",
                         "Tag": "OOB"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5011592139811090341",
+                        "ComponentGUID": "17378643928610342117",
                         "Position": [
                             0.0,
-                            -115.0,
-                            -583.9447021484375
+                            -2750.0,
+                            1450.0
                         ],
                         "Rotation": [
                             0.0,
@@ -2038,9 +2038,9 @@
                             0.0
                         ],
                         "Scale": [
-                            2373.89697265625,
-                            1000.0,
-                            1723.749267578125
+                            2.0,
+                            4.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -2049,11 +2049,11 @@
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "11352660415149010855",
-                        "Mesh": "",
-                        "Material": "OOB.mat",
+                        "ComponentGUID": "15072800919397008617",
+                        "Mesh": "lvl2redesign_OOB_walls_v001.fbx",
+                        "Material": "OOB_v001.mat",
                         "Texture": "",
-                        "Visible": false,
+                        "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
                         "Billboarding": false,
@@ -2065,15 +2065,40 @@
                     }
                 },
                 {
-                    "Type": "AnimatorComponent",
+                    "Type": "RigidbodyComponent",
                     "Properties": {
-                        "ComponentGUID": "0",
-                        "playing": true,
-                        "respectClipLoop": true,
-                        "controller": 1,
-                        "currentClipIndex": 0,
-                        "currentTime": 28.24169921875,
-                        "playbackSpeed": 1.0
+                        "ComponentGUID": "4696507377935221991",
+                        "Mass": -1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15649261671705298157",
+                        "ScriptClassName": "Game.TickDamage"
                     }
                 }
             ]
@@ -2608,7 +2633,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Button_RestartLevel2.png",
+                        "Texture": "Button_RestartLevel3.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -7429,7 +7454,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -7530,8 +7558,8 @@
                     "Properties": {
                         "ComponentGUID": "16732350830320074971",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": true,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -7548,9 +7576,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "SphereRadius": 0.5
                     }
