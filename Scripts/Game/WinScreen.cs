@@ -213,7 +213,8 @@ namespace Game
 
         private void OnTrenchAudioEnd(string eventName, string payload){
             LogMessage("[WinScreen] Trench ended already stopping audio then playing");
-            StopGroup(AudioType.MASTER);
+            //StopGroup(AudioType.MASTER);
+            StopGroup(AudioType.SFX);
             winVOPrefab = winTrenchVOPrefab;
             countdownstart = true;
             countdown = countdowntrench;

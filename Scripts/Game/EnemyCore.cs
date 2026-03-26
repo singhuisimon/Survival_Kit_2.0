@@ -26,6 +26,18 @@ namespace Game
 
         private const string EVENT_ENEMYCORE_HEALTHCHANGE = "EnemyCore Health Change";
 
+        private string[] Core_Sub_Entities = { 
+            "Decor_EnemyCore_Core", 
+            "Decor_EnemyCore_CoreLines", 
+            "Decor_EnemyCore_CoreLines2", 
+            "Decor_EnemyCore_CoreLines3", 
+            "Decor_EnemyCore_CoreLines4", 
+            "Decor_EnemyCore_CoreLines5", 
+            "DecorLoveletterMesh" 
+        };
+
+        private const uint INVALID_ENTITY = 0xffffffffu;
+
         public override void OnStart()
         {
             CurrentHealth = MaxHealth;
@@ -104,6 +116,8 @@ namespace Game
             Quat spawnrot = GetRotation((uint)EntityID);
             Vector3 spawnscale = GetScale((uint)EntityID);
 
+            string data = TransformToString(spawnpos, spawnrot);
+
             // Spawn the explosion
             uint explosion = PrefabInstantiateWithTransform(EnemyCore_ExplosionPrefab, ref spawnpos, ref spawnrot, ref spawnscale, false);
             if(explosion == 0){
@@ -113,6 +127,18 @@ namespace Game
                 LogMessage("[EnemyCore] Instantiating EnemyCore_ExplosionPrefab success! ID is: " + explosion.ToString());
             }
 
+            Publish("CoreDeadTriggerPostTrenchRun", data);
+            //Publish("EnemyCoreDeath", "");
+
+            foreach (string name in Core_Sub_Entities)
+            {
+                uint id = SceneFindEntityByName(name);
+
+                if (id != INVALID_ENTITY)
+                {
+                    SceneDestroyEntity(id);   
+                }
+            }
             // Spawn the audio
             uint audioID = 0;
             audioID = PrefabInstantiate(EnemyCore_CorruptAudioPrefab);
@@ -122,9 +148,15 @@ namespace Game
                 LogMessage("[EnemyCore] Succeed in intantiating EnemyCore_CorruptAudioPrefab");
             }
 
-            Publish("EnemyCoreDeath", "");
+            //Publish("EnemyCoreDeath", "");
 
             SceneDestroyEntity((uint)EntityID);            
+        }
+
+        public static string TransformToString(Vector3 pos, Quat rot)
+        {
+            return pos.X + "," + pos.Y + "," + pos.Z + "|" +
+                rot.X + "," + rot.Y + "," + rot.Z + "," + rot.W;
         }
     }
 }

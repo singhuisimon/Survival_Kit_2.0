@@ -26,6 +26,9 @@ namespace Game
 
         private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
 
+        private const string EVENT_SENTRY_WAIT_TRENCH = "WaitingSentryTrench";
+        private const string EVENT_SENTRY_SPAWNED_TRENCH = "SentrySpawnedTrench";
+
         // ===== State =====
         private bool initialized = false;
         private int initialcount = 0;
@@ -56,6 +59,7 @@ namespace Game
         // ===== Summon Bar State =====
         private uint   barEntityID     = 0;
         private bool   isHoldingKey    = false;
+        private bool forTrenchEnd      = false;
 
         [SerializeField] private float barHeightOffset = 10.0f;
 
@@ -73,6 +77,7 @@ namespace Game
 
             Event.Subscribe(EVENT_COLLECT_PAYLOAD, OnPayloadCollection);
 
+            Event.Subscribe(EVENT_SENTRY_WAIT_TRENCH, OnSentryWaitTrench);
             playerID = SceneFindEntityByName(playerName);
 
             if (playerID == 0)
@@ -298,6 +303,11 @@ namespace Game
 
             SetPosition(sentrySpawnID, ref spawnPos);
             SetRotation(sentrySpawnID, ref spawnRot);
+
+            if (forTrenchEnd == true)
+            {
+                Publish(EVENT_SENTRY_SPAWNED_TRENCH, EntityID.ToString());
+            }
         }
 
         private void OnPayloadCollection(string eventName, string payload){
@@ -312,10 +322,16 @@ namespace Game
             SetText((uint)EntityID, "");
             Text.SetIsVisible((uint)EntityID, false);
             allowedspawn = false;
+            forTrenchEnd = false;
 
             // Clean up if player was mid-hold
             KillSummonBar(); 
 
+        }
+
+        private void OnSentryWaitTrench(string eventName, string payload)
+        {
+            forTrenchEnd = true;
         }
 
         private void UpdateCountDisplay()
@@ -333,6 +349,7 @@ namespace Game
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameOver);
             Event.Unsubscribe(GAMEWIN, OnGameOver);
             Event.Unsubscribe(EVENT_COLLECT_PAYLOAD, OnPayloadCollection);
+            Event.Unsubscribe(EVENT_SENTRY_WAIT_TRENCH, OnSentryWaitTrench);
             LogMessage("=== SentryCount Destroyed ===");
         }
     }

@@ -43,8 +43,8 @@ namespace Engine
             return Entity{};
         }
 
-        Engine::m_AnimationClipStorage.clear();
-        Engine::m_AnimatorControllerStorage.clear();
+        //Engine::m_AnimationClipStorage.clear();
+        //Engine::m_AnimatorControllerStorage.clear();
 
 
         Prefab prefab;
@@ -691,7 +691,7 @@ namespace Engine
 
                     if (parentEntity.HasComponent<TransformComponent>()) {
                         auto& parentTransform = parentEntity.GetComponent<TransformComponent>();
-                        u32 childHandle = static_cast<u32>(sceneEntity.GetHandle());
+                        //u32 childHandle = static_cast<u32>(sceneEntity.GetHandle());
 
                         transform.Parent = static_cast<u32>(parentEntity.GetHandle());
 

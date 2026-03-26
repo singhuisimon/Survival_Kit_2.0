@@ -1,12 +1,13 @@
 using Engine;
 using System;
-using static Engine.Scene;
-using static Engine.Logger;
-using static Engine.Transform;
 using static Engine.AudioManager;
+using static Engine.Logger;
+using static Engine.Scene;
 using static Engine.SpriteRenderer;
 using static Engine.Text;
+using static Engine.Transform;
 using static Game.AudioSettings;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Game
 {
@@ -82,6 +83,7 @@ namespace Game
         private const string EVENT_GAME_PAUSED = "GamePaused";
         private const string EVENT_GAME_RESUMED = "GameResumed";
         private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPauseMenu";
+        private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
 
         // Entity IDs
         private uint bgId;
@@ -116,6 +118,7 @@ namespace Game
         private uint checkboxSFXUntickedId, checkboxSFXTickedId;
 
         private uint[] hudElementIds;
+        private uint timerUILevel2ID;
 
         // State
         private bool isPaused = false;
@@ -125,6 +128,7 @@ namespace Game
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
         private bool pauseForTutorial = false;
+        private bool isTutorialOver = false;
 
         // Mixer initial X scales and positions
         private float mixerFill1InitialWidth;
@@ -138,11 +142,21 @@ namespace Game
         private Vector3 mixerFill4InitialPosition;
         private Vector3 mixerFill5InitialPosition;
 
+        // Audio track
+        private uint _lastHoveredButton = 0;
+        private uint hoverSoundId;
+        private uint clickSoundId;
+
+        private const string HOVER_AUDIO_NAME = "UI Pause Hover";
+        private const string PRESS_AUDIO_NAME = "UI Pause Press";
+
+
+
         private static void SafeSetVisible(uint id, bool visible)
         {
             if (id == 0) return;
             SpriteRenderer.SetIsVisible(id, visible);
-            Text.SetIsVisible(id, visible);
+            Engine.Text.SetIsVisible(id, visible);
         }
 
         // =====================================================================
@@ -201,6 +215,10 @@ namespace Game
             checkboxBGMTickedId = SceneFindEntityByName(CHECKBOX_BGM_TICKED_NAME);
             checkboxSFXUntickedId = SceneFindEntityByName(CHECKBOX_SFX_UNTICKED_NAME);
             checkboxSFXTickedId = SceneFindEntityByName(CHECKBOX_SFX_TICKED_NAME);
+
+            //Audio
+            hoverSoundId = SceneFindEntityByName(HOVER_AUDIO_NAME);
+            clickSoundId = SceneFindEntityByName(PRESS_AUDIO_NAME);
 
             HidePauseMenu();
 
@@ -266,6 +284,10 @@ namespace Game
             Event.Subscribe("GameWin", OnGameEnded);
             Event.Subscribe("GameRestart", OnGameRestart);
             Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Subscribe(EVENT_TUTORIALOVER, OnTutorialOver);
+
+            // Save timer UI ID in level 2
+            timerUILevel2ID = SceneFindEntityByName("TImer");
 
             LogMessage("PauseMenuPopup: Ready!");
         }
@@ -439,8 +461,17 @@ namespace Game
             SafeSetVisible(checkboxSFXTickedId, false);
 
             if (hudElementIds != null)
-                for (int i = 0; i < hudElementIds.Length; i++)
-                    SafeSetVisible(hudElementIds[i], true);
+                for (int i = 0; i < hudElementIds.Length; i++) {
+
+                    // Exception for timer UI in Level 2
+                    if(hudElementIds[i] == timerUILevel2ID) {
+                        if(isTutorialOver) {
+                            SafeSetVisible(hudElementIds[i], true);
+                        }
+                    } else {
+                        SafeSetVisible(hudElementIds[i], true);
+                    }
+                }
 
             if (entitiesFound)
             {
@@ -456,31 +487,42 @@ namespace Game
         // =====================================================================
         private void HandleHoverStates()
         {
-            UpdateButtonHover(resumeButtonId, resumeButtonHoveredId);
-            UpdateButtonHover(restartButtonId, restartButtonHoveredId);
-            UpdateButtonHover(plusButtonId, plusButtonHoveredId);
-            UpdateButtonHover(minusButtonId, minusButtonHoveredId);
-            UpdateButtonHover(mainMenuButtonId, mainMenuButtonHoveredId);
-            UpdateButtonHover(howToPlayButtonId, howToPlayButtonHoveredId);
-            UpdateButtonHover(plusButtonId2, plusButtonHoveredId2);
-            UpdateButtonHover(minusButtonId2, minusButtonHoveredId2);
-            UpdateButtonHover(plusButtonId3, plusButtonHoveredId3);
-            UpdateButtonHover(minusButtonId3, minusButtonHoveredId3);
-            UpdateButtonHover(plusButtonId4, plusButtonHoveredId4);
-            UpdateButtonHover(minusButtonId4, minusButtonHoveredId4);
-            UpdateButtonHover(defaultButtonId4, defaultButtonHoveredId4);
-            UpdateButtonHover(plusButtonId5, plusButtonHoveredId5);
-            UpdateButtonHover(minusButtonId5, minusButtonHoveredId5);
-            UpdateButtonHover(defaultButtonId5, defaultButtonHoveredId5);
+            uint newHovered = 0;
+
+            newHovered = UpdateButtonHover(resumeButtonId, resumeButtonHoveredId) ? resumeButtonId : newHovered;
+            newHovered = UpdateButtonHover(restartButtonId, restartButtonHoveredId) ? restartButtonId : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId, plusButtonHoveredId) ? plusButtonId : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId, minusButtonHoveredId) ? minusButtonId : newHovered;
+            newHovered = UpdateButtonHover(mainMenuButtonId, mainMenuButtonHoveredId) ? mainMenuButtonId : newHovered;
+            newHovered = UpdateButtonHover(howToPlayButtonId, howToPlayButtonHoveredId) ? howToPlayButtonId : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId2, plusButtonHoveredId2) ? plusButtonId2 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId2, minusButtonHoveredId2) ? minusButtonId2 : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId3, plusButtonHoveredId3) ? plusButtonId3 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId3, minusButtonHoveredId3) ? minusButtonId3 : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId4, plusButtonHoveredId4) ? plusButtonId4 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId4, minusButtonHoveredId4) ? minusButtonId4 : newHovered;
+            newHovered = UpdateButtonHover(defaultButtonId4, defaultButtonHoveredId4) ? defaultButtonId4 : newHovered;
+            newHovered = UpdateButtonHover(plusButtonId5, plusButtonHoveredId5) ? plusButtonId5 : newHovered;
+            newHovered = UpdateButtonHover(minusButtonId5, minusButtonHoveredId5) ? minusButtonId5 : newHovered;
+            newHovered = UpdateButtonHover(defaultButtonId5, defaultButtonHoveredId5) ? defaultButtonId5 : newHovered;
+
+            if(newHovered != 0 && newHovered != _lastHoveredButton)
+            {
+                Audio.AudioPlay(hoverSoundId); //fires once on enter
+            }
+
+            _lastHoveredButton = newHovered;
         }
 
-        private void UpdateButtonHover(uint normalId, uint hoveredId)
+        private bool UpdateButtonHover(uint normalId, uint hoveredId)
         {
-            if (normalId == 0 || hoveredId == 0) return;
+            if (normalId == 0 || hoveredId == 0) return false;
             bool isHovered = Collision2D.IsMouseCollidingWithEntity(normalId) ||
                              Collision2D.IsMouseCollidingWithEntity(hoveredId);
             SpriteRenderer.SetIsVisible(normalId, !isHovered);
             SpriteRenderer.SetIsVisible(hoveredId, isHovered);
+
+            return isHovered;
         }
 
         // =====================================================================
@@ -492,6 +534,15 @@ namespace Game
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
             if (!mouseJustPressed) return;
+
+            bool overCheckbox = IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId) ||
+                        IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId) ||
+                        IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId);
+
+            if(_lastHoveredButton != 0 || overCheckbox)
+            {
+                Audio.AudioPlay(clickSoundId);
+            }
 
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
             {
@@ -783,12 +834,19 @@ namespace Game
             }
         }
 
+        private void OnTutorialOver(string eventName, string payload)
+        {
+            isTutorialOver = true;
+            LogMessage("[PauseMenuPopup] Level 2 tutorial is over, allow to show timer UI");
+        }
+
         public override void OnDestroy()
         {
             Event.Unsubscribe("GameOver", OnGameEnded);
             Event.Unsubscribe("GameWin", OnGameEnded);
             Event.Unsubscribe("GameRestart", OnGameRestart);
             Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Unsubscribe(EVENT_TUTORIALOVER, OnTutorialOver);
             LogMessage("PauseMenuPopup: Destroyed");
         }
     }
