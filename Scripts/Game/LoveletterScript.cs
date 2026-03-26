@@ -1,4 +1,5 @@
 using Engine;
+using System.Collections.Generic;
 using static Engine.Logger;
 using static Engine.Scene;
 using static Engine.Event;
@@ -14,7 +15,7 @@ namespace Game
     public class LoveLetterScript : ScriptBehaviour
     {
         // ===== NAME OF ENTITY =====
-        [SerializeField] private string loveletterEntity = "loveletter";
+        //[SerializeField] private string loveletterEntity = "loveletter";
         private uint loveletterEntityID = 0;
 
         // ===== CORE TAG =====
@@ -46,12 +47,15 @@ namespace Game
         [SerializeField] private float coreHalfSizeY = 37.5f;
         [SerializeField] private float coreHalfSizeZ = 37.5f;
         
-        [SerializeField] private float stopDistanceFromSurface = 200.0f;
+        // [EDIT 1] Changed stopDistanceFromSurface to 0 so LoveLetter reaches core surface for collision detection
+        //[SerializeField] private float stopDistanceFromSurface = 200.0f;
+        [SerializeField] private float stopDistanceFromSurface = 0.0f;
 
-        // ===== MOVEMENT SETTING ===== 
+        // ===== MOVEMENT SETTING =====
         [SerializeField] private float moveSpeed = 500.0f;
         [SerializeField] private float startDelay = 2.0f;
-        [SerializeField] private float waitTimeAtSurface = 3.0f;
+        // [EDIT 2] Commented out - wait timer replaced by collision detection to trigger OnReachedCore
+        //[SerializeField] private float waitTimeAtSurface = 3.0f;
 
         // ===== SIMPLE HEALTH SYSTEM =====
         [SerializeField] private float maxHealth = 60.0f;
@@ -63,9 +67,10 @@ namespace Game
 
         // ===== MOVEMENT STATE =====
         private bool isMoving = false;
-        private bool isWaitingAtSurface = false;
+        // [EDIT 3] Commented out - isWaitingAtSurface and waitTimer no longer needed; collision detection handles core arrival
+        //private bool isWaitingAtSurface = false;
+        //private float waitTimer = 0.0f;
         private float delayTimer = 0.0f;
-        private float waitTimer = 0.0f;
         
         // Manual position tracking to bypass physics
         private Engine.Vector3 currentPosition;
@@ -167,20 +172,41 @@ namespace Game
                 return;
             }
 
-            if (isWaitingAtSurface)
-            {
-                waitTimer -= deltaTime;
-                if (waitTimer <= 0.0f)
-                {
-                    LogMessage("Wait time finished - self destructing!");
-                    OnReachedCore();
-                }
-                return;
-            }
+            // [EDIT 4] Commented out - wait timer block replaced by collision-based detection in OnFixedUpdate
+            //if (isWaitingAtSurface)
+            //{
+            //    waitTimer -= deltaTime;
+            //    if (waitTimer <= 0.0f)
+            //    {
+            //        LogMessage("Wait time finished - self destructing!");
+            //        OnReachedCore();
+            //    }
+            //    return;
+            //}
 
             if (isMoving && targetCalculated)
             {
                 MoveTowardsTargetLinear(deltaTime);
+            }
+        }
+
+        // [EDIT 5] Added OnFixedUpdate - uses CollisionManager.GetEnemyCollisions to detect when LoveLetter
+        // physically touches the core, replacing the old distance+timer approach
+        public override void OnFixedUpdate(float deltaTime)
+        {
+            if (isDead || selectedCoreEntityID == 0) return;
+
+            List<uint> hits = CollisionManager.GetEnemyCollisions((uint)EntityID);
+            if (hits == null) return;
+
+            foreach (uint hitId in hits)
+            {
+                if (hitId == selectedCoreEntityID)
+                {
+                    LogMessage("[LoveLetter] Collision with core detected - triggering OnReachedCore");
+                    OnReachedCore();
+                    return;
+                }
             }
         }
 
@@ -263,7 +289,8 @@ namespace Game
             LogMessage("=== LOVELETTER DESTROYED ===");
 
             isMoving = false;
-            isWaitingAtSurface = false;
+            // [EDIT 9] Commented out - isWaitingAtSurface field removed (see EDIT 3)
+            //isWaitingAtSurface = false;
             Publish("LoveLetterKilled", "killer=" + lastKillerTag);
             Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
 
@@ -459,11 +486,12 @@ namespace Game
         {
             SetPosition(loveletterEntityID, ref targetSurfaceCenter);
             isMoving = false;
-            isWaitingAtSurface = true;
-            waitTimer = waitTimeAtSurface;
-            LogMessage("=== REACHED TARGET SURFACE ===");
+            // [EDIT 6] Commented out - no longer waiting with timer; collision detection in OnFixedUpdate now triggers OnReachedCore
+            //isWaitingAtSurface = true;
+            //waitTimer = waitTimeAtSurface;
+            LogMessage("=== REACHED TARGET SURFACE - awaiting collision with core ===");
             LogMessage("Traveled " + totalDistanceTraveled.ToString("F1") + " units in total");
-            LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface before self-destruct...");
+            //LogMessage("Waiting " + waitTimeAtSurface + " seconds at surface before self-destruct...");
         }
 
         private void OnReachedCore()
@@ -473,13 +501,17 @@ namespace Game
 
             isDead = true;
             isMoving = false;
-            isWaitingAtSurface = false;
+            // [EDIT 7] Commented out - isWaitingAtSurface field removed (see EDIT 3)
+            //isWaitingAtSurface = false;
             LogMessage("=== SELF DESTRUCTING AT CORE ===");
-        
+
             if (selectedCoreEntityID != 0)
             {
-                LogMessage("Dealing 200 damage to core ID: " + selectedCoreEntityID);
-                DamageSystem.DealDamage(selectedCoreEntityID, 200.0f, loveletterEntityID);
+                // [EDIT 8] Changed damage from 200 to 9999 for guaranteed instant core kill
+                //LogMessage("Dealing 200 damage to core ID: " + selectedCoreEntityID);
+                //DamageSystem.DealDamage(selectedCoreEntityID, 200.0f, loveletterEntityID);
+                LogMessage("Dealing 9999 damage to core ID: " + selectedCoreEntityID);
+                DamageSystem.DealDamage(selectedCoreEntityID, 9999.0f, loveletterEntityID);
                 LogMessage("Core damaged successfully");
             }
 
@@ -539,7 +571,8 @@ namespace Game
                 return;
             isDead = true;
             isMoving = false;
-            isWaitingAtSurface = false;
+            // [EDIT 10] Commented out - isWaitingAtSurface field removed (see EDIT 3)
+            //isWaitingAtSurface = false;
 
             if (labelEntityID != 0)              // <-- add this
             {
