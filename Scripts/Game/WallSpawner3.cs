@@ -9,19 +9,19 @@ using static Engine.MeshRenderer;
 
 namespace Game
 {
-    public class WallSpawner3Large : ScriptBehaviour
+    public class WallSpawner3 : ScriptBehaviour
     {
         // ================== Spawn Setting ============================
         [SerializeField] private float spawntimer = 0.0f;
         [SerializeField] private int currentTotalSpawnCount = 0;
-        [SerializeField] private float spawnInterval = 10.0f;
+        [SerializeField] private float spawnInterval = 20.0f;
         [SerializeField] private float decreaseTimer = 0.0f; // every 10s decrease
         [SerializeField] private float decreaseInterval = 10.0f; // every 10s decrease
         [SerializeField] private float gradualdecrease = 0.5f;
         [SerializeField] private int currentBotnetSpawned = 0;
         [SerializeField] private int currentWormSpawned = 0;
         [SerializeField] private int currentLoveletterSpawned = 0;
-        private float minInterval = 4.0f;
+        private float minInterval = 10.0f;
         private float wormbotSpawnDist = 1.5f;
         private float loveletterSpawnDist = 200.0f;
         private int enemiesSpawnPerWave = 3;
@@ -40,7 +40,7 @@ namespace Game
         private const string EVENT_GAMEWIN = "GameWin";
 
         // ======================  Wall Setting ==============================
-        private float largewall_width = 1500.0f;
+        private float smallwall_width = 1000.0f;
         private float wall_height = 600.0f;
 
         // ====================== STATE ======================
@@ -50,9 +50,12 @@ namespace Game
         // ============== RNG Setting =================
         private static uint seed = 123;
 
+        //[SerializeField] private float botnetSpawnWeight = 0.0f;
         [SerializeField] private float botnetSpawnWeight = 55.0f;
-        [SerializeField] private float wormHostSpawnWeight = 40.0f;
-        [SerializeField] private float loveletterSpawnWeight = 5.0f;
+        [SerializeField] private float wormHostSpawnWeight = 35.0f;
+        //[SerializeField] private float wormHostSpawnWeight = 0.0f;
+        [SerializeField] private float loveletterSpawnWeight = 10.0f;
+        //[SerializeField] private float loveletterSpawnWeight = 50.0f;
 
         public override void OnStart(){
             initialize();
@@ -74,7 +77,7 @@ namespace Game
             }
 
             if(!canSpawn){
-                LogMessage("[WallSpawner3Large] Spawn is disabled for wall entity: " + EntityID.ToString());
+                LogMessage("[WallSpawner3Small] Spawn is disabled for wall entity: " + EntityID.ToString());
                 return;
             }
 
@@ -93,7 +96,7 @@ namespace Game
                     }
                 }
                 catch(Exception e){
-                    LogMessage("[WallSpawner3Large] ERRROR during spawn: " + e.ToString());
+                    LogMessage("[WallSpawner3] ERRROR during spawn: " + e.ToString());
                 }
                 finally{
                     //Always Execute even if exeption thrown
@@ -111,12 +114,15 @@ namespace Game
         }
 
         private void OnGameEnd(string eventName, string payload){
-            LogMessage("[WallSpawner3Large] GameEnd detected disallowing spawning");
+            LogMessage("[WallSpawner3] GameEnd detected disallowing spawning");
             canSpawn = false;
         }
 
         private void SpawnRandomEnemyOnWall(){
+            //int enemyDex = RNG.RandInt(0, 2);
+            //int enemyDex = GetRandom012();
             int enemyDex = GetWeightedRandomEnemy();
+            //string enemyPrefabPath = "";
             float selectedWidth = 0.0f;
             float spawnDistance = 0.0f;
             
@@ -124,19 +130,19 @@ namespace Game
                 case 0:
                     //botnet
                     enemyPrefabPath = botnetPrefabPath;
-                    selectedWidth = largewall_width;
+                    selectedWidth = smallwall_width;
                     spawnDistance = wormbotSpawnDist;
                     break;
                 case 1:
                     //worm
                     enemyPrefabPath = wormHostPrefabPath;
                     spawnDistance = wormbotSpawnDist;
-                    selectedWidth = largewall_width;
+                    selectedWidth = smallwall_width;
                     break;
                 case 2:
                     //loveletter
                     enemyPrefabPath = loveletterPrefabPath;
-                    selectedWidth = largewall_width;
+                    selectedWidth = smallwall_width;
                     spawnDistance = loveletterSpawnDist;
                     break;
             }
@@ -147,7 +153,7 @@ namespace Game
             uint enemyID = 0;
             enemyID = PrefabInstantiate(enemyPrefabPath);
             if(enemyID == 0){
-                LogMessage("[WallSpawner3Large] Fail to instantiate enemy for: " + enemyPrefabPath);
+                LogMessage("[WallSpawner3] Fail to instantiate enemy for: " + enemyPrefabPath);
                 return;
             }
 
@@ -171,7 +177,7 @@ namespace Game
                 Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
                 uint warpingInID = PrefabInstantiateWithTransform(warpingInPrefab, ref spawnPos, ref spawnRot, ref scale, false);
                 if(warpingInID == 0){
-                    LogMessage("[WallSpawner3Large] loveletter warping in entity fail to instantiate");
+                    LogMessage("[WallSpawner3] loveletter warping in entity fail to instantiate");
                     return;
                 }
             }
@@ -197,7 +203,7 @@ namespace Game
         }
 
         private void initialize(){
-            //spawntimer = spawnInterval;
+            spawntimer = 10.0f;
             canSpawn = true;
             initialized = true;
             decreaseTimer = decreaseInterval;
