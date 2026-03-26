@@ -31,6 +31,7 @@ namespace Game
 
         private const string TRENCH_RUN_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
         private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2_graphic_card.json";
+        private const string LEVEL3_SCENE_PATH = "Resources/Sources/Scenes/level3_motherboard.json";
         private const int NUM_ERROR_POPUPS = 8;
 
         private const float HIDDEN_Y = -500.0f;
@@ -419,7 +420,9 @@ namespace Game
             {
                 sceneLoadTriggered = true;
                 LogMessage("InstallButtonHandler: Loading main game scene at " + bsodElapsedTime + "s");
-                string scenePath = LevelSelectController.IsLevel2Selected ? LEVEL2_SCENE_PATH : TRENCH_RUN_SCENE_PATH;
+                string scenePath = LevelSelectController.IsLevel3Selected ? LEVEL3_SCENE_PATH :
+                                LevelSelectController.IsLevel2Selected ? LEVEL2_SCENE_PATH : 
+                                TRENCH_RUN_SCENE_PATH;
                 LogMessage("InstallButtonHandler: Loading scene: " + scenePath);
                 bool success = Scene.SceneLoadFromFile(scenePath);
                 if (success)
