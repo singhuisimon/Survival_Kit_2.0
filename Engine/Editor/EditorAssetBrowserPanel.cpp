@@ -632,6 +632,7 @@ namespace Engine
 
 					assetsToDisplay.push_back(displayAsset);
 				}
+
 			}
 			else if (!selectedFolder.empty() && raw_asset)
 			{
@@ -1339,49 +1340,8 @@ namespace Engine
 			ImGui::EndTable();
 		}
 		//ImGui::EndChild();
-
-		if (m_ShowDeleteConfirmPopUp)
-		{
-			ImGui::OpenPopup("Confirm Delete");
-			m_ShowDeleteConfirmPopUp = false;
-		}
-
-		if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-		{
-			ImGui::Text("Are you sure you want to delete:");
-			ImGui::Text("%s", m_AssetToDelete.fileName.c_str());
-			ImGui::Separator();
-
-			if (ImGui::Button("Delete", ImVec2(120, 0)))
-			{
-				if (std::filesystem::exists(m_AssetToDelete.fullPath))
-				{
-					std::string resourcesPath = convertAssetPathToRootResources(m_AssetToDelete.fullPath);
-					std::filesystem::remove(m_AssetToDelete.fullPath);
-					std::filesystem::remove(resourcesPath);
-					LOG_INFO("Deleted asset: ", m_AssetToDelete.fullPath);
-					LOG_INFO("Deleted asset from root: ", resourcesPath);
-
-					// Clear selection if the deleted asset was selected
-					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
-						m_Editor->SetScenePath("");
-					else if (m_Editor->HasPrefabPath() && m_Editor->GetPrefabPath() == m_AssetToDelete.fullPath)
-						m_Editor->ClearPrefabPath();
-
-					selectedResourcesIndex = -1;
-				}
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0)))
-			{
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
-
+		// Delete the assets
+		RenderDeleteConfirmPopup();
 	}
 
 	void EditorAssetBrowserPanel::HandleAssetSelection(const DisplayableAsset& asset)
@@ -1597,12 +1557,16 @@ namespace Engine
 		}
 
 		// ===== DELETE CONFIRM POPUP =====
+		RenderDeleteConfirmPopup();
+	}
+
+	void EditorAssetBrowserPanel::RenderDeleteConfirmPopup()
+	{
 		if (m_ShowDeleteConfirmPopUp)
 		{
 			ImGui::OpenPopup("Confirm Delete");
 			m_ShowDeleteConfirmPopUp = false;
 		}
-
 		if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::Text("Are you sure you want to delete:");
@@ -1617,20 +1581,49 @@ namespace Engine
 					std::filesystem::remove(m_AssetToDelete.fullPath);
 					std::filesystem::remove(resourcesPath);
 
+
+					// Remove from DB
+					AM.db().Remove(m_AssetToDelete.guid);
+
+					if (m_AssetToDelete.record != nullptr)
+					{
+						m_AssetToDelete.record->valid = false;
+					}
+
+					
+					// Remove from filtered search list
+					m_FilteredAssets.erase(
+						std::remove_if(m_FilteredAssets.begin(), m_FilteredAssets.end(),
+							[&](const FilteredAssetInfo& f) {
+								return f.fullPath == m_AssetToDelete.fullPath;
+							}),
+						m_FilteredAssets.end()
+					);
+
 					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
-						m_Editor->SetScenePath("");
+					{
+						m_Editor->ClearScenePath();
+						Scene* currentSceneDelete = m_Editor->GetActiveScene();
+						bool is_ActiveScene = m_Editor->HasActiveScene();
+						LOG_DEBUG("is_ActiveScene: ", is_ActiveScene);
+						currentSceneDelete->GetRegistry().clear();
+					}
 					else if (m_Editor->HasPrefabPath() && m_Editor->GetPrefabPath() == m_AssetToDelete.fullPath)
+					{
 						m_Editor->ClearPrefabPath();
+					}
 
 					selectedResourcesIndex = -1;
 				}
 				ImGui::CloseCurrentPopup();
 			}
+
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120, 0)))
 				ImGui::CloseCurrentPopup();
 
 			ImGui::EndPopup();
 		}
+
 	}
 }
