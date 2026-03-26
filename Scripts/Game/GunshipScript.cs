@@ -26,7 +26,8 @@ namespace Game
         [SerializeField] private float fireRate = 0.2f;
         [SerializeField] private float turretRange = 600f;
         [SerializeField] private float turretRotationSpeed = 5f;
-        [SerializeField] private float bulletSpeed = 3000f;
+        //[SerializeField] private float bulletSpeed = 3000f;
+        [SerializeField] private float bulletSpeed = 6000f;
         [SerializeField] private string bulletPrefabPath = "Sources/Prefabs/NormalTurretBullet.prefab";
         [SerializeField] private string gunshipDeathPath = "Sources/Prefabs/GunshipDeath.prefab";
         [SerializeField] private int allyIndex = 1;
