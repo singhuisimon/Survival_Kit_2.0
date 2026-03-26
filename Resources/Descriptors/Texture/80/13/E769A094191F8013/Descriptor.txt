@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/Enemy spawn wall_v002_v001_Roughness.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}

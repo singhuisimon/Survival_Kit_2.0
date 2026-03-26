@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: NormalSentry.prefab",
-    "Prefab GUID": 17571638985905734825,
+    "Prefab GUID": 552113800588902609,
     "version": 1,
     "entities": [
         {
@@ -83,7 +83,7 @@
                             "Is3D": true,
                             "MinDistance": 50.262001037597656,
                             "MaxDistance": 150.0919952392578,
-                            "RolloffMode": 0,
+                            "RolloffMode": 1,
                             "DopplerLevel": 1.0,
                             "Pan2D": 0.0
                         }
@@ -164,7 +164,7 @@
                             "ComponentGUID": "18008611278202062259",
                             "ScriptClassName": "Game.SentriesNormal",
                             "Started": false,
-                            "GCHandle": 331
+                            "GCHandle": 0
                         }
                     }
                 }

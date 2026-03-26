@@ -22,7 +22,8 @@ namespace Game
     ///    G             = Fully recharge alt fire (publishes "GainUlt" x30)
     ///    Z             = Go to Main Menu (loads MainMenu.json)
     ///    X             = Go to Level 1 (loads trench_run.json)
-    ///    C             = Go to Level 2  (loads level2.json)
+    ///    V             = Go to Level 2 (name.json)
+    ///    C             = Go to Level 3  (loads level2.json)
     ///    
     /// Note: cheatcode to move to level2 is moved from PlayerWeapon.cs, was T key previously
     /// 
@@ -34,7 +35,8 @@ namespace Game
         //Scene paths
          private const string SCENE_MAIN_MENU = "Resources/Sources/Scenes/MainMenu.json";
         private const string SCENE_LEVEL1    = "Resources/Sources/Scenes/trench_run.json";
-        private const string SCENE_LEVEL2    = "Resources/Sources/Scenes/level2.json";
+        private const string SCENE_LEVEL2    = "Resources/Sources/Scenes/level2_graphic_card.json";
+        private const string SCENE_LEVEL3 = "Resources/Sources/Scenes/level3_motherboard.json";
 
         // ===== Event Names =====
         private const string EVENT_PLAYER_DEAD    = "PlayerDead";
@@ -64,6 +66,8 @@ namespace Game
         private bool wasXPressed = false;
         private bool wasCPressed = false;
 
+        private bool wasVPressed = false;
+
         public override void OnStart()
         {
             LogMessage("[DebugCheats] Debug cheats active!");
@@ -78,7 +82,8 @@ namespace Game
             LogMessage("[DebugCheats]  G  = Fully recharge alt fire");
             LogMessage("[DebugCheats]  Z  = Go to Main Menu");
             LogMessage("[DebugCheats]  X  = Go to Level 1");
-            LogMessage("[DebugCheats]  C  = Go to Level 2");
+            LogMessage("[DebugCheats]  V  = Go to Level 2");
+            LogMessage("[DebugCheats]  C  = Go to Level 3");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -180,17 +185,29 @@ namespace Game
                 Scene.SceneLoadFromFile(SCENE_LEVEL1);
             }
             wasXPressed = xPressed;
- 
-            // C = Go to Level 2 (moved from PlayerWeapon.cs, was T key)
-            bool cPressed = IsKeyPressed(KeyCode.C);
-            if (cPressed && !wasCPressed)
+
+            // V = Go to Level 2
+            bool vPressed = IsKeyPressed(KeyCode.V);
+            if (vPressed && !wasVPressed)
             {
-                LogMessage("[DebugCheats] C - loading Level 2");
+                LogMessage("[DebugCheats] V - loading level 2");
                 GameState.IsPaused = false;
                 Input.SetCursorVisible(false);
                 Scene.SceneLoadFromFile(SCENE_LEVEL2);
             }
+            wasVPressed = vPressed;
+
+            // C = Go to Level 3 (moved from PlayerWeapon.cs, was T key)
+            bool cPressed = IsKeyPressed(KeyCode.C);
+            if (cPressed && !wasCPressed)
+            {
+                LogMessage("[DebugCheats] C - loading Level 3");
+                GameState.IsPaused = false;
+                Input.SetCursorVisible(false);
+                Scene.SceneLoadFromFile(SCENE_LEVEL3);
+            }
             wasCPressed = cPressed;
+
 
         }
 

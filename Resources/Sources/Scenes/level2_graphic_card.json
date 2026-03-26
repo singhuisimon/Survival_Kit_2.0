@@ -3,6 +3,316 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 1048706,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "OOB_Walls",
+                        "Tag": "OOB"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17378643928610342117",
+                        "Position": [
+                            -500.0,
+                            -1750.0,
+                            1000.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            4.0,
+                            3.5,
+                            2.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "15072800919397008617",
+                        "Mesh": "lvl2redesign_OOB_walls_v001.fbx",
+                        "Material": "OOB_UVAnimationMat.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "4696507377935221991",
+                        "Mass": -1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 3,
+                        "BoxHalfExtent": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15649261671705298157",
+                        "ScriptClassName": "Game.TickDamage"
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 1,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 129,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Wall5",
+                        "Tag": "Wall"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "17936509740218730797",
+                        "PrefabAssetGuid": "6983755446453437691",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Wall5",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6100530852772446537\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-79.99996948242188,0.0],\"Scale\":[1000.0,600.0,1.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3524990932632634607\",\"Name\":\"Wall5\",\"Tag\":\"Wall\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1488844834345386315\",\"Mesh\":\"\",\"Material\":\"Firewall_Active.mat\",\"Texture\":\"\",\"Visible\":false,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11901422349663667349\",\"ScriptClassName\":\"Game.WallSpawner\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6100530852772446537",
+                        "Position": [
+                            2500.0,
+                            300.0,
+                            -1750.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -50.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "1488844834345386315",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
+                        "Texture": "",
+                        "Visible": false,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11901422349663667349",
+                        "ScriptClassName": "Game.WallSpawner"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 128,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Wall4",
+                        "Tag": "Wall"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "13324823721791293731",
+                        "PrefabAssetGuid": "15630666731004757239",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Wall4",
+                        "prefabVersion": 1,
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6100530852772446537\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,79.99996948242188,0.0],\"Scale\":[1000.0,600.0,1.0],\"Parent\":4294967295,\"Children\":[]}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11595441464880563431\",\"Name\":\"Wall4\",\"Tag\":\"Wall\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1488844834345386315\",\"Mesh\":\"\",\"Material\":\"Firewall_Active.mat\",\"Texture\":\"\",\"Visible\":false,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11901422349663667349\",\"ScriptClassName\":\"Game.WallSpawner\",\"Started\":false,\"GCHandle\":0}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6100530852772446537",
+                        "Position": [
+                            -2500.0,
+                            300.0,
+                            -1750.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            50.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "1488844834345386315",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
+                        "Texture": "",
+                        "Visible": false,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "11901422349663667349",
+                        "ScriptClassName": "Game.WallSpawner"
+                    }
+                }
+            ]
+        },
+        {
             "ID": 2097228,
             "Components": [
                 {
@@ -964,9 +1274,9 @@
                     "Properties": {
                         "ComponentGUID": "16745553909902450455",
                         "Position": [
-                            167.27699279785156,
-                            -158.7239990234375,
-                            406.1310119628906
+                            650.0,
+                            -430.0,
+                            -1000.0
                         ],
                         "Rotation": [
                             0.0,
@@ -1027,9 +1337,9 @@
                     "Properties": {
                         "ComponentGUID": "5792799616132947725",
                         "Position": [
-                            795.0,
-                            -360.0,
-                            -952.1729736328125
+                            -575.0,
+                            -465.0,
+                            -1000.0
                         ],
                         "Rotation": [
                             0.0,
@@ -1237,7 +1547,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1615,7 +1925,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1702,7 +2012,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2769,7 +3079,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"16732350830320074971\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[0.5,0.5,0.5],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 8,
@@ -2819,7 +3132,7 @@
                         "ComponentGUID": "16100272381120889775",
                         "Position": [
                             0.0,
-                            0.0,
+                            250.0,
                             0.0
                         ],
                         "Rotation": [
@@ -2870,8 +3183,8 @@
                     "Properties": {
                         "ComponentGUID": "16732350830320074971",
                         "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": true,
+                        "IsKinematic": false,
+                        "IsTrigger": false,
                         "UseGravity": false,
                         "Velocity": [
                             0.0,
@@ -2888,9 +3201,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            0.5,
-                            0.5,
-                            0.5
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -4118,7 +4431,7 @@
                         "Is3D": true,
                         "MinDistance": 5.291999816894531,
                         "MaxDistance": 150.4429931640625,
-                        "RolloffMode": 0,
+                        "RolloffMode": 1,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
                     }
@@ -4189,13 +4502,13 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            648.156982421875,
-                            -68.83100128173828,
-                            390.9230041503906
+                            650.0,
+                            -450.0,
+                            -2000.0
                         ],
                         "Rotation": [
-                            180.0,
-                            18.266550064086914,
+                            -180.0,
+                            -24.000003814697266,
                             180.0
                         ],
                         "Scale": [
@@ -4358,7 +4671,7 @@
                         "Is3D": true,
                         "MinDistance": 5.291999816894531,
                         "MaxDistance": 150.4429931640625,
-                        "RolloffMode": 0,
+                        "RolloffMode": 1,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
                     }
@@ -4429,13 +4742,13 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -688.1279907226563,
-                            -345.6510009765625,
-                            -695.7080078125
+                            -575.0,
+                            -485.0,
+                            -2000.0
                         ],
                         "Rotation": [
                             180.0,
-                            18.266550064086914,
+                            18.266563415527344,
                             180.0
                         ],
                         "Scale": [
@@ -4598,7 +4911,7 @@
                         "Is3D": true,
                         "MinDistance": 5.291999816894531,
                         "MaxDistance": 150.4429931640625,
-                        "RolloffMode": 0,
+                        "RolloffMode": 1,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
                     }
@@ -4687,13 +5000,13 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -182.0189971923828,
-                            -496.0350036621094,
-                            888.905029296875
+                            650.0,
+                            -450.0,
+                            -1500.0
                         ],
                         "Rotation": [
                             180.0,
-                            18.266550064086914,
+                            -34.0,
                             180.0
                         ],
                         "Scale": [
@@ -4856,7 +5169,7 @@
                         "Is3D": true,
                         "MinDistance": 5.291999816894531,
                         "MaxDistance": 150.4429931640625,
-                        "RolloffMode": 0,
+                        "RolloffMode": 1,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
                     }
@@ -4927,9 +5240,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -799.8250122070313,
-                            -402.77099609375,
-                            -136.4810028076172
+                            -575.0,
+                            -485.0,
+                            -1500.0
                         ],
                         "Rotation": [
                             180.0,
@@ -5096,7 +5409,7 @@
                         "Is3D": true,
                         "MinDistance": 5.291999816894531,
                         "MaxDistance": 150.4429931640625,
-                        "RolloffMode": 0,
+                        "RolloffMode": 1,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
                     }
@@ -5167,14 +5480,14 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            166.57699584960938,
-                            -173.9239959716797,
-                            406.1310119628906
+                            650.0,
+                            -450.0,
+                            -1000.0
                         ],
                         "Rotation": [
-                            180.0,
-                            18.266550064086914,
-                            180.0
+                            -180.0,
+                            -37.999996185302734,
+                            -180.0
                         ],
                         "Scale": [
                             0.03999999910593033,
@@ -5407,9 +5720,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            798.0,
-                            -376.24957275390625,
-                            -952.4028930664063
+                            -575.0,
+                            -485.0,
+                            -1000.0
                         ],
                         "Rotation": [
                             180.0,
@@ -5686,7 +5999,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6756,7 +7069,10 @@
                                 "componentType": 6,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15322750612248530623\",\"Mass\":1.0,\"IsKinematic\":true,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[75.0,75.0,75.0],\"SphereRadius\":0.5}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             },
                             {
                                 "componentType": 9,
@@ -6787,7 +7103,7 @@
                         "ComponentGUID": "15900363641908576543",
                         "Position": [
                             3.0,
-                            -408.0,
+                            -250.0,
                             126.0
                         ],
                         "Rotation": [
@@ -6796,9 +7112,9 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            150.0,
-                            150.0
+                            600.0,
+                            600.0,
+                            600.0
                         ],
                         "Parent": 4294967295,
                         "Children": [
@@ -6849,9 +7165,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            75.0,
-                            75.0,
-                            75.0
+                            300.0,
+                            300.0,
+                            300.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -6871,7 +7187,7 @@
                         "Is3D": true,
                         "MinDistance": 52.55500030517578,
                         "MaxDistance": 502.072998046875,
-                        "RolloffMode": 0,
+                        "RolloffMode": 1,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
                     }
@@ -6905,7 +7221,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7209,7 +7525,7 @@
                         "ComponentGUID": "7571492693698003779",
                         "Position": [
                             0.000009495363883615937,
-                            19.97862434387207,
+                            270.0,
                             30.014230728149414
                         ],
                         "Rotation": [
@@ -7238,13 +7554,13 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
                         "Target": [
                             0.000009495363883615937,
-                            20.69212532043457,
+                            270.0,
                             -969.9855346679688
                         ]
                     }
@@ -7885,7 +8201,10 @@
                                 "componentType": 5,
                                 "isAddedComponent": false,
                                 "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}"
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"Core.mat\",\"Initial Velocity\":[0.0,1.5,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[15.0,10.0,15.0],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[1.0,1.0,1.0],\"Color Max\":[1.0,1.0,1.0],\"Emitter Shape\":1,\"Max Particles\":50,\"Particle Type\":0,\"Emission Rate\":10.0,\"Particle Lifetime\":4.0,\"Emission Accumulator\":0.7705078125,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":180.0,\"Min Speed\":10.0,\"Max Speed\":25.0,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
                             }
                         ]
                     }
@@ -7896,7 +8215,7 @@
                         "ComponentGUID": "14827864839706771731",
                         "Position": [
                             3.0,
-                            -408.0,
+                            -250.0,
                             126.0
                         ],
                         "Rotation": [
@@ -7905,9 +8224,9 @@
                             90.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            4.0,
+                            4.0,
+                            4.0
                         ],
                         "Parent": 13,
                         "Children": []
@@ -7930,9 +8249,9 @@
                             0.0
                         ],
                         "Default Size": [
-                            15.0,
-                            10.0,
-                            15.0
+                            60.0,
+                            60.0,
+                            60.0
                         ],
                         "End Size": [
                             0.0,
@@ -8001,7 +8320,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8148,7 +8467,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8539,8 +8858,8 @@
                             0.0
                         ],
                         "Scale": [
-                            1500.0,
-                            600.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -8551,8 +8870,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "4947609348160487749",
-                        "Mesh": "",
-                        "Material": "Firewall_Active.mat",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
                         "Texture": "",
                         "Visible": false,
                         "GlobalIlluminate": true,
@@ -8595,12 +8914,12 @@
                         ],
                         "Rotation": [
                             0.0,
-                            45.000003814697266,
+                            30.000001907348633,
                             0.0
                         ],
                         "Scale": [
-                            1000.0,
-                            600.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -8611,8 +8930,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "1488844834345386315",
-                        "Mesh": "",
-                        "Material": "Firewall_Active.mat",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
                         "Texture": "",
                         "Visible": false,
                         "GlobalIlluminate": true,
@@ -8654,13 +8973,13 @@
                             -3000.0
                         ],
                         "Rotation": [
-                            180.0,
-                            45.000003814697266,
-                            180.0
+                            0.0000032279656352329766,
+                            -30.000001907348633,
+                            -0.000003907216068910202
                         ],
                         "Scale": [
-                            1000.0,
-                            600.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -8671,8 +8990,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "7253452357380129105",
-                        "Mesh": "",
-                        "Material": "Firewall_Active.mat",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
                         "Texture": "",
                         "Visible": false,
                         "GlobalIlluminate": true,
@@ -8719,9 +9038,9 @@
                             0.0
                         ],
                         "Scale": [
-                            0.25,
-                            0.25,
-                            0.25
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -8731,8 +9050,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "351043840617595705",
-                        "Mesh": "lvl2redesign_level_design_v001.fbx",
-                        "Material": "Level1_M4.mat",
+                        "Mesh": "lvl2redesign_level_design_v005.fbx",
+                        "Material": "MAT_lvl2redesign_v003.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -9034,9 +9353,9 @@
                     "Properties": {
                         "ComponentGUID": "10384210640159851477",
                         "Position": [
-                            648.156982421875,
-                            -50.86674499511719,
-                            390.9230041503906
+                            650.0,
+                            -430.0,
+                            -2000.0
                         ],
                         "Rotation": [
                             0.0,
@@ -9094,9 +9413,9 @@
                     "Properties": {
                         "ComponentGUID": "8171861303703995493",
                         "Position": [
-                            -672.4483032226563,
-                            -328.3448791503906,
-                            -689.31640625
+                            -575.0,
+                            -465.0,
+                            -2000.0
                         ],
                         "Rotation": [
                             0.0,
@@ -9268,9 +9587,9 @@
                     "Properties": {
                         "ComponentGUID": "9324782808314184825",
                         "Position": [
-                            -177.11900329589844,
-                            -469.2136535644531,
-                            863.3368530273438
+                            650.0,
+                            -430.0,
+                            -1500.0
                         ],
                         "Rotation": [
                             0.0,
@@ -9442,9 +9761,9 @@
                     "Properties": {
                         "ComponentGUID": "3560175285282702509",
                         "Position": [
-                            -781.2308959960938,
-                            -388.2073669433594,
-                            -131.43414306640625
+                            -575.0,
+                            -465.0,
+                            -1500.0
                         ],
                         "Rotation": [
                             0.0,
@@ -9996,6 +10315,116 @@
                         "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 132,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Pause Hover",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16648964032318064901",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "8578513500070299911",
+                        "FilePath": "UI Pause Button Hover.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 133,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI Pause Press",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6272670490857195787",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "5119748986250529037",
+                        "FilePath": "UI Pause Button Press.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
                     }
                 }
             ]
