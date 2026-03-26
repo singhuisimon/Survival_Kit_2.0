@@ -1,16 +1,16 @@
-/Resources/Sources/Textures/UI_DetectionRange_Enemy.png|1772994879|115486
-/Resources/Sources/Audio/Player_Move.wav|1769350445|2304172
-/Resources/Sources/Textures/vfx/Flare27.png|1772730719|42506
-/Resources/Sources/Textures/vfx/Impact36.png|1772730719|90203
-/Resources/Sources/Shaders/skybox.vert|1769350446|522
-/Resources/Sources/Textures/Level2Button_Selected.png|1772730719|3055
 /Resources/Sources/Textures/MainMenu_HowToPlay_MovementWindow.png|1774371251|2139287
-/Resources/Sources/Textures/vfx/Glow8.png|1772730719|90104
-/Resources/Sources/Textures/Tooltip_DescriptionTurret.png|1772994879|73085
-/Resources/Sources/Material/Obstacle_Wall_WallofDeath.mat|1772730718|817
-/Resources/Sources/Textures/vfx/Circle16.png|1772730719|124756
-/Resources/Sources/Material/testma2.mat|1769350446|748
+/Resources/Sources/Textures/Level2Button_Selected.png|1772730719|3055
+/Resources/Sources/Shaders/skybox.vert|1769350446|522
+/Resources/Sources/Textures/vfx/Impact36.png|1772730719|90203
+/Resources/Sources/Textures/vfx/Flare27.png|1772730719|42506
+/Resources/Sources/Audio/Player_Move.wav|1769350445|2304172
 /Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Metallic.png|1774416601|170231
+/Resources/Sources/Material/testma2.mat|1769350446|748
+/Resources/Sources/Textures/vfx/Circle16.png|1772730719|124756
+/Resources/Sources/Material/Obstacle_Wall_WallofDeath.mat|1772730718|817
+/Resources/Sources/Textures/Tooltip_DescriptionTurret.png|1772994879|73085
+/Resources/Sources/Textures/vfx/Glow8.png|1772730719|90104
+/Resources/Sources/Textures/UI_DetectionRange_Enemy.png|1772994879|115486
 /Resources/Sources/Material/TimerBarMat.mat|1769350446|776
 /Resources/Sources/Textures/vfx/Smoke4.png|1772730720|73516
 /Resources/Sources/Textures/vfx/Ring7.png|1772730720|4375529
@@ -60,9 +60,9 @@
 /Resources/Sources/Shaders/trails.frag|1773397095|1716
 /Resources/Sources/Material/payload.mat|1772730718|842
 /Resources/Sources/Meshes/A1001_turret_v005.fbx|1772730718|33008
+/Resources/Sources/Scenes/WinCutScene.json|1774411695|30342
 /Resources/Sources/Meshes/Temp_PlayerPrimaryBullet.fbx|1769350446|15100
 /Resources/Sources/Audio/Turret Normal Fire.wav|1773397095|96048
-/Resources/Sources/Scenes/WinCutScene.json|1774411695|30342
 /Resources/Sources/Textures/ErrorPopUp.png|1769755676|45985
 /Resources/Sources/Textures/A1001_turret_v005_Opacity.png|1772730719|27345
 /Resources/Sources/Textures/lvl1_level_design_v004_Opacity.png|1772730719|5024
@@ -508,9 +508,9 @@
 /Resources/Sources/Audio/Core Barrier Destroy.wav|1772730718|769392
 /Resources/Sources/Textures/Particle_Circle2.png|1769351039|982185
 /Resources/Sources/Textures/vfx/Spiral12.png|1772730720|123780
-/Resources/Sources/Textures/E001_worm_host_v004_Roughness.png|1772730719|72164
 /Resources/Sources/Textures/Tooltip_Movement.png|1772994879|109514
 /Resources/Sources/Textures/A1001_turret_v005_BaseColor.png|1772730719|40086
+/Resources/Sources/Textures/E001_worm_host_v004_Roughness.png|1772730719|72164
 /Resources/Sources/Textures/PlayerHPWindow.png|1769351039|60240
 /Resources/Sources/Textures/Blackscreen.png|1769755676|10543
 /Resources/Sources/Textures/vfx/Circle13.png|1772730719|2364

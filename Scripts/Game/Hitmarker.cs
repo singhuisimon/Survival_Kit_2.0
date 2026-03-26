@@ -70,9 +70,8 @@ namespace Game
 
         private bool CheckForHits()
         {
-            // CollisionManager already tracked all collisions this frame
-            // Just check if any player projectiles hit enemies
-            return CollisionManager.HasAnyPlayerProjectileHits();
+            // Check if collision manager has detected any bullet that hit targetable / destroyable (e.g. enemies / destructable wall)
+            return CollisionManager.HasAnyPlayerProjectileValidHits();
         }
 
         private void ShowHitMarker()
