@@ -109,6 +109,7 @@ namespace Game
 
         // Projectile hits entity
         private Dictionary<uint, List<uint>> playerProjectileHits = new Dictionary<uint, List<uint>>();
+        private Dictionary<uint, List<uint>> playerProjectileValidHits = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> enemyProjectileHits = new Dictionary<uint, List<uint>>();
         private Dictionary<uint, List<uint>> allyProjectileHits = new Dictionary<uint, List<uint>>();
 
@@ -227,6 +228,8 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
         private void ClearAllCollisions()
         {
             playerProjectileHits.Clear();
+            // [EDIT 2] Clear the valid hits dictionary each frame alongside the others
+            playerProjectileValidHits.Clear();
             enemyProjectileHits.Clear();
             allyProjectileHits.Clear();
             playerCollisions.Clear();
@@ -274,10 +277,22 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             if (catA == CollisionCategory.PLAYER_PROJECTILE)
             {
                 RecordHit(playerProjectileHits, entityA, entityB);
+                //record valid collision for hitmarker
+                string targetTagB = TagGetTag(entityB).ToLower();
+                if (catB == CollisionCategory.ENEMY ||
+                    //targetTagB == "obstacle_wall_destructable" ||
+                    targetTagB == "destructablewall")
+                    RecordHit(playerProjectileValidHits, entityA, entityB);
             }
             else if (catB == CollisionCategory.PLAYER_PROJECTILE)
             {
                 RecordHit(playerProjectileHits, entityB, entityA);
+                //record valid collision for hitmarker
+                string targetTagA = TagGetTag(entityA).ToLower();
+                if (catA == CollisionCategory.ENEMY ||
+                    //targetTagA == "obstacle_wall_destructable" ||
+                    targetTagA == "destructablewall")
+                    RecordHit(playerProjectileValidHits, entityB, entityA);
             }
 
             if (catA == CollisionCategory.ENEMY_PROJECTILE)
@@ -507,15 +522,12 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             }
         }
 
-        /// <summary>
-        /// Check if ANY player projectiles hit enemies this frame (for hit markers, sounds, etc.)
-        /// </summary>
-        public static bool HasAnyPlayerProjectileHits()
+        public static bool HasAnyPlayerProjectileValidHits()
         {
-            if (instance == null || instance.playerProjectileHits == null)
+            if (instance == null || instance.playerProjectileValidHits == null)
                 return false;
 
-            return instance.playerProjectileHits.Count > 0;
+            return instance.playerProjectileValidHits.Count > 0;
         }
     }
 }

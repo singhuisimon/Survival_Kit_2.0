@@ -7818,7 +7818,7 @@
                         "Position": [
                             0.0,
                             -2750.0,
-                            1450.0
+                            1750.0
                         ],
                         "Rotation": [
                             0.0,
@@ -7826,9 +7826,9 @@
                             0.0
                         ],
                         "Scale": [
-                            2.0,
-                            4.0,
-                            1.0
+                            3.0,
+                            4.5,
+                            1.25
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -7970,16 +7970,16 @@
                         "Position": [
                             -33.138153076171875,
                             -0.00000762939453125,
-                            1336.09326171875
+                            1779.881103515625
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            180.0,
+                            0.000005008956122765085,
+                            180.0
                         ],
                         "Scale": [
-                            1500.0,
-                            600.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -7990,8 +7990,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "4947609348160487749",
-                        "Mesh": "",
-                        "Material": "Firewall_Active.mat",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -8008,7 +8008,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "14727985277514400947",
-                        "ScriptClassName": "Game.WallSpawner3Large"
+                        "ScriptClassName": "Game.WallSpawner3"
                     }
                 }
             ]
@@ -8028,7 +8028,7 @@
                     "Properties": {
                         "ComponentGUID": "6100530852772446537",
                         "Position": [
-                            -1257.5540771484375,
+                            -1710.829833984375,
                             0.0,
                             -515.495361328125
                         ],
@@ -8038,8 +8038,8 @@
                             0.0
                         ],
                         "Scale": [
-                            1000.0,
-                            600.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -8050,8 +8050,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "1488844834345386315",
-                        "Mesh": "",
-                        "Material": "Firewall_Active.mat",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -8068,7 +8068,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "1469387974536365237",
-                        "ScriptClassName": "Game.WallSpawner3Small"
+                        "ScriptClassName": "Game.WallSpawner3"
                     }
                 }
             ]
@@ -8088,18 +8088,18 @@
                     "Properties": {
                         "ComponentGUID": "17629745898841637199",
                         "Position": [
-                            1324.0059814453125,
+                            1735.083984375,
                             0.0,
                             -474.595947265625
                         ],
                         "Rotation": [
-                            0.0,
-                            89.98021697998047,
-                            0.0
+                            -1.8151376669078845e-13,
+                            -89.98021697998047,
+                            -1.1621789999057758e-17
                         ],
                         "Scale": [
-                            1000.0,
-                            600.0,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -8110,8 +8110,8 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "7253452357380129105",
-                        "Mesh": "",
-                        "Material": "Firewall_Active.mat",
+                        "Mesh": "Enemy spawn wall_v002.fbx",
+                        "Material": "EnemySpawnWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -8128,7 +8128,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "316466469929649335",
-                        "ScriptClassName": "Game.WallSpawner3Small"
+                        "ScriptClassName": "Game.WallSpawner3"
                     }
                 }
             ]
