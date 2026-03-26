@@ -34,8 +34,8 @@ namespace Engine
 
 	enum class AssetViewMode
 	{
-		Grid,
-		List
+		List,
+		Grid
 	};
 
 	class Editor;
@@ -67,7 +67,7 @@ namespace Engine
 		bool m_ShowDeleteConfirmPopUp = false;
 		DisplayableAsset m_AssetToDelete;
 
-		AssetViewMode m_ViewMode = AssetViewMode::Grid;
+		AssetViewMode m_ViewMode = AssetViewMode::List;
 
 
 		/*Scene* m_Scene = nullptr;
@@ -90,6 +90,7 @@ namespace Engine
 		void FilterAssetsBySearchQuery();
 		void SearchFolderRecursive(const std::string& folderPath, const std::string& displayFolder, const std::string& lowerQuery);
 		void RenderAssetList(const std::vector<DisplayableAsset>& displayAssets);
+		void RenderDeleteConfirmPopup();
 	};
 }
 #endif // END OF EDITOR_PROPERTYPANEL_H
