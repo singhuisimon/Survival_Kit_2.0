@@ -40,7 +40,7 @@
                     "Properties": {
                         "ComponentGUID": "15072800919397008617",
                         "Mesh": "lvl2redesign_OOB_walls_v001.fbx",
-                        "Material": "OOB_v001.mat",
+                        "Material": "OOB_UVAnimationMat.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -88,6 +88,18 @@
                     "Properties": {
                         "ComponentGUID": "15649261671705298157",
                         "ScriptClassName": "Game.TickDamage"
+                    }
+                },
+                {
+                    "Type": "AnimatorComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "playing": true,
+                        "respectClipLoop": true,
+                        "controller": 1,
+                        "currentClipIndex": 0,
+                        "currentTime": 0.0,
+                        "playbackSpeed": 1.0
                     }
                 }
             ]
