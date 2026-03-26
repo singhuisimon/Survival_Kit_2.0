@@ -96,7 +96,7 @@ namespace Game
         public override void OnStart()
         {
             LogMessage("///////////////////////////Start of the Loveletter Script");
-            loveletterEntityID = SceneFindEntityByName(loveletterEntity);
+            loveletterEntityID = EntityID;//SceneFindEntityByName(loveletterEntity);
 
             LogMessage("=== LoveLetter Started ===");
             LogMessage("LoveLetterEntity: " + loveletterEntityID);
@@ -290,9 +290,6 @@ namespace Game
                 Transform.SetScale(mainExplosion, ref explosionScale);
             }
 
-            // Destroy the LoveLetter FIRST so it doesn't overlap spawned entities
-            SceneDestroyEntity(loveletterEntityID);
-
             // Spawn the payload
             Vector3 payloadScale = new Vector3(10.0f, 10.0f, 10.0f);
             uint payload = PrefabInstantiateWithTransform(payloadPrefab, ref spawnPos, ref spawnRot, ref payloadScale, false);
@@ -324,6 +321,9 @@ namespace Game
                 LogMessage("[LoveletterScript] upgradeModuleLabel spawned ID: " + labelEntityID +
                     " | sent init event with payload ID: " + payload);
             }
+
+            // Destroy the LoveLetter FIRST so it doesn't overlap spawned entities
+            SceneDestroyEntity(loveletterEntityID);
         }
 
         // ===== MOVEMENT SYSTEM =====
