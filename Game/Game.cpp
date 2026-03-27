@@ -263,12 +263,7 @@ void Game::OnInit()
 			m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 			m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
 
-			m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
-			m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
-			m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
-			m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
-			m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
-			m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
+			m_AudioManager->LoadProjectAudioSettings();
 		}
 		else {
 			LOG_WARNING("  -> Could not load scene file, will create default content");
@@ -547,12 +542,7 @@ void Game::CreateDefaultScene()
 	m_Renderer->getBloomFilterRadius() = m_ActiveScene->GetSceneSetting().s_BloomFilterRadius;
 	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 
-	m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
+	m_AudioManager->LoadProjectAudioSettings();
 
 	// ---------------------------------------------------------------------
 	// Load animation clips
@@ -1727,12 +1717,7 @@ Engine::Scene* Game::CreateScene(const std::string& name)
 	m_Renderer->getExposure() = m_ActiveScene->GetSceneSetting().s_Exposure;
 	m_Renderer->getGlobalBias() = m_ActiveScene->GetSceneSetting().s_GlobalBias;
 
-	m_AudioManager->SetEditorCap(Engine::AudioType::MASTER, m_ActiveScene->GetSceneSetting().s_MasterVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::SFX, m_ActiveScene->GetSceneSetting().s_SFXVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::BGM, m_ActiveScene->GetSceneSetting().s_BGMVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::UI, m_ActiveScene->GetSceneSetting().s_UIVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::VO, m_ActiveScene->GetSceneSetting().s_VOVolume);
-	m_AudioManager->SetEditorCap(Engine::AudioType::GAMESFX, m_ActiveScene->GetSceneSetting().s_GameSFXVolume);
+	m_AudioManager->LoadProjectAudioSettings();
 
 	LOG_INFO("Scene created successfully");
 	return m_ActiveScene;

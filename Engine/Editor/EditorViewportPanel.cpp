@@ -476,18 +476,9 @@ namespace Engine
                 }
                 activeScene->GetRegistry().clear();
                 activeScene->LoadFromFile(m_OriginalScenePath);
-                // Re-sync AudioManager editorCap from the reloaded scene; Stop() uses the direct C++ LoadFromFile
-                // path which skips the InternalCall that normally applies audio settings, causing the mixer to drift.
+                // Re-apply project-wide audio caps after scene reload; Stop() bypasses the normal load path.
                 if (AudioManager* am = m_Editor->GetAudioManager())
-                {
-                    const auto& s = activeScene->GetSceneSetting();
-                    am->SetEditorCap(AudioType::MASTER,   s.s_MasterVolume);
-                    am->SetEditorCap(AudioType::SFX,      s.s_SFXVolume);
-                    am->SetEditorCap(AudioType::BGM,      s.s_BGMVolume);
-                    am->SetEditorCap(AudioType::UI,       s.s_UIVolume);
-                    am->SetEditorCap(AudioType::VO,       s.s_VOVolume);
-                    am->SetEditorCap(AudioType::GAMESFX,  s.s_GameSFXVolume);
-                }
+                    am->LoadProjectAudioSettings();
                 RestoreEditModeScriptFieldOverrides(activeScene);
                 auto& se = Engine::MonoScriptEngine::GetInstance();
                 se.EnsureAllScriptInstances(activeScene, true);

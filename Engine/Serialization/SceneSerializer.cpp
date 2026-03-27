@@ -972,12 +972,7 @@ namespace Engine {
 		settingsObj.AddMember("BloomFilterRadius", sceneSettings.s_BloomFilterRadius, allocator);
 		settingsObj.AddMember("Exposure", sceneSettings.s_Exposure, allocator);
 		settingsObj.AddMember("GlobalBias", sceneSettings.s_GlobalBias, allocator);
-		settingsObj.AddMember("MasterVolume", sceneSettings.s_MasterVolume, allocator);
-		settingsObj.AddMember("SFXVolume", sceneSettings.s_SFXVolume, allocator);
-		settingsObj.AddMember("BGMVolume", sceneSettings.s_BGMVolume, allocator);
-		settingsObj.AddMember("VOVolume", sceneSettings.s_VOVolume, allocator);
-		settingsObj.AddMember("UIVolume", sceneSettings.s_UIVolume, allocator);
-		settingsObj.AddMember("GameSFXVolume", sceneSettings.s_GameSFXVolume, allocator);
+		// Audio mixer caps are no longer per-scene; managed by ProjectAudioSettings instead.
 
 		settingsArray.PushBack(settingsObj, allocator);
 		doc.AddMember("Settings", settingsArray, allocator);
@@ -2076,7 +2071,7 @@ namespace Engine {
 						if (properties.HasMember("Active"))
 							beam.Active = properties["Active"].GetBool();
 
-						// Target Entity — only present if it was non-null at serialize time
+						// Target Entity ï¿½ only present if it was non-null at serialize time
 						if (properties.HasMember("Target Entity ID"))
 							beam.TargetEntity = static_cast<entt::entity>(properties["Target Entity ID"].GetUint());
 					}

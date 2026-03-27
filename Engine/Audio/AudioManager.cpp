@@ -12,6 +12,7 @@
 #include "Utility/Logger.h"
 #include "Utility/AssetPath.h"
 #include "AudioManager.h"
+#include "Serialization/AudioProjectSerializer.h"
 
 namespace Engine {
 	
@@ -782,6 +783,52 @@ namespace Engine {
 		}
 
 		return true;
+	}
+
+	static const std::string PROJECT_AUDIO_PATH = "Sources/ProjectSetting/ProjectAudioSettings.json";
+
+	void AudioManager::LoadProjectAudioSettings()
+	{
+		AudioProjectSettings s;
+		std::string exePath = getAssetFilePath(PROJECT_AUDIO_PATH);
+		if (!AudioProjectSerializer::Deserialize(exePath, s))
+		{
+			// Fallback: try the repo root Resources path (useful on first run before a save)
+			std::string rootResources = getRootResourcesPath();
+			if (!rootResources.empty())
+			{
+				std::string rootPath = (std::filesystem::path(rootResources) / PROJECT_AUDIO_PATH).generic_string();
+				AudioProjectSerializer::Deserialize(rootPath, s);
+			}
+		}
+		SetEditorCap(AudioType::MASTER,   s.masterVolume);
+		SetEditorCap(AudioType::SFX,      s.sfxVolume);
+		SetEditorCap(AudioType::BGM,      s.bgmVolume);
+		SetEditorCap(AudioType::UI,       s.uiVolume);
+		SetEditorCap(AudioType::VO,       s.voVolume);
+		SetEditorCap(AudioType::GAMESFX,  s.gameSFXVolume);
+	}
+
+	void AudioManager::SaveProjectAudioSettings()
+	{
+		AudioProjectSettings s;
+		s.masterVolume  = GetEditorCap(AudioType::MASTER);
+		s.sfxVolume     = GetEditorCap(AudioType::SFX);
+		s.bgmVolume     = GetEditorCap(AudioType::BGM);
+		s.uiVolume      = GetEditorCap(AudioType::UI);
+		s.voVolume      = GetEditorCap(AudioType::VO);
+		s.gameSFXVolume = GetEditorCap(AudioType::GAMESFX);
+
+		// Save to exe-relative Resources (runtime path)
+		AudioProjectSerializer::Serialize(s, getAssetFilePath(PROJECT_AUDIO_PATH));
+
+		// Also save to repo root Resources so the setting is committed to source
+		std::string rootResources = getRootResourcesPath();
+		if (!rootResources.empty())
+		{
+			std::string rootPath = (std::filesystem::path(rootResources) / PROJECT_AUDIO_PATH).generic_string();
+			AudioProjectSerializer::Serialize(s, rootPath);
+		}
 	}
 
 	// New functions

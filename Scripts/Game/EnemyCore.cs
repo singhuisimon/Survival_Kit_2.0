@@ -5,6 +5,7 @@ using static Engine.Event;
 using static Engine.Transform;
 using static Engine.Scene;
 using static Engine.Prefab;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -54,6 +55,15 @@ namespace Game
             Publish(EVENT_ENEMYCORE_HEALTHCHANGE, CurrentHealth.ToString());
             //Vector3 newpos = new Vector3(-5504.39f, -438.72f, 643.28f);
             //Engine.Transform.SetPosition(EntityID, ref newpos);
+
+            if (ProgressTracker.SkipTutorialLevel1)
+            {
+                skipTutorial = true;
+            }
+            else
+            {
+                skipTutorial = false;
+            }
 
             LogMessage("EnemyCore " + EntityID + " Health initialized");
             LogMessage("EnemyCore " + EntityID + " Health is: " + CurrentHealth.ToString() + "/" + MaxHealth.ToString());
