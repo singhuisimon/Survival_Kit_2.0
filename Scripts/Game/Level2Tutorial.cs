@@ -56,7 +56,7 @@ namespace Game
         [SerializeField] private bool tutorialover = false;
         private int tutorialstate = 0;
         private float tutorialSpawnInterval = 5.0f;
-        [SerializeField] private float tutorialCountdown = 7.5f; // Have a short delay at the start
+        [SerializeField] private float tutorialCountdown = 0.5f; // Have a short delay at the start
         private const uint INVALID_ENTITY = 0xffffffffu;
 
         // ============== RNG Setting =================
