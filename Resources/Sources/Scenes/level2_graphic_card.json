@@ -13,56 +13,12 @@
                     }
                 },
                 {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "17936509740218730797",
-                        "PrefabAssetGuid": "6983755446453437691",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Wall5",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6100530852772446537\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-79.99996948242188,0.0],\"Scale\":[1000.0,600.0,1.0],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3524990932632634607\",\"Name\":\"Wall5\",\"Tag\":\"Wall\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1488844834345386315\",\"Mesh\":\"\",\"Material\":\"Firewall_Active.mat\",\"Texture\":\"\",\"Visible\":false,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11901422349663667349\",\"ScriptClassName\":\"Game.WallSpawner\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
                     "Type": "TransformComponent",
                     "Properties": {
                         "ComponentGUID": "6100530852772446537",
                         "Position": [
                             2500.0,
-                            300.0,
+                            -250.0,
                             -1750.0
                         ],
                         "Rotation": [
@@ -117,56 +73,12 @@
                     }
                 },
                 {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "13324823721791293731",
-                        "PrefabAssetGuid": "15630666731004757239",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Wall4",
-                        "prefabVersion": 1,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6100530852772446537\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,79.99996948242188,0.0],\"Scale\":[1000.0,600.0,1.0],\"Parent\":4294967295,\"Children\":[]}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11595441464880563431\",\"Name\":\"Wall4\",\"Tag\":\"Wall\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1488844834345386315\",\"Mesh\":\"\",\"Material\":\"Firewall_Active.mat\",\"Texture\":\"\",\"Visible\":false,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"11901422349663667349\",\"ScriptClassName\":\"Game.WallSpawner\",\"Started\":false,\"GCHandle\":0}}"
-                            }
-                        ]
-                    }
-                },
-                {
                     "Type": "TransformComponent",
                     "Properties": {
                         "ComponentGUID": "6100530852772446537",
                         "Position": [
                             -2500.0,
-                            300.0,
+                            -250.0,
                             -1750.0
                         ],
                         "Rotation": [
@@ -479,7 +391,7 @@
                         "ComponentGUID": "17378643928610342117",
                         "Position": [
                             -500.0,
-                            -1750.0,
+                            -1000.0,
                             1000.0
                         ],
                         "Rotation": [
@@ -489,7 +401,7 @@
                         ],
                         "Scale": [
                             4.0,
-                            3.5,
+                            1.75,
                             2.0
                         ],
                         "Parent": 4294967295,
@@ -1224,7 +1136,7 @@
                         "ComponentGUID": "16745553909902450455",
                         "Position": [
                             650.0,
-                            -430.0,
+                            270.0,
                             -1000.0
                         ],
                         "Rotation": [
@@ -1287,7 +1199,7 @@
                         "ComponentGUID": "5792799616132947725",
                         "Position": [
                             -575.0,
-                            -465.0,
+                            -165.0,
                             -1000.0
                         ],
                         "Rotation": [
@@ -1496,7 +1408,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1874,7 +1786,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1961,7 +1873,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4452,7 +4364,7 @@
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
                             650.0,
-                            -450.0,
+                            -150.0,
                             -2000.0
                         ],
                         "Rotation": [
@@ -5190,7 +5102,7 @@
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
                             -575.0,
-                            -485.0,
+                            285.0,
                             -1500.0
                         ],
                         "Rotation": [
@@ -5430,7 +5342,7 @@
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
                             650.0,
-                            -450.0,
+                            250.0,
                             -1000.0
                         ],
                         "Rotation": [
@@ -5670,7 +5582,7 @@
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
                             -575.0,
-                            -485.0,
+                            -185.0,
                             -1000.0
                         ],
                         "Rotation": [
@@ -5948,7 +5860,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7170,7 +7082,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7503,7 +7415,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9374369382858276,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -8169,7 +8081,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -0.0,
+                            -1.0177775099486433e-13,
                             90.0
                         ],
                         "Scale": [
@@ -8269,7 +8181,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8416,7 +8328,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8798,7 +8710,7 @@
                         "ComponentGUID": "912384082036343107",
                         "Position": [
                             -33.0,
-                            300.0,
+                            -250.0,
                             -3500.0
                         ],
                         "Rotation": [
@@ -8858,7 +8770,7 @@
                         "ComponentGUID": "6100530852772446537",
                         "Position": [
                             -1500.0,
-                            300.0,
+                            -250.0,
                             -3000.0
                         ],
                         "Rotation": [
@@ -8918,7 +8830,7 @@
                         "ComponentGUID": "17629745898841637199",
                         "Position": [
                             1500.0,
-                            300.0,
+                            -250.0,
                             -3000.0
                         ],
                         "Rotation": [
@@ -9303,7 +9215,7 @@
                         "ComponentGUID": "10384210640159851477",
                         "Position": [
                             650.0,
-                            -430.0,
+                            -130.0,
                             -2000.0
                         ],
                         "Rotation": [
@@ -9711,7 +9623,7 @@
                         "ComponentGUID": "3560175285282702509",
                         "Position": [
                             -575.0,
-                            -465.0,
+                            305.0,
                             -1500.0
                         ],
                         "Rotation": [
@@ -10385,13 +10297,7 @@
             "BloomStrength": 0.004999999888241291,
             "BloomFilterRadius": 0.0010000000474974513,
             "Exposure": 5.0,
-            "GlobalBias": 0.004999999888241291,
-            "MasterVolume": 2.0,
-            "SFXVolume": 1.0,
-            "BGMVolume": 1.0,
-            "VOVolume": 1.0,
-            "UIVolume": 1.0,
-            "GameSFXVolume": 1.0
+            "GlobalBias": 0.004999999888241291
         }
     ]
 }
