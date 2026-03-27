@@ -94,6 +94,7 @@ uniform bool hasMetallicMap;
 uniform bool hasRoughnessMap;
 uniform bool hasEmissionMap;
 uniform bool hasOcclusionMap;
+uniform bool uHasMaterial;
 
 layout(binding = 0) uniform sampler2D Texture2D;
 layout(binding = 1) uniform sampler2D NormalMap;
@@ -368,12 +369,20 @@ void main()
     vec3 color = ambient + Lo;
     if(uEmissive){
         if(hasEmissionMap){
-            color += (texture(emissionMap, TexCoord * tiling + offset).rgb) * material_.emissionStrength;
-        }else{
-            if (uParticle) {
-                color += (uColor.rgb * material_.emissionStrength);
+            vec3 emSample = texture(emissionMap, TexCoord * tiling + offset).rgb;
+            if(uBlacksAsTransparent){
+                float emLuminance = dot(emSample, vec3(0.299, 0.587, 0.114));
+                color += emSample * emLuminance * material_.emissionStrength;
             } else {
-                color += (material_.emissionColor * material_.emissionStrength);
+                color += emSample * material_.emissionStrength;
+            }
+        }else{
+            vec3 emissiveColor = (uParticle && !uHasMaterial) ? uColor.rgb : material_.emissionColor;
+            if(uBlacksAsTransparent){
+                float emLuminance = dot(emissiveColor, vec3(0.299, 0.587, 0.114));
+                color += emissiveColor * emLuminance * material_.emissionStrength;
+            } else {
+                color += emissiveColor * material_.emissionStrength;
             }
         }
     }
