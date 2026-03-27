@@ -41,6 +41,7 @@ namespace Game
         private const string EVENT_GAMEOVER = "GameOver";
         private const string EVENT_GAMEWIN = "GameWin";
         private const string EVENT_WALLENABLED = "WallEnabled";
+        private const string EVENT_TUTORIALSTART = "TUTORIALSTART";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
 
         // ======================  Wall Setting ==============================
@@ -54,6 +55,13 @@ namespace Game
 
         // ========================= TUTORIAL SETTING ======================
         [SerializeField] private bool tutorialover = false;
+        [SerializeField] private bool tutorialstart = false;
+
+        [SerializeField] private bool tutorialWaveSpawned = false;
+        [SerializeField] private float postTutorialDelay = 5.0f;   // adjustable gap
+        [SerializeField] private float postTutorialTimer = 0.0f;
+        [SerializeField] private bool waitingForMainGameStart = false;
+
         private int tutorialstate = 0;
         private float tutorialSpawnInterval = 5.0f;
         [SerializeField] private float tutorialCountdown = 0.5f; // Have a short delay at the start
@@ -72,6 +80,7 @@ namespace Game
             Subscribe(EVENT_GAMEOVER, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
             Subscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Subscribe(EVENT_TUTORIALSTART, OnTutorialStart);
         }
 
         public override void OnUpdate(float deltaTime){
@@ -96,27 +105,63 @@ namespace Game
                 return;
             }
 
-            // TEMP
-            if(!tutorialover){
+            if(!tutorialover && tutorialstart){
 
                 // Complete tutorial if loveletter is destroyed
-                if (tutorialstate > 2 && SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
+                // if (tutorialstate > 2 && SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
+                //     tutorialover = true;
+                //     Publish(EVENT_TUTORIALOVER, "");
+                // }
+
+                // // Time delay between enemy spawns
+                // if (SceneFindEntityByName("botnet") == INVALID_ENTITY &&
+                //    SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
+                //    SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
+                //     tutorialCountdown -= deltaTime;
+                // }
+
+                // // Spawn enemy
+                // if(tutorialCountdown <= 0.0f){
+                //     SpawnTutorialOnWall();
+                // } 
+
+                // Spawn all 3 tutorial enemies once
+                if (!tutorialWaveSpawned)
+                {
+                    for (int i = 0; i < 3; i++)
+                    {
+                        SpawnTutorialOnWall();
+                    }
+
+                    tutorialWaveSpawned = true;
+                }
+
+                // Wait until all 3 tutorial enemies are destroyed
+                if (tutorialWaveSpawned &&
+                    SceneFindEntityByName("botnet") == INVALID_ENTITY &&
+                    SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
+                    SceneFindEntityByName("loveletter") == INVALID_ENTITY)
+                {
                     tutorialover = true;
+                    waitingForMainGameStart = true;
+                    postTutorialTimer = postTutorialDelay;
                     Publish(EVENT_TUTORIALOVER, "");
                 }
 
-                // Time delay between enemy spawns
-                if (SceneFindEntityByName("botnet") == INVALID_ENTITY &&
-                   SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
-                   SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
-                    tutorialCountdown -= deltaTime;
+                return; // return once fin first tutorial
+            }
+
+            if (waitingForMainGameStart)
+            {
+                postTutorialTimer -= deltaTime;
+
+                if (postTutorialTimer <= 0.0f)
+                {
+                    waitingForMainGameStart = false;
+                    spawntimer = spawnInterval; // reset normal spawn timer cleanly
                 }
 
-                // Spawn enemy
-                if(tutorialCountdown <= 0.0f){
-                    SpawnTutorialOnWall();
-                }  
-                return; // return once fin first tutorial
+                return;
             }
 
             spawntimer -= deltaTime;
@@ -146,6 +191,9 @@ namespace Game
         public override void OnDestroy(){
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+            Unsubscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Unsubscribe(EVENT_TUTORIALSTART, OnTutorialStart);
+
 
             canSpawn = false;
             initialized = false;
@@ -159,6 +207,12 @@ namespace Game
         private void OnWallEnabled(string eventName, string payload){
             LogMessage("[WallSpawner] Wall Enabled detected checking if wall is activated");
             active = GetVisible((uint)EntityID); //only enable spawning if it is active
+        }
+
+        private void OnTutorialStart(string eventName, string payload)
+        {
+            LogMessage("[Level2Tutorial] Detect tutorial has begin initializing spawn");
+            tutorialstart = true;
         }
 
         private void SpawnRandomEnemyOnWall(){
@@ -250,6 +304,11 @@ namespace Game
             canSpawn = true;
             initialized = true;
             tutorialover = false;
+            tutorialstart = false;
+            tutorialstate = 0;
+            tutorialWaveSpawned = false;
+            waitingForMainGameStart = false;
+            postTutorialTimer = postTutorialDelay;
             decreaseTimer = decreaseInterval;
             active = GetVisible((uint)EntityID); //only enable spawning if it is active
         }
@@ -280,8 +339,12 @@ namespace Game
         }
 
         private void SpawnTutorialOnWall(){
-            //int enemyDex = RNG.RandInt(0, 2);
-            //int enemyDex = GetRandom012();
+            
+            if(tutorialstate > 2)
+            {
+                return;
+            }
+
             int enemyDex = tutorialstate;
             //string enemyPrefabPath = "";
             float selectedWidth = 0.0f;
@@ -323,7 +386,7 @@ namespace Game
             SetRotation(enemyID, ref spawnRot);
 
             //Set tutorial state
-            tutorialCountdown = tutorialSpawnInterval;
+            //tutorialCountdown = tutorialSpawnInterval;
             tutorialstate++;
 
             //Instantiate audio if needed
