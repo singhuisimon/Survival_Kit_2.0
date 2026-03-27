@@ -5,7 +5,7 @@
 \author     Low Yue Jun (yuejun.low)
 \par        email: yuejun.low@digipen.edu
 \date       2025/11/09
-\brief      Jolt Physics high-level façade:
+\brief      Jolt Physics high-level faï¿½ade:
 			- Entity-addressed body queries and activation
 			- Force/impulse/torque and velocity nudges
 			- Per-body properties (damping, gravity factor, CCD)
@@ -37,6 +37,18 @@ namespace Engine
 	{
 		EntityID entA{ entt::null };
 		EntityID entB{ entt::null };
+	};
+
+	/**************************************************************************
+	 * @brief
+	 * Result of a successful sphere cast query.
+	 **************************************************************************/
+	struct SphereCastHit
+	{
+		EntityID  entity{ entt::null };  ///< Entity that was hit
+		glm::vec3 point{};               ///< World-space contact point on the hit surface
+		glm::vec3 normal{};              ///< World-space surface normal pointing toward the caster
+		float     fraction{};            ///< [0..1] fraction along (direction * maxDistance)
 	};
 
 	/**************************************************************************
@@ -83,7 +95,7 @@ namespace Engine
 
 		/**************************************************************************
 		 * @brief
-		 * Applies a world-space force at the body’s center of mass.
+		 * Applies a world-space force at the bodyï¿½s center of mass.
 		 * @param e
 		 * The entity handle.
 		 * @param force
@@ -97,7 +109,7 @@ namespace Engine
 		 * @param e
 		 * The entity handle.
 		 * @param impulse
-		 * Impulse vector (N·s).
+		 * Impulse vector (Nï¿½s).
 		 **************************************************************************/
 		static void AddImpulse(const Entity &e, const glm::vec3 &impulse);
 
@@ -107,7 +119,7 @@ namespace Engine
 		 * @param e
 		 * The entity handle.
 		 * @param torque
-		 * Torque vector (N·m).
+		 * Torque vector (Nï¿½m).
 		 **************************************************************************/
 		static void AddTorque(const Entity &e, const glm::vec3 &torque);
 
@@ -117,7 +129,7 @@ namespace Engine
 		 * @param e
 		 * The entity handle.
 		 * @param angularImpulse
-		 * Angular impulse (N·m·s).
+		 * Angular impulse (Nï¿½mï¿½s).
 		 **************************************************************************/
 		static void AddAngularImpulse(const Entity &e, const glm::vec3 &angularImpulse);
 
@@ -127,7 +139,7 @@ namespace Engine
 
 		/**************************************************************************
 		 * @brief
-		 * Adds a delta to the body’s linear velocity.
+		 * Adds a delta to the bodyï¿½s linear velocity.
 		 * @param e
 		 * The entity handle.
 		 * @param deltaVelocity
@@ -137,7 +149,7 @@ namespace Engine
 
 		/**************************************************************************
 		 * @brief
-		 * Adds a delta to the body’s angular velocity.
+		 * Adds a delta to the bodyï¿½s angular velocity.
 		 * @param e
 		 * The entity handle.
 		 * @param deltaOmega
@@ -190,12 +202,36 @@ namespace Engine
 		static void SetContinuousDetection(const Entity &e, bool enabled);
 
 		// =========================
+		//  Scene queries
+		// =========================
+
+		/**************************************************************************
+		 * @brief
+		 * Sweeps a sphere through the scene and returns the closest hit.
+		 * @param origin
+		 * World-space start position of the sphere centre.
+		 * @param direction
+		 * World-space cast direction (will be normalised internally).
+		 * @param radius
+		 * Radius of the sphere (metres, > 0).
+		 * @param maxDistance
+		 * Maximum cast length (metres).
+		 * @param outHit
+		 * Populated on success with hit entity, contact point, normal and fraction.
+		 * @return
+		 * True if any body was hit, false otherwise.
+		 **************************************************************************/
+		static bool SphereCast(const glm::vec3 &origin, const glm::vec3 &direction,
+		                       float radius, float maxDistance, SphereCastHit &outHit,
+		                       EntityID excludeEntity = entt::null);
+
+		// =========================
 		//  Collision events
 		// =========================
 
 		/**************************************************************************
 		 * @brief
-		 * Installs the engine’s contact listener and routes events to a buffer.
+		 * Installs the engineï¿½s contact listener and routes events to a buffer.
 		 *
 		 * Idempotent: safe to call more than once; only one listener is active.
 		 **************************************************************************/
@@ -209,7 +245,7 @@ namespace Engine
 
 		/**************************************************************************
 		 * @brief
-		 * Returns the current frame’s contact events without draining them.
+		 * Returns the current frameï¿½s contact events without draining them.
 		 * @return
 		 * Const reference to the per-frame contact event buffer.
 		 **************************************************************************/
