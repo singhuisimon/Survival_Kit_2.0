@@ -1,5 +1,5 @@
 {
-  "sourcePath": "/Resources/Sources/Textures/Firewall-active-logo.png",
+  "sourcePath": "/Resources/Sources/Textures/Tooltip_CombatAbility.png",
   "textureSettings": {
     "usageType": "COLOR",
     "compression": "BC7",

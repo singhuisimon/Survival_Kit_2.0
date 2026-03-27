@@ -24,13 +24,20 @@ namespace Game
         private float minInterval = 10.0f;
         private float wormbotSpawnDist = 1.5f;
         private float loveletterSpawnDist = 200.0f;
+        private float VFXDelayAccum = 0.0f;
         private int enemiesSpawnPerWave = 3;
         
         // ================== Enemy Spawn Prefab Path ============================
         private const string loveletterPrefabPath = "Sources/Prefabs/loveletterv4.prefab";
         private const string botnetPrefabPath = "Sources/Prefabs/Enemy_Botnet.prefab";
         private const string wormHostPrefabPath = "Sources/Prefabs/WormHost.prefab";
+
+        private const string botnetVFXPath = "Sources/Prefabs/RootSpawnBotNet.prefab";
+        private const string wormVFXPath = "";
+        private const string loveletterVFXPath = "";
+
         [SerializeField] private string enemyPrefabPath;
+        [SerializeField] private string vfxPrefabPath;
 
         // =================== Audio ======================
         private const string warpingInPrefab = "Sources/Prefabs/Loveletter_warping.prefab";
@@ -92,7 +99,7 @@ namespace Game
             if(spawntimer <= 0.0f){
                 try{
                     for(int i = 0; i < enemiesSpawnPerWave; i++){
-                        SpawnRandomEnemyOnWall();
+                        SpawnRandomEnemyOnWall(deltaTime);
                     }
                 }
                 catch(Exception e){
@@ -118,7 +125,7 @@ namespace Game
             canSpawn = false;
         }
 
-        private void SpawnRandomEnemyOnWall(){
+        private void SpawnRandomEnemyOnWall(float deltaTime){
             //int enemyDex = RNG.RandInt(0, 2);
             //int enemyDex = GetRandom012();
             int enemyDex = GetWeightedRandomEnemy();
@@ -130,18 +137,21 @@ namespace Game
                 case 0:
                     //botnet
                     enemyPrefabPath = botnetPrefabPath;
+                    vfxPrefabPath = botnetVFXPath;
                     selectedWidth = smallwall_width;
                     spawnDistance = wormbotSpawnDist;
                     break;
                 case 1:
                     //worm
                     enemyPrefabPath = wormHostPrefabPath;
+                    vfxPrefabPath = botnetVFXPath;
                     spawnDistance = wormbotSpawnDist;
                     selectedWidth = smallwall_width;
                     break;
                 case 2:
                     //loveletter
                     enemyPrefabPath = loveletterPrefabPath;
+                    vfxPrefabPath = botnetVFXPath;
                     selectedWidth = smallwall_width;
                     spawnDistance = loveletterSpawnDist;
                     break;
@@ -150,9 +160,28 @@ namespace Game
             Vector3 spawnPos = GetRandomPositionOnWall(selectedWidth, wall_height, spawnDistance);
             Quat spawnRot = GetSpawnRotation(spawnPos);
 
+            uint VFXID = 0;
+            VFXID = PrefabInstantiate(vfxPrefabPath);
+
+            if (VFXID == 0)
+            {
+                LogMessage("[WallSpawner3] Fail to instantiate enemy for: " + enemyPrefabPath);
+                return;
+            }
+
+            SetPosition(VFXID, ref spawnPos);
+            SetRotation(VFXID, ref spawnRot);
+
+            while (VFXDelayAccum <= 1.0f)
+            {
+                VFXDelayAccum += deltaTime;
+                return;
+            }
+
             uint enemyID = 0;
             enemyID = PrefabInstantiate(enemyPrefabPath);
-            if(enemyID == 0){
+
+            if (enemyID == 0){
                 LogMessage("[WallSpawner3] Fail to instantiate enemy for: " + enemyPrefabPath);
                 return;
             }
@@ -181,6 +210,8 @@ namespace Game
                     return;
                 }
             }
+
+            VFXDelayAccum = 0.0f;
         }
 
         private Vector3 GetRandomPositionOnWall(float wallWidth, float wallHeight, float spawnDistance){

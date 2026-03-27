@@ -30,7 +30,13 @@ namespace Game
         private const string loveletterPrefabPath = "Sources/Prefabs/loveletterv4.prefab";
         private const string botnetPrefabPath = "Sources/Prefabs/Enemy_Botnet.prefab";
         private const string wormHostPrefabPath = "Sources/Prefabs/WormHost.prefab";
+
+        private const string botnetVFXPath = "Sources/Prefabs/RootSpawnBotNet.prefab";
+        private const string wormVFXPath = "";
+        private const string loveletterVFXPath = "";
+
         [SerializeField] private string enemyPrefabPath;
+        [SerializeField] private string vfxPrefabPath;
 
         // =================== Audio ======================
         private const string warpingInPrefab = "Sources/Prefabs/Loveletter_warping.prefab";
@@ -149,23 +155,26 @@ namespace Game
             //string enemyPrefabPath = "";
             float selectedWidth = 0.0f;
             float spawnDistance = 0.0f;
-            
+                
             switch(enemyDex){
                 case 0:
                     //botnet
                     enemyPrefabPath = botnetPrefabPath;
+                    vfxPrefabPath = botnetVFXPath;
                     selectedWidth = smallwall_width;
                     spawnDistance = wormbotSpawnDist;
                     break;
                 case 1:
                     //worm
                     enemyPrefabPath = wormHostPrefabPath;
+                    vfxPrefabPath = botnetVFXPath;
                     spawnDistance = wormbotSpawnDist;
                     selectedWidth = smallwall_width;
                     break;
                 case 2:
                     //loveletter
                     enemyPrefabPath = loveletterPrefabPath;
+                    vfxPrefabPath = botnetVFXPath;
                     selectedWidth = smallwall_width;
                     spawnDistance = loveletterSpawnDist;
                     break;
@@ -176,7 +185,17 @@ namespace Game
 
             uint enemyID = 0;
             enemyID = PrefabInstantiate(enemyPrefabPath);
+
+            uint VFXID = 0;
+            VFXID = PrefabInstantiate(vfxPrefabPath);
+
             if(enemyID == 0){
+                LogMessage("[WallSpawner] Fail to instantiate enemy for: " + enemyPrefabPath);
+                return;
+            }
+
+            if (VFXID == 0)
+            {
                 LogMessage("[WallSpawner] Fail to instantiate enemy for: " + enemyPrefabPath);
                 return;
             }
@@ -184,6 +203,9 @@ namespace Game
             //Set Position and Rotation
             SetPosition(enemyID, ref spawnPos);
             SetRotation(enemyID, ref spawnRot);
+
+            SetPosition(VFXID, ref spawnPos);
+            SetRotation(VFXID, ref spawnRot);
 
             //Increment counters
             currentTotalSpawnCount++;
