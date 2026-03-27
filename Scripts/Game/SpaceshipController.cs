@@ -35,6 +35,7 @@ namespace Game
         [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 20.0f;
         [SerializeField("Camera Distance Behind")] private float cameraDistanceBack = 30.0f;
         [SerializeField("Camera Look Distance")] private float cameraLookDistance = 1000.0f;
+        [SerializeField("Camera Collision Radius")] private float cameraCollisionRadius = 0.5f;
 
         // ===== Spawn Lock Camera =====
         [SerializeField("Spawn Lock Camera Height")] private float spawnLockCameraHeight = 35.0f;
@@ -62,6 +63,7 @@ namespace Game
         [SerializeField("Spawn Period")] private float spawnTimer = 5f;
         [SerializeField("Start With Cursor Locked")] private bool startWithCursorLocked = true;
 
+        [SerializeField("Desired Minimum Distance")] private const float toDesiredMin = 1f;
         [SerializeField] private float playerHP = 100.0f;
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
@@ -515,6 +517,25 @@ namespace Game
                     - camFwd * cameraDistanceBack
                     + camUp * cameraHeightOffset;
 
+                Vector3 camTarget = desiredCamPos;
+
+                Vector3 toDesired = desiredCamPos - predictedPlayerPos;
+                float desiredDist = toDesired.Magnitude;
+
+                if (desiredDist > toDesiredMin)
+                {
+                    Vector3 castDir = toDesired / desiredDist;
+
+                    if (Physics.SphereCast(predictedPlayerPos, castDir, cameraCollisionRadius, desiredDist, playerEntityID, out SphereCastHit camHit))
+                    {
+                        float safeDistance = camHit.Fraction * desiredDist - cameraCollisionRadius;
+                        if (safeDistance < 0.0f)
+                            safeDistance = 0.0f;
+
+                        camTarget = predictedPlayerPos + castDir * safeDistance;
+                    }
+                }
+
                 if (!camFollowInit)
                 {
                     smoothCamPos = GetPosition(cameraEntityID);
@@ -524,7 +545,7 @@ namespace Game
                 float t = cameraFollowSmooth * deltaTime;
                 t = t / (1.0f + t);
 
-                smoothCamPos = Vector3.Lerp(smoothCamPos, desiredCamPos, t);
+                smoothCamPos = Vector3.Lerp(smoothCamPos, camTarget, t);
             }
 
             if (camShakeTimer < camShakeTimerThreshold)
