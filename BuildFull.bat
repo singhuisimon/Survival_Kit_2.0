@@ -99,6 +99,22 @@ cd ..
 copy /Y "Scripts\bin\Debug\net8.0\GameScripts.dll" "build\bin\Debug\GameScripts.dll"
 copy /Y "Scripts\bin\Release\net8.0\GameScripts.dll" "build\bin\Release\GameScripts.dll"
 
+REM ===============================================
+REM Compile Assets (Textures, Meshes, Fonts)
+REM ===============================================
+echo.
+echo ===========================================
+echo Compiling Assets
+echo ===========================================
+echo.
+
+"build\bin\Release\AssetCompiler.exe" --force --verbose
+echo [NOTE] AssetCompiler exit code: %ERRORLEVEL% (non-zero is expected - Audio/Material/Shader compilers not implemented)
+
+REM Copy compiled assets to both Debug and Release output
+robocopy "Resources\Compiled" "build\bin\Debug\Resources\Compiled" /E /IS /IT /NP /NJH /NJS
+robocopy "Resources\Compiled" "build\bin\Release\Resources\Compiled" /E /IS /IT /NP /NJH /NJS
+
 echo.
 echo ===========================================
 echo All builds completed successfully!

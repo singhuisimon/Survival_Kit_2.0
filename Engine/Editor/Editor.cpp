@@ -357,13 +357,7 @@ namespace Engine
         settings.s_GlobalBias = renderer->getGlobalBias();
         settings.s_Gamma = renderer->getGamma();
 
-		// Sync audio manager settings to scene
-        settings.s_MasterVolume = audioManager->GetEditorCap(AudioType::MASTER);
-        settings.s_BGMVolume = audioManager->GetEditorCap(AudioType::BGM);
-        settings.s_SFXVolume = audioManager->GetEditorCap(AudioType::SFX);
-        settings.s_UIVolume = audioManager->GetEditorCap(AudioType::UI);
-        settings.s_VOVolume = audioManager->GetEditorCap(AudioType::VO);
-        settings.s_GameSFXVolume = audioManager->GetEditorCap(AudioType::GAMESFX);
+		// Audio mixer caps are stored in ProjectAudioSettings, not in the scene file.
 
         scene->SaveToFile(finalPath);
         scene->SaveToFile(convertAssetPathToRootResources(finalPath));

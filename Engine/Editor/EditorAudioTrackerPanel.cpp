@@ -55,6 +55,8 @@ namespace Engine
                 if (changed)
                 {
                     audioManager->SetEditorCap(type, value);
+                    // Persist immediately so the value survives scene switches and Stop.
+                    audioManager->SaveProjectAudioSettings();
                 }
 
                 ImGui::PopID();

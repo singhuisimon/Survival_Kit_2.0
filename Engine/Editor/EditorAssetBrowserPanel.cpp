@@ -632,6 +632,7 @@ namespace Engine
 
 					assetsToDisplay.push_back(displayAsset);
 				}
+
 			}
 			else if (!selectedFolder.empty() && raw_asset)
 			{
@@ -1236,7 +1237,7 @@ namespace Engine
 
 				ImGui::PushID(static_cast<int>(i));
 
-				// ===== BUTTON =====
+				// ===== BUTTON / THUMBNAIL =====
 				if (ImGui::Button(asset.fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
 				{
 					selectedResourcesIndex = static_cast<int>(i);
@@ -1302,19 +1303,20 @@ namespace Engine
 				{
 					ImGui::BeginTooltip();
 
-					ImGui::Text("Name: %s", asset.fileName.c_str());
-					//ImGui::Text("Path: %s", asset.displayFolder.c_str());
+					//ImGui::Text("Name: %s", asset.fileName.c_str());
+					////ImGui::Text("Path: %s", asset.displayFolder.c_str());
 
-					if (asset.isRawAsset && asset.record)
-					{
-						ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
-						ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
+					//if (asset.isRawAsset && asset.record)
+					//{
+					//	ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+					//	ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
 
-						char timeBuf[64];
-						std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
-						std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
-						ImGui::Text("Last Write Time: %s", timeBuf);
-					}
+					//	char timeBuf[64];
+					//	std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
+					//	std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+					//	ImGui::Text("Last Write Time: %s", timeBuf);
+					//}
+					RenderAssetTooltipPreview(asset);
 					ImGui::EndTooltip();
 				}
 
@@ -1339,49 +1341,8 @@ namespace Engine
 			ImGui::EndTable();
 		}
 		//ImGui::EndChild();
-
-		if (m_ShowDeleteConfirmPopUp)
-		{
-			ImGui::OpenPopup("Confirm Delete");
-			m_ShowDeleteConfirmPopUp = false;
-		}
-
-		if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
-		{
-			ImGui::Text("Are you sure you want to delete:");
-			ImGui::Text("%s", m_AssetToDelete.fileName.c_str());
-			ImGui::Separator();
-
-			if (ImGui::Button("Delete", ImVec2(120, 0)))
-			{
-				if (std::filesystem::exists(m_AssetToDelete.fullPath))
-				{
-					std::string resourcesPath = convertAssetPathToRootResources(m_AssetToDelete.fullPath);
-					std::filesystem::remove(m_AssetToDelete.fullPath);
-					std::filesystem::remove(resourcesPath);
-					LOG_INFO("Deleted asset: ", m_AssetToDelete.fullPath);
-					LOG_INFO("Deleted asset from root: ", resourcesPath);
-
-					// Clear selection if the deleted asset was selected
-					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
-						m_Editor->SetScenePath("");
-					else if (m_Editor->HasPrefabPath() && m_Editor->GetPrefabPath() == m_AssetToDelete.fullPath)
-						m_Editor->ClearPrefabPath();
-
-					selectedResourcesIndex = -1;
-				}
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::SameLine();
-			if (ImGui::Button("Cancel", ImVec2(120, 0)))
-			{
-				ImGui::CloseCurrentPopup();
-			}
-
-			ImGui::EndPopup();
-		}
-
+		// Delete the assets
+		RenderDeleteConfirmPopup();
 	}
 
 	void EditorAssetBrowserPanel::HandleAssetSelection(const DisplayableAsset& asset)
@@ -1410,12 +1371,8 @@ namespace Engine
 				m_Editor->GetRenderer()->getBloomFilterRadius() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomFilterRadius;
 				m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
 
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::MASTER, m_Editor->GetActiveScene()->GetSceneSetting().s_MasterVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::SFX, m_Editor->GetActiveScene()->GetSceneSetting().s_SFXVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::BGM, m_Editor->GetActiveScene()->GetSceneSetting().s_BGMVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::UI, m_Editor->GetActiveScene()->GetSceneSetting().s_UIVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::VO, m_Editor->GetActiveScene()->GetSceneSetting().s_VOVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::GAMESFX, m_Editor->GetActiveScene()->GetSceneSetting().s_GameSFXVolume);
+				// Audio mixer caps are project-wide; load from ProjectAudioSettings instead of per-scene values.
+				m_Editor->GetAudioManager()->LoadProjectAudioSettings();
 			}
 
 			// Register prefabs
@@ -1536,7 +1493,7 @@ namespace Engine
 			if (ImGui::IsItemHovered())
 			{
 				ImGui::BeginTooltip();
-				ImGui::Text("Name: %s", asset.fileName.c_str());
+				/*ImGui::Text("Name: %s", asset.fileName.c_str());
 				if (asset.isRawAsset && asset.record)
 				{
 					ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
@@ -1545,7 +1502,8 @@ namespace Engine
 					std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
 					std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
 					ImGui::Text("Last Write: %s", timeBuf);
-				}
+				}*/
+				RenderAssetTooltipPreview(asset);
 				ImGui::EndTooltip();
 			}
 
@@ -1597,12 +1555,16 @@ namespace Engine
 		}
 
 		// ===== DELETE CONFIRM POPUP =====
+		RenderDeleteConfirmPopup();
+	}
+
+	void EditorAssetBrowserPanel::RenderDeleteConfirmPopup()
+	{
 		if (m_ShowDeleteConfirmPopUp)
 		{
 			ImGui::OpenPopup("Confirm Delete");
 			m_ShowDeleteConfirmPopUp = false;
 		}
-
 		if (ImGui::BeginPopupModal("Confirm Delete", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::Text("Are you sure you want to delete:");
@@ -1617,20 +1579,104 @@ namespace Engine
 					std::filesystem::remove(m_AssetToDelete.fullPath);
 					std::filesystem::remove(resourcesPath);
 
+
+					// Remove from DB
+					AM.db().Remove(m_AssetToDelete.guid);
+
+					if (m_AssetToDelete.record != nullptr)
+					{
+						m_AssetToDelete.record->valid = false;
+					}
+
+					
+					// Remove from filtered search list
+					m_FilteredAssets.erase(
+						std::remove_if(m_FilteredAssets.begin(), m_FilteredAssets.end(),
+							[&](const FilteredAssetInfo& f) {
+								return f.fullPath == m_AssetToDelete.fullPath;
+							}),
+						m_FilteredAssets.end()
+					);
+
+					// delete assets 
+					m_ThumbnailCache.erase(m_AssetToDelete.guid);
+
+
 					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
-						m_Editor->SetScenePath("");
+					{
+						m_Editor->ClearScenePath();
+						Scene* currentSceneDelete = m_Editor->GetActiveScene();
+						bool is_ActiveScene = m_Editor->HasActiveScene();
+						LOG_DEBUG("is_ActiveScene: ", is_ActiveScene);
+						currentSceneDelete->GetRegistry().clear();
+					}
 					else if (m_Editor->HasPrefabPath() && m_Editor->GetPrefabPath() == m_AssetToDelete.fullPath)
+					{
 						m_Editor->ClearPrefabPath();
+					}
 
 					selectedResourcesIndex = -1;
 				}
 				ImGui::CloseCurrentPopup();
 			}
+
 			ImGui::SameLine();
 			if (ImGui::Button("Cancel", ImVec2(120, 0)))
 				ImGui::CloseCurrentPopup();
 
 			ImGui::EndPopup();
+		}
+
+	}
+
+	void EditorAssetBrowserPanel::RenderAssetTooltipPreview(const DisplayableAsset& asset)
+	{
+		ImGui::Text("Name: %s", asset.fileName.c_str());
+
+		if (asset.isRawAsset && asset.record)
+		{
+			ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+			ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
+
+			char timeBuf[64];
+			std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
+			std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+			ImGui::Text("Last Write Time: %s", timeBuf);
+
+			// ===== TEXTURE PREVIEW =====
+			if (asset.record->type == ResourceType::TEXTURE)
+			{
+				auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(asset.guid));
+				if (texture != nullptr)
+				{
+					ImGui::Separator();
+
+					// Constrain preview size while keeping aspect ratio
+					const float maxPreviewSize = 150.0f;
+					float tex_w = static_cast<float>(texture->width);
+					float tex_h = static_cast<float>(texture->height);
+					float aspect = tex_w / tex_h;
+
+					ImVec2 previewSize;
+					if (aspect >= 1.0f)
+					{
+						previewSize.x = maxPreviewSize;
+						previewSize.y = maxPreviewSize / aspect;
+					}
+					else
+					{
+						previewSize.y = maxPreviewSize;
+						previewSize.x = maxPreviewSize * aspect;
+					}
+
+					ImGui::Text("Preview: (%dx%d)", texture->width, texture->height);
+					ImGui::Image(
+						(ImTextureID)(intptr_t)((GLuint)texture->textureID),
+						previewSize,
+						ImVec2(0, 0), ImVec2(1, 1)
+					);
+				}
+			}
 		}
 	}
 }

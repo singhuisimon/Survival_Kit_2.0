@@ -225,12 +225,8 @@ namespace Engine
 
 						if(AudioManager* audioManager = m_Editor->GetAudioManager())
 						{
-							const auto& settings = newScene->GetSceneSetting();
-							audioManager->SetEditorCap(AudioType::SFX, settings.s_SFXVolume);
-							audioManager->SetEditorCap(AudioType::BGM, settings.s_BGMVolume);
-							audioManager->SetEditorCap(AudioType::UI, settings.s_UIVolume);
-							audioManager->SetEditorCap(AudioType::VO, settings.s_VOVolume);
-							audioManager->SetEditorCap(AudioType::GAMESFX, settings.s_GameSFXVolume);
+							// Audio mixer caps are project-wide; load from ProjectAudioSettings instead of per-scene values.
+							audioManager->LoadProjectAudioSettings();
 						}
 
 						// to register entity that contain prefab

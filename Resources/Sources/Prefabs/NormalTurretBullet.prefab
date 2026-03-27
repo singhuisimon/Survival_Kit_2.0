@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: NormalTurretBullet.prefab",
     "Prefab GUID": 14094086019144251855,
-    "version": 1,
+    "version": 2,
     "entities": [
         {
             "Name": "NormalTurretBullet",
@@ -74,7 +74,7 @@
                             "ComponentGUID": "710742473456669635",
                             "Mass": 1.0,
                             "IsKinematic": false,
-                            "IsTrigger": false,
+                            "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
                                 0.0,
