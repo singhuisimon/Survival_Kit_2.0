@@ -473,13 +473,7 @@ namespace Engine
 					s_Renderer->getExposure() = s_CurrentScene->GetSceneSetting().s_Exposure;
 					s_Renderer->getGlobalBias() = s_CurrentScene->GetSceneSetting().s_GlobalBias;
 
-					//adding in the audio
-					s_AudioManager->SetEditorCap(AudioType::MASTER, s_CurrentScene->GetSceneSetting().s_MasterVolume);
-					s_AudioManager->SetEditorCap(AudioType::SFX, s_CurrentScene->GetSceneSetting().s_SFXVolume);
-					s_AudioManager->SetEditorCap(AudioType::BGM, s_CurrentScene->GetSceneSetting().s_BGMVolume);
-					s_AudioManager->SetEditorCap(AudioType::UI, s_CurrentScene->GetSceneSetting().s_UIVolume);
-					s_AudioManager->SetEditorCap(AudioType::VO, s_CurrentScene->GetSceneSetting().s_VOVolume);
-					s_AudioManager->SetEditorCap(AudioType::GAMESFX, s_CurrentScene->GetSceneSetting().s_GameSFXVolume);
+					// Audio mixer caps are project-wide; no longer overridden per scene load.
 				}
 				
 			}

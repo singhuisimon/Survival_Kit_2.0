@@ -250,6 +250,7 @@ ce3b988e429cc0bf|0|/Resources/Sources/Textures/vfx/DigitalShapes2.png|.png||1772
 5dd5d08c9398802b|0|/Resources/Sources/Textures/DefenceSuccess_MainMenuButton.png|.png||1772730719|1|0|0|0
 53ebf88fbc4a801d|0|/Resources/Sources/Textures/Worldspace_Bar.png|.png||1773397096|1|0|0|0
 df0f708349bdc0ad|0|/Resources/Sources/Textures/Cutscene_3.png|.png||1772730719|1|0|0|0
+8742889463b74003|3|/Resources/Sources/Audio/Computer Smack Impact.wav|.wav||1774581503|1|0|0|0
 870f708349be0195|3|/Resources/Sources/Audio/ErrorPopUp2.wav|.wav||1769755676|1|0|0|0
 ff0f708349bdc0af|0|/Resources/Sources/Textures/DefenceFailed.png|.png||1769351039|1|0|0|0
 d70f708349bdc0b1|0|/Resources/Sources/Textures/DefenceSuccess.png|.png||1769351039|1|0|0|0
@@ -842,7 +843,7 @@ c034308e67100005|0|/Resources/Sources/Textures/MainMenu_CreditsResources.png|.pn
 81c0d08ed8090001|6|/Resources/Sources/Scenes/trench_run_test_audiosetting.json|.json||1773397095|1|0|0|0
 71c0d08ed8090003|0|/Resources/Sources/Textures/UI_DetectionRange_Pickup_UpgradeModule.png|.png||1773063671|1|0|0|0
 c1c0d08ed8090009|3|/Resources/Sources/Audio/System AI_VO_Core Damage 1.wav|.wav||1773397095|1|0|0|0
-811e509325494007|6|/Resources/Sources/Scenes/level3_motherboard.json|.json||1774521203|1|0|0|0
+811e509325494007|6|/Resources/Sources/Scenes/level3_motherboard.json|.json||1774589102|1|0|0|0
 d9c0d08ed809000b|3|/Resources/Sources/Audio/System AI_VO_Core Damage 2.wav|.wav||1773397095|1|0|0|0
 51c0d08ed809000d|3|/Resources/Sources/Audio/System AI_VO_Core Damage 3.wav|.wav||1773397095|1|0|0|0
 21c0d08ed8090011|3|/Resources/Sources/Audio/System AI_VO_Defence Success.wav|.wav||1773397095|1|0|0|0
@@ -934,6 +935,7 @@ e7ef90939f398001|6|/Resources/Sources/Scenes/EndCreditTransition.json|.json||177
 5fef90939f398005|0|/Resources/Sources/Textures/Button_Credits.png|.png||1774411695|1|0|0|0
 d4cdd893b6ee4001|6|/Resources/Sources/Scenes/level2_graphic_card_audiotest.json|.json||1774440655|1|0|0|0
 612d5893ba38c00f|0|/Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Opacity.png|.png||1774416601|1|0|0|0
+3f42889463b74001|3|/Resources/Sources/Audio/Computer Reboot Chime.wav|.wav||1774581502|1|0|0|0
 792d5893bb0f84eb|2|/Resources/Sources/Material/OOB_v001.mat|.mat||1774451872|1|0|0|0
 54962893e014c001|0|/Resources/Sources/Textures/Button_RestartLevel3.png|.png||1774454536|1|0|0|0
 41e92893e11e8009|0|/Resources/Sources/Textures/lvl2redesign_level_design_v005_v004_Normal.png|.png||1774455853|1|0|0|0

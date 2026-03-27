@@ -1,12 +1,12 @@
+/Resources/Sources/Textures/DigitalTriangle.png|1769351039|2902
+/Resources/Sources/Scenes/Level1_NewPlayer_Backup.json|1773397095|292546
 /Resources/Sources/Textures/vfx/Projectile2.png|1772730720|70577
 /Resources/Sources/Audio/COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav|1769350445|17070698
 /Resources/Sources/Textures/vfx/Smoke8.png|1772730720|98102
 /Resources/Sources/Textures/Tooltip_InstructionsLvl3.png|1774574905|75492
-/Resources/Sources/Scenes/Level1_NewPlayer_Backup.json|1773397095|292546
-/Resources/Sources/Textures/DigitalTriangle.png|1769351039|2902
+/Resources/Sources/Audio/Small Laser_8.wav|1774005977|68618
 /Resources/Sources/Textures/DefenceSuccess_PopUpWindow.png|1773397095|225789
 /Resources/Sources/Textures/lvl2redesign_level_design_v005_v004_Metallic.png|1774455853|170365
-/Resources/Sources/Audio/Small Laser_8.wav|1774005977|68618
 /Resources/Sources/Meshes/E009_keylogger_v005.fbx|1773397095|56412
 /Resources/Sources/Textures/HowToPlay_CombatButton.png|1774349036|2551
 /Resources/Sources/Textures/vfx/Circle30.png|1772730719|135716
@@ -653,7 +653,7 @@
 /Resources/Sources/Textures/vfx/FireEmbers.png|1772730719|21592
 /Resources/Sources/Textures/lvl2redesign_level_design_v005_v005_Emissive.png|1774458291|2726954
 /Resources/Sources/Textures/Paused_MinusButton.png|1772730719|982
-/Resources/Sources/Scenes/level3_motherboard.json|1774521203|406124
+/Resources/Sources/Scenes/level3_motherboard.json|1774589102|406124
 /Resources/Sources/Audio/Small Laser_3.wav|1774005977|68618
 /Resources/Sources/Shaders/hdr.frag|1772730719|915
 /Resources/Sources/Textures/vfx/DigitalShapes2.png|1772730719|1079
@@ -756,6 +756,7 @@
 /Resources/Sources/Meshes/E007_adware_v001.fbx|1769350446|27568
 /Resources/Sources/Textures/vfx/Flare33.png|1772730719|23703
 /Resources/Sources/Scenes/level2_graphic_card_audiotest.json|1774440655|436826
+/Resources/Sources/Audio/Computer Reboot Chime.wav|1774581502|216600
 /Resources/Sources/Textures/vfx/Fire8.png|1772730719|52122
 /Resources/Sources/Scenes/MainGameScene.json|1773397095|268551
 /Resources/Sources/Material/LevelDesign_GroundBelow.mat|1769350446|808
@@ -944,3 +945,4 @@
 /Resources/Sources/Textures/vfx/Line6.png|1772730720|2189
 /Resources/Sources/Scenes/Level1_test.json|1773397095|74247
 /Resources/Sources/Textures/Enemy spawn wall_v002_v001_Emissive.png|1774511525|444603
+/Resources/Sources/Audio/Computer Smack Impact.wav|1774581503|253068
