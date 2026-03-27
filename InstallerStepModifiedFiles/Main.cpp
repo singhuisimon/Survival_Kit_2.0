@@ -423,11 +423,11 @@ int main(int argc, char* argv[]) {
         {fontSourceDir + "DigitalNumbers-Regular.ttf", fontOutputDir + "DigitalNumbers-Regular.font"}
     };*/
     std::vector<std::pair<std::string, std::string>> fontsToCompile = {
-     {"Resources/Sources/Fonts/Quantico-Bold.ttf",        "Resources/Compiled/Fonts/Quantico-Bold.font"},
-     {"Resources/Sources/Fonts/Quantico-BoldItalic.ttf",    "Resources/Compiled/Fonts/Quantico-BoldItalic.font"},
-     {"Resources/Sources/Fonts/Quantico-Regular.ttf",   "Resources/Compiled/Fonts/Quantico-Regular.font"},
-     {"Resources/Sources/Fonts/Quantico-Italic.ttf",        "Resources/Compiled/Fonts/Quantico-Italic.font"},
-     {"Resources/Sources/Fonts/DigitalNumbers-Regular.ttf", "Resources/Compiled/Fonts/DigitalNumbers-Regular.font"}
+     {"Resources/Sources/Fonts/Quantico-Bold.ttf",        "Resources/Compiled/Font/Quantico-Bold.font"},
+     {"Resources/Sources/Fonts/Quantico-BoldItalic.ttf",    "Resources/Compiled/Font/Quantico-BoldItalic.font"},
+     {"Resources/Sources/Fonts/Quantico-Regular.ttf",   "Resources/Compiled/Font/Quantico-Regular.font"},
+     {"Resources/Sources/Fonts/Quantico-Italic.ttf",        "Resources/Compiled/Font/Quantico-Italic.font"},
+     {"Resources/Sources/Fonts/DigitalNumbers-Regular.ttf", "Resources/Compiled/Font/DigitalNumbers-Regular.font"}
     };
 
 
