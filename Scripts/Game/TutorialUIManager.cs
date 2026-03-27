@@ -20,7 +20,9 @@ namespace Game
             DestroyEnemies, // Show destroy enemies
             Wait,
             AltFire,
-            CollectUpgradeModule //Show collect upgrade tooltip
+            CollectUpgradeModule, //Show collect upgrade tooltip
+            SummonSentry    // Show sentry summon tooltip
+
         }
 
         private TutorialState currentState = TutorialState.Move;
@@ -34,6 +36,7 @@ namespace Game
         private uint altFireID; // UI_AltFire
         private uint proceedID; // UI_E_ToProceed
         private uint collectUpgradeModuleID; //UI_CollectUpgradeModule
+        private uint sentrySummonID;
 
         // Entity IDs - Player, Wall
         private uint playerID;
@@ -50,6 +53,7 @@ namespace Game
         [SerializeField] private string altFireName = "UI_AltFire";
         [SerializeField] private string proceedName = "UI_E_ToProceed";
         [SerializeField] private string collectUpgradeModuleName = "UI_CollectUpgradeModule";
+        [SerializeField] private string sentrySummonName = "UI_CombatAbilitySentry";
 
         // Events
         private string EVENT_ONE_TURRET_DESTROYED = "OneTurretDestroyed";
@@ -58,6 +62,7 @@ namespace Game
         private const string EVENT_ALT_FIRED = "AltFired";
         private const string EVENT_CORE_DEAD = "CoreDeadTriggerPostTrenchRun";
         private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
+        private const string EVENT_SENTRY_SPAWNED = "SentrySpawnedTrench";
 
         // Fading
         private bool EPressed = false;
@@ -69,6 +74,7 @@ namespace Game
         [SerializeField] private float fadeUpTime = 1.0f;
         [SerializeField] private float uiStartFadePos = 360.0f;
         [SerializeField] private float switchTime = 0.5f;
+        [SerializeField] private float sentrySummonFadeOutTime = 1.0f;
 
         // Collect Upgrade Tooltip fading (dedicated timers to avoid interfering with state machine)
         //private bool showCollectUI = false;
@@ -85,6 +91,7 @@ namespace Game
         private bool altUsed = false;
         private bool altFireShown = false;
         private bool hasCollectedUpgrade = false;
+        private bool hasSummonedSentry = false;
 
         private Vector3 wallPos = new Vector3(0.0f, 0.0f, 0.0f);
 
@@ -103,6 +110,7 @@ namespace Game
             altFireID = SceneFindEntityByName(altFireName);
             proceedID = SceneFindEntityByName(proceedName);
             collectUpgradeModuleID = SceneFindEntityByName(collectUpgradeModuleName);
+            sentrySummonID = SceneFindEntityByName(sentrySummonName);
 
 
             if (ProgressTracker.SkipTutorialLevel1)
@@ -124,6 +132,7 @@ namespace Game
             SpriteRenderer.SetIsVisible(altFireID, false);
             SpriteRenderer.SetIsVisible(proceedID, false);
             SpriteRenderer.SetIsVisible(collectUpgradeModuleID, false);
+            SpriteRenderer.SetIsVisible(sentrySummonID, false);
 
             wallPos = Transform.GetPosition(wallID);
 
@@ -133,6 +142,7 @@ namespace Game
             Subscribe(EVENT_ALT_FIRED, OnAltFired);
             Subscribe(EVENT_CORE_DEAD, OnCoreDeath);
             Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
+            Subscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -182,6 +192,10 @@ namespace Game
                     HandleCollectUpgradeModuleState(deltaTime);
                     break;
 
+                case TutorialState.SummonSentry:
+                    HandleSummonSentryState(deltaTime);
+                    break;
+
                 default:
                     break;
             }
@@ -195,6 +209,7 @@ namespace Game
             Unsubscribe(EVENT_ALT_FIRED, OnAltFired);
             Unsubscribe(EVENT_CORE_DEAD, OnCoreDeath);
             Unsubscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
+            Unsubscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
         }
 
         private void HandleMoveState(Vector3 currentPos, float dt)
@@ -405,12 +420,36 @@ namespace Game
                     fadeUpElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     hasCollectedUpgrade = false;
-                    currentState = TutorialState.Wait;
+                    currentState = TutorialState.SummonSentry;
                 }
             }
             else
             {
                 ShowCollectUpgradeUI(true, dt);
+            }
+        }
+
+        private void HandleSummonSentryState(float dt)
+        {
+            if (IsKeyPressed(KeyCode.E)) hasSummonedSentry = true; // Dismiss this tooltip
+
+            if (hasSummonedSentry)
+            {
+                ShowSentrySummonUI(false, dt);
+
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    SpriteRenderer.FadeIn(sentrySummonID, 1.0f, 1.0f); // Reset alpha
+                    SpriteRenderer.SetIsVisible(sentrySummonID, false);
+                    fadeUpElapsed = 0.0f;
+                    fadeOutElapsed = 0.0f;
+                    hasSummonedSentry = false;
+                    currentState = TutorialState.Wait;
+                }
+            }
+            else
+            {
+                ShowSentrySummonUI(true, dt);
             }
         }
 
@@ -526,6 +565,13 @@ namespace Game
             fadeOutElapsed = 0.0f;
         }
 
+        private void OnSentrySpawned(string eventName, string payload)
+        {
+            hasSummonedSentry = true;
+            fadeUpElapsed = 0.0f;
+            fadeOutElapsed = 0.0f;
+        }
+
         private void ShowCollectUpgradeUI(bool value, float dt)
         {
             if (value)
@@ -547,6 +593,30 @@ namespace Game
 
                 if (fadeOutElapsed > fadeOutTime)
                     SpriteRenderer.SetIsVisible(collectUpgradeModuleID, false);
+            }
+        }
+
+        private void ShowSentrySummonUI(bool value, float dt)
+        {
+            if (value)
+            {
+                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                SpriteRenderer.FadeIn(sentrySummonID, fadeUpElapsed, fadeUpTime);
+
+                Vector3 newPos = Transform.GetPosition(sentrySummonID);
+                newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
+                Transform.SetPosition(sentrySummonID, ref newPos);
+
+                if (!SpriteRenderer.GetIsVisible(sentrySummonID))
+                    SpriteRenderer.SetIsVisible(sentrySummonID, true);
+            }
+            else
+            {
+                fadeOutElapsed += dt;
+                SpriteRenderer.FadeOut(sentrySummonID, fadeOutElapsed, sentrySummonFadeOutTime);
+
+                if (fadeOutElapsed > sentrySummonFadeOutTime)
+                    SpriteRenderer.SetIsVisible(sentrySummonID, false);
             }
         }
     }
