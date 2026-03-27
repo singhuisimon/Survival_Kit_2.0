@@ -986,7 +986,7 @@ namespace Engine
 			auto& dstTag = duplicate.AddComponent<TagComponent>();
 			dstTag.Name = srcTag.Name + (newParent ? "" : " (Copy)");
 			dstTag.Tag = srcTag.Tag;
-			dstTag.ComponentGUID.GenerateGUID();
+			dstTag.ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		// Copy TransformComponent
@@ -997,7 +997,7 @@ namespace Engine
 			dstTransform.Rotation = srcTransform.Rotation;
 			dstTransform.Scale = srcTransform.Scale;
 			dstTransform.IsDirty = true;
-			dstTransform.ComponentGUID.GenerateGUID();
+			dstTransform.ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 
 			// Set parent if provided
 			if (newParent && newParent.HasComponent<TransformComponent>()) {
@@ -1015,62 +1015,79 @@ namespace Engine
 
 		if (source.HasComponent<CameraComponent>()) {
 			duplicate.AddComponent<CameraComponent>() = source.GetComponent<CameraComponent>();
-			duplicate.GetComponent<CameraComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<CameraComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<LightComponent>()) {
 			duplicate.AddComponent<LightComponent>() = source.GetComponent<LightComponent>();
-			duplicate.GetComponent<LightComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<LightComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 		if (source.HasComponent<ListenerComponent>()) {
 			duplicate.AddComponent<ListenerComponent>() = source.GetComponent<ListenerComponent>();
-			duplicate.GetComponent<ListenerComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<ListenerComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<RigidbodyComponent>()) {
 			duplicate.AddComponent<RigidbodyComponent>() = source.GetComponent<RigidbodyComponent>();
-			duplicate.GetComponent<RigidbodyComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<RigidbodyComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<AudioComponent>()) {
 			duplicate.AddComponent<AudioComponent>() = source.GetComponent<AudioComponent>();
-			duplicate.GetComponent<AudioComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<AudioComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<ScriptComponent>()) {
-			duplicate.AddComponent<ScriptComponent>() = source.GetComponent<ScriptComponent>();
-			duplicate.GetComponent<ScriptComponent>().ComponentGUID.GenerateGUID();
+			//duplicate.AddComponent<ScriptComponent>() = source.GetComponent<ScriptComponent>();
+			///duplicate.GetComponent<ScriptComponent>().ComponentGUID.GenerateGUID();
+			auto& srcScript = source.GetComponent<ScriptComponent>();
+			auto& dstScript = duplicate.AddComponent<ScriptComponent>();
+			dstScript.ScriptClassName = srcScript.ScriptClassName;
+			dstScript.SerializedFields = srcScript.SerializedFields;
+			dstScript.ComponentGUID = xresource::instance_guid::GenerateGUIDCopy(); //new guid
+			dstScript.ScriptInstance = nullptr;
+			dstScript.GCHandle = 0;
+			dstScript.Started = false;
 		}
 
 		if (source.HasComponent<ParticleComponent>()) {
 			duplicate.AddComponent<ParticleComponent>() = source.GetComponent<ParticleComponent>();
-			duplicate.GetComponent<ParticleComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<ParticleComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<AnimatorComponent>()) {
 			duplicate.AddComponent<AnimatorComponent>() = source.GetComponent<AnimatorComponent>();
-			duplicate.GetComponent<AnimatorComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<AnimatorComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<SpriteRendererComponent>()) {
 			duplicate.AddComponent<SpriteRendererComponent>() = source.GetComponent<SpriteRendererComponent>();
-			duplicate.GetComponent<SpriteRendererComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<SpriteRendererComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<ReverbZoneComponent>()) {
 			duplicate.AddComponent<ReverbZoneComponent>() = source.GetComponent<ReverbZoneComponent>();
-			duplicate.GetComponent<ReverbZoneComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<ReverbZoneComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 
 		if (source.HasComponent<TrailComponent>()) {
 			duplicate.AddComponent<TrailComponent>() = source.GetComponent<TrailComponent>();
-			duplicate.GetComponent<TrailComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<TrailComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		if (source.HasComponent<TextComponent>()) {
 			duplicate.AddComponent<TextComponent>() = source.GetComponent<TextComponent>();
-			duplicate.GetComponent<TextComponent>().ComponentGUID.GenerateGUID();
+			duplicate.GetComponent<TextComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
+		}
+
+		if (source.HasComponent<BeamComponent>()) {
+			duplicate.AddComponent<BeamComponent>() = source.GetComponent<BeamComponent>();
+			duplicate.GetComponent<BeamComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
+		}
+		if (source.HasComponent<BehaviourTreeComponent>()) {
+			duplicate.AddComponent<BehaviourTreeComponent>() = source.GetComponent<BehaviourTreeComponent>();
+			duplicate.GetComponent<BehaviourTreeComponent>().ComponentGUID = xresource::instance_guid::GenerateGUIDCopy();
 		}
 
 		// RECURSIVELY DUPLICATE CHILDREN

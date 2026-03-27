@@ -27,6 +27,16 @@ namespace Engine
         bool m_ScrollToBottom = true;
         bool m_AutoScroll = true;
 
+        // search function in log
+        char m_SearchBuffer[256] = {};
+        std::string m_SearchQuery = "";
+        std::vector<int>m_MatchIndices;
+        int m_CurrentMatchIndex = 0;
+        int  m_GotoIndex = 1;
+        int  m_JumpToEntry = -1;
+        bool m_SearchDirty = false;
+        bool m_JumpMatch = false;
+
         ImVec4 GetLevelColor(LogLevel level)
         {
             switch (level) {
@@ -46,6 +56,15 @@ namespace Engine
             // Register ourselves as the logger callback
             Logger::Get().SetCallback([this](LogLevel level, const std::string& msg) {
                 m_Entries.push_back({ level, msg });
+                if (!m_SearchQuery.empty())
+                {
+                    std::string msgLower = msg;
+                    std::string queryLower = m_SearchQuery;
+                    std::transform(msgLower.begin(), msgLower.end(), msgLower.begin(), ::tolower);
+                    std::transform(queryLower.begin(), queryLower.end(), queryLower.begin(), ::tolower);
+                    if (msgLower.find(queryLower) != std::string::npos)
+                        m_MatchIndices.push_back(static_cast<int>(m_Entries.size()) - 1);
+                }
             });
         }
 
@@ -54,7 +73,13 @@ namespace Engine
             Logger::Get().ClearCallback();
         }
 
-        void Clear() { m_Entries.clear(); }
+        void Clear() { 
+            m_Entries.clear();
+            m_MatchIndices.clear();
+            m_CurrentMatchIndex = 0;
+            m_SearchBuffer[0] = '\0';
+            m_SearchQuery.clear();
+        }
         void LogPanel();
 
     };

@@ -145,7 +145,7 @@ namespace Engine
                         if (registry.valid(parentEntity) && registry.all_of<TransformComponent>(parentEntity)) {
                             auto& parent_transform = registry.get<TransformComponent>(parentEntity);
 
-                            // Convert world to local: local = parent_inverse × world
+                            // Convert world to local: local = parent_inverse ï¿½ world
                             glm::mat4 parent_inverse = glm::inverse(parent_transform.WorldTransform);
                             glm::mat4 newLocalTransform = parent_inverse * transform;
 
@@ -205,7 +205,7 @@ namespace Engine
                             parentRotationMatrix[2] = glm::normalize(glm::vec3(parent_transform.WorldTransform[2]));
                             glm::quat parentWorldRotation = glm::quat_cast(parentRotationMatrix);
 
-                            // Local rotation = parent_world_inverse × world_rotation
+                            // Local rotation = parent_world_inverse ï¿½ world_rotation
                             tc.Rotation = glm::inverse(parentWorldRotation) * newWorldRotation;
                         }
                     }
@@ -476,6 +476,18 @@ namespace Engine
                 }
                 activeScene->GetRegistry().clear();
                 activeScene->LoadFromFile(m_OriginalScenePath);
+                // Re-sync AudioManager editorCap from the reloaded scene; Stop() uses the direct C++ LoadFromFile
+                // path which skips the InternalCall that normally applies audio settings, causing the mixer to drift.
+                if (AudioManager* am = m_Editor->GetAudioManager())
+                {
+                    const auto& s = activeScene->GetSceneSetting();
+                    am->SetEditorCap(AudioType::MASTER,   s.s_MasterVolume);
+                    am->SetEditorCap(AudioType::SFX,      s.s_SFXVolume);
+                    am->SetEditorCap(AudioType::BGM,      s.s_BGMVolume);
+                    am->SetEditorCap(AudioType::UI,       s.s_UIVolume);
+                    am->SetEditorCap(AudioType::VO,       s.s_VOVolume);
+                    am->SetEditorCap(AudioType::GAMESFX,  s.s_GameSFXVolume);
+                }
                 RestoreEditModeScriptFieldOverrides(activeScene);
                 auto& se = Engine::MonoScriptEngine::GetInstance();
                 se.EnsureAllScriptInstances(activeScene, true);
