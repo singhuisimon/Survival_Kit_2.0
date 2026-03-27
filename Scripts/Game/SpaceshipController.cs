@@ -55,6 +55,7 @@ namespace Game
         [SerializeField("Spawn Period")] private float spawnTimer = 0.05f;
         [SerializeField("Start With Cursor Locked")] private bool startWithCursorLocked = true;
 
+        [SerializeField("Desired Minimum Distance")] private const float toDesiredMin = 1f;
         [SerializeField] private float playerHP = 100.0f;
         [SerializeField] private const float playerOriginalHP = 100.0f;
 
@@ -444,7 +445,7 @@ namespace Game
             Vector3 camTarget  = desiredCamPos;
             Vector3 toDesired  = desiredCamPos - predictedPlayerPos;
             float   desiredDist = toDesired.Magnitude;
-            if (desiredDist > 1e-4f)
+            if (desiredDist > toDesiredMin)
             {
                 Vector3 castDir = toDesired / desiredDist;
                 if (Physics.SphereCast(predictedPlayerPos, castDir, cameraCollisionRadius,
