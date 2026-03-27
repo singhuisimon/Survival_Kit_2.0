@@ -5,6 +5,7 @@ using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Camera;
 using static Engine.Input;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -18,7 +19,10 @@ namespace Game
             DestroyTurret, // Show destroy turret
             DestroyEnemies, // Show destroy enemies
             Wait,
-            AltFire
+            AltFire,
+            CollectUpgradeModule, //Show collect upgrade tooltip
+            SummonSentry    // Show sentry summon tooltip
+
         }
 
         private TutorialState currentState = TutorialState.Move;
@@ -31,6 +35,8 @@ namespace Game
         private uint destroyEnemiesID; // UI_DestroyEnemies
         private uint altFireID; // UI_AltFire
         private uint proceedID; // UI_E_ToProceed
+        private uint collectUpgradeModuleID; //UI_CollectUpgradeModule
+        private uint sentrySummonID;
 
         // Entity IDs - Player, Wall
         private uint playerID;
@@ -46,12 +52,17 @@ namespace Game
         [SerializeField] private string destroyEnemiesName = "UI_DestroyEnemies";
         [SerializeField] private string altFireName = "UI_AltFire";
         [SerializeField] private string proceedName = "UI_E_ToProceed";
+        [SerializeField] private string collectUpgradeModuleName = "UI_CollectUpgradeModule";
+        [SerializeField] private string sentrySummonName = "UI_CombatAbilitySentry";
 
         // Events
         private string EVENT_ONE_TURRET_DESTROYED = "OneTurretDestroyed";
         private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
         private const string EVENT_ULT_CHARGED = "UltCharged";
         private const string EVENT_ALT_FIRED = "AltFired";
+        private const string EVENT_CORE_DEAD = "CoreDeadTriggerPostTrenchRun";
+        private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
+        private const string EVENT_SENTRY_SPAWNED = "SentrySpawnedTrench";
 
         // Fading
         private bool EPressed = false;
@@ -63,6 +74,13 @@ namespace Game
         [SerializeField] private float fadeUpTime = 1.0f;
         [SerializeField] private float uiStartFadePos = 360.0f;
         [SerializeField] private float switchTime = 0.5f;
+        [SerializeField] private float sentrySummonFadeOutTime = 1.0f;
+
+        // Collect Upgrade Tooltip fading (dedicated timers to avoid interfering with state machine)
+        //private bool showCollectUI = false;
+        //private bool hideCollectUI = false;
+        //private float collectFadeUpElapsed = 0.0f;
+        //private float collectFadeOutElapsed = 0.0f;
 
         private bool movedWASD = false;
         private bool movedSpacebar = false;
@@ -72,6 +90,8 @@ namespace Game
         private bool ultCharged = false;
         private bool altUsed = false;
         private bool altFireShown = false;
+        private bool hasCollectedUpgrade = false;
+        private bool hasSummonedSentry = false;
 
         private Vector3 wallPos = new Vector3(0.0f, 0.0f, 0.0f);
 
@@ -89,13 +109,18 @@ namespace Game
             destroyEnemiesID = SceneFindEntityByName(destroyEnemiesName);
             altFireID = SceneFindEntityByName(altFireName);
             proceedID = SceneFindEntityByName(proceedName);
+            collectUpgradeModuleID = SceneFindEntityByName(collectUpgradeModuleName);
+            sentrySummonID = SceneFindEntityByName(sentrySummonName);
 
-            if (skipTutorial)
+
+            if (ProgressTracker.SkipTutorialLevel1)
             {
+                skipTutorial = true;
                 SpriteRenderer.SetIsVisible(pressWASDID, false);
 
             } else
             {
+                skipTutorial = false;
                 SpriteRenderer.SetIsVisible(pressWASDID, true);
             }
 
@@ -106,6 +131,8 @@ namespace Game
             SpriteRenderer.SetIsVisible(destroyEnemiesID, false);
             SpriteRenderer.SetIsVisible(altFireID, false);
             SpriteRenderer.SetIsVisible(proceedID, false);
+            SpriteRenderer.SetIsVisible(collectUpgradeModuleID, false);
+            SpriteRenderer.SetIsVisible(sentrySummonID, false);
 
             wallPos = Transform.GetPosition(wallID);
 
@@ -113,6 +140,9 @@ namespace Game
             Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
             Subscribe(EVENT_ULT_CHARGED, OnUltCharged);
             Subscribe(EVENT_ALT_FIRED, OnAltFired);
+            Subscribe(EVENT_CORE_DEAD, OnCoreDeath);
+            Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
+            Subscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -157,6 +187,15 @@ namespace Game
                 case TutorialState.AltFire:
                     HandleAltFire(deltaTime);
                     break;
+
+                case TutorialState.CollectUpgradeModule:
+                    HandleCollectUpgradeModuleState(deltaTime);
+                    break;
+
+                case TutorialState.SummonSentry:
+                    HandleSummonSentryState(deltaTime);
+                    break;
+
                 default:
                     break;
             }
@@ -168,6 +207,9 @@ namespace Game
             Unsubscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
             Unsubscribe(EVENT_ULT_CHARGED, OnUltCharged);
             Unsubscribe(EVENT_ALT_FIRED, OnAltFired);
+            Unsubscribe(EVENT_CORE_DEAD, OnCoreDeath);
+            Unsubscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
+            Unsubscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
         }
 
         private void HandleMoveState(Vector3 currentPos, float dt)
@@ -367,6 +409,50 @@ namespace Game
             }
         }
 
+        private void HandleCollectUpgradeModuleState(float dt)
+        {
+            if (hasCollectedUpgrade)
+            {
+                ShowCollectUpgradeUI(false, dt);
+
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    fadeUpElapsed = 0.0f;
+                    fadeOutElapsed = 0.0f;
+                    hasCollectedUpgrade = false;
+                    currentState = TutorialState.SummonSentry;
+                }
+            }
+            else
+            {
+                ShowCollectUpgradeUI(true, dt);
+            }
+        }
+
+        private void HandleSummonSentryState(float dt)
+        {
+            if (IsKeyPressed(KeyCode.E)) hasSummonedSentry = true; // Dismiss this tooltip
+
+            if (hasSummonedSentry)
+            {
+                ShowSentrySummonUI(false, dt);
+
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    SpriteRenderer.FadeIn(sentrySummonID, 1.0f, 1.0f); // Reset alpha
+                    SpriteRenderer.SetIsVisible(sentrySummonID, false);
+                    fadeUpElapsed = 0.0f;
+                    fadeOutElapsed = 0.0f;
+                    hasSummonedSentry = false;
+                    currentState = TutorialState.Wait;
+                }
+            }
+            else
+            {
+                ShowSentrySummonUI(true, dt);
+            }
+        }
+
         // UI Functions
         private void ShowUI(uint entityID, bool value, float dt)
         {
@@ -452,6 +538,86 @@ namespace Game
         private void OnAltFired(string eventName, string payload)
         {
             altUsed = true;
+        }
+
+        private void OnCoreDeath(string eventName, string payload)
+        {
+            // Force hide all other tooltips in case player never dismissed them
+            SpriteRenderer.SetIsVisible(pressWASDID, false);
+            SpriteRenderer.SetIsVisible(pressFlyTunnelID, false);
+            SpriteRenderer.SetIsVisible(pressShootID, false);
+            SpriteRenderer.SetIsVisible(destroyTurretID, false);
+            SpriteRenderer.SetIsVisible(destroyEnemiesID, false);
+            SpriteRenderer.SetIsVisible(altFireID, false);
+            SpriteRenderer.SetIsVisible(proceedID, false);
+
+            // Reset timers and transition to collect upgrade state
+            EPressed = false;
+            fadeUpElapsed = 0.0f;
+            fadeOutElapsed = 0.0f;
+            currentState = TutorialState.CollectUpgradeModule;
+        }
+
+        private void OnCollectPayload(string eventName, string payload)
+        {
+            hasCollectedUpgrade = true;
+            fadeUpElapsed = 0.0f;
+            fadeOutElapsed = 0.0f;
+        }
+
+        private void OnSentrySpawned(string eventName, string payload)
+        {
+            hasSummonedSentry = true;
+            fadeUpElapsed = 0.0f;
+            fadeOutElapsed = 0.0f;
+        }
+
+        private void ShowCollectUpgradeUI(bool value, float dt)
+        {
+            if (value)
+            {
+                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                SpriteRenderer.FadeIn(collectUpgradeModuleID, fadeUpElapsed, fadeUpTime);
+
+                Vector3 newPos = Transform.GetPosition(collectUpgradeModuleID);
+                newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
+                Transform.SetPosition(collectUpgradeModuleID, ref newPos);
+
+                if (!SpriteRenderer.GetIsVisible(collectUpgradeModuleID))
+                    SpriteRenderer.SetIsVisible(collectUpgradeModuleID, true);
+            }
+            else
+            {
+                fadeOutElapsed += dt;
+                SpriteRenderer.FadeOut(collectUpgradeModuleID, fadeOutElapsed, fadeOutTime);
+
+                if (fadeOutElapsed > fadeOutTime)
+                    SpriteRenderer.SetIsVisible(collectUpgradeModuleID, false);
+            }
+        }
+
+        private void ShowSentrySummonUI(bool value, float dt)
+        {
+            if (value)
+            {
+                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                SpriteRenderer.FadeIn(sentrySummonID, fadeUpElapsed, fadeUpTime);
+
+                Vector3 newPos = Transform.GetPosition(sentrySummonID);
+                newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
+                Transform.SetPosition(sentrySummonID, ref newPos);
+
+                if (!SpriteRenderer.GetIsVisible(sentrySummonID))
+                    SpriteRenderer.SetIsVisible(sentrySummonID, true);
+            }
+            else
+            {
+                fadeOutElapsed += dt;
+                SpriteRenderer.FadeOut(sentrySummonID, fadeOutElapsed, sentrySummonFadeOutTime);
+
+                if (fadeOutElapsed > sentrySummonFadeOutTime)
+                    SpriteRenderer.SetIsVisible(sentrySummonID, false);
+            }
         }
     }
 }

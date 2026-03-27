@@ -94,6 +94,10 @@ namespace Engine {
 		void SetPlayerVolume(AudioType type, float volume);
 		float GetPlayerVolume(AudioType type) const;
 
+		// Project-level audio settings (replaces per-scene audio caps)
+		void LoadProjectAudioSettings();
+		void SaveProjectAudioSettings();
+
 		void ApplyBusVolume(AudioType type);
 		void ApplyAllBusVolumes();
 

@@ -473,13 +473,7 @@ namespace Engine
 					s_Renderer->getExposure() = s_CurrentScene->GetSceneSetting().s_Exposure;
 					s_Renderer->getGlobalBias() = s_CurrentScene->GetSceneSetting().s_GlobalBias;
 
-					//adding in the audio
-					s_AudioManager->SetEditorCap(AudioType::MASTER, s_CurrentScene->GetSceneSetting().s_MasterVolume);
-					s_AudioManager->SetEditorCap(AudioType::SFX, s_CurrentScene->GetSceneSetting().s_SFXVolume);
-					s_AudioManager->SetEditorCap(AudioType::BGM, s_CurrentScene->GetSceneSetting().s_BGMVolume);
-					s_AudioManager->SetEditorCap(AudioType::UI, s_CurrentScene->GetSceneSetting().s_UIVolume);
-					s_AudioManager->SetEditorCap(AudioType::VO, s_CurrentScene->GetSceneSetting().s_VOVolume);
-					s_AudioManager->SetEditorCap(AudioType::GAMESFX, s_CurrentScene->GetSceneSetting().s_GameSFXVolume);
+					// Audio mixer caps are project-wide; no longer overridden per scene load.
 				}
 				
 			}
@@ -1503,6 +1497,41 @@ namespace Engine
 
 			*a = (uint32_t)evs[index].entA;
 			*b = (uint32_t)evs[index].entB;
+		}
+
+		/**************************************************************************
+		 * @brief
+		 * Sweeps a sphere through the scene and returns the closest hit.
+		 * @param origin       World-space start position of the sphere centre.
+		 * @param direction    Cast direction (normalised internally).
+		 * @param radius       Sphere radius in metres (> 0).
+		 * @param maxDistance  Maximum cast length in metres.
+		 * @param outEntityID  Entity that was hit.
+		 * @param outPoint     World-space contact point on the hit surface.
+		 * @param outNormal    World-space surface normal pointing toward the caster.
+		 * @param outFraction  [0..1] fraction along (direction * maxDistance).
+		 * @return             True if any body was hit, false otherwise.
+		***************************************************************************/
+		bool Physics_SphereCast(glm::vec3 *origin, glm::vec3 *direction,
+		                        float radius, float maxDistance,
+		                        uint32_t excludeEntityID,
+		                        uint32_t *outEntityID, glm::vec3 *outPoint,
+		                        glm::vec3 *outNormal, float *outFraction)
+		{
+			if (!origin || !direction || !outEntityID || !outPoint || !outNormal || !outFraction)
+				return false;
+
+			EntityID excludeEntity = static_cast<EntityID>(excludeEntityID);
+
+			SphereCastHit hit{};
+			if (!PhysicsAPI::SphereCast(*origin, *direction, radius, maxDistance, hit, excludeEntity))
+				return false;
+
+			*outEntityID = static_cast<uint32_t>(hit.entity);
+			*outPoint    = hit.point;
+			*outNormal   = hit.normal;
+			*outFraction = hit.fraction;
+			return true;
 		}
 
 		// =====================================================================
