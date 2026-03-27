@@ -625,6 +625,24 @@ namespace Engine {
 		 * pair.
 		***************************************************************************/
 		void Physics_GetCollisionPair(int index, uint32_t *a, uint32_t *b);
+		/**************************************************************************
+		 * @brief
+		 * Sweeps a sphere through the scene and returns the closest hit.
+		 * @param origin       World-space start position of the sphere centre.
+		 * @param direction    Cast direction (normalised internally).
+		 * @param radius       Sphere radius (metres, > 0).
+		 * @param maxDistance  Maximum cast length (metres).
+		 * @param outEntityID  Entity that was hit (entt::null cast to uint32 on miss).
+		 * @param outPoint     World-space contact point on the hit surface.
+		 * @param outNormal    World-space surface normal pointing toward the caster.
+		 * @param outFraction  [0..1] fraction along (direction * maxDistance).
+		 * @return             True if any body was hit, false otherwise.
+		***************************************************************************/
+		bool Physics_SphereCast(glm::vec3 *origin, glm::vec3 *direction,
+		                        float radius, float maxDistance,
+		                        uint32_t excludeEntityID,
+		                        uint32_t *outEntityID, glm::vec3 *outPoint,
+		                        glm::vec3 *outNormal, float *outFraction);
 
 		// ===== Entity / component adders =====
 		/**************************************************************************
