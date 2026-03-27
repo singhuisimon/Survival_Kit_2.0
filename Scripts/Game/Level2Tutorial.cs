@@ -33,6 +33,9 @@ namespace Game
         private const string wormHostPrefabPath = "Sources/Prefabs/WormHost.prefab";
         [SerializeField] private string enemyPrefabPath;
 
+        private uint tutorialbotnetID = 0;
+        private uint tutorialwormID = 0;
+        private uint tutorialloveletterID = 0;
 
         // ================ Audio ==========================
         private const string warpingInPrefab = "Sources/Prefabs/Loveletter_warping.prefab";
@@ -56,7 +59,7 @@ namespace Game
         [SerializeField] private bool tutorialover = false;
         private int tutorialstate = 0;
         private float tutorialSpawnInterval = 0.0f;
-        [SerializeField] private float tutorialCountdown = 0.5f; // Have a short delay at the start
+        [SerializeField] private float tutorialCountdown = 0.0f; // Have a short delay at the start
         private const uint INVALID_ENTITY = 0xffffffffu;
 
         // ============== RNG Setting =================
@@ -99,7 +102,10 @@ namespace Game
             if(!tutorialover){
 
                 // Complete tutorial if loveletter is destroyed
-                if (tutorialstate > 2 && SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
+                if (tutorialstate > 2 && 
+                   SceneFindEntityByName("botnet") == INVALID_ENTITY &&
+                   SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
+                   SceneFindEntityByName("loveletter") == INVALID_ENTITY) {
                     tutorialover = true;
                     Publish(EVENT_TUTORIALOVER, "");
                 }
@@ -113,7 +119,10 @@ namespace Game
 
                 // Spawn enemy
                 if(tutorialCountdown <= 0.0f){
-                    SpawnTutorialOnWall();
+                    for (int i = 0; i < 3; i++)
+                    {
+                        SpawnTutorialOnWall();
+                    }
                 } 
 
                 return; // return once fin first tutorial
@@ -335,15 +344,18 @@ namespace Game
             //Instantiate audio if needed
             if(enemyDex == 0){
                 currentBotnetSpawned++;
-                Publish("BotnetTutorialSpawn", enemyID.ToString());
+                tutorialbotnetID = enemyID;
             }
             else if(enemyDex == 1){
                 currentWormSpawned++;
-                Publish("WormTutorialSpawn", enemyID.ToString());
+                tutorialwormID = enemyID;
             }
             else if(enemyDex == 2){
                 currentLoveletterSpawned++;
-                Publish("LoveletterTutorialSpawn", enemyID.ToString());
+                tutorialloveletterID = enemyID;
+                Publish("BotnetTutorialSpawn", tutorialbotnetID.ToString());
+                Publish("WormTutorialSpawn", tutorialwormID.ToString());
+                Publish("LoveletterTutorialSpawn", tutorialloveletterID.ToString());
                 //spawn warping in audio
                 Vector3 scale = new Vector3(0.1f, 0.1f, 0.1f);
                 uint warpingInID = PrefabInstantiateWithTransform(warpingInPrefab, ref spawnPos, ref spawnRot, ref scale, false);
