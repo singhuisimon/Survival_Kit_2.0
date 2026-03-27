@@ -226,6 +226,8 @@ namespace Engine
 						if(AudioManager* audioManager = m_Editor->GetAudioManager())
 						{
 							const auto& settings = newScene->GetSceneSetting();
+							// MASTER was previously missing here, causing it to carry over from the old scene instead of loading the new scene's value.
+							audioManager->SetEditorCap(AudioType::MASTER,  settings.s_MasterVolume);
 							audioManager->SetEditorCap(AudioType::SFX, settings.s_SFXVolume);
 							audioManager->SetEditorCap(AudioType::BGM, settings.s_BGMVolume);
 							audioManager->SetEditorCap(AudioType::UI, settings.s_UIVolume);
