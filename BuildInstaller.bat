@@ -49,7 +49,7 @@ echo ===========================================
 echo [INSTALLER] Step 2/5: Building
 echo ===========================================
 
-call BuildJenkins.bat
+call BuildJenkinsRelease.bat
 if %ERRORLEVEL% NEQ 0 (echo [ERROR] Build failed & exit /b %ERRORLEVEL%)
 
 echo [OK] Build complete.

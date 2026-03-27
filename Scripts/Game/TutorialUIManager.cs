@@ -5,6 +5,7 @@ using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Camera;
 using static Engine.Input;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -90,12 +91,14 @@ namespace Game
             altFireID = SceneFindEntityByName(altFireName);
             proceedID = SceneFindEntityByName(proceedName);
 
-            if (skipTutorial)
+            if (ProgressTracker.SkipTutorialLevel1)
             {
+                skipTutorial = true;
                 SpriteRenderer.SetIsVisible(pressWASDID, false);
 
             } else
             {
+                skipTutorial = false;
                 SpriteRenderer.SetIsVisible(pressWASDID, true);
             }
 
