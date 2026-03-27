@@ -26,8 +26,8 @@ namespace Game
         private const string EVENTENEMYCOREDEATH = "EnemyCoreDeath";
         private const string EVENTGAMEWIN = "GameWin";
 
-        private const float FLASHDURATION = 0.1f;
-        private const float LERPDURATION = 0.1f;
+        private const float FLASHDURATION = 0.05f;
+        private const float LERPDURATION = 0.05f;
 
         // Bar settings
         private float barMaxWidth;

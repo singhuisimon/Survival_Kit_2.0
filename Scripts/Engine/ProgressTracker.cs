@@ -5,24 +5,31 @@ using static Engine.Event;
 namespace Engine
 {
     /// <summary>
-    /// Tracks which levels the player has won. Persists across sessions via progress.json.
+    /// Tracks which levels the player has won, tutorial skip preferences,
+    /// and shop/score state. Persists across sessions via progress.json.
     /// </summary>
     public static class ProgressTracker
     {
         private const string SAVEFILE = "Resources/Sources/SaveData/progress.json";
 
+        // Level wins
         public static bool HasWonTrenchRun { get; private set; } = false;
         public static bool HasWonLevel2 { get; private set; } = false;
         public static bool HasWonLevel3 { get; private set; } = false;
 
+        // Tutorial skip per level
+        public static bool SkipTutorialLevel1 { get; set; } = false;
+        public static bool SkipTutorialLevel2 { get; set; } = false;
+        public static bool SkipTutorialLevel3 { get; set; } = false;
+
+        // Score
         public static int CumulativeScore { get; set; } = 0;
 
-        // Shop state - skin purchases and equipped skin (0 = default, 1 = skin 1, 2 = skin 2)
+        // Shop state
         public static bool Skin1Purchased { get; set; } = false;
         public static bool Skin2Purchased { get; set; } = false;
         public static bool Skin3Purchased { get; set; } = false;
         public static int EquippedSkin { get; set; } = 0;
-
         public static int ByteChips { get; set; } = 0;
 
         // ByteChips pack purchase tracking
@@ -37,6 +44,9 @@ namespace Engine
             HasWonTrenchRun = false;
             HasWonLevel2 = false;
             HasWonLevel3 = false;
+            SkipTutorialLevel1 = false;
+            SkipTutorialLevel2 = false;
+            SkipTutorialLevel3 = false;
             CumulativeScore = 0;
             Skin1Purchased = false;
             Skin2Purchased = false;
@@ -60,12 +70,14 @@ namespace Engine
                 LogMessage("ProgressTracker: Loaded progress: " + json);
 
                 // Parse level wins
-                if (json.Contains("\"trench_run_won\":true") || json.Contains("\"trench_run_won\": true"))
-                    HasWonTrenchRun = true;
-                if (json.Contains("\"level2_won\":true") || json.Contains("\"level2_won\": true"))
-                    HasWonLevel2 = true;
-                if (json.Contains("\"level3_won\":true") || json.Contains("\"level3_won\": true"))
-                    HasWonLevel3 = true;
+                if (json.Contains("\"trench_run_won\":true") || json.Contains("\"trench_run_won\": true")) HasWonTrenchRun = true;
+                if (json.Contains("\"level2_won\":true") || json.Contains("\"level2_won\": true")) HasWonLevel2 = true;
+                if (json.Contains("\"level3_won\":true") || json.Contains("\"level3_won\": true")) HasWonLevel3 = true;
+
+                // Parse tutorial skips
+                if (json.Contains("\"skip_tutorial_1\":true") || json.Contains("\"skip_tutorial_1\": true")) SkipTutorialLevel1 = true;
+                if (json.Contains("\"skip_tutorial_2\":true") || json.Contains("\"skip_tutorial_2\": true")) SkipTutorialLevel2 = true;
+                if (json.Contains("\"skip_tutorial_3\":true") || json.Contains("\"skip_tutorial_3\": true")) SkipTutorialLevel3 = true;
 
                 // Parse cumulative_score
                 int csIdx = json.IndexOf("\"cumulative_score\"");
@@ -126,6 +138,9 @@ namespace Engine
                 LogMessage("ProgressTracker: HasWonTrenchRun=" + HasWonTrenchRun +
                            " HasWonLevel2=" + HasWonLevel2 +
                            " HasWonLevel3=" + HasWonLevel3 +
+                           " SkipTutorial1=" + SkipTutorialLevel1 +
+                           " SkipTutorial2=" + SkipTutorialLevel2 +
+                           " SkipTutorial3=" + SkipTutorialLevel3 +
                            " CumulativeScore=" + CumulativeScore +
                            " ByteChips=" + ByteChips +
                            " EquippedSkin=" + EquippedSkin);
@@ -141,12 +156,10 @@ namespace Engine
         {
             LogMessage("ProgressTracker: Marking level won: " + levelName);
             LoadProgress();
-
             if (levelName == "trenchrun") HasWonTrenchRun = true;
             else if (levelName == "level2") HasWonLevel2 = true;
             else if (levelName == "level3") HasWonLevel3 = true;
             else LogMessage("ProgressTracker: Unknown level name: " + levelName);
-
             SaveProgress();
         }
 
@@ -165,6 +178,9 @@ namespace Engine
             HasWonTrenchRun = false;
             HasWonLevel2 = false;
             HasWonLevel3 = false;
+            SkipTutorialLevel1 = false;
+            SkipTutorialLevel2 = false;
+            SkipTutorialLevel3 = false;
             CumulativeScore = 0;
             Skin1Purchased = false;
             Skin2Purchased = false;
@@ -175,7 +191,6 @@ namespace Engine
             BytePack2Bought = false;
             BytePack3Bought = false;
             BytePack4Bought = false;
-
             LogMessage("ProgressTracker: All progress reset");
             SaveProgress();
             Event.Publish("ProgressReset", "");
@@ -199,6 +214,9 @@ namespace Engine
                     "\"trench_run_won\":" + (HasWonTrenchRun ? "true" : "false") + "," +
                     "\"level2_won\":" + (HasWonLevel2 ? "true" : "false") + "," +
                     "\"level3_won\":" + (HasWonLevel3 ? "true" : "false") + "," +
+                    "\"skip_tutorial_1\":" + (SkipTutorialLevel1 ? "true" : "false") + "," +
+                    "\"skip_tutorial_2\":" + (SkipTutorialLevel2 ? "true" : "false") + "," +
+                    "\"skip_tutorial_3\":" + (SkipTutorialLevel3 ? "true" : "false") + "," +
                     "\"cumulative_score\":" + CumulativeScore + "," +
                     "\"skin1_purchased\":" + (Skin1Purchased ? "true" : "false") + "," +
                     "\"skin2_purchased\":" + (Skin2Purchased ? "true" : "false") + "," +

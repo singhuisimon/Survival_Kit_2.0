@@ -1,0 +1,114 @@
+@echo off
+setlocal
+
+REM ===========================================
+REM BuildJenkinsRelease.bat - Release-Only CI Build Script
+REM No pauses, no interactive prompts
+REM ===========================================
+
+cd /d %~dp0
+
+REM ===========================================
+REM Build GameScripts.dll (Release only)
+REM ===========================================
+echo ===========================================
+echo [CI] Building C# Scripts (Release)
+echo ===========================================
+echo.
+
+set DOTNET_ROOT=%CD%\External\dotnet
+set PATH=%DOTNET_ROOT%;%PATH%
+set DOTNET_MULTILEVEL_LOOKUP=0
+set DOTNET_CLI_TELEMETRY_OPTOUT=1
+
+if not exist "%DOTNET_ROOT%\dotnet.exe" (
+    echo [CI ERROR] dotnet.exe not found at %DOTNET_ROOT%
+    exit /b 1
+)
+
+REM Ensure output directory exists
+if not exist "build\bin\Release" mkdir "build\bin\Release"
+
+REM Build Release - output directly to build\bin\Release\
+echo.
+echo --- [CI] Building Release (GameScripts.dll) ---
+"%DOTNET_ROOT%\dotnet.exe" build Scripts\GameScripts.csproj -c Release --ignore-failed-sources -nologo -v:m -o "build\bin\Release"
+if %ERRORLEVEL% NEQ 0 (
+    echo [CI ERROR] Release GameScripts build failed!
+    exit /b %ERRORLEVEL%
+)
+
+REM Verify Release DLL was produced
+if not exist "build\bin\Release\GameScripts.dll" (
+    echo [CI ERROR] Release GameScripts.dll was not produced!
+    echo [CI] Searching for it...
+    dir /s /b GameScripts.dll 2>nul
+    exit /b 1
+)
+echo [CI] Release GameScripts.dll OK
+
+REM ===========================================
+REM Build C++ Game Engine (Release only)
+REM ===========================================
+echo.
+echo ===========================================
+echo [CI] GameEngine - Build Release Configuration
+echo ===========================================
+echo.
+
+if not exist "build" (
+    echo [CI] Creating build directory...
+    mkdir build
+)
+
+cd build
+
+echo [CI] Generating Visual Studio solution...
+cmake .. -G "Visual Studio 17 2022" -A x64
+if %ERRORLEVEL% NEQ 0 (
+    echo [CI ERROR] CMake generation failed!
+    exit /b %ERRORLEVEL%
+)
+
+echo.
+echo --- [CI] Building Release configuration ---
+cmake --build . --config Release -j
+if %ERRORLEVEL% NEQ 0 (
+    echo [CI ERROR] Release build failed!
+    exit /b %ERRORLEVEL%
+)
+
+cd ..
+
+REM ===========================================
+REM Verify all outputs exist
+REM ===========================================
+echo.
+echo [CI] Verifying build outputs...
+
+set BUILD_OK=true
+
+if not exist "build\bin\Release\GameEngine.exe" (
+    echo [CI ERROR] Missing: build\bin\Release\GameEngine.exe
+    set BUILD_OK=false
+)
+if not exist "build\bin\Release\GameScripts.dll" (
+    echo [CI ERROR] Missing: build\bin\Release\GameScripts.dll
+    set BUILD_OK=false
+)
+
+if "%BUILD_OK%"=="false" (
+    echo [CI ERROR] One or more build outputs are missing!
+    exit /b 1
+)
+
+echo.
+echo ===========================================
+echo [CI] Release build completed successfully!
+echo ===========================================
+echo   Release: build\bin\Release\GameEngine.exe
+echo   DLL:     build\bin\Release\GameScripts.dll
+echo.
+
+endlocal
+exit /b 0

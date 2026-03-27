@@ -1237,7 +1237,7 @@ namespace Engine
 
 				ImGui::PushID(static_cast<int>(i));
 
-				// ===== BUTTON =====
+				// ===== BUTTON / THUMBNAIL =====
 				if (ImGui::Button(asset.fileName.c_str(), ImVec2(thumbnailSize, thumbnailSize)))
 				{
 					selectedResourcesIndex = static_cast<int>(i);
@@ -1303,19 +1303,20 @@ namespace Engine
 				{
 					ImGui::BeginTooltip();
 
-					ImGui::Text("Name: %s", asset.fileName.c_str());
-					//ImGui::Text("Path: %s", asset.displayFolder.c_str());
+					//ImGui::Text("Name: %s", asset.fileName.c_str());
+					////ImGui::Text("Path: %s", asset.displayFolder.c_str());
 
-					if (asset.isRawAsset && asset.record)
-					{
-						ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
-						ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
+					//if (asset.isRawAsset && asset.record)
+					//{
+					//	ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+					//	ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
 
-						char timeBuf[64];
-						std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
-						std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
-						ImGui::Text("Last Write Time: %s", timeBuf);
-					}
+					//	char timeBuf[64];
+					//	std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
+					//	std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+					//	ImGui::Text("Last Write Time: %s", timeBuf);
+					//}
+					RenderAssetTooltipPreview(asset);
 					ImGui::EndTooltip();
 				}
 
@@ -1370,12 +1371,8 @@ namespace Engine
 				m_Editor->GetRenderer()->getBloomFilterRadius() = m_Editor->GetActiveScene()->GetSceneSetting().s_BloomFilterRadius;
 				m_Editor->GetRenderer()->getExposure() = m_Editor->GetActiveScene()->GetSceneSetting().s_Exposure;
 
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::MASTER, m_Editor->GetActiveScene()->GetSceneSetting().s_MasterVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::SFX, m_Editor->GetActiveScene()->GetSceneSetting().s_SFXVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::BGM, m_Editor->GetActiveScene()->GetSceneSetting().s_BGMVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::UI, m_Editor->GetActiveScene()->GetSceneSetting().s_UIVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::VO, m_Editor->GetActiveScene()->GetSceneSetting().s_VOVolume);
-				m_Editor->GetAudioManager()->SetEditorCap(AudioType::GAMESFX, m_Editor->GetActiveScene()->GetSceneSetting().s_GameSFXVolume);
+				// Audio mixer caps are project-wide; load from ProjectAudioSettings instead of per-scene values.
+				m_Editor->GetAudioManager()->LoadProjectAudioSettings();
 			}
 
 			// Register prefabs
@@ -1496,7 +1493,7 @@ namespace Engine
 			if (ImGui::IsItemHovered())
 			{
 				ImGui::BeginTooltip();
-				ImGui::Text("Name: %s", asset.fileName.c_str());
+				/*ImGui::Text("Name: %s", asset.fileName.c_str());
 				if (asset.isRawAsset && asset.record)
 				{
 					ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
@@ -1505,7 +1502,8 @@ namespace Engine
 					std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
 					std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
 					ImGui::Text("Last Write: %s", timeBuf);
-				}
+				}*/
+				RenderAssetTooltipPreview(asset);
 				ImGui::EndTooltip();
 			}
 
@@ -1600,6 +1598,10 @@ namespace Engine
 						m_FilteredAssets.end()
 					);
 
+					// delete assets 
+					m_ThumbnailCache.erase(m_AssetToDelete.guid);
+
+
 					if (m_Editor->HasScenePath() && m_Editor->GetScenePath() == m_AssetToDelete.fullPath)
 					{
 						m_Editor->ClearScenePath();
@@ -1625,5 +1627,56 @@ namespace Engine
 			ImGui::EndPopup();
 		}
 
+	}
+
+	void EditorAssetBrowserPanel::RenderAssetTooltipPreview(const DisplayableAsset& asset)
+	{
+		ImGui::Text("Name: %s", asset.fileName.c_str());
+
+		if (asset.isRawAsset && asset.record)
+		{
+			ImGui::Text("Type: %s", resourceTypeToString(asset.record->type).c_str());
+			ImGui::Text("Content Hash: %s", asset.record->contentHash.c_str());
+
+			char timeBuf[64];
+			std::tm* tm_local = std::localtime(&asset.record->lastWriteTime);
+			std::strftime(timeBuf, sizeof(timeBuf), "%Y-%m-%d %H:%M:%S", tm_local);
+			ImGui::Text("Last Write Time: %s", timeBuf);
+
+			// ===== TEXTURE PREVIEW =====
+			if (asset.record->type == ResourceType::TEXTURE)
+			{
+				auto* texture = RM.loadResource<TextureResource>(Engine::convertToTextureGuid(asset.guid));
+				if (texture != nullptr)
+				{
+					ImGui::Separator();
+
+					// Constrain preview size while keeping aspect ratio
+					const float maxPreviewSize = 150.0f;
+					float tex_w = static_cast<float>(texture->width);
+					float tex_h = static_cast<float>(texture->height);
+					float aspect = tex_w / tex_h;
+
+					ImVec2 previewSize;
+					if (aspect >= 1.0f)
+					{
+						previewSize.x = maxPreviewSize;
+						previewSize.y = maxPreviewSize / aspect;
+					}
+					else
+					{
+						previewSize.y = maxPreviewSize;
+						previewSize.x = maxPreviewSize * aspect;
+					}
+
+					ImGui::Text("Preview: (%dx%d)", texture->width, texture->height);
+					ImGui::Image(
+						(ImTextureID)(intptr_t)((GLuint)texture->textureID),
+						previewSize,
+						ImVec2(0, 0), ImVec2(1, 1)
+					);
+				}
+			}
+		}
 	}
 }

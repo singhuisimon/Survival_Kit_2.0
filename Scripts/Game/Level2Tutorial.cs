@@ -6,6 +6,7 @@ using static Engine.Transform;
 using static Engine.Event;
 using static Engine.Prefab;
 using static Engine.MeshRenderer;
+using System.Numerics;
 
 namespace Game
 {
@@ -190,7 +191,7 @@ namespace Game
             }
  
             Vector3 spawnPos = GetRandomPositionOnWall(selectedWidth, wall_height, spawnDistance);
-            Quat spawnRot = GetRotation((uint)EntityID);
+            Quat spawnRot = GetSpawnRotation(spawnPos);
 
             uint enemyID = 0;
             enemyID = PrefabInstantiate(enemyPrefabPath);
@@ -308,7 +309,7 @@ namespace Game
             }
  
             Vector3 spawnPos = GetRandomPositionOnWall(selectedWidth, wall_height, spawnDistance);
-            Quat spawnRot = GetRotation((uint)EntityID);
+            Quat spawnRot = GetSpawnRotation(spawnPos);
 
             uint enemyID = 0;
             enemyID = PrefabInstantiate(enemyPrefabPath);
@@ -347,6 +348,28 @@ namespace Game
                 }
             }
 
+        }
+
+        private Quat GetSpawnRotation(Vector3 spawnPos)
+        {
+            uint coreID = SceneFindEntityByName("SEMICONDUCTOR");
+            Quat Rot = GetRotation((uint)EntityID);
+            if(coreID != 0)
+            {
+                Vector3 corePos = GetPosition(coreID);
+                
+                //Direction vector from spawn point toward core
+                Vector3 dir = corePos - spawnPos;
+                float len = dir.Magnitude;
+
+                if(len > 0.001f)
+                {
+                    dir = dir / len; // Normalize
+                    Rot = SimpleMath.LookRotation(-dir, Vector3.Up);
+                }
+            }
+
+            return Rot;
         }
 
     }

@@ -5,6 +5,7 @@ using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Camera;
 using static Engine.Input;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -88,6 +89,7 @@ namespace Game
         private Vector3 wallPos = new Vector3(0.0f, 0.0f, 0.0f);
 
         private bool wallDestroyedPublished = false;
+        private bool skipTutorial = false;
 
         public override void OnStart()
         {
@@ -103,8 +105,18 @@ namespace Game
             collectUpgradeModuleID = SceneFindEntityByName(collectUpgradeModuleName);
 
 
+            if (ProgressTracker.SkipTutorialLevel1)
+            {
+                skipTutorial = true;
+                SpriteRenderer.SetIsVisible(pressWASDID, false);
+
+            } else
+            {
+                skipTutorial = false;
+                SpriteRenderer.SetIsVisible(pressWASDID, true);
+            }
+
             // Show initial UI
-            SpriteRenderer.SetIsVisible(pressWASDID, true);
             SpriteRenderer.SetIsVisible(pressFlyTunnelID, false);
             SpriteRenderer.SetIsVisible(pressShootID, false);
             SpriteRenderer.SetIsVisible(destroyTurretID, false);
@@ -125,6 +137,12 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            if (skipTutorial)
+            {
+                currentState = TutorialState.Move;
+                return;
+            }
+
             if (GameState.IsPaused)
                 return;
 
