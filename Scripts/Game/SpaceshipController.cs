@@ -20,6 +20,7 @@ namespace Game
     /// - Player rotation applied in FixedUpdate to avoid fighting physics
     /// - Smoothed velocity changes to reduce tunneling risk
     /// - Spawn lock blocks only input; all other controller calculations continue
+    /// - While spawn input is blocked, camera uses an angled overhead shot and blends into gameplay view during the last second
     /// </summary>
     public class SpaceshipController : ScriptBehaviour
     {
@@ -34,6 +35,12 @@ namespace Game
         [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 20.0f;
         [SerializeField("Camera Distance Behind")] private float cameraDistanceBack = 30.0f;
         [SerializeField("Camera Look Distance")] private float cameraLookDistance = 1000.0f;
+
+        // ===== Spawn Lock Camera =====
+        [SerializeField("Spawn Lock Camera Height")] private float spawnLockCameraHeight = 35.0f;
+        [SerializeField("Spawn Lock Camera Look Offset")] private float spawnLockCameraLookOffset = 0.0f;
+        [SerializeField("Spawn Lock Look Down Degrees")] private float spawnLockLookDownDegrees = 70.0f;
+        [SerializeField("Spawn Camera Blend Duration")] private float spawnCameraBlendDuration = 1.0f;
 
         // ===== Camera Movement =====
         [SerializeField("Camera Follow Smooth")] private float cameraFollowSmooth = 1.8f;
@@ -93,6 +100,7 @@ namespace Game
 
         private float controlLockTimer = 0.0f;
         private bool controlsEnabled = false;
+        private bool restoreCameraRotationAfterSpawnLock = false;
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
         [SerializeField] private bool inEnvironment = true;
@@ -170,6 +178,7 @@ namespace Game
 
             controlLockTimer = 0.0f;
             controlsEnabled = spawnTimer <= 0.0f;
+            restoreCameraRotationAfterSpawnLock = false;
 
             RigidbodySetUseGravity(playerEntityID, false);
             RigidbodySetIsKinematic(playerEntityID, false);
@@ -241,6 +250,7 @@ namespace Game
                 if (controlLockTimer >= spawnTimer)
                 {
                     controlsEnabled = true;
+                    restoreCameraRotationAfterSpawnLock = true;
                     LogMessage("[SpaceshipController] Spawn input lock ended");
                 }
             }
@@ -332,6 +342,20 @@ namespace Game
             yawRad = (float)Math.Atan2(-cameraForward.X, -cameraForward.Z);
         }
 
+        private void ApplyCameraRotationFromYawPitch()
+        {
+            Quat qYaw = Quat.FromAxisAngle(Vector3.Up, yawRad);
+            Quat qPitch = Quat.FromAxisAngle(Vector3.Right, pitchRad);
+
+            Quat camRot = (qYaw * qPitch).Normalized();
+
+            cameraForward = camRot.Forward;
+            cameraRight = camRot.Right;
+            cameraUp = camRot.Up;
+
+            SetRotation(cameraEntityID, ref camRot);
+        }
+
         private void HandleCursorToggle()
         {
             if (IsKeyReleased(toggleCursorKey) || IsKeyReleased(KeyCode.Tab))
@@ -357,27 +381,26 @@ namespace Game
             float limit = pitchLimitDegrees * SimpleMath.DEG_TO_RAD;
             pitchRad = SimpleMath.Clamp(pitchRad, -limit, limit);
 
-            Quat qYaw = Quat.FromAxisAngle(Vector3.Up, yawRad);
-            Quat qPitch = Quat.FromAxisAngle(Vector3.Right, pitchRad);
+            ApplyCameraRotationFromYawPitch();
 
-            Quat camRot = (qYaw * qPitch).Normalized();
-
-            cameraForward = camRot.Forward;
-            cameraRight = camRot.Right;
-            cameraUp = camRot.Up;
-
-            SetRotation(cameraEntityID, ref camRot);
-
+            Quat camRot = GetRotation(cameraEntityID);
             Quat modelXOffset = Quat.FromAxisAngle(Vector3.Right, modelXRotationOffset * SimpleMath.DEG_TO_RAD);
             targetPlayerRotation = (camRot * modelXOffset).Normalized();
         }
 
         private void HandleMovementPhysics(float deltaTime)
         {
+            bool inputBlocked = IsSpawnInputBlocked();
+
+            if (!inputBlocked && restoreCameraRotationAfterSpawnLock)
+            {
+                ApplyCameraRotationFromYawPitch();
+                restoreCameraRotationAfterSpawnLock = false;
+            }
+
             GetCameraMoveAxes(out Vector3 camFwd, out Vector3 camRight, out Vector3 camUp);
 
             Vector3 moveDir = Vector3.Zero;
-            bool inputBlocked = IsSpawnInputBlocked();
 
             if (!inputBlocked)
             {
@@ -432,28 +455,87 @@ namespace Game
             Vector3 playerPosNow = GetPosition(playerEntityID);
             Vector3 predictedPlayerPos = playerPosNow + commandedVelocity * deltaTime;
 
-            Vector3 desiredCamPos =
-                predictedPlayerPos
-                - camFwd * cameraDistanceBack
-                + camUp * cameraHeightOffset;
+            UpdateCameraFollow(deltaTime, predictedPlayerPos, camFwd, camRight, camUp, inputBlocked);
+        }
 
-            if (!camFollowInit)
+        private void UpdateCameraFollow(float deltaTime, Vector3 predictedPlayerPos, Vector3 camFwd, Vector3 camRight, Vector3 camUp, bool inputBlocked)
+        {
+            float blockedBlendT = 0.0f;
+            Vector3 spawnLockAimTarget = predictedPlayerPos + Vector3.Up * spawnLockCameraLookOffset;
+            Vector3 gameplayForward = camFwd;
+            Vector3 gameplayRight = camRight;
+            Vector3 gameplayUp = camUp;
+
+            if (inputBlocked)
             {
-                smoothCamPos = GetPosition(cameraEntityID);
-                camFollowInit = true;
+                GetStoredGameplayCameraAxes(out gameplayForward, out gameplayRight, out gameplayUp);
+
+                Vector3 flatForward = new Vector3(gameplayForward.X, 0.0f, gameplayForward.Z);
+                if (flatForward.SqrMagnitude < 1e-8f)
+                    flatForward = Vector3.Forward;
+                else
+                    flatForward = flatForward.Normalized;
+
+                float lookDownDegrees = SimpleMath.Clamp(spawnLockLookDownDegrees, 5.0f, 85.0f);
+                float angleRad = lookDownDegrees * SimpleMath.DEG_TO_RAD;
+                float horizontalOffset = spawnLockCameraHeight / (float)Math.Tan(angleRad);
+
+                Vector3 spawnLockPos =
+                    predictedPlayerPos
+                    - flatForward * horizontalOffset
+                    + Vector3.Up * spawnLockCameraHeight;
+
+                Vector3 gameplayCamPos =
+                    predictedPlayerPos
+                    - gameplayForward * cameraDistanceBack
+                    + gameplayUp * cameraHeightOffset;
+
+                float blendDuration = spawnCameraBlendDuration;
+                if (blendDuration < 0.0001f)
+                    blendDuration = 0.0001f;
+
+                float blendStartTime = spawnTimer - blendDuration;
+                if (blendStartTime < 0.0f)
+                    blendStartTime = 0.0f;
+
+                if (controlLockTimer > blendStartTime)
+                    blockedBlendT = (controlLockTimer - blendStartTime) / blendDuration;
+
+                blockedBlendT = SimpleMath.Clamp(blockedBlendT, 0.0f, 1.0f);
+
+                // SmoothStep easing
+                blockedBlendT = blockedBlendT * blockedBlendT * (3.0f - 2.0f * blockedBlendT);
+
+                smoothCamPos = Vector3.Lerp(spawnLockPos, gameplayCamPos, blockedBlendT);
             }
+            else
+            {
+                Vector3 desiredCamPos =
+                    predictedPlayerPos
+                    - camFwd * cameraDistanceBack
+                    + camUp * cameraHeightOffset;
 
-            float t = cameraFollowSmooth * deltaTime;
-            t = t / (1.0f + t);
+                if (!camFollowInit)
+                {
+                    smoothCamPos = GetPosition(cameraEntityID);
+                    camFollowInit = true;
+                }
 
-            smoothCamPos = Vector3.Lerp(smoothCamPos, desiredCamPos, t);
+                float t = cameraFollowSmooth * deltaTime;
+                t = t / (1.0f + t);
+
+                smoothCamPos = Vector3.Lerp(smoothCamPos, desiredCamPos, t);
+            }
 
             if (camShakeTimer < camShakeTimerThreshold)
             {
                 camShakeTimer += deltaTime;
 
-                Vector3 xShake = camRight * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
-                Vector3 yShake = camUp * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
+                Vector3 shakeRight = inputBlocked ? Vector3.Right : camRight;
+                Vector3 shakeUp = inputBlocked ? Vector3.Forward : camUp;
+
+                Vector3 xShake = shakeRight * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
+                Vector3 yShake = shakeUp * RNG.RandFloat(-CAMSHAKE_DamageTakenMagnitude, CAMSHAKE_DamageTakenMagnitude) * deltaTime;
 
                 smoothCamPos = smoothCamPos + xShake + yShake;
 
@@ -463,10 +545,20 @@ namespace Game
 
             SetPosition(cameraEntityID, ref smoothCamPos);
 
-            Vector3 camPos = GetPosition(cameraEntityID);
-            Quat camRot = GetRotation(cameraEntityID);
-            Vector3 camForwardNow = camRot.Forward;
-            camAimTarget = camPos + camForwardNow * cameraLookDistance;
+            if (inputBlocked)
+            {
+                Vector3 actualCamPos = GetPosition(cameraEntityID);
+                Vector3 gameplayAimTarget = actualCamPos + gameplayForward * cameraLookDistance;
+                camAimTarget = Vector3.Lerp(spawnLockAimTarget, gameplayAimTarget, blockedBlendT);
+            }
+            else
+            {
+                Vector3 camPos = GetPosition(cameraEntityID);
+                Quat camRot = GetRotation(cameraEntityID);
+                Vector3 camForwardNow = camRot.Forward;
+                camAimTarget = camPos + camForwardNow * cameraLookDistance;
+            }
+
             SetTarget(cameraEntityID, ref camAimTarget);
         }
 
@@ -587,6 +679,25 @@ namespace Game
         private void GetCameraMoveAxes(out Vector3 forward, out Vector3 right, out Vector3 up)
         {
             Quat camRot = GetRotation(cameraEntityID);
+
+            forward = camRot.Forward;
+            if (forward.SqrMagnitude < 1e-8f) forward = Vector3.Forward;
+            else forward = forward.Normalized;
+
+            right = camRot.Right;
+            if (right.SqrMagnitude < 1e-8f) right = Vector3.Right;
+            else right = right.Normalized;
+
+            up = camRot.Up;
+            if (up.SqrMagnitude < 1e-8f) up = Vector3.Up;
+            else up = up.Normalized;
+        }
+
+        private void GetStoredGameplayCameraAxes(out Vector3 forward, out Vector3 right, out Vector3 up)
+        {
+            Quat qYaw = Quat.FromAxisAngle(Vector3.Up, yawRad);
+            Quat qPitch = Quat.FromAxisAngle(Vector3.Right, pitchRad);
+            Quat camRot = (qYaw * qPitch).Normalized();
 
             forward = camRot.Forward;
             if (forward.SqrMagnitude < 1e-8f) forward = Vector3.Forward;
