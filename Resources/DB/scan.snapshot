@@ -1,12 +1,12 @@
+/Resources/Sources/Textures/vfx/Magic2.png|1772730720|61205
 /Resources/Sources/Audio/Small Laser_8.wav|1774005977|68618
-/Resources/Sources/Textures/lvl2redesign_level_design_v005_v004_Metallic.png|1774455853|170365
 /Resources/Sources/Textures/DefenceSuccess_PopUpWindow.png|1773397095|225789
+/Resources/Sources/Textures/lvl2redesign_level_design_v005_v004_Metallic.png|1774455853|170365
 /Resources/Sources/Textures/vfx/Glow11.png|1772730719|4263299
+/Resources/Sources/Textures/trench_run_v007_v007_Metallic.png|1774544347|88687
 /Resources/Sources/Meshes/Particle_Mesh_Cube.fbx|1769351039|15228
 /Resources/Sources/Textures/vfx/Glow4.png|1772730719|136731
-/Resources/Sources/Textures/trench_run_v007_v007_Metallic.png|1774544347|88687
 /Resources/Sources/Textures/vfx/ImpactToon7.png|1772730720|16119
-/Resources/Sources/Textures/vfx/Magic2.png|1772730720|61205
 /Resources/Sources/Textures/DigitalTriangle.png|1769351039|2902
 /Resources/Sources/Scenes/Level1_NewPlayer_Backup.json|1773397095|292546
 /Resources/Sources/Audio/COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav|1769350445|17070698
@@ -182,7 +182,7 @@
 /Resources/Sources/Textures/Crosshair_Base.png|1769351039|6523
 /Resources/Sources/Textures/vfx/Shield13.png|1772730720|82946
 /Resources/Sources/Textures/vfx/Spiral.png|1772730720|123668
-/Resources/Sources/Scenes/level2_graphic_card.json|1774598772|418344
+/Resources/Sources/Scenes/level2_graphic_card.json|1774612934|417844
 /Resources/Sources/Textures/vfx/Flare18.png|1772730719|87449
 /Resources/Sources/Material/VFX_EnemyTurretAura.mat|1773397095|801
 /Resources/Sources/Textures/vfx/Projectile11.png|1772730720|22685
@@ -232,6 +232,7 @@
 /Resources/Sources/Textures/vfx/Splash26.png|1772730720|4644342
 /Resources/Sources/Textures/Destructible Wall/Destructible wall_v001_v001_BaseColor.png|1772994879|92202
 /Resources/Sources/Audio/Audio VO placeholder.mp4|1774416601|91312
+/Resources/Sources/Meshes/lvl2redesign_level_design_v006.fbx|1774600360|135680
 /Resources/Sources/Audio/Enemy Deal Damage.wav|1772730718|384068
 /Resources/Sources/Shaders/bloom_upsample.frag|1769350446|1179
 /Resources/Sources/Textures/Tooltip_InstructionsLvl1.png|1772994879|78909
@@ -242,7 +243,7 @@
 /Resources/Sources/Material/SecondaryBullet.mat|1769350446|807
 /Resources/Sources/Shaders/hdr.vert|1769350446|221
 /Resources/Sources/Textures/vfx/LightingShape.png|1772730720|32211
-/Resources/Sources/Scenes/MainMenu.json|1774349036|241415
+/Resources/Sources/Scenes/MainMenu.json|1774600366|241415
 /Resources/Sources/Textures/PacksButton.png|1773397095|2226
 /Resources/Sources/Audio/Player_Secondary_Fire.wav|1769350445|1152044
 /Resources/Sources/Textures/vfx/Heart3.png|1772730719|8485
@@ -441,6 +442,7 @@
 /Resources/Sources/Textures/vfx/Flare21.png|1772730719|88656
 /Resources/Sources/Textures/PlayerHPFrame.png|1769351039|2611
 /Resources/Sources/Textures/vfx/Magic6.png|1772730720|86366
+/Resources/Sources/Material/Mat_Level2_Spotlight.mat|1774611120|1070
 /Resources/Sources/Shaders/ui.vert|1769351039|293
 /Resources/Sources/Scenes/Test.json|1773397095|6453
 /Resources/Sources/Textures/vfx/Circle27.png|1772730719|58387
@@ -468,7 +470,7 @@
 /Resources/Sources/Audio/Flotilla_Gunship_Ambient.wav|1769350445|768092
 /Resources/Sources/Textures/lvl2redesign_level_design_v003_v002_Opacity.png|1774416601|413680
 /Resources/Sources/Textures/vfx/Shield4.png|1772730720|28015
-/Resources/Sources/Scenes/trench_run.json|1774544347|1159545
+/Resources/Sources/Scenes/trench_run.json|1774600366|1159545
 /Resources/Sources/Textures/vfx/Magic8.png|1772730720|160215
 /Resources/Sources/Textures/vfx/Circle21.png|1772730719|48073
 /Resources/Sources/Textures/Flare19.png|1769351039|37858
@@ -946,3 +948,4 @@
 /Resources/Sources/Scenes/Level1_test.json|1773397095|74247
 /Resources/Sources/Textures/Enemy spawn wall_v002_v001_Emissive.png|1774511525|444603
 /Resources/Sources/Audio/Computer Smack Impact.wav|1774591413|253068
+/Resources/Sources/Meshes/spotlight_v001.fbx|1774600360|30480

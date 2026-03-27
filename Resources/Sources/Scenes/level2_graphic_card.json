@@ -3,32 +3,32 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 129,
+            "ID": 134,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Wall5",
-                        "Tag": "Wall"
+                        "Name": "BlackScreen",
+                        "Tag": "BlackScreen"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "6100530852772446537",
+                        "ComponentGUID": "13100048363787666651",
                         "Position": [
-                            2500.0,
-                            -250.0,
-                            -1750.0
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
-                            -50.0,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
+                            1920.0,
+                            800.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -36,54 +36,45 @@
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "1488844834345386315",
-                        "Mesh": "Enemy spawn wall_v002.fbx",
-                        "Material": "EnemySpawnWall.mat",
-                        "Texture": "",
-                        "Visible": false,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11901422349663667349",
-                        "ScriptClassName": "Game.WallSpawner"
+                        "Texture": "Blackscreen.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 5,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
         },
         {
-            "ID": 128,
+            "ID": 133,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Wall4",
-                        "Tag": "Wall"
+                        "Name": "UI Pause Press",
+                        "Tag": "Audio"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "6100530852772446537",
+                        "ComponentGUID": "6272670490857195787",
                         "Position": [
-                            -2500.0,
-                            -250.0,
-                            -1750.0
+                            0.0,
+                            0.0,
+                            0.0
                         ],
                         "Rotation": [
                             0.0,
-                            50.0,
+                            -0.0,
                             0.0
                         ],
                         "Scale": [
@@ -96,13 +87,68 @@
                     }
                 },
                 {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "5119748986250529037",
+                        "FilePath": "UI Pause Button Press.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 19,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "ENVIRONMENT_Level1_LevelDesignWall",
+                        "Tag": "ENVIRONMENT_Level1_LevelDesign2"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9872348417553335513",
+                        "Position": [
+                            0.0,
+                            -561.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "1488844834345386315",
-                        "Mesh": "Enemy spawn wall_v002.fbx",
-                        "Material": "EnemySpawnWall.mat",
+                        "ComponentGUID": "648976380699083995",
+                        "Mesh": "spotlight_v001.fbx",
+                        "Material": "Mat_Level2_Spotlight.mat",
                         "Texture": "",
-                        "Visible": false,
+                        "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
                         "Billboarding": false,
@@ -111,13 +157,6 @@
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "11901422349663667349",
-                        "ScriptClassName": "Game.WallSpawner"
                     }
                 }
             ]
@@ -390,9 +429,9 @@
                     "Properties": {
                         "ComponentGUID": "17378643928610342117",
                         "Position": [
-                            -500.0,
+                            -147.0,
                             -1000.0,
-                            1000.0
+                            -231.0
                         ],
                         "Rotation": [
                             0.0,
@@ -400,9 +439,9 @@
                             0.0
                         ],
                         "Scale": [
-                            4.0,
-                            1.75,
-                            2.0
+                            1.5,
+                            1.5,
+                            0.8500000238418579
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -961,14 +1000,14 @@
                     "Properties": {
                         "ComponentGUID": "5866018294480569311",
                         "Position": [
-                            75.103515625,
-                            294.3609924316406,
-                            -478.20849609375
+                            -56.8388671875,
+                            427.1669921875,
+                            -434.65771484375
                         ],
                         "Rotation": [
-                            -3.204196224471245e-20,
+                            3.204196224471245e-20,
                             0.0000011208516070837504,
-                            -2.672318746496649e-13
+                            2.672318746496649e-13
                         ],
                         "Scale": [
                             780.0,
@@ -1135,9 +1174,9 @@
                     "Properties": {
                         "ComponentGUID": "16745553909902450455",
                         "Position": [
-                            650.0,
-                            270.0,
-                            -1000.0
+                            322.63507080078125,
+                            53.72848892211914,
+                            -440.93182373046875
                         ],
                         "Rotation": [
                             0.0,
@@ -1198,9 +1237,9 @@
                     "Properties": {
                         "ComponentGUID": "5792799616132947725",
                         "Position": [
-                            -575.0,
-                            -165.0,
-                            -1000.0
+                            -297.7138977050781,
+                            -267.9649658203125,
+                            -473.2061767578125
                         ],
                         "Rotation": [
                             0.0,
@@ -2993,7 +3032,7 @@
                         "ComponentGUID": "16100272381120889775",
                         "Position": [
                             0.0,
-                            250.0,
+                            0.0,
                             0.0
                         ],
                         "Rotation": [
@@ -4363,9 +4402,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            650.0,
-                            -150.0,
-                            -2000.0
+                            340.0,
+                            -531.0,
+                            -1047.0
                         ],
                         "Rotation": [
                             -180.0,
@@ -4603,9 +4642,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -575.0,
-                            -485.0,
-                            -2000.0
+                            -285.53662109375,
+                            -513.0,
+                            -1041.0
                         ],
                         "Rotation": [
                             180.0,
@@ -4861,9 +4900,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            650.0,
-                            -450.0,
-                            -1500.0
+                            334.0,
+                            -290.0,
+                            -710.0
                         ],
                         "Rotation": [
                             180.0,
@@ -5101,9 +5140,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -575.0,
-                            285.0,
-                            -1500.0
+                            -300.0,
+                            35.0,
+                            -840.0
                         ],
                         "Rotation": [
                             180.0,
@@ -5341,9 +5380,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            650.0,
-                            250.0,
-                            -1000.0
+                            336.9333801269531,
+                            35.0,
+                            -433.87945556640625
                         ],
                         "Rotation": [
                             -180.0,
@@ -5581,9 +5620,9 @@
                     "Properties": {
                         "ComponentGUID": "4860677560785862851",
                         "Position": [
-                            -575.0,
-                            -185.0,
-                            -1000.0
+                            -296.0845947265625,
+                            -290.0,
+                            -494.6129455566406
                         ],
                         "Rotation": [
                             180.0,
@@ -6963,9 +7002,9 @@
                     "Properties": {
                         "ComponentGUID": "15900363641908576543",
                         "Position": [
-                            3.0,
-                            -250.0,
-                            126.0
+                            14.5,
+                            -300.0,
+                            60.0
                         ],
                         "Rotation": [
                             0.0,
@@ -6973,9 +7012,9 @@
                             0.0
                         ],
                         "Scale": [
-                            600.0,
-                            600.0,
-                            600.0
+                            300.0,
+                            300.0,
+                            300.0
                         ],
                         "Parent": 4294967295,
                         "Children": [
@@ -7026,9 +7065,9 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            300.0,
-                            300.0,
-                            300.0
+                            150.0,
+                            150.0,
+                            150.0
                         ],
                         "SphereRadius": 0.5
                     }
@@ -7386,7 +7425,7 @@
                         "ComponentGUID": "7571492693698003779",
                         "Position": [
                             0.000009495363883615937,
-                            270.0,
+                            20.0,
                             30.014230728149414
                         ],
                         "Rotation": [
@@ -7421,8 +7460,8 @@
                         "FarPlane": 5000.0,
                         "Target": [
                             0.000009495363883615937,
-                            270.0,
-                            -969.9855346679688
+                            20.0,
+                            -985.0
                         ]
                     }
                 },
@@ -8075,9 +8114,9 @@
                     "Properties": {
                         "ComponentGUID": "14827864839706771731",
                         "Position": [
-                            3.0,
-                            -250.0,
-                            126.0
+                            14.5,
+                            -300.0,
+                            60.0
                         ],
                         "Rotation": [
                             90.0,
@@ -8085,9 +8124,9 @@
                             90.0
                         ],
                         "Scale": [
-                            4.0,
-                            4.0,
-                            4.0
+                            2.0,
+                            2.0,
+                            2.0
                         ],
                         "Parent": 13,
                         "Children": []
@@ -8110,9 +8149,9 @@
                             0.0
                         ],
                         "Default Size": [
-                            60.0,
-                            60.0,
-                            60.0
+                            30.0,
+                            30.0,
+                            30.0
                         ],
                         "End Size": [
                             0.0,
@@ -8711,7 +8750,7 @@
                         "Position": [
                             -33.0,
                             -250.0,
-                            -3500.0
+                            -2580.0
                         ],
                         "Rotation": [
                             0.0,
@@ -8769,13 +8808,13 @@
                     "Properties": {
                         "ComponentGUID": "6100530852772446537",
                         "Position": [
-                            -1500.0,
+                            -1275.0,
                             -250.0,
-                            -3000.0
+                            -1850.0
                         ],
                         "Rotation": [
                             0.0,
-                            30.000001907348633,
+                            45.000003814697266,
                             0.0
                         ],
                         "Scale": [
@@ -8829,14 +8868,14 @@
                     "Properties": {
                         "ComponentGUID": "17629745898841637199",
                         "Position": [
-                            1500.0,
+                            1275.0,
                             -250.0,
-                            -3000.0
+                            -1850.0
                         ],
                         "Rotation": [
-                            0.0000032279656352329766,
-                            -30.000001907348633,
-                            -0.000003907216068910202
+                            0.00000455816370958928,
+                            -45.000003814697266,
+                            -0.000004715212526207324
                         ],
                         "Scale": [
                             1.0,
@@ -8899,9 +8938,9 @@
                             0.0
                         ],
                         "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
+                            0.5,
+                            0.5,
+                            0.5
                         ],
                         "Parent": 4294967295,
                         "Children": []
@@ -8911,7 +8950,7 @@
                     "Type": "MeshRendererComponent",
                     "Properties": {
                         "ComponentGUID": "351043840617595705",
-                        "Mesh": "lvl2redesign_level_design_v005.fbx",
+                        "Mesh": "lvl2redesign_level_design_v006.fbx",
                         "Material": "MAT_lvl2redesign_v003.mat",
                         "Texture": "",
                         "Visible": true,
@@ -9214,9 +9253,9 @@
                     "Properties": {
                         "ComponentGUID": "10384210640159851477",
                         "Position": [
-                            650.0,
-                            -130.0,
-                            -2000.0
+                            331.0,
+                            -513.0,
+                            -1041.0
                         ],
                         "Rotation": [
                             0.0,
@@ -9274,9 +9313,9 @@
                     "Properties": {
                         "ComponentGUID": "8171861303703995493",
                         "Position": [
-                            -575.0,
-                            -465.0,
-                            -2000.0
+                            -266.1846618652344,
+                            -494.2735900878906,
+                            -1037.968994140625
                         ],
                         "Rotation": [
                             0.0,
@@ -9448,9 +9487,9 @@
                     "Properties": {
                         "ComponentGUID": "9324782808314184825",
                         "Position": [
-                            650.0,
-                            -430.0,
-                            -1500.0
+                            306.58050537109375,
+                            -258.8772888183594,
+                            -731.5921020507813
                         ],
                         "Rotation": [
                             0.0,
@@ -9622,9 +9661,9 @@
                     "Properties": {
                         "ComponentGUID": "3560175285282702509",
                         "Position": [
-                            -575.0,
-                            305.0,
-                            -1500.0
+                            -295.6200866699219,
+                            51.28135681152344,
+                            -840.0
                         ],
                         "Rotation": [
                             0.0,
@@ -10218,61 +10257,6 @@
                     "Properties": {
                         "ComponentGUID": "8578513500070299911",
                         "FilePath": "UI Pause Button Hover.wav",
-                        "Type": 5,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 133,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "UI Pause Press",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6272670490857195787",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "5119748986250529037",
-                        "FilePath": "UI Pause Button Press.wav",
                         "Type": 5,
                         "State": 2,
                         "Volume": 1.0,
