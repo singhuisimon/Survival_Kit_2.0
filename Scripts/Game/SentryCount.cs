@@ -37,7 +37,7 @@ namespace Game
 
         // ==== Timer =====
         [SerializeField] private float countdown = 0.0f;
-        private float holdTimer = 3.0f;
+        private float holdTimer = 1.5f;
 
         // ===== Entity =====
         private uint playerID = 0;
