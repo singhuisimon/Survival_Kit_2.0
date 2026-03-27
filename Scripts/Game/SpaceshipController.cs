@@ -33,6 +33,7 @@ namespace Game
         [SerializeField("Camera Height Offset")] private float cameraHeightOffset = 20.0f;
         [SerializeField("Camera Distance Behind")] private float cameraDistanceBack = 30.0f;
         [SerializeField("Camera Look Distance")] private float cameraLookDistance = 1000.0f;
+        [SerializeField("Camera Collision Radius")] private float cameraCollisionRadius = 0.5f;
 
         // ===== Camera Movement =====
         [SerializeField("Camera Follow Smooth")] private float cameraFollowSmooth = 1.8f;
@@ -431,10 +432,29 @@ namespace Game
             Vector3 playerPosNow = GetPosition(playerEntityID);
             Vector3 predictedPlayerPos = playerPosNow + commandedVelocity * deltaTime;
 
+            // Ideal (unobstructed) camera position.
             Vector3 desiredCamPos =
                 predictedPlayerPos
                 - camFwd * cameraDistanceBack
                 + camUp * cameraHeightOffset;
+
+            // Spring arm: cast from the player to the ideal position and stop at the
+            // first piece of geometry. The height offset is preserved so when a wall
+            // forces the camera closer the view naturally rises to a more overhead angle.
+            Vector3 camTarget  = desiredCamPos;
+            Vector3 toDesired  = desiredCamPos - predictedPlayerPos;
+            float   desiredDist = toDesired.Magnitude;
+            if (desiredDist > 1e-4f)
+            {
+                Vector3 castDir = toDesired / desiredDist;
+                if (Physics.SphereCast(predictedPlayerPos, castDir, cameraCollisionRadius,
+                                       desiredDist, playerEntityID, out SphereCastHit camHit))
+                {
+                    float safeDistance = camHit.Fraction * desiredDist - cameraCollisionRadius;
+                    if (safeDistance < 0.0f) safeDistance = 0.0f;
+                    camTarget = predictedPlayerPos + castDir * safeDistance;
+                }
+            }
 
             if (!camFollowInit)
             {
@@ -445,7 +465,7 @@ namespace Game
             float t = cameraFollowSmooth * deltaTime;
             t = t / (1.0f + t);
 
-            smoothCamPos = Vector3.Lerp(smoothCamPos, desiredCamPos, t);
+            smoothCamPos = Vector3.Lerp(smoothCamPos, camTarget, t);
 
             if (camShakeTimer < camShakeTimerThreshold)
             {

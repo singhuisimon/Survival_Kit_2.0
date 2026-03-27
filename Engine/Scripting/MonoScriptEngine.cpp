@@ -1350,6 +1350,8 @@ namespace Engine {
 						 reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionCount));
 		BindInternalCall("Engine.Physics::Physics_GetCollisionPair",
 						 reinterpret_cast<void *>(InternalCalls::Physics_GetCollisionPair));
+		BindInternalCall("Engine.Physics::Physics_SphereCast",
+						 reinterpret_cast<void *>(InternalCalls::Physics_SphereCast));
 
 		// =====================================================================
 		// Tag
