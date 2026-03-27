@@ -67,7 +67,25 @@ namespace Engine
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
 
+		/*auto& input = GetInput();
+		bool isF2Pressed = input.IsKeyJustPressed(GLFW_KEY_F2);
+		bool isF2WasPressedLastFrame = false;*/
+
+		
 		m_Window = glfwCreateWindow(m_WindowWidth, m_WindowHeight, m_Name.c_str(), nullptr, nullptr);
+		/*GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+		const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+		m_Window = glfwCreateWindow(
+			mode->width,
+			mode->height,
+			m_Name.c_str(),
+			monitor,
+			nullptr
+		);
+
+		m_WindowWidth = mode->width;
+		m_WindowHeight = mode->height;*/
 
 		if (!m_Window)
 		{
@@ -171,7 +189,10 @@ namespace Engine
 
 				// Update input system (after events are polled)
 				m_Input->Update();
-
+				if (m_Input->IsKeyJustPressed(GLFW_KEY_F2))
+				{
+					ToggleFullscreen();
+				}
 				// Then update game
 				OnUpdate(timestep);
 			}
@@ -235,6 +256,32 @@ namespace Engine
 		Engine::MonoScriptEngine::GetInstance().Shutdown();
 
 		LOG_INFO("Application shutdown complete");
+	}
+
+	
+	void Application::ToggleFullscreen()
+	{
+		if (!m_IsFullscreen)
+		{
+			// These get written here BEFORE they're ever read below
+			glfwGetWindowPos(m_Window, &m_WindowedX, &m_WindowedY);
+			glfwGetWindowSize(m_Window, &m_WindowedWidth, &m_WindowedHeight);
+
+			GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+			const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+
+			glfwSetWindowMonitor(m_Window, monitor, 0, 0,
+				mode->width, mode->height, mode->refreshRate);
+			m_IsFullscreen = true;
+		}
+		else
+		{
+			// Only read here, after they were already written above
+			glfwSetWindowMonitor(m_Window, nullptr,
+				m_WindowedX, m_WindowedY,
+				m_WindowedWidth, m_WindowedHeight, 0);
+			m_IsFullscreen = false;
+		}
 	}
 
 } // namespace Engine
