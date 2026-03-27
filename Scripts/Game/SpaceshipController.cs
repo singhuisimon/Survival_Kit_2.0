@@ -19,6 +19,7 @@ namespace Game
     /// - Physics movement in FixedUpdate
     /// - Player rotation applied in FixedUpdate to avoid fighting physics
     /// - Smoothed velocity changes to reduce tunneling risk
+    /// - Spawn lock blocks only input; all other controller calculations continue
     /// </summary>
     public class SpaceshipController : ScriptBehaviour
     {
@@ -51,7 +52,7 @@ namespace Game
 
         // ===== Cursor Control =====
         [SerializeField("Toggle Cursor Key")] private KeyCode toggleCursorKey = KeyCode.F3;
-        [SerializeField("Spawn Period")] private float spawnTimer = 0.05f;
+        [SerializeField("Spawn Period")] private float spawnTimer = 5f;
         [SerializeField("Start With Cursor Locked")] private bool startWithCursorLocked = true;
 
         [SerializeField] private float playerHP = 100.0f;
@@ -212,7 +213,7 @@ namespace Game
             mouseSensitivity = (AudioSettings.Instance != null) ? AudioSettings.Instance.GetMouseSensitivity() : mouseSensitivity;
 
             initialized = true;
-            LogMessage("[SpaceshipController] Initialized - preserving editor rotation and applying spawn movement lock");
+            LogMessage("[SpaceshipController] Initialized - preserving editor rotation and applying spawn input lock");
         }
 
         public override void OnUpdate(float deltaTime)
@@ -240,15 +241,18 @@ namespace Game
                 if (controlLockTimer >= spawnTimer)
                 {
                     controlsEnabled = true;
-                    LogMessage("[SpaceshipController] Controls enabled after spawn delay");
+                    LogMessage("[SpaceshipController] Spawn input lock ended");
                 }
             }
 
-            HandleCursorToggle();
-
-            if (!IsCursorVisible())
+            if (!IsSpawnInputBlocked())
             {
-                UpdateCameraRotationFromMouse(deltaTime);
+                HandleCursorToggle();
+
+                if (!IsCursorVisible())
+                {
+                    UpdateCameraRotationFromMouse(deltaTime);
+                }
             }
 
             if (startHealVFXTimer)
@@ -282,18 +286,6 @@ namespace Game
                 return;
             }
 
-            if (!controlsEnabled)
-            {
-                commandedVelocity = Vector3.Zero;
-
-                Vector3 zero = Vector3.Zero;
-                RigidbodySetVelocity(playerEntityID, ref zero);
-                RigidbodySetAngularVelocity(playerEntityID, ref zero);
-
-                emitParticles(Vector3.Zero);
-                return;
-            }
-
             HandleMovementPhysics(deltaTime);
         }
 
@@ -312,6 +304,11 @@ namespace Game
 
             Unsubscribe(EVENT_PLAYER_HEAL, OnPlayerHeal);
             Unsubscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
+        }
+
+        private bool IsSpawnInputBlocked()
+        {
+            return !controlsEnabled;
         }
 
         private void InitializeCameraRotationStateFromCurrentTransform()
@@ -380,13 +377,17 @@ namespace Game
             GetCameraMoveAxes(out Vector3 camFwd, out Vector3 camRight, out Vector3 camUp);
 
             Vector3 moveDir = Vector3.Zero;
+            bool inputBlocked = IsSpawnInputBlocked();
 
-            if (IsKeyPressed(KeyCode.W)) moveDir += camFwd;
-            if (IsKeyPressed(KeyCode.S)) moveDir -= camFwd;
-            if (IsKeyPressed(KeyCode.D)) moveDir += camRight;
-            if (IsKeyPressed(KeyCode.A)) moveDir -= camRight;
-            if (IsKeyPressed(KeyCode.Space)) moveDir += camUp;
-            if (IsKeyPressed(KeyCode.LeftShift)) moveDir -= camUp;
+            if (!inputBlocked)
+            {
+                if (IsKeyPressed(KeyCode.W)) moveDir += camFwd;
+                if (IsKeyPressed(KeyCode.S)) moveDir -= camFwd;
+                if (IsKeyPressed(KeyCode.D)) moveDir += camRight;
+                if (IsKeyPressed(KeyCode.A)) moveDir -= camRight;
+                if (IsKeyPressed(KeyCode.Space)) moveDir += camUp;
+                if (IsKeyPressed(KeyCode.LeftShift)) moveDir -= camUp;
+            }
 
             bool hasInput = moveDir.SqrMagnitude > 1e-8f;
             if (hasInput)
