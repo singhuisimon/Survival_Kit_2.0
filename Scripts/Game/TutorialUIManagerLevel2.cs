@@ -59,7 +59,7 @@ namespace Game
         [SerializeField] private float fadeOutTime = 0.2f;
         private float fadeUpElapsed = 0.0f;
         [SerializeField] private float fadeUpTime = 1.0f;
-        [SerializeField] private float uiStartFadePos = 360.0f;
+        [SerializeField] private float uiStartFadePos = 260.0f;
         [SerializeField] private float switchTime = 0.5f;
         private float camFlySpeed = 30000.0f;
         //private float camRotateSpeed = 1.0f;
@@ -331,13 +331,13 @@ namespace Game
             if (fadeUpElapsed > fadeUpTime) {
 
                 // Update tooltip elapsed time
-                tooltipElapsed += dt;
+                //tooltipElapsed += dt;
 
                 // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                if (tooltipElapsed > tooltipMinTime) {
+                //if (tooltipElapsed > tooltipMinTime) {
 
                     // Display assistance message: "Press "E" to proceed"
-                    ShowProceedText(true);
+                    //ShowProceedText(true);
 
                     // Check for 'E' input
                     if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -345,7 +345,7 @@ namespace Game
                     // Begin fade out
                     if (EPressed) {
                         ShowUI(instructionID, false, dt);
-                        ShowProceedText(false);  // Remove assistance message
+                        //ShowProceedText(false);  // Remove assistance message
                     }
 
                     // Ensure all fading effects are completed before moving on
@@ -353,14 +353,14 @@ namespace Game
 
                         // Reset all elapsed time, 'E' pressed state, and set up for next state
                         EPressed = false;
-                        tooltipElapsed = 0.0f;
+                        //tooltipElapsed = 0.0f;
                         fadeOutElapsed = 0.0f;
                         fadeUpElapsed = 0.0f;
                         currentState = TutorialState.BotnetInfo;
                         pauseForTutorial = false;
                         GameState.IsPaused = false;
                     }
-                }
+                //}
             }
         }
 
@@ -374,13 +374,13 @@ namespace Game
             if (fadeUpElapsed > fadeUpTime) {
 
                 // Update tooltip elapsed time
-                tooltipElapsed += dt;
+                //tooltipElapsed += dt;
 
                 // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                if (tooltipElapsed > tooltipMinTime) {
+                //if (tooltipElapsed > tooltipMinTime) {
 
                     // Display assistance message: "Press "E" to proceed"
-                    ShowProceedText(true);
+                    //ShowProceedText(true);
 
                     // Check for 'E' input
                     if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -388,7 +388,7 @@ namespace Game
                     // Begin fade out
                     if (EPressed) {
                         ShowUI(botnetInfoID, false, dt);
-                        ShowProceedText(false);  // Remove assistance message
+                        //ShowProceedText(false);  // Remove assistance message
                     }
 
                     // Ensure all fading effects are completed before moving on
@@ -396,12 +396,12 @@ namespace Game
 
                         // Reset all elapsed time, 'E' pressed state, and set up for next state
                         EPressed = false;
-                        tooltipElapsed = 0.0f;
+                        //tooltipElapsed = 0.0f;
                         fadeOutElapsed = 0.0f;
                         fadeUpElapsed = 0.0f;
                         tutorialEnd = true;
                     }
-                }
+                //}
             }
         }
 
@@ -413,13 +413,13 @@ namespace Game
             if (fadeUpElapsed > fadeUpTime) {
 
                 // Update tooltip elapsed time
-                tooltipElapsed += dt;
+                //tooltipElapsed += dt;
 
                 // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                if (tooltipElapsed > tooltipMinTime) {
+                //if (tooltipElapsed > tooltipMinTime) {
 
                     // Display assistance message: "Press "E" to proceed"
-                    ShowProceedText(true);
+                    //ShowProceedText(true);
 
                     // Check for 'E' input
                     if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -427,7 +427,7 @@ namespace Game
                     // Begin fade out
                     if (EPressed) {
                         ShowUI(wormInfoID, false, dt);
-                        ShowProceedText(false);  // Remove assistance message
+                        //ShowProceedText(false);  // Remove assistance message
                     }
 
                     // Ensure all fading effects are completed before moving on
@@ -435,13 +435,13 @@ namespace Game
 
                         // Reset all elapsed time, 'E' pressed state, and set up for next state
                         EPressed = false;
-                        tooltipElapsed = 0.0f;
+                        //tooltipElapsed = 0.0f;
                         fadeOutElapsed = 0.0f;
                         fadeUpElapsed = 0.0f;
                         tutorialEnd = true;
 
                     }
-                }
+                //}
             }
         }
 
@@ -453,13 +453,13 @@ namespace Game
             if (fadeUpElapsed > fadeUpTime) {
 
                 // Update tooltip elapsed time
-                tooltipElapsed += dt;
+                //tooltipElapsed += dt;
 
                 // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                if (tooltipElapsed > tooltipMinTime) {
+                //if (tooltipElapsed > tooltipMinTime) {
 
                     // Display assistance message: "Press "E" to proceed"
-                    ShowProceedText(true);
+                    //ShowProceedText(true);
 
                     // Check for 'E' input
                     if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -467,7 +467,7 @@ namespace Game
                     // Begin fade out
                     if (EPressed) {
                         ShowUI(loveletterInfoID, false, dt);
-                        ShowProceedText(false);  // Remove assistance message
+                        //ShowProceedText(false);  // Remove assistance message
                     }
 
                     // Ensure all fading effects are completed before moving on
@@ -475,13 +475,13 @@ namespace Game
 
                         // Reset all elapsed time, 'E' pressed state, and set up for next state
                         EPressed = false;
-                        tooltipElapsed = 0.0f;
+                        //tooltipElapsed = 0.0f;
                         fadeOutElapsed = 0.0f;
                         fadeUpElapsed = 0.0f;
                         tutorialEnd = true;
 
                     }
-                }
+                //}
             }
         }
 
@@ -513,16 +513,16 @@ namespace Game
             }
         }
 
-        private void ShowProceedText(bool value)
-        {
-            Engine.SpriteRenderer.SetIsVisible(proceedID, value);
-        }
+        //private void ShowProceedText(bool value)
+        //{
+        //    Engine.SpriteRenderer.SetIsVisible(proceedID, value);
+        //}
 
-        private void SetProceedTextPosition(float x, float y)
-        {
-            Vector3 newPos = new Vector3(x, y, 0.0f);
-            Transform.SetPosition(proceedID, ref newPos);
-        }
+        //private void SetProceedTextPosition(float x, float y)
+        //{
+        //    Vector3 newPos = new Vector3(x, y, 0.0f);
+        //    Transform.SetPosition(proceedID, ref newPos);
+        //}
 
         private bool IsEscapeJustPressed() {
             bool pressed = IsKeyPressed(KeyCode.Escape);
@@ -535,7 +535,7 @@ namespace Game
             LogMessage("[TutorialUIManagerLevel2] Detect game end, hiding all tooltip");
 
             //Hide all the Tooltip UI
-            ShowProceedText(false);
+            //ShowProceedText(false);
 
             SpriteRenderer.SetIsVisible(instructionID, false);
             SpriteRenderer.SetIsVisible(botnetInfoID, false);
