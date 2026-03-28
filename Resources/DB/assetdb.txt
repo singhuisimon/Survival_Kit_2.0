@@ -987,5 +987,7 @@ e3e0c894bd96c005|2|/Resources/Sources/Material/RootLoveLetterSpawn.mat|.mat||177
 6be0c894bd96c007|2|/Resources/Sources/Material/RootSpawnBotNet.mat|.mat||1774682626|1|0|0|0
 fbe0c894bd96c00b|2|/Resources/Sources/Material/RootSpawnBotNetLogo.mat|.mat||1774682626|1|0|0|0
 53e0c894bd96c00d|2|/Resources/Sources/Material/RootWormRingVFX.mat|.mat||1774682626|1|0|0|0
-97bf1894c5f140af|6|/Resources/Sources/Scenes/LX_VFX_ENEMIES.json|.json||1774693133|1|0|0|0
 9fbf1894c80100c5|2|/Resources/Sources/Material/VFX_Enemy_Worm_Ring.mat|.mat||1774691716|1|0|0|0
+e6869894e47a00dd|6|/Resources/Sources/Scenes/LX_VFX_TEST_1.json|.json||1774720606|1|0|0|0
+f6869894e47a00df|2|/Resources/Sources/Material/VFX_WallExplosion.mat|.mat||1774720895|1|0|0|0
+6ab65094e4e600a7|2|/Resources/Sources/Material/Explosion_Corruption1.mat|.mat||1774721304|1|0|0|0
