@@ -1,10 +1,10 @@
 {
     "shaderName": "StandardMetallicRoughness",
-    "baseMap": "LightingErode1.png",
+    "baseMap": "Firewall-active-logo-triangle.png",
     "normalMap": "",
     "metallicMap": "",
     "roughnessMap": "",
-    "emissionMap": "",
+    "emissionMap": "Firewall-active-logo-triangle.png",
     "occlusionMap": "",
     "baseColor": [
         1.0,
@@ -12,14 +12,14 @@
         1.0
     ],
     "emissionColor": [
-        0.7288135290145874,
-        0.27858468890190125,
-        0.005294027738273144
+        1.0,
+        1.0,
+        1.0
     ],
     "metallic": 0.0,
     "roughness": 0.6000000238418579,
     "opacity": 1.0,
-    "emissionStrength": 6.409999847412109,
+    "emissionStrength": 1.090000033378601,
     "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [
@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": false,
     "castShadows": false,
-    "treatBlacksAsTransparent": true
+    "treatBlacksAsTransparent": false
 }

@@ -526,7 +526,7 @@ namespace Engine {
 			 // Check for material resource
 			 if (MaterialResource* material_resource = RM.loadResource<MaterialResource>(convertToMaterialGuid(item.m_material_guid)))
 			 {
-
+				 prog.setUniform("uHasMaterial", true);
 			    prog.setUniform("uEmissive", material_resource->enableEmission);
 				prog.setUniform("uBlacksAsTransparent", material_resource->treatBlacksAsTransparent);
 				
@@ -609,6 +609,7 @@ namespace Engine {
 			 }
 			 else
 			 {
+				 prog.setUniform("uHasMaterial", false);
 				 // New workflow has no ambient lighting
 				 prog.setUniform("material_.albedo", glm::vec3(m_defaultMaterial.baseColor[0],
 					 m_defaultMaterial.baseColor[1],
