@@ -18,8 +18,8 @@
     ],
     "metallic": 0.0,
     "roughness": 0.0,
-    "opacity": 1.0,
-    "emissionStrength": 1.2899999618530273,
+    "opacity": 0.23000000417232513,
+    "emissionStrength": 5.329999923706055,
     "alphaThreshold": 0.5120000243186951,
     "ambientOcclusion": 0.5,
     "tiling": [
@@ -35,5 +35,5 @@
     "doubleSided": false,
     "receiveShadows": false,
     "castShadows": false,
-    "treatBlacksAsTransparent": true
+    "treatBlacksAsTransparent": false
 }
