@@ -1,13 +1,13 @@
+/Resources/Sources/Textures/lvl2redesign_level_design_v005_v004_Emissive.png|1774543237|2726979
+/Resources/Sources/Textures/NormalSentryWindow.png|1772712478|300044
 /Resources/Sources/Scenes/level2_player_old.json|1773149076|369964
 /Resources/Sources/Textures/lvl1_level_design_v003_lvl1_level_design_v003_BaseColor.png|1770194165|75002
-/Resources/Sources/Textures/NormalSentryWindow.png|1772712478|300044
-/Resources/Sources/Textures/lvl2redesign_level_design_v005_v004_Emissive.png|1774543237|2726979
 /Resources/Sources/Textures/vfx/Splash28.png|1772712479|3689594
 /Resources/Sources/Textures/vfx/Magic13.png|1772712478|142324
 /Resources/Sources/Material/MAT_lvl2redesign_level_design.mat|1774409148|1101
-/Resources/Sources/Textures/testcat.jpg|1774366860|5876
-/Resources/Sources/Textures/vfx/Fire5.png|1772712478|97223
 /Resources/Sources/Textures/vfx/Circle32.png|1772712478|3030324
+/Resources/Sources/Textures/vfx/Fire5.png|1772712478|97223
+/Resources/Sources/Textures/testcat.jpg|1774366860|5876
 /Resources/Sources/Meshes/E009_keylogger_v005.fbx|1773371704|56412
 /Resources/Sources/Textures/MainMenu_GeneralFill.png|1774012876|138
 /Resources/Sources/Textures/vfx/Drop.png|1772712478|824
@@ -47,7 +47,7 @@
 /Resources/Sources/Textures/E005_loveletter_v003_BaseColor.png|1769939465|160385
 /Resources/Sources/Textures/vfx/ImpactToon7.png|1772712478|16119
 /Resources/Sources/Audio/Lose Screen Yell no reverb/Office Worker_3.wav|1774680597|165042
-/Resources/Sources/Scenes/level2_graphic_card.json|1774625785|417847
+/Resources/Sources/Scenes/level2_graphic_card.json|1774705873|418341
 /Resources/Sources/Audio/COMBAT_Vestigal_Strings+Perc-Action_BGM_140bpm.wav|1769939463|17070698
 /Resources/Sources/Textures/vfx/Flare3.png|1772712478|42671
 /Resources/Sources/Textures/vfx/SpikeBall.png|1772712479|309956
@@ -94,7 +94,7 @@
 /Resources/Sources/Textures/vfx/Fire10.png|1772712478|17678
 /Resources/Sources/Audio/office_ambience.wav|1769939464|80645084
 /Resources/Sources/Textures/vfx/Circle16.png|1772712478|124756
-/Resources/Sources/Textures/Tooltip_InstructionsLvl3.png|1774570002|75492
+/Resources/Sources/Textures/Tooltip_InstructionsLvl3.png|1774704979|73921
 /Resources/Sources/Textures/vfx/LightingShape.png|1772712478|32211
 /Resources/Sources/Scenes/Level1_NewPlayer_Backup.json|1773149076|292546
 /Resources/Sources/Textures/A1001_turret_v005_Opacity.png|1772542384|27345
@@ -308,7 +308,7 @@
 /Resources/Sources/Textures/A1001_turret_v005_Emissive.png|1772542384|62837
 /Resources/Sources/Textures/vfx/Glow6.png|1772712478|319812
 /Resources/Sources/Textures/Trenchrun CorruptedCore/Corrupted Core_v002_Roughness.png|1772799324|120321
-/Resources/Sources/Textures/Tooltip_DescriptionLoveLetter.png|1774570002|86029
+/Resources/Sources/Textures/Tooltip_DescriptionLoveLetter.png|1774704979|83857
 /Resources/Sources/Meshes/E005_loveletter_separated_v004.fbx|1771441106|91264
 /Resources/Sources/Textures/ShutdownButton.png|1769939466|5023
 /Resources/Sources/Meshes/core pad.fbx|1769939465|30416
@@ -431,7 +431,7 @@
 /Resources/Sources/Audio/Sentry Ambient.wav|1772542384|576080
 /Resources/Sources/Audio/System AI_VO_Trench Run Win.wav|1774680598|562358
 /Resources/Sources/Audio/Loveletter_Ambient.wav|1769939463|256808
-/Resources/Sources/Textures/Tooltip_DescriptionWorms.png|1774570002|67180
+/Resources/Sources/Textures/Tooltip_DescriptionWorms.png|1774704979|62425
 /Resources/Sources/Audio/laserSmall_001.ogg|1769939463|7448
 /Resources/Sources/Material/ShutdownButton.mat|1769939465|779
 /Resources/Sources/Meshes/lvl1_level_design_v002.fbx|1769939465|38192
@@ -462,7 +462,7 @@
 /Resources/Sources/Textures/E001_worm_host_v004_Emissive.png|1771441106|80883
 /Resources/Sources/Textures/DefenceSuccess_Level2Cutscene.png|1773371704|20708
 /Resources/Sources/Material/MAT_lvl2redesign_v003.mat|1774543237|1101
-/Resources/Sources/Textures/Tooltip_DescriptionBotnet.png|1774570002|65914
+/Resources/Sources/Textures/Tooltip_DescriptionBotnet.png|1774704979|61723
 /Resources/Sources/Material/Firewall_Logo.mat|1769939464|785
 /Resources/Sources/Audio/System AI_VO_Trench Run Enemies.wav|1773149076|989078
 /Resources/Sources/Textures/vfx/Spiral13.png|1772712479|123299
@@ -679,7 +679,7 @@
 /Resources/Sources/Audio/Small Laser_3.wav|1774012876|68618
 /Resources/Sources/Textures/Trenchrun LevelDesign/trench_run_v006_Opacity.png|1772899809|25415
 /Resources/Sources/Textures/vfx/Circle15.png|1772712478|109952
-/Resources/Sources/Textures/Tooltip_InstructionsLvl2.png|1774570002|75186
+/Resources/Sources/Textures/Tooltip_InstructionsLvl2.png|1774704979|72479
 /Resources/Sources/Textures/vfx/DigitalShapes2.png|1772712478|1079
 /Resources/Sources/Shaders/hdr.frag|1772712478|915
 /Resources/Sources/Textures/lvl1_level_design_v003_lvl1_level_design_v003_Emissive.png|1770194165|1897251
@@ -935,7 +935,7 @@
 /Resources/Sources/Textures/Trenchrun CorruptedCore/Corrupted Core_v001_v001_BaseColor.png|1772724792|48790
 /Resources/Sources/Textures/vfx/Flare17.png|1772712478|106242
 /Resources/Sources/Textures/E009_keylogger_v005_v002_Metallic.png|1773371704|85836
-/Resources/Sources/Scenes/level3_motherboard.json|1774684349|566173
+/Resources/Sources/Scenes/level3_motherboard.json|1774705900|566129
 /Resources/Sources/Textures/vfx/Glow9.png|1772712478|98887
 /Resources/Sources/Textures/vfx/Circle17.png|1772712478|96112
 /Resources/Sources/Textures/vfx/Impact19.png|1772712478|91124
