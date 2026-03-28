@@ -1,14 +1,14 @@
 /Resources/Sources/Shaders/debug.frag|1774282469|126
 /Resources/Sources/Scenes/level2_player_old.json|1774282468|369964
-/Resources/Sources/Scenes/lovelettertest.json|1774282468|28146
-/Resources/Sources/Textures/ExclamationIcon.png|1774282469|9974
+/Resources/Sources/Textures/Paused_RestartButton.png|1774282469|6998
 /Resources/Sources/Textures/vfx/Splash6.png|1774282471|78291
 /Resources/Sources/Textures/vfx/Flare16.png|1774282470|58864
-/Resources/Sources/Textures/Paused_RestartButton.png|1774282469|6998
-/Resources/Sources/Textures/vfx/Projectile17.png|1774282471|47890
-/Resources/Sources/Material/MAT_lvl2redesign_level_design.mat|1774377353|1101
-/Resources/Sources/Shaders/skybox.vert|1774282469|522
+/Resources/Sources/Textures/ExclamationIcon.png|1774282469|9974
+/Resources/Sources/Scenes/lovelettertest.json|1774282468|28146
 /Resources/Sources/Textures/vfx/GroundCrack6.png|1774282470|51173
+/Resources/Sources/Shaders/skybox.vert|1774282469|522
+/Resources/Sources/Material/MAT_lvl2redesign_level_design.mat|1774377353|1101
+/Resources/Sources/Textures/vfx/Projectile17.png|1774282471|47890
 /Resources/Sources/Textures/testcat.jpg|1774287793|5876
 /Resources/Sources/Textures/vfx/Impact43.png|1774282471|5781816
 /Resources/Sources/Material/PlayerHitSparks.mat|1774282468|796
@@ -289,6 +289,7 @@
 /Resources/Sources/Textures/vfx/Shield.png|1774282471|24551
 /Resources/Sources/Material/MAT_PlayerDeathExplosion1.mat|1774282468|857
 /Resources/Sources/Shaders/shadow_depth.vert|1774282469|196
+/Resources/Sources/Material/Explosion_Corruption1.mat|1774721304|800
 /Resources/Sources/Textures/vfx/SpikeBallTwirl.png|1774282471|341109
 /Resources/Sources/Textures/vfx/Smoke4.png|1774282471|73516
 /Resources/Sources/Audio/Player Heal.wav|1774282466|997752
@@ -982,6 +983,7 @@
 /Resources/Sources/Textures/Destructible Wall/Destructible wall_v001_v001_Emissive.png|1774282469|281724
 /Resources/Sources/Textures/vfx/Line6.png|1774282471|2189
 /Resources/Sources/Material/RootLoveLetterSpawn.mat|1774682626|885
-/Resources/Sources/Scenes/LX_VFX_ENEMIES.json|1774693133|350
 /Resources/Sources/Material/VFX_Enemy_Worm_Aura1.mat|1774715400|826
 /Resources/Sources/Material/VFX_Enemy_Worm_Ring.mat|1774691716|781
+/Resources/Sources/Scenes/LX_VFX_TEST_1.json|1774720606|15851
+/Resources/Sources/Material/VFX_WallExplosion.mat|1774720895|786
