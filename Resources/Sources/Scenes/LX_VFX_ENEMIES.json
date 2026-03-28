@@ -1,0 +1,319 @@
+{
+    "Scene": "LX_VFX_ENEMIES",
+    "Version": "1.0",
+    "Entities": [
+        {
+            "ID": 1,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "VFX_Enemy_Worm_Aura1",
+                        "Tag": "VFX_Enemy_Worm_Aura1"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5746338676796735657",
+                        "PrefabAssetGuid": "14963632608173965495",
+                        "isPrefabRoot": false,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: WormHost.prefab",
+                        "prefabVersion": 2,
+                        "componentOverrides": [
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "modifiedPropertyNames": [
+                                    "Name",
+                                    "Tag"
+                                ]
+                            },
+                            {
+                                "componentType": 17,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": true,
+                                "originalComponentJSON": "{\"Properties\":{\"Material Type\":\"\",\"Num Segments\":2,\"Start Width\":0.20000000298023224,\"End Width\":0.20000000298023224,\"Start Color\":[1.0,1.0,1.0,1.0],\"End Color\":[1.0,1.0,1.0,1.0],\"Noise Amplitude\":0.0,\"Noise Speed\":1.0,\"UV Scroll Speed\":0.0,\"Start Offset\":[0.0,0.0,0.0],\"End Point Offset\":[0.0,0.0,0.0],\"Active\":true}}"
+                            },
+                            {
+                                "componentType": 16,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": true,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"8052181686011674797\",\"Material Type\":\"\",\"Max Segments\":50,\"Segment Lifetime\":1.0,\"Min Distance\":0.10000000149011612,\"Sample Interval\":0.01600000075995922,\"Sample Accumulator\":0.0,\"Start Color\":[1.0,1.0,1.0,1.0],\"End Color\":[1.0,1.0,1.0,0.0],\"Start Width\":0.5,\"End Width\":0.10000000149011612,\"Last Position\":[0.0,0.0,0.0],\"Local Offset\":[0.0,0.0,0.0],\"Has Last Position\":false,\"Active\":true,\"Emit Trail\":true}}"
+                            },
+                            {
+                                "componentType": 5,
+                                "isAddedComponent": true,
+                                "isRemovedComponent": false,
+                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"\",\"Initial Velocity\":[0.0,1.0,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[0.0,0.0,0.699999988079071],\"Color Max\":[0.30000001192092896,0.30000001192092896,1.0],\"Emitter Shape\":0,\"Max Particles\":1000,\"Particle Type\":0,\"Emission Rate\":5.0,\"Particle Lifetime\":2.0,\"Emission Accumulator\":0.0,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":15.0,\"Min Speed\":0.5,\"Max Speed\":1.5,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}",
+                                "modifiedPropertyNames": [
+                                    "modified"
+                                ]
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10358024695224123559",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 0,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ParticleComponent",
+                    "Properties": {
+                        "ComponentGUID": "0",
+                        "Particle Type Advanced": "",
+                        "Material Type": "VFX_Enemy_Worm_Aura1.mat",
+                        "Initial Velocity": [
+                            0.0,
+                            1.0,
+                            0.0
+                        ],
+                        "Start Size": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Default Size": [
+                            0.5,
+                            0.5,
+                            0.5
+                        ],
+                        "End Size": [
+                            70.0,
+                            70.0,
+                            70.0
+                        ],
+                        "Emission Box Size": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Color Min": [
+                            0.699999988079071,
+                            0.0,
+                            0.0
+                        ],
+                        "Color Max": [
+                            1.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Emitter Shape": 0,
+                        "Max Particles": 13,
+                        "Particle Type": 0,
+                        "Emission Rate": 2.5,
+                        "Particle Lifetime": 0.4000000059604645,
+                        "Emission Accumulator": 0.0,
+                        "Particle Size": 0.20000000298023224,
+                        "Grow Phase End": 0.0,
+                        "Shrink Phase Start": 0.0,
+                        "Emission Sphere Radius": 1.0,
+                        "Velocity Randomness": 0.0,
+                        "Lifetime Randomness": 0.7300000190734863,
+                        "Spread Angle": 15.0,
+                        "Min Speed": 0.5,
+                        "Max Speed": 1.5,
+                        "Rotation Speed": 0.0,
+                        "Play Delay": 0.0,
+                        "Delay Accumulator": 0.0,
+                        "Randomize Rotation": false,
+                        "Loop": true,
+                        "Active": true,
+                        "World Space": true,
+                        "Burst Mode": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 0,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "WormHost",
+                        "Tag": "WormHost"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "5746338676796555427",
+                        "PrefabAssetGuid": "14963632608173965495",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: WormHost.prefab",
+                        "prefabVersion": 2,
+                        "prefabFilePath": "C:/Users/Atlas/Desktop/GAM3 engine/repo/build/bin/Debug/Resources/Sources/Prefabs/WormHost.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"6748275165371336983\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.009999999776482582,0.009999999776482582,0.009999999776482582],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"18277490211439806741\",\"Name\":\"WormHost\",\"Tag\":\"WormHost\"}}"
+                            },
+                            {
+                                "componentType": 2,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"407206890034530587\",\"Mesh\":\"E001_worm_host_v006.fbx\",\"Material\":\"WormHost.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
+                            },
+                            {
+                                "componentType": 6,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15971647202226424089\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":true,\"UseGravity\":false,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[20.0,20.0,20.0],\"SphereRadius\":0.5}}"
+                            },
+                            {
+                                "componentType": 9,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"17014943003178271835\",\"FilePath\":\"Worm_Host_Ambient.wav\",\"Type\":5,\"State\":0,\"Volume\":1.0,\"Pitch\":1.0,\"Loop\":true,\"Mute\":false,\"ReverbProperties\":1.0,\"Is3D\":true,\"MinDistance\":40.07899856567383,\"MaxDistance\":200.40699768066406,\"RolloffMode\":1,\"DopplerLevel\":1.0,\"Pan2D\":0.0}}"
+                            },
+                            {
+                                "componentType": 8,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": true,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"3289510651551910173\",\"ScriptClassName\":\"Game.WormHost\",\"Started\":false,\"GCHandle\":19}}"
+                            }
+                        ],
+                        "childEntityIDs": [
+                            1
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6748275165371336983",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            0.009999999776482582,
+                            0.009999999776482582,
+                            0.009999999776482582
+                        ],
+                        "Parent": 4294967295,
+                        "Children": [
+                            1
+                        ]
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "407206890034530587",
+                        "Mesh": "E001_worm_host_v006.fbx",
+                        "Material": "WormHost.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "15971647202226424089",
+                        "Mass": 1.0,
+                        "IsKinematic": false,
+                        "IsTrigger": true,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            20.0,
+                            20.0,
+                            20.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "17014943003178271835",
+                        "FilePath": "Worm_Host_Ambient.wav",
+                        "Type": 5,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 40.07899856567383,
+                        "MaxDistance": 200.40699768066406,
+                        "RolloffMode": 1,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                }
+            ]
+        }
+    ],
+    "Settings": [
+        {
+            "BloomToggle": false,
+            "BloomStrength": 0.009999999776482582,
+            "BloomFilterRadius": 0.0024999999441206455,
+            "Exposure": 5.0,
+            "GlobalBias": 0.004999999888241291
+        }
+    ]
+}
