@@ -1,0 +1,120 @@
+{
+    "Prefab Name": "VFX_Enemy_Pierce",
+    "Prefab GUID": 11510946199889887433,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "VFX_Enemy_Pierce",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "10358024695224123559",
+                            "Position": [
+                                -0.5517845153808594,
+                                -5.843530654907227,
+                                -26.541019439697266
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                90.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14969710713651511461",
+                            "Name": "VFX_Enemy_Pierce",
+                            "Tag": "VFX_Enemy_Pierce"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "VFX_Enemy_Worm_Aura1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.10000000149011612,
+                                102.0999984741211
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "End Size": [
+                                40.599998474121094,
+                                40.0,
+                                40.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Color Max": [
+                                1.0,
+                                0.27450981736183167,
+                                0.27450981736183167
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 57,
+                            "Particle Type": 0,
+                            "Emission Rate": 3.5,
+                            "Particle Lifetime": 2.9000000953674316,
+                            "Emission Accumulator": 0.4359372854232788,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.800000011920929,
+                            "Shrink Phase Start": 0.4000000059604645,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.7300000190734863,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.0,
+                            "Max Speed": 4.050000190734863,
+                            "Rotation Speed": 90.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 12.58935546875,
+                            "Randomize Rotation": false,
+                            "Loop": true,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": false
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
