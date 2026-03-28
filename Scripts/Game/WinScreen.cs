@@ -5,6 +5,7 @@ using static Engine.SpriteRenderer;
 using static Engine.Event;
 using static Engine.AudioManager;
 using static Engine.Prefab;
+using static Engine.Scene;
 
 namespace Game
 {
@@ -44,12 +45,16 @@ namespace Game
 
         // Button fade delay
         private bool pendingLoad = false;
-        private float showDelay = 2.0f;
+        private float showDelay = 0.5f; //changed from 2.0 to 0.5 --> TODO: CUT STRAIGHT TO BLACK SCREEN
         private float showDelayTimer = 0.0f;
 
         // Score & Time cached 
         private const string EVENT_SHOW_SCORE = "ShowFinalScore";
         private const string EVENT_SHOW_TIME  = "ShowTimeSurvived";
+
+        // BlackScreen
+        private uint blackScreenID = 0;
+        private const string blackScreenName = "BlackScreen";
 
         public override void OnStart()
         {
@@ -68,6 +73,12 @@ namespace Game
             WinCutSceneContext.FinalTime  = "00 m : 00 s";
 
             SetIsVisible((uint)EntityID, false);
+
+            blackScreenID = SceneFindEntityByName(blackScreenName);
+            if(blackScreenID != 0)
+            {
+                SetIsVisible(blackScreenID, false);
+            }
 
             initialized = true;
             LogMessage("[WinScreen] Initialized - waiting for win condition");
@@ -150,6 +161,11 @@ namespace Game
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
 
+            if(blackScreenID != 0)
+            {
+                SetIsVisible(blackScreenID, true);
+            }
+
             Publish(GAMEWIN, "");
 
             pendingLoad = true;
@@ -170,6 +186,11 @@ namespace Game
             fadeElapsed = 0.0f;
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
+            
+            if(blackScreenID != 0)
+            {
+                SetIsVisible(blackScreenID, true);
+            }
 
             Publish(GAMEWIN, "");
 
