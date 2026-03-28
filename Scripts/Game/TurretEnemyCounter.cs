@@ -26,7 +26,7 @@ namespace Game
                     Publish("OneTurretDestroyed", EntityID.ToString());
                 }
 
-                if(turretCount == 6){
+                if(turretCount == 2){
                     Publish("FiveTurretsDestroyed", EntityID.ToString());
                     destroyed = true;
                 }
