@@ -84,8 +84,8 @@ namespace Game
         // ========================= TUTORIAL SETTING ======================
         [SerializeField] private bool tutorialover = false;
         private int tutorialstate = 0;
-        private float tutorialSpawnInterval = 5.0f;
-        [SerializeField] private float tutorialCountdown = 7.5f;
+        private float tutorialSpawnInterval = 0.0f;
+        [SerializeField] private float tutorialCountdown = 0.0f;
         private const uint INVALID_ENTITY = 0xffffffffu;
 
         // ============== RNG Setting =================
@@ -148,19 +148,22 @@ namespace Game
             if (!tutorialover)
             {
                 // Complete tutorial if loveletter is destroyed
-                if (tutorialstate > 2 && SceneFindEntityByName("loveletter") == INVALID_ENTITY)
+                if (tutorialstate > 2 && 
+                   SceneFindEntityByName("botnet") == INVALID_ENTITY &&
+                   SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
+                   SceneFindEntityByName("loveletter") == INVALID_ENTITY)
                 {
                     tutorialover = true;
                     Publish(EVENT_TUTORIALOVER, "");
                 }
 
-                // Time delay between enemy spawns
-                if (SceneFindEntityByName("botnet") == INVALID_ENTITY &&
-                   SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
-                   SceneFindEntityByName("loveletter") == INVALID_ENTITY)
-                {
-                    tutorialCountdown -= deltaTime;
-                }
+                //// Time delay between enemy spawns
+                //if (SceneFindEntityByName("botnet") == INVALID_ENTITY &&
+                //   SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
+                //   SceneFindEntityByName("loveletter") == INVALID_ENTITY)
+                //{
+                //    tutorialCountdown -= deltaTime;
+                //}
 
                 // Spawn enemy
                 if (tutorialCountdown <= 0.0f)

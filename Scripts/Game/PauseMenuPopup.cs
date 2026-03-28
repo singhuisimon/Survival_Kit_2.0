@@ -82,7 +82,7 @@ namespace Game
 
         private const string EVENT_GAME_PAUSED = "GamePaused";
         private const string EVENT_GAME_RESUMED = "GameResumed";
-        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPauseMenu";
+        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "TutorialPauseMenu";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
 
         // Entity IDs

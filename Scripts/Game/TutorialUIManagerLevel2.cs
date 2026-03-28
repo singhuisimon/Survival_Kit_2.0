@@ -128,8 +128,8 @@ namespace Game
                 // Return to tutorial from pause menu
                 if (escapeJustPressed) {
                     playerPauseOnTutorial = false;
-                    Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
-                    Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
                 }
                 return;
             }
@@ -143,12 +143,12 @@ namespace Game
                 if (escapeJustPressed) {
                     // Inform subscribers pause is user-induced
                     playerPauseOnTutorial = true;
-                    Publish("Level2TutorialPause", false.ToString());
+                    Publish("TutorialPauseAudio", false.ToString());
                     return;
                 } else {
                     // Inform subscribers pause is tutorial-induced
-                    Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
-                    Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
                     CrosshairVisibility(false);
                 }
 
@@ -232,8 +232,8 @@ namespace Game
             }
 
             // Ensure subscribers know level 2 pause is not tutorial-induced
-            Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
-            Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
+            Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+            Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
             CrosshairVisibility(true);
 
             // Check for enemy spawning events if tutorial is ongoing

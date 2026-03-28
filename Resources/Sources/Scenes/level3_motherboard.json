@@ -3,6 +3,48 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 162,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "TutorialUIManagerLevel3",
+                        "Tag": "TutorialUIManagerLevel3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "9032796524325196719",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "14797404047359611825",
+                        "ScriptClassName": "Game.TutorialUIManagerLevel3"
+                    }
+                }
+            ]
+        },
+        {
             "ID": 51048604,
             "Components": [
                 {
@@ -840,7 +882,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1218,7 +1260,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1308,7 +1350,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5311,7 +5353,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6538,7 +6580,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6850,8 +6892,8 @@
                         ],
                         "Rotation": [
                             0.04088059440255165,
-                            -0.029375262558460236,
-                            3.6360619376507586e-12
+                            -0.029375256970524788,
+                            4.4502838913995646e-12
                         ],
                         "Scale": [
                             1.0,
@@ -6874,7 +6916,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.9374369382858276,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -7650,7 +7692,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7797,7 +7839,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -9983,7 +10025,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10067,7 +10109,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10151,7 +10193,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10235,7 +10277,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10319,7 +10361,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10403,7 +10445,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10487,7 +10529,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10571,7 +10613,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10655,7 +10697,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10739,7 +10781,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10823,7 +10865,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10907,7 +10949,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -10991,7 +11033,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11075,7 +11117,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11159,7 +11201,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11243,7 +11285,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: EnemyIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11327,7 +11369,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11411,7 +11453,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11495,7 +11537,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11579,7 +11621,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11663,7 +11705,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11747,7 +11789,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11831,7 +11873,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11915,7 +11957,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11999,7 +12041,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12083,7 +12125,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12167,7 +12209,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12251,7 +12293,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12335,7 +12377,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12419,7 +12461,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12503,7 +12545,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12587,7 +12629,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: UpgradeIndicator.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12671,7 +12713,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Audio_PrimaryFire.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Audio_PrimaryFire.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Audio_PrimaryFire.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12717,7 +12759,7 @@
                         ],
                         "Rotation": [
                             179.95912170410156,
-                            0.02937527932226658,
+                            0.02937527745962143,
                             180.0
                         ],
                         "Scale": [
@@ -12808,7 +12850,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: Audio_PrimaryFire.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Audio_PrimaryFire.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Audio_PrimaryFire.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -12854,7 +12896,7 @@
                         ],
                         "Rotation": [
                             179.95912170410156,
-                            0.02937527932226658,
+                            0.02937527745962143,
                             180.0
                         ],
                         "Scale": [
@@ -12945,7 +12987,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: MuzzleFlashBurst.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/MuzzleFlashBurst.prefab",
+                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/MuzzleFlashBurst.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -13242,6 +13284,57 @@
                         ],
                         "Quad": 3,
                         "Sprite Layer": 5,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 22020381,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI_InstructionLevel3",
+                        "Tag": "UI_InstructionLevel3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15852987986573314607",
+                        "Position": [
+                            950.0,
+                            260.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            126.80000305175781,
+                            76.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Tooltip_InstructionsLvl3.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": false
                     }
