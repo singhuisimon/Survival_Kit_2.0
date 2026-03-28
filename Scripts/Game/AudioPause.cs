@@ -17,7 +17,7 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
 
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
-        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPause";
+        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "TutorialPauseAudio";
 
 
         // ===== State =====
