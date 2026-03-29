@@ -368,6 +368,7 @@ namespace Game
                         currentState = TutorialState.BotnetInfo;
                         pauseForTutorial = false;
                         GameState.IsPaused = false;
+                        Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
                     }
                 //}
             }

@@ -18,8 +18,9 @@ namespace Game
         private float startingTime = 240.0f;  // 2 minutes = 120 seconds
 
         private float timePassed = 0.0f;
-        private float time1_5min = 90.0f;
-        private float time3min = 180.0f;
+        private float time2min = 120.0f;
+        private float time1min = 60.0f;
+        private float time10sec = 10.0f;
 
         // ===== Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
@@ -28,8 +29,8 @@ namespace Game
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string GAMEWIN = "GameWin";
         private const string EVENT_DEBUG_SET_TIMER = "DebugSetTimer";
-        private const string EVENT_1_5MIN = "1_5MIN";
-        private const string EVENT_3MIN = "3MIN";
+        //private const string EVENT_1_5MIN = "1_5MIN";
+        private const string EVENT_2MIN = "2MIN";
         private const string EVENT_BOTSPAWN = "BOTSPAWN";
         private const string EVENT_WORMSPAWN = "WORMSPAWN";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
@@ -39,8 +40,9 @@ namespace Game
         private bool gameOver = false;
         private float remainingTime = 0.0f;
 
-        private bool event1_5min = false;
-        private bool event3min = false;
+        private bool event2min = false;
+        private bool event1min = false;
+        private bool event10sec = false;
 
         public override void OnStart()
         {
@@ -106,6 +108,7 @@ namespace Game
         {
             float.TryParse(payload, out float newTime);
             remainingTime = newTime;
+            timePassed = startingTime - remainingTime;
             LogMessage("[TimerUI2] Debug: timer set to " + newTime + " seconds");
             UpdateTimerDisplay();
         }
@@ -142,7 +145,7 @@ namespace Game
             // Update the text display
             SetText((uint)EntityID, timeText);
 
-            if(!event1_5min || !event3min){
+            if(!event2min || !event1min || !event10sec){
                 CheckTimeForEvent();
             }
 
@@ -162,20 +165,24 @@ namespace Game
 
         private void CheckTimeForEvent(){
 
-            if(timePassed >= time1_5min && !event1_5min){
-                Publish(EVENT_1_5MIN, "");
-                event1_5min = true;
+            if(remainingTime <= time2min && !event2min){
+                Publish(EVENT_2MIN, "");
+                event2min = true;
                 return;
             }
 
-            if (event1_5min)
+            if(remainingTime <= time1min && !event1min)
             {
-                if(timePassed >= time3min && !event3min)
-                {
-                    Publish(EVENT_3MIN, "");
-                    event3min = true;
-                    return;
-                }
+                //publish event here
+                event1min = true;
+                return;
+            }
+
+            if(timePassed >= (startingTime - time10sec) && !event10sec)
+            {
+                //publish event here
+                event10sec = true;
+                return;
             }
 
         }

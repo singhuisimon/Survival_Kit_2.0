@@ -1856,7 +1856,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponFrame",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponFrame.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2006,7 +2006,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2138,7 +2138,7 @@
                         ],
                         "Rotation": [
                             90.0,
-                            -0.0,
+                            -1.0177775099486433e-13,
                             90.0
                         ],
                         "Scale": [
@@ -2208,7 +2208,7 @@
                         "Max Speed": 25.0,
                         "Rotation Speed": 0.0,
                         "Play Delay": 0.0,
-                        "Delay Accumulator": 4.4427490234375,
+                        "Delay Accumulator": 0.0,
                         "Randomize Rotation": true,
                         "Loop": false,
                         "Active": true,
@@ -2840,7 +2840,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9374369382858276,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -3105,7 +3105,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3772,6 +3772,26 @@
                     }
                 },
                 {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18299973105751295191",
+                        "FilePath": "Office Worker_Reverb_1.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "8776918099747013473",
@@ -4327,7 +4347,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SentryWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SentryWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SentryWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6001,7 +6021,7 @@
                             -1004.6934814453125
                         ],
                         "Rotation": [
-                            -9.67292180575896e-7,
+                            -9.672922942627338e-7,
                             36.000179290771484,
                             9.672826308815274e-7
                         ],
@@ -7293,7 +7313,7 @@
                         "Max Speed": 1.5,
                         "Rotation Speed": 0.0,
                         "Play Delay": 0.0,
-                        "Delay Accumulator": 4.4427490234375,
+                        "Delay Accumulator": 0.0,
                         "Randomize Rotation": false,
                         "Loop": false,
                         "Active": true,
@@ -7824,7 +7844,7 @@
                     "Type": "AudioComponent",
                     "Properties": {
                         "ComponentGUID": "4381985458912183229",
-                        "FilePath": "System AI_VO_Defence BGM.wav",
+                        "FilePath": "System AI_VO_Anti Virus Status.wav",
                         "Type": 4,
                         "State": 2,
                         "Volume": 0.6439999938011169,
@@ -7844,7 +7864,10 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "8993671477349598809",
-                        "ScriptClassName": "Game.AudioPause"
+                        "ScriptClassName": "Game.AudioPause",
+                        "Fields": {
+                            "startaudio": 5.0
+                        }
                     }
                 }
             ]
@@ -8339,7 +8362,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8404,7 +8427,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8735,7 +8758,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kenny/Desktop/GitHub/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -8839,7 +8862,7 @@
                         "Max Speed": 1.0,
                         "Rotation Speed": 0.0,
                         "Play Delay": 0.0,
-                        "Delay Accumulator": 4.4427490234375,
+                        "Delay Accumulator": 0.0,
                         "Randomize Rotation": false,
                         "Loop": false,
                         "Active": true,
