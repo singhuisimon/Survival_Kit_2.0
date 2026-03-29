@@ -165,10 +165,10 @@ namespace Engine {
 		AssetDescriptorGenerator& descriptorGenerator() { return m_descGen; }
 		const AssetDescriptorGenerator& descriptorGenerator() const { return m_descGen; }
 
-/**
- * @brief Get the compiled resources path
- * @return Reference to cached compiled path from config
- */
+		/**
+ 		* @brief Get the compiled resources path
+		* @return Reference to cached compiled path from config
+ 		*/
 		const std::string& getCompiledPath() const {
 			return m_cfg.compiledPath;
 		}
@@ -248,7 +248,9 @@ namespace Engine {
 
 		void handleAddedOrModified(const std::string& src);
 		void handleRemoved(const std::string& src);
-		//static const char* typeName(ResourceType t);
+		// Computes a fast FNV-1a hash of the file contents.
+		// Returns hex string, or empty string on read failure.
+		static std::string ComputeFileHash(const std::string& path);
 
 		// State
 		Config m_cfg{};

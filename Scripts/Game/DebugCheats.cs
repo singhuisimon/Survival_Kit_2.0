@@ -2,6 +2,7 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Event;
 using static Engine.Input;
+using System.Security.Cryptography;
 
 namespace Game
 {
@@ -16,14 +17,14 @@ namespace Game
     ///   Apostrophe (') = Reset all progress (not high scores)
     /// 
     /// NEW
-    ///    H             = Add +10 Player health (publishes "PlayerHeal")
-    ///    J             = Deal -10 Player damage (publishes "PlayerDamage")
-    ///    U             = Add 1 upgrade module payload (publishes "CollectPayload")
-    ///    G             = Fully recharge alt fire (publishes "GainUlt" x30)
-    ///    Z             = Go to Main Menu (loads MainMenu.json)
-    ///    X             = Go to Level 1 (loads trench_run.json)
-    ///    V             = Go to Level 2 (name.json)
-    ///    C             = Go to Level 3  (loads level2.json)
+    ///    Alt + H             = Add +10 Player health (publishes "PlayerHeal")
+    ///    Alt + J             = Deal -10 Player damage (publishes "PlayerDamage")
+    ///    Alt + U             = Add 1 upgrade module payload (publishes "CollectPayload")
+    ///    Alt + G             = Fully recharge alt fire (publishes "GainUlt" x30)
+    ///    Alt + Z             = Go to Main Menu (loads MainMenu.json)
+    ///    Alt + X             = Go to Level 1 (loads trench_run.json)
+    ///    Alt + V             = Go to Level 2 (name.json)
+    ///    Alt + C             = Go to Level 3  (loads level2.json)
     ///    
     /// Note: cheatcode to move to level2 is moved from PlayerWeapon.cs, was T key previously
     /// 
@@ -88,9 +89,13 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+
+           
+            bool altHeld = IsKeyPressed(KeyCode.LeftAlt) || IsKeyPressed(KeyCode.RightAlt);
+
             // Comma = Kill player
             bool commaPressed = IsKeyPressed(KeyCode.Comma);
-            if (commaPressed && !wasCommaPressed)
+            if (altHeld && commaPressed && !wasCommaPressed)
             {
                 LogMessage("[DebugCheats] Comma pressed - killing player");
                 Publish("PlayerDead", "");
@@ -99,7 +104,7 @@ namespace Game
 
             // Period = Kill enemy core
             bool periodPressed = IsKeyPressed(KeyCode.Period);
-            if (periodPressed && !wasPeriodPressed)
+            if (altHeld && periodPressed && !wasPeriodPressed)
             {
                 LogMessage("[DebugCheats] Period pressed - killing enemy core");
                 Publish("EnemyCoreDeath", "");
@@ -108,7 +113,7 @@ namespace Game
 
             // Slash = Set timer to 10 seconds
             bool slashPressed = IsKeyPressed(KeyCode.Slash);
-            if (slashPressed && !wasSlashPressed)
+            if (altHeld && slashPressed && !wasSlashPressed)
             {
                 LogMessage("[DebugCheats] Slash pressed - setting timer to 10 seconds");
                 Publish("DebugSetTimer", "10");
@@ -117,7 +122,7 @@ namespace Game
 
             // Apostrophe = Reset all progress
             bool apostrophePressed = IsKeyPressed(KeyCode.Apostrophe);
-            if (apostrophePressed && !wasApostrophePressed)
+            if (altHeld && apostrophePressed && !wasApostrophePressed)
             {
                 ProgressTracker.ResetAllProgress();
                 LogMessage("[DebugCheats] Apostrophe pressed - all progress reset");
@@ -127,7 +132,7 @@ namespace Game
 
         // H = Add +10 player health
             bool hPressed = IsKeyPressed(KeyCode.H);
-            if (hPressed && !wasHPressed)
+            if (altHeld && hPressed && !wasHPressed)
             {
                 Publish(EVENT_PLAYER_HEAL, "10");
                 LogMessage("[DebugCheats] H - PlayerHeal +10 sent to SpaceshipController");
@@ -136,7 +141,7 @@ namespace Game
  
             // J = Deal -10 damage to player
             bool jPressed = IsKeyPressed(KeyCode.J);
-            if (jPressed && !wasJPressed)
+            if (altHeld && jPressed && !wasJPressed)
             {
                 Publish(EVENT_PLAYER_DAMAGE, "10");
                 LogMessage("[DebugCheats] J - PlayerDamage -10 sent to SpaceshipController");
@@ -145,7 +150,7 @@ namespace Game
  
             // U = Add 1 upgrade module (payload)
             bool uPressed = IsKeyPressed(KeyCode.U);
-            if (uPressed && !wasUPressed)
+            if (altHeld && uPressed && !wasUPressed)
             {
                 Publish(EVENT_COLLECT_PAYLOAD, "");
                 LogMessage("[DebugCheats] U - added 1 upgrade module (CollectPayload)");
@@ -154,7 +159,7 @@ namespace Game
  
             // G = Fully recharge alt fire (publish GainUlt enough times to fill bar)
             bool gPressed = IsKeyPressed(KeyCode.G);
-            if (gPressed && !wasGPressed)
+            if (altHeld && gPressed && !wasGPressed)
             {
                 for (int i = 0; i < ALT_FIRE_MAX_CHARGE; i++)
                 {
@@ -163,10 +168,12 @@ namespace Game
                 LogMessage("[DebugCheats] G - alt fire fully recharged (published GainUlt x" + ALT_FIRE_MAX_CHARGE + ")");
             }
             wasGPressed = gPressed;
- 
+
+
+
             // Z = Go to Main Menu
             bool zPressed = IsKeyPressed(KeyCode.Z);
-            if (zPressed && !wasZPressed)
+            if (altHeld && zPressed && !wasZPressed)
             {
                 LogMessage("[DebugCheats] Z - loading Main Menu");
                 GameState.IsPaused = false;
@@ -177,7 +184,7 @@ namespace Game
  
             // X = Go to Level 1
             bool xPressed = IsKeyPressed(KeyCode.X);
-            if (xPressed && !wasXPressed)
+            if (altHeld && xPressed && !wasXPressed)
             {
                 LogMessage("[DebugCheats] X - loading Level 1");
                 GameState.IsPaused = false;
@@ -188,7 +195,7 @@ namespace Game
 
             // V = Go to Level 2
             bool vPressed = IsKeyPressed(KeyCode.V);
-            if (vPressed && !wasVPressed)
+            if (altHeld && vPressed && !wasVPressed)
             {
                 LogMessage("[DebugCheats] V - loading level 2");
                 GameState.IsPaused = false;
@@ -199,7 +206,7 @@ namespace Game
 
             // C = Go to Level 3 (moved from PlayerWeapon.cs, was T key)
             bool cPressed = IsKeyPressed(KeyCode.C);
-            if (cPressed && !wasCPressed)
+            if (altHeld && cPressed && !wasCPressed)
             {
                 LogMessage("[DebugCheats] C - loading Level 3");
                 GameState.IsPaused = false;
