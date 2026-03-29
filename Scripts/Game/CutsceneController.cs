@@ -7,6 +7,7 @@ using System;
 using static Engine.Scene;
 using static Engine.Event;
 using static Engine.Logger;
+using static Engine.SpriteRenderer;
 
 namespace Game
 {
@@ -23,6 +24,7 @@ namespace Game
         private uint pg1ID;
         private uint pg2ID;
         private uint pg3ID;
+        private uint SkipButtonID;
 
         // State
         private float elapsedTime = 0.0f;
@@ -30,6 +32,7 @@ namespace Game
         private bool cutsceneStarted = false;
         private float cutsceneTime = 0.0f;
         private bool hasLoadedMenu = false;
+        private bool skipped = false;
 
         public override void OnStart()
         {
@@ -40,12 +43,15 @@ namespace Game
             cutsceneStarted = false;
             cutsceneTime = 0.0f;
             hasLoadedMenu = false;
+            
 
             epilepsyImageID = SceneFindEntityByName("Epilepsy Warning Image");
             pg1ID = SceneFindEntityByName("Cutscene Page 1");
             pg2ID = SceneFindEntityByName("Cutscene Page 2");
             pg3ID = SceneFindEntityByName("Cutscene Page 3");
+            SkipButtonID = SceneFindEntityByTag("SkipButton");
 
+            SetIsVisible(SkipButtonID, false);
             LogMessage("CutsceneController: Found entities - Epilepsy: " + epilepsyImageID
                 + ", pg1: " + pg1ID + ", pg2: " + pg2ID + ", pg3: " + pg3ID);
         }
@@ -55,6 +61,19 @@ namespace Game
             if (hasLoadedMenu)
                 return;
 
+            if (!cutsceneStarted)
+            {
+                SetIsVisible(SkipButtonID, false);
+            }
+            if (!skipped && CheckSkipInput())
+            {
+                skipped = true;
+                cutsceneStarted = true;
+                cutsceneTime = 5.82f;
+                SetIsVisible(SkipButtonID, false);
+                UpdateCutscene();
+                return;
+            }
             if (!cutsceneStarted)
             {
                 elapsedTime += deltaTime;
@@ -78,9 +97,14 @@ namespace Game
                 UpdateCutscene();
             }
         }
+        
 
         private void UpdateCutscene()
         {
+            if (cutsceneTime > 0.45f && cutsceneTime <= 5.81f)
+                SetIsVisible(SkipButtonID, true);
+            else
+                SetIsVisible(SkipButtonID, false);
             // Epilepsy fade-out: 0s opacity 1 -> 0.45s opacity 0
             if (cutsceneTime <= 0.45f)
             {
@@ -125,6 +149,7 @@ namespace Game
                 hasLoadedMenu = true;
                 LogMessage("CutsceneController: Loading main menu during pg3");
                 //Publish("LoadScene", mainMenuScenePath);
+                SetIsVisible(SkipButtonID, false);
                 bool success = Scene.SceneLoadFromFile(mainMenuScenePath);
                 if (success)
                 {
@@ -133,6 +158,15 @@ namespace Game
 
 
             }
+        }
+
+        private bool CheckSkipInput()
+        {
+            if (Input.IsMouseButtonPressed(MouseButton.Left) && Collision2D.IsMouseCollidingWithEntity(SkipButtonID))
+            {
+                return true;
+            }
+            return false;
         }
 
         private bool CheckAnyInput()
