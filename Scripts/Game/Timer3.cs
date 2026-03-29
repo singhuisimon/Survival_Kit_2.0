@@ -18,9 +18,9 @@ namespace Game
         private float startingTime = 240.0f;  // 2 minutes = 120 seconds
 
         private float timePassed = 0.0f;
-        private float time2min = 120.0f;
-        private float time1min = 60.0f;
-        private float time10sec = 10.0f;
+        private float time2min = 120.5f;
+        private float time1min = 60.5f;
+        private float time10sec = 10.5f;
 
         // ===== Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
