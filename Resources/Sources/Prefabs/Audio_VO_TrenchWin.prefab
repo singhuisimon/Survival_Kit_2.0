@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Prefab: Audio_VO_TrenchWin.prefab",
+    "Prefab GUID": 11837413193427730605,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Audio_VO_TrenchWin",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11457439565704659319",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17822723486416339121",
+                            "Name": "Audio_VO_TrenchWin",
+                            "Tag": "Audio"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9151596556491342201",
+                            "FilePath": "System AI_VO_Trench Run Win.wav",
+                            "Type": 4,
+                            "State": 2,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5692832042671096187",
+                            "ScriptClassName": "Game.GameVODelaySoundPrefab",
+                            "Started": false,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

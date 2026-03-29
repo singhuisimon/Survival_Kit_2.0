@@ -165,6 +165,8 @@ namespace Game
                     currentState = TutorialState.Done;
                     pauseForTutorial = false;
                     GameState.IsPaused = false;
+                    Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
+                    Publish("TUTORIALOVER", ""); // Signal timer and other systems to start
                     Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
                     Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
                     CrosshairVisibility(true);

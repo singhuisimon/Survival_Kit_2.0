@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Audio;
 using static Engine.Tag;
 using static Engine.Transform;
+using System.Numerics;
 
 namespace Game
 {
@@ -23,6 +24,7 @@ namespace Game
         private string hitmarkerAudioPrefab = "Sources/Prefabs/audio_hitmarker.prefab";
         private string playerKillPrefab = "Sources/Prefabs/audio_Player_Kill.prefab";
         private string destroyedAudioPrefab = "Sources/Prefabs/Audio_DestructableWall.prefab";
+        private string destroyedVFXPrefab = "Sources/Prefabs/VFX_WallExplosion_Debries.prefab";
 
         // Health
         [SerializeField] private float health = 15.0f; //changed from 5->15
@@ -107,6 +109,15 @@ namespace Game
                 if(audioDestroyedID != 0){
                     Vector3 currPos = GetPosition((uint)EntityID);
                     SetPosition(audioDestroyedID, ref currPos);
+                }
+                uint vfxDestroyedID = 0;
+                vfxDestroyedID = PrefabInstantiate(destroyedVFXPrefab);
+                if(vfxDestroyedID != 0)
+                {
+                    Vector3 currPos = GetPosition((uint)EntityID);
+                    Quat currRot = GetRotation((uint)EntityID);
+                    SetPosition(vfxDestroyedID, ref currPos);
+                    SetRotation(vfxDestroyedID, ref currRot);
                 }
                 Publish("DestructableWallDestroyed", EntityID.ToString());
                 SceneDestroyEntity(EntityID);

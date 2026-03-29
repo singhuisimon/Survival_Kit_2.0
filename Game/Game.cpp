@@ -897,7 +897,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	auto &editorModeToggle = m_Renderer->getEditorModeToggle();
 
 	// Add this somewhere in your input handling:
-	if (input.IsKeyJustPressed(GLFW_KEY_F3))
+	if (input.IsKeyJustPressed(GLFW_KEY_F3) && (input.IsKeyPressed(GLFW_KEY_LEFT_ALT) || input.IsKeyPressed(GLFW_KEY_RIGHT_ALT)))
 	{
 		m_EditorEnable = !m_EditorEnable;
 		editorModeToggle = m_EditorEnable;
@@ -1472,7 +1472,7 @@ void Game::OnUpdate(Engine::Timestep ts)
 	}
 
 	// Function keys
-	if (input.IsKeyJustPressed(GLFW_KEY_F1))
+	if (input.IsKeyJustPressed(GLFW_KEY_F1) && (input.IsKeyPressed(GLFW_KEY_LEFT_ALT) || input.IsKeyPressed(GLFW_KEY_RIGHT_ALT)) )
 	{
 		bool newVisibility = !input.IsCursorVisible();
 		input.SetCursorVisible(newVisibility);

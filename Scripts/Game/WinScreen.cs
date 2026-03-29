@@ -176,9 +176,9 @@ namespace Game
         {
             LogMessage("[WinScreen] Win! Timer finished!");
             StopGroup(AudioType.MASTER);
-            winVOPrefab = winLevel2VOPrefab;
-            countdownstart = true;
-            countdown = countdownlevel2;
+            //winVOPrefab = winLevel2VOPrefab;
+            //countdownstart = true;
+            //countdown = countdownlevel2;
             Input.SetCursorVisible(true);
 
             SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);

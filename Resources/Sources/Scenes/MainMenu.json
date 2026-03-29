@@ -7231,6 +7231,115 @@
                     }
                 }
             ]
+        },
+        {
+            "ID": 365953129,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Bouncing Logo",
+                        "Tag": "Bouncing Logo"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "900000000000000001",
+                        "Position": [
+                            640.0,
+                            360.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            50.0,
+                            30.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "BouncingLogo.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": true
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "900000000000000002",
+                        "ScriptClassName": "Game.BouncingLogo"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 365953130,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Install Button Hovered",
+                        "Tag": "Install Button Hovered"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "900000000000000003",
+                        "Position": [
+                            805.0999755859375,
+                            546.2000122070313,
+                            -0.5
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            63.0,
+                            20.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "InstallButton_Hovered.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 2,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
         }
     ],
     "Settings": [

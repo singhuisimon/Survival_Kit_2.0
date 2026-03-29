@@ -18,6 +18,7 @@ namespace Game
 
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "TutorialPauseAudio";
+        private const string EVENT_BGM_VO_START = "BGMVOStart";
 
 
         // ===== State =====
@@ -26,9 +27,10 @@ namespace Game
         private bool disabled = false;
         private bool isPaused = false;
         private bool pauseForTutorial = false;
+        [SerializeField] private bool waitForTutorial = true;
 
         // ===== Timer =====
-        private float startaudio = 5.0f;
+        [SerializeField] private float startaudio = 5.0f;
         [SerializeField] private float elapsedTime = 0.0f;
 
         public override void OnStart()
@@ -39,6 +41,7 @@ namespace Game
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
             Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Subscribe(EVENT_BGM_VO_START, OnBGMVOStart);
 
             initialized = true;
 
@@ -76,6 +79,8 @@ namespace Game
             }
 
             if(!audiostarted){
+                if(waitForTutorial) return;
+
                 elapsedTime += deltaTime;
 
                 if(elapsedTime > startaudio){
@@ -104,6 +109,7 @@ namespace Game
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameEnd);
             Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Unsubscribe(EVENT_BGM_VO_START, OnBGMVOStart);
 
             LogMessage("=== AmmoBar Destroyed ===");
         }
@@ -121,6 +127,11 @@ namespace Game
 
                 LogMessage("[AudioPause] Level 2 pause for tutorial, continue playing audio");
             }
+        }
+
+        private void OnBGMVOStart(string eventName, string payload) {
+            waitForTutorial = false;
+            LogMessage("[AudioPause] BGMVOStart received, audio countdown begins");
         }
     }
 }

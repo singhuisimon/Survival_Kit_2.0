@@ -6,6 +6,8 @@ using Engine;
 using System;
 using static Engine.Scene;
 using static Engine.Event;
+using static Engine.Audio;
+using static Engine.Prefab;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.SpriteRenderer;
@@ -31,11 +33,19 @@ namespace Game
         private uint MainMenuButtonID;
         private uint CreditEndButtonID;
         private uint WinPopUpFinalID;
+        private uint MouseUIAudioID;
 
         // // ScenePath
         // private string mainMenuscenePath = "Resources/Sources/Scenes/MainMenu.json";
         // private string level2Path = "Resources/Sources/Scenes/level2_graphic_card.json";
 
+        // Prefab Audio Path
+        private const string audiosmack = "Sources/Prefabs/Audio_Smack_Impact.prefab";
+        private const string audiochime = "Sources/Prefabs/Audio_Com_Chime.prefab";
+        private const string audiowin3 = "Sources/Prefabs/Audio_VO_Lvl3_Win.prefab";
+        private const string audiowin2 = "Sources/Prefabs/Audio_Win_Level2_VO.prefab";
+        private const string audiowinTrench = "Sources/Prefabs/Audio_VO_TrenchWin.prefab";
+        private const string audioskip = "Sources/Prefabs/Audio_Spam_Skip_Click.prefab";
 
         // Frame sequence
         private uint[] frameSequence = new uint[8];
@@ -64,6 +74,12 @@ namespace Game
         private bool  wasMousePressed  = false;
         private bool  popupVisible     = false;
 
+        // Delayed transition
+        private bool   pendingTransition     = false;
+        private string pendingScene          = "";
+        private float  transitionTimer       = 0.0f;
+        private const float TRANSITION_DELAY = 1.0f;
+
         public override void OnStart()
         {
             LogMessage("WinCutSceneTransition: Started");
@@ -83,6 +99,7 @@ namespace Game
             MainMenuButtonID = SceneFindEntityByTag("MainMenuButton");
             CreditEndButtonID = SceneFindEntityByTag("CreditEndButton");
             WinPopUpFinalID = SceneFindEntityByTag("WinPopUpFinal");
+            MouseUIAudioID = SceneFindEntityByName("MouseUIClick");
 
             LogMessage("WinCutSceneTransition: Found entity Level2CutScene0204 "+  Level2CutScene0204ID);
             LogMessage("WinCutSceneTransition: Found entity Level2CutScene07 "+ Level2CutScene07ID);
@@ -97,6 +114,7 @@ namespace Game
             LogMessage("WinCutSceneTransition: Found entity WinPopUpFinal "+ WinPopUpFinalID);
             LogMessage("WinCutSceneTransition: Found entity Level2CutScene08 "+ Level2CutScene08ID);
             LogMessage("WinCutSceneTransition: Found entity CreditEndButton "+ CreditEndButtonID);
+            LogMessage("WinCutSceneTransition: Found entity MouseUIAudio "+ MouseUIAudioID);
 
 
             // If any entity is missing
@@ -106,7 +124,7 @@ namespace Game
                 WinPopUpID            == 0 || NextLevelButtonID     == 0 ||
                 MainMenuButtonID      == 0 || CreditEndButtonID == 0 ||
                 WinPopUpFinalID       == 0 || Level2CutScene08ID    == 0 ||
-                CreditEndButtonID     == 0)
+                CreditEndButtonID     == 0 || MouseUIAudioID == 0)
             {
                 LogError("WinCutScenePopUp: One or more entities not found – aborting");
                 return;
@@ -149,6 +167,18 @@ namespace Game
                 return;
             }
 
+            // Delayed scene transition
+            if (pendingTransition)
+            {
+                transitionTimer += deltaTime;
+                if (transitionTimer >= TRANSITION_DELAY)
+                {
+                    bool ok = Scene.SceneLoadFromFile(pendingScene);
+                    if (!ok) LogError("WinCutScenePopUp: Failed to load scene: " + pendingScene);
+                }
+                return;
+            }
+
             // Input 
             bool mouseDown        = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = mouseDown && !wasMousePressed;
@@ -162,19 +192,21 @@ namespace Game
                 if (!WinCutSceneContext.IsFinalLevel
                     && Collision2D.IsMouseCollidingWithEntity(NextLevelButtonID))
                 {
+                    AudioPlay(MouseUIAudioID);
                     LogMessage("WinCutScenePopUp: Next Level clicked  "
                                + WinCutSceneContext.NextScene);
-                    bool ok = Scene.SceneLoadFromFile(WinCutSceneContext.NextScene);
-                    if (!ok) LogError("WinCutScenePopUp: Failed to load next level");
+                    pendingScene      = WinCutSceneContext.NextScene;
+                    pendingTransition = true;
                     return;
                 }
                 // Main Menu – normal layout (non-final levels)
                 if (!WinCutSceneContext.IsFinalLevel
                     && Collision2D.IsMouseCollidingWithEntity(MainMenuButtonID))
                 {
+                    AudioPlay(MouseUIAudioID);
                     LogMessage("WinCutScenePopUp: Main Menu clicked (normal)");
-                    bool ok = Scene.SceneLoadFromFile(WinCutSceneContext.MAIN_MENU_SCENE);
-                    if (!ok) LogError("WinCutScenePopUp: Failed to load main menu");
+                    pendingScene      = WinCutSceneContext.MAIN_MENU_SCENE;
+                    pendingTransition = true;
                     return;
                 }
 
@@ -182,9 +214,10 @@ namespace Game
                 if (WinCutSceneContext.IsFinalLevel
                     && Collision2D.IsMouseCollidingWithEntity(CreditEndButtonID))
                 {
+                    AudioPlay(MouseUIAudioID);
                     LogMessage("WinCutScenePopUp: Credit End clicked (Credit)");
-                    bool ok = Scene.SceneLoadFromFile(WinCutSceneContext.CREDITS_END_SCENE);
-                    if (!ok) LogError("WinCutScenePopUp: Failed to load credit scene");
+                    pendingScene      = WinCutSceneContext.CREDITS_END_SCENE;
+                    pendingTransition = true;
                     return;
                 }
             }
@@ -194,6 +227,8 @@ namespace Game
                 if (Collision2D.IsMouseCollidingWithEntity(CutSceneSkipButtonID))
                 {
                     LogMessage("WinCutScenePopUp: Skip pressed");
+                    //Instantiate Audio
+                    PrefabInstantiate(audioskip);
                     SkipToLastFrame();
                     return;
                 }
@@ -222,6 +257,9 @@ namespace Game
 
             currentFrame++;
             ShowFrame(currentFrame);
+
+            PlayAudio();
+
             frameTimer = 0.0f;
 
             LogMessage("WinCutScenePopUp: Frame " + (currentFrame + 1));
@@ -255,6 +293,9 @@ namespace Game
                 SetIsVisible(WinPopUpID, false);
                 SetIsVisible(WinPopUpFinalID, true);
                 SetIsVisible(CreditEndButtonID, true);
+
+                //Instantiate the win VO for level 3
+                PrefabInstantiate(audiowin3);
             }
             else
             {
@@ -264,6 +305,20 @@ namespace Game
                 SetIsVisible(WinPopUpID, true);
                 SetIsVisible(MainMenuButtonID,      true);
                 SetIsVisible(CreditEndButtonID, false);
+
+                //Checking if it was trench run prev
+                if(WinCutSceneContext.NextScene == WinCutSceneContext.LEVEL2_SCENE)
+                {
+                    //Instantiate win VO for trench
+                    PrefabInstantiate(audiowinTrench);
+                } 
+                //Checking if it was level2 prev
+                else if (WinCutSceneContext.NextScene == WinCutSceneContext.LEVEL3_SCENE)
+                {
+                    //Instantiate win VO for level2
+                    PrefabInstantiate(audiowin2);
+                }
+
             }
             //LogMessage("WinCutScenePopUp: Cutscene complete – hook up win popup here");
             popupVisible = true;
@@ -301,6 +356,22 @@ namespace Game
                     HideFrame(i);
             }
         }
+
+        private void PlayAudio()
+        {
+            if(currentFrame == 1 || currentFrame == 3)
+            {
+                //instantiate the sound
+                PrefabInstantiate(audiosmack);
+            }
+
+            if(currentFrame == 6)
+            {
+                //instantiate the sound
+                PrefabInstantiate(audiochime);
+            }
+        }
+
         public override void OnDestroy()
         {
             LogMessage("WinCutScenePopUp: Destroyed");
