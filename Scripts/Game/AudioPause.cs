@@ -27,7 +27,7 @@ namespace Game
         private bool disabled = false;
         private bool isPaused = false;
         private bool pauseForTutorial = false;
-        [SerializeField] private bool waitForTutorial = false;
+        [SerializeField] private bool waitForTutorial = true;
 
         // ===== Timer =====
         [SerializeField] private float startaudio = 5.0f;

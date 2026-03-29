@@ -865,7 +865,7 @@ c034308e67100005|0|/Resources/Sources/Textures/MainMenu_CreditsResources.png|.pn
 71c0d08ed8090003|0|/Resources/Sources/Textures/UI_DetectionRange_Pickup_UpgradeModule.png|.png||1773063671|1|0|0|0
 5f6d60948a96c003|1|/Resources/Sources/Meshes/spotlight_v001.fbx|.fbx||1774623605|1|0|0|0
 c1c0d08ed8090009|3|/Resources/Sources/Audio/System AI_VO_Core Damage 1.wav|.wav||1773397095|1|0|0|0
-811e509325494007|6|/Resources/Sources/Scenes/level3_motherboard.json|.json||1774766961|1|0|0|0
+811e509325494007|6|/Resources/Sources/Scenes/level3_motherboard.json|.json||1774767042|1|0|0|0
 d9c0d08ed809000b|3|/Resources/Sources/Audio/System AI_VO_Core Damage 2.wav|.wav||1773397095|1|0|0|0
 51c0d08ed809000d|3|/Resources/Sources/Audio/System AI_VO_Core Damage 3.wav|.wav||1773397095|1|0|0|0
 21c0d08ed8090011|3|/Resources/Sources/Audio/System AI_VO_Defence Success.wav|.wav||1773397095|1|0|0|0
@@ -901,7 +901,7 @@ abebf88fbc4a8023|3|/Resources/Sources/Audio/Upgrade Module Pickup.wav|.wav||1773
 6bebf88fbc4a8025|2|/Resources/Sources/Material/SentryBarBG.mat|.mat||1773397095|1|0|0|0
 43ebf88fbc4a8027|2|/Resources/Sources/Material/SentryBarFill.mat|.mat||1773397095|1|0|0|0
 fc50889394a60009|0|/Resources/Sources/Textures/Level2_Graphics_Card/lvl2redesign_level_design_v003_v001_Normal.png|.png||1774411695|1|0|0|0
-491e509325494003|6|/Resources/Sources/Scenes/level2_graphic_card.json|.json||1774766924|1|0|0|0
+491e509325494003|6|/Resources/Sources/Scenes/level2_graphic_card.json|.json||1774767024|1|0|0|0
 991e509325494005|6|/Resources/Sources/Scenes/level2_withouthub.json|.json||1774002917|1|0|0|0
 491e509325494009|6|/Resources/Sources/Scenes/lvl2_moreTesting_2.json|.json||1773672427|1|0|0|0
 d91e50932549400b|6|/Resources/Sources/Scenes/WinCutScene.json|.json||1774411695|1|0|0|0
