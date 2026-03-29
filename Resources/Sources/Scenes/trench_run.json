@@ -3,584 +3,6 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 190,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "UI_CollectUpgradeModule",
-                        "Tag": "UI_CollectUpgradeModule"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5273663024485798787",
-                        "Position": [
-                            377.70001220703125,
-                            350.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            880.0,
-                            500.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Tooltip_Objective_CollectUpgradeMod.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 1,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 69,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "TrenchRunEndManager",
-                        "Tag": "TrenchRunEndManager"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "7418124111935228409",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "13759192387273132539",
-                        "ScriptClassName": "Game.TrenchRunEndTutorial"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 48,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "timerUp",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14030850923594140145",
-                        "Position": [
-                            1085.9000244140625,
-                            628.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "14714175410029496821",
-                        "ScriptClassName": "Game.Timer1"
-                    }
-                },
-                {
-                    "Type": "TextComponent",
-                    "Properties": {
-                        "ComponentGUID": "9995625657470306803",
-                        "text": "00 m 05 s",
-                        "fontName": "Quantico-Regular",
-                        "fontSize": 21.0,
-                        "color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "isVisible": true,
-                        "align": 0,
-                        "lineSpacing": 1.0,
-                        "letterSpacing": 0.0,
-                        "maxWidth": 0.0
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 8388648,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Paused_MixerFill_4",
-                        "Tag": "Default"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "9627482770114515805",
-                        "Position": [
-                            555.5,
-                            164.60000610351563,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            140.0,
-                            2.5,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Paused_MixerFill.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1049133,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "DestructableWall",
-                        "Tag": "DestructableWall"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3031793979015763949",
-                        "Position": [
-                            -4150.845703125,
-                            -101.82085418701172,
-                            612.88525390625
-                        ],
-                        "Rotation": [
-                            178.78050231933594,
-                            1.0146863460540771,
-                            0.6353124380111694
-                        ],
-                        "Scale": [
-                            1.7999999523162842,
-                            80.0,
-                            80.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "149490217498646513",
-                        "Mesh": "",
-                        "Material": "Mat_DestructibleWall.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "1878872474408916981",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            2.0,
-                            35.0,
-                            35.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "3031793979015763961",
-                        "ScriptClassName": "Game.DestructableWall",
-                        "Fields": {
-                            "health": 20.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 10486182,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "DestructableWall",
-                        "Tag": "DestructableWall"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "8219940749746247641",
-                        "Position": [
-                            -4150.845703125,
-                            -181.8092803955078,
-                            612.88525390625
-                        ],
-                        "Rotation": [
-                            178.78050231933594,
-                            1.0146863460540771,
-                            0.6353124380111694
-                        ],
-                        "Scale": [
-                            1.7999999523162842,
-                            80.0,
-                            80.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "1302411722105165789",
-                        "Mesh": "",
-                        "Material": "Mat_DestructibleWall.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "149490217498318817",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            2.0,
-                            35.0,
-                            35.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "8796401502049671141",
-                        "ScriptClassName": "Game.DestructableWall",
-                        "Fields": {
-                            "health": 15.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 1049131,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "DestructableWall",
-                        "Tag": "DestructableWall"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "18019773538904152005",
-                        "Position": [
-                            -4045.7900390625,
-                            -174.8567657470703,
-                            686.3756713867188
-                        ],
-                        "Rotation": [
-                            178.78050231933594,
-                            1.0146863460540771,
-                            0.6353124380111694
-                        ],
-                        "Scale": [
-                            1.7999999523162842,
-                            80.0,
-                            80.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "3031793979015141321",
-                        "Mesh": "",
-                        "Material": "Mat_DestructibleWall.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "15137469777387034573",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            2.0,
-                            35.0,
-                            35.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "1878872474408294353",
-                        "ScriptClassName": "Game.DestructableWall",
-                        "Fields": {
-                            "health": 15.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 5243286,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "DestructableWall",
-                        "Tag": "DestructableWall"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15713930529690228657",
-                        "Position": [
-                            -4045.7900390625,
-                            -255.45303344726563,
-                            686.3756713867188
-                        ],
-                        "Rotation": [
-                            178.78050231933594,
-                            1.0146863460540771,
-                            0.6353124380111694
-                        ],
-                        "Scale": [
-                            1.7999999523162842,
-                            80.0,
-                            80.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "1302411722104641461",
-                        "Mesh": "",
-                        "Material": "Mat_DestructibleWall.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "1302411722104641465",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            2.0,
-                            35.0,
-                            35.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "149490217497794493",
-                        "ScriptClassName": "Game.DestructableWall",
-                        "Fields": {
-                            "health": 15.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
             "ID": 2097615,
             "Components": [
                 {
@@ -788,7 +210,7 @@
                         "Rotation": [
                             -180.0,
                             62.698692321777344,
-                            1.3849903345108032
+                            1.3849904537200928
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -881,7 +303,7 @@
                         "Rotation": [
                             -180.0,
                             62.698692321777344,
-                            1.3849903345108032
+                            1.3849904537200928
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -974,7 +396,7 @@
                         "Rotation": [
                             -180.0,
                             62.698692321777344,
-                            1.3849903345108032
+                            1.3849904537200928
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1067,7 +489,7 @@
                         "Rotation": [
                             -180.0,
                             62.698692321777344,
-                            1.3849903345108032
+                            1.3849904537200928
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1253,7 +675,7 @@
                         "Rotation": [
                             180.0,
                             79.31255340576172,
-                            -1.4990945984560966e-11
+                            -1.646433163415839e-11
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1346,7 +768,7 @@
                         "Rotation": [
                             180.0,
                             19.911298751831055,
-                            -1.9347873997377363e-12
+                            -1.9484776205697107e-12
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1439,7 +861,7 @@
                         "Rotation": [
                             180.0,
                             19.911298751831055,
-                            -1.9347873997377363e-12
+                            -1.9484776205697107e-12
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1532,7 +954,7 @@
                         "Rotation": [
                             180.0,
                             19.911298751831055,
-                            -1.9347873997377363e-12
+                            -1.9484776205697107e-12
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1625,7 +1047,7 @@
                         "Rotation": [
                             180.0,
                             19.911298751831055,
-                            -1.9347873997377363e-12
+                            -1.9484776205697107e-12
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -1902,7 +1324,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1988,7 +1410,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2074,7 +1496,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2160,7 +1582,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2246,7 +1668,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2332,7 +1754,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2418,7 +1840,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2504,7 +1926,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2590,7 +2012,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2676,7 +2098,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2762,7 +2184,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2848,7 +2270,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2934,7 +2356,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3020,7 +2442,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3106,7 +2528,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3192,7 +2614,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3278,7 +2700,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3364,7 +2786,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3450,7 +2872,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3536,7 +2958,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3622,7 +3044,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3708,7 +3130,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3794,7 +3216,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3880,7 +3302,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3966,7 +3388,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4052,7 +3474,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4138,7 +3560,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4224,7 +3646,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4310,7 +3732,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4396,7 +3818,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4482,7 +3904,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4568,7 +3990,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4654,7 +4076,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4740,7 +4162,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4826,7 +4248,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4912,7 +4334,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4998,7 +4420,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5084,7 +4506,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5170,7 +4592,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5256,7 +4678,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5342,7 +4764,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5428,7 +4850,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5514,7 +4936,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5600,7 +5022,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5686,7 +5108,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5772,7 +5194,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5858,7 +5280,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5944,7 +5366,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6030,7 +5452,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6116,7 +5538,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6202,7 +5624,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6288,7 +5710,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6374,7 +5796,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6460,7 +5882,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6546,7 +5968,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6632,7 +6054,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6718,7 +6140,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6807,7 +6229,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6893,7 +6315,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -7030,9 +6452,9 @@
                             698.6172485351563
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -7191,9 +6613,9 @@
                             698.6172485351563
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -7352,9 +6774,9 @@
                             698.6172485351563
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -7513,9 +6935,9 @@
                             698.6172485351563
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -7674,9 +7096,9 @@
                             698.6172485351563
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -7835,9 +7257,9 @@
                             586.5510864257813
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -7996,9 +7418,9 @@
                             586.5510864257813
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -8157,9 +7579,9 @@
                             586.5510864257813
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -8318,9 +7740,9 @@
                             586.5513305664063
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -8479,9 +7901,9 @@
                             586.5515747070313
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -8640,9 +8062,9 @@
                             -189.50515747070313
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -8801,9 +8223,9 @@
                             -53.65276336669922
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -8964,7 +8386,7 @@
                         "Rotation": [
                             180.0,
                             29.45758819580078,
-                            -5.607698333465194e-12
+                            -5.610681190482136e-12
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -9057,7 +8479,7 @@
                         "Rotation": [
                             180.0,
                             29.45758819580078,
-                            -5.607698333465194e-12
+                            -5.610681190482136e-12
                         ],
                         "Scale": [
                             1.7999999523162842,
@@ -9148,9 +8570,9 @@
                             186.178466796875
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -9309,9 +8731,9 @@
                             186.17825317382813
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -9470,9 +8892,9 @@
                             186.17822265625
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -9806,7 +9228,7 @@
                     "Properties": {
                         "ComponentGUID": "1386801433920423189",
                         "Position": [
-                            1077.300048828125,
+                            1122.800048828125,
                             473.20001220703125,
                             0.0
                         ],
@@ -9908,7 +9330,7 @@
                     "Properties": {
                         "ComponentGUID": "9296951966573544701",
                         "Position": [
-                            377.70001220703125,
+                            1166.4000244140625,
                             350.0,
                             0.0
                         ],
@@ -9918,8 +9340,8 @@
                             0.0
                         ],
                         "Scale": [
-                            880.0,
-                            500.0,
+                            104.61000061035156,
+                            73.69999694824219,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -9959,7 +9381,7 @@
                     "Properties": {
                         "ComponentGUID": "11026334223482537201",
                         "Position": [
-                            377.70001220703125,
+                            1165.199951171875,
                             350.0,
                             0.0
                         ],
@@ -9969,8 +9391,8 @@
                             0.0
                         ],
                         "Scale": [
-                            880.0,
-                            500.0,
+                            104.61000061035156,
+                            70.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -9990,7 +9412,7 @@
                         "Quad": 3,
                         "Sprite Layer": 1,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -10047,48 +9469,46 @@
             ]
         },
         {
-            "ID": 1048594,
+            "ID": 1049131,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyTurret",
-                        "Tag": "EnemyTurret"
+                        "Name": "DestructableWall",
+                        "Tag": "DestructableWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "7258035198361486611",
+                        "ComponentGUID": "18019773538904152005",
                         "Position": [
-                            -760.030029296875,
-                            -14.7227144241333,
-                            -67.67562866210938
+                            -4045.7900390625,
+                            -174.8567657470703,
+                            686.3756713867188
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
-                            0.42574286460876465,
-                            -0.10387878865003586
+                            178.78050231933594,
+                            1.0146863460540771,
+                            0.6353124380111694
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
+                            1.7999999523162842,
+                            80.0,
+                            80.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            144
-                        ]
+                        "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "8987417455271757079",
+                        "ComponentGUID": "3031793979015141321",
                         "Mesh": "",
-                        "Material": "EnemyTurret.mat",
+                        "Material": "Mat_DestructibleWall.mat",
                         "Texture": "",
-                        "Visible": false,
+                        "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
                         "Billboarding": false,
@@ -10102,7 +9522,7 @@
                 {
                     "Type": "RigidbodyComponent",
                     "Properties": {
-                        "ComponentGUID": "13022642721395721499",
+                        "ComponentGUID": "15137469777387034573",
                         "Mass": 1.0,
                         "IsKinematic": true,
                         "IsTrigger": false,
@@ -10122,86 +9542,20 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            10.0,
-                            10.0,
-                            10.0
+                            2.0,
+                            35.0,
+                            35.0
                         ],
                         "SphereRadius": 0.5
                     }
                 },
                 {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "2646349179934098721",
-                        "Particle Type Advanced": "E005_loveletter6piece_v004.fbx",
-                        "Material Type": "VFX_EnemyTurretAura.mat",
-                        "Initial Velocity": [
-                            0.0,
-                            1.0,
-                            0.0
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            0.0010000000474974513,
-                            0.0010000000474974513,
-                            0.0010000000474974513
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            0.0,
-                            0.0,
-                            0.699999988079071
-                        ],
-                        "Color Max": [
-                            0.30000001192092896,
-                            0.30000001192092896,
-                            1.0
-                        ],
-                        "Emitter Shape": 0,
-                        "Max Particles": 10,
-                        "Particle Type": 0,
-                        "Emission Rate": 2.0,
-                        "Particle Lifetime": 1.0,
-                        "Emission Accumulator": 0.2469940185546875,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.009999999776482582,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 170.0,
-                        "Min Speed": 0.5,
-                        "Max Speed": 1.5,
-                        "Rotation Speed": 360.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": true,
-                        "Loop": true,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
-                    }
-                },
-                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "18210789492126532895",
-                        "ScriptClassName": "Game.EnemyTurret",
+                        "ComponentGUID": "1878872474408294353",
+                        "ScriptClassName": "Game.DestructableWall",
                         "Fields": {
-                            "shootingCooldown": 0.10000000149011612
+                            "health": 15.0
                         }
                     }
                 }
@@ -10227,9 +9581,9 @@
                             -67.67562866210938
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -10430,9 +9784,9 @@
                             -141.3223114013672
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -10591,9 +9945,9 @@
                             -141.3223114013672
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -10752,9 +10106,9 @@
                             -81.11088562011719
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -11003,9 +10357,9 @@
                             178.8462371826172
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -11164,9 +10518,9 @@
                             -206.9739227294922
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -11306,388 +10660,114 @@
             ]
         },
         {
-            "ID": 100,
+            "ID": 48,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyTurret",
-                        "Tag": "EnemyTurret"
+                        "Name": "timerUp",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "12446181969091871997",
+                        "ComponentGUID": "14030850923594140145",
                         "Position": [
-                            -598.8191528320313,
-                            -11.979225158691406,
-                            -43.40431594848633
+                            1085.9000244140625,
+                            628.0,
+                            0.0
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
-                            0.42574286460876465,
-                            -0.10387878865003586
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
+                            1.0,
+                            1.0,
+                            1.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            143
-                        ]
-                    }
-                },
-                {
-                    "Type": "MeshRendererComponent",
-                    "Properties": {
-                        "ComponentGUID": "6681574446057637121",
-                        "Mesh": "",
-                        "Material": "EnemyTurret.mat",
-                        "Texture": "",
-                        "Visible": false,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "9563878207574754565",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            10.0,
-                            10.0,
-                            10.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "5528652941450790155",
-                        "Particle Type Advanced": "E005_loveletter6piece_v004.fbx",
-                        "Material Type": "VFX_EnemyTurretAura.mat",
-                        "Initial Velocity": [
-                            0.0,
-                            1.0,
-                            0.0
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            0.0010000000474974513,
-                            0.0010000000474974513,
-                            0.0010000000474974513
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            0.0,
-                            0.0,
-                            0.699999988079071
-                        ],
-                        "Color Max": [
-                            0.30000001192092896,
-                            0.30000001192092896,
-                            1.0
-                        ],
-                        "Emitter Shape": 0,
-                        "Max Particles": 10,
-                        "Particle Type": 0,
-                        "Emission Rate": 2.0,
-                        "Particle Lifetime": 1.0,
-                        "Emission Accumulator": 0.2469940185546875,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.009999999776482582,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 170.0,
-                        "Min Speed": 0.5,
-                        "Max Speed": 1.5,
-                        "Rotation Speed": 360.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": true,
-                        "Loop": true,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
+                        "Children": []
                     }
                 },
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "13599103473698718985",
-                        "ScriptClassName": "Game.EnemyTurret",
-                        "Fields": {
-                            "shootingCooldown": 0.10000000149011612
-                        }
+                        "ComponentGUID": "14714175410029496821",
+                        "ScriptClassName": "Game.Timer1"
+                    }
+                },
+                {
+                    "Type": "TextComponent",
+                    "Properties": {
+                        "ComponentGUID": "9995625657470306803",
+                        "text": "00 m 05 s",
+                        "fontName": "Quantico-Regular",
+                        "fontSize": 21.0,
+                        "color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "isVisible": true,
+                        "align": 0,
+                        "lineSpacing": 1.0,
+                        "letterSpacing": 0.0,
+                        "maxWidth": 0.0
                     }
                 }
             ]
         },
         {
-            "ID": 17,
+            "ID": 190,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyTurret",
-                        "Tag": "EnemyTurret"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "6613782906387350929",
-                        "PrefabAssetGuid": "12052064173021740283",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "EnemyTurret",
-                        "prefabVersion": 2,
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"1286807396408853019\",\"Position\":[-445.71868896484375,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[5.0,5.0,5.0],\"Parent\":4294967295,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"10603523575498704853\",\"Tag\":\"EnemyTurret\"}}",
-                                "modifiedPropertyNames": [
-                                    "Name"
-                                ]
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15121865451691328031\",\"Mesh\":\"\",\"Material\":\"EnemyTurret.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 6,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"710346644105593373\",\"Mass\":1.0,\"IsKinematic\":false,\"IsTrigger\":false,\"UseGravity\":true,\"Velocity\":[0.0,0.0,0.0],\"AngularVelocity\":[0.0,0.0,0.0],\"LinearDamping\":0.05000000074505806,\"AngularDamping\":0.05000000074505806,\"Restitution\":0.10000000149011612,\"CollideType\":1,\"BoxHalfExtent\":[30.0,30.0,30.0],\"SphereRadius\":0.5}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            },
-                            {
-                                "componentType": 8,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4169111157926363681\",\"ScriptClassName\":\"Game.EnemyTurret\",\"Started\":false,\"GCHandle\":899}}"
-                            },
-                            {
-                                "componentType": 5,
-                                "isAddedComponent": true,
-                                "isRemovedComponent": false,
-                                "currentComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"0\",\"Particle Type Advanced\":\"\",\"Material Type\":\"\",\"Initial Velocity\":[0.0,1.0,0.0],\"Start Size\":[0.0,0.0,0.0],\"Default Size\":[0.5,0.5,0.5],\"End Size\":[0.0,0.0,0.0],\"Emission Box Size\":[1.0,1.0,1.0],\"Color Min\":[0.0,0.0,0.699999988079071],\"Color Max\":[0.30000001192092896,0.30000001192092896,1.0],\"Emitter Shape\":0,\"Max Particles\":1000,\"Particle Type\":0,\"Emission Rate\":5.0,\"Particle Lifetime\":2.0,\"Emission Accumulator\":0.0,\"Particle Size\":0.20000000298023224,\"Grow Phase End\":0.30000001192092896,\"Shrink Phase Start\":0.699999988079071,\"Emission Sphere Radius\":1.0,\"Velocity Randomness\":0.5,\"Lifetime Randomness\":0.20000000298023224,\"Spread Angle\":15.0,\"Min Speed\":0.5,\"Max Speed\":1.5,\"Rotation Speed\":0.0,\"Play Delay\":0.0,\"Delay Accumulator\":0.0,\"Randomize Rotation\":true,\"Loop\":false,\"Active\":true,\"World Space\":true,\"Burst Mode\":false}}",
-                                "modifiedPropertyNames": [
-                                    "modified"
-                                ]
-                            }
-                        ],
-                        "childEntityIDs": [
-                            35
-                        ]
+                        "Name": "UI_CollectUpgradeModule",
+                        "Tag": "UI_CollectUpgradeModule"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "1286807396408853019",
+                        "ComponentGUID": "5273663024485798787",
                         "Position": [
-                            -417.2215270996094,
-                            1.9017530679702759,
-                            -43.40431594848633
+                            1169.199951171875,
+                            350.0,
+                            0.0
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
-                            0.42574286460876465,
-                            -0.10387878865003586
+                            0.0,
+                            -0.0,
+                            0.0
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
+                            104.61000061035156,
+                            54.900001525878906,
+                            1.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            35
-                        ]
+                        "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "15121865451691328031",
-                        "Mesh": "",
-                        "Material": "EnemyTurret.mat",
-                        "Texture": "",
-                        "Visible": false,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
-                    }
-                },
-                {
-                    "Type": "RigidbodyComponent",
-                    "Properties": {
-                        "ComponentGUID": "710346644105593373",
-                        "Mass": 1.0,
-                        "IsKinematic": true,
-                        "IsTrigger": false,
-                        "UseGravity": false,
-                        "Velocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "AngularVelocity": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "LinearDamping": 0.05000000074505806,
-                        "AngularDamping": 0.05000000074505806,
-                        "Restitution": 0.10000000149011612,
-                        "CollideType": 1,
-                        "BoxHalfExtent": [
-                            10.0,
-                            10.0,
-                            10.0
-                        ],
-                        "SphereRadius": 0.5
-                    }
-                },
-                {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "0",
-                        "Particle Type Advanced": "E005_loveletter6piece_v004.fbx",
-                        "Material Type": "VFX_EnemyTurretAura.mat",
-                        "Initial Velocity": [
-                            0.0,
+                        "Texture": "Tooltip_Objective_CollectUpgradeMod.png",
+                        "Color": [
                             1.0,
-                            0.0
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            0.0010000000474974513,
-                            0.0010000000474974513,
-                            0.0010000000474974513
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
                             1.0,
                             1.0,
                             1.0
                         ],
-                        "Color Min": [
-                            0.0,
-                            0.0,
-                            0.699999988079071
-                        ],
-                        "Color Max": [
-                            0.30000001192092896,
-                            0.30000001192092896,
-                            1.0
-                        ],
-                        "Emitter Shape": 0,
-                        "Max Particles": 10,
-                        "Particle Type": 0,
-                        "Emission Rate": 2.0,
-                        "Particle Lifetime": 1.0,
-                        "Emission Accumulator": 0.2469940185546875,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.009999999776482582,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 170.0,
-                        "Min Speed": 0.5,
-                        "Max Speed": 1.5,
-                        "Rotation Speed": 360.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": true,
-                        "Loop": true,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4169111157926363681",
-                        "ScriptClassName": "Game.EnemyTurret",
-                        "Fields": {
-                            "shootingCooldown": 0.10000000149011612
-                        }
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
@@ -11769,7 +10849,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11937,9 +11017,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -0.00001005120520858327,
+                            -0.00001004866135190241,
                             -89.98021697998047,
-                            1.4670427095353489e-9
+                            -1.1791435605701395e-9
                         ],
                         "Scale": [
                             1.5,
@@ -12521,9 +11601,9 @@
                             -25.666072845458984
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -12911,9 +11991,9 @@
                             9.999994277954102
                         ],
                         "Rotation": [
-                            0.000005009274900658056,
+                            0.000005010181212128373,
                             89.98021697998047,
-                            -3.558803474135175e-9
+                            -2.9478590679588024e-9
                         ],
                         "Scale": [
                             1.0,
@@ -12936,7 +12016,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9028741121292114,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.0,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -13013,9 +12093,9 @@
                             45.35585021972656
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -13225,9 +12305,9 @@
                             277.39044189453125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -13386,9 +12466,9 @@
                             -25.666072845458984
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -13547,9 +12627,9 @@
                             -25.666072845458984
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -13689,48 +12769,46 @@
             ]
         },
         {
-            "ID": 3145803,
+            "ID": 1049133,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "EnemyTurret",
-                        "Tag": "EnemyTurret"
+                        "Name": "DestructableWall",
+                        "Tag": "DestructableWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "9563878207576474965",
+                        "ComponentGUID": "3031793979015763949",
                         "Position": [
-                            -600.7863159179688,
-                            -33.613590240478516,
-                            23.64906120300293
+                            -4150.845703125,
+                            -101.82085418701172,
+                            612.88525390625
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
-                            0.42574286460876465,
-                            -0.10387878865003586
+                            178.78050231933594,
+                            1.0146863460540771,
+                            0.6353124380111694
                         ],
                         "Scale": [
-                            5.0,
-                            5.0,
-                            5.0
+                            1.7999999523162842,
+                            80.0,
+                            80.0
                         ],
                         "Parent": 4294967295,
-                        "Children": [
-                            141
-                        ]
+                        "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "15904946482914133337",
+                        "ComponentGUID": "149490217498646513",
                         "Mesh": "",
-                        "Material": "EnemyTurret.mat",
+                        "Material": "Mat_DestructibleWall.mat",
                         "Texture": "",
-                        "Visible": false,
+                        "Visible": true,
                         "GlobalIlluminate": true,
                         "ShadowReceive": false,
                         "Billboarding": false,
@@ -13744,7 +12822,7 @@
                 {
                     "Type": "RigidbodyComponent",
                     "Properties": {
-                        "ComponentGUID": "916966923025122653",
+                        "ComponentGUID": "1878872474408916981",
                         "Mass": 1.0,
                         "IsKinematic": true,
                         "IsTrigger": false,
@@ -13764,86 +12842,20 @@
                         "Restitution": 0.10000000149011612,
                         "CollideType": 1,
                         "BoxHalfExtent": [
-                            10.0,
-                            10.0,
-                            10.0
+                            2.0,
+                            35.0,
+                            35.0
                         ],
                         "SphereRadius": 0.5
                     }
                 },
                 {
-                    "Type": "ParticleComponent",
-                    "Properties": {
-                        "ComponentGUID": "15328485730610709859",
-                        "Particle Type Advanced": "E005_loveletter6piece_v004.fbx",
-                        "Material Type": "VFX_EnemyTurretAura.mat",
-                        "Initial Velocity": [
-                            0.0,
-                            1.0,
-                            0.0
-                        ],
-                        "Start Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Default Size": [
-                            0.0010000000474974513,
-                            0.0010000000474974513,
-                            0.0010000000474974513
-                        ],
-                        "End Size": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Emission Box Size": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Color Min": [
-                            0.0,
-                            0.0,
-                            0.699999988079071
-                        ],
-                        "Color Max": [
-                            0.30000001192092896,
-                            0.30000001192092896,
-                            1.0
-                        ],
-                        "Emitter Shape": 0,
-                        "Max Particles": 10,
-                        "Particle Type": 0,
-                        "Emission Rate": 2.0,
-                        "Particle Lifetime": 1.0,
-                        "Emission Accumulator": 0.2469940185546875,
-                        "Particle Size": 0.20000000298023224,
-                        "Grow Phase End": 0.30000001192092896,
-                        "Shrink Phase Start": 0.009999999776482582,
-                        "Emission Sphere Radius": 1.0,
-                        "Velocity Randomness": 0.5,
-                        "Lifetime Randomness": 0.20000000298023224,
-                        "Spread Angle": 170.0,
-                        "Min Speed": 0.5,
-                        "Max Speed": 1.5,
-                        "Rotation Speed": 360.0,
-                        "Play Delay": 0.0,
-                        "Delay Accumulator": 0.0,
-                        "Randomize Rotation": true,
-                        "Loop": true,
-                        "Active": true,
-                        "World Space": true,
-                        "Burst Mode": false
-                    }
-                },
-                {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "8410956702969628001",
-                        "ScriptClassName": "Game.EnemyTurret",
+                        "ComponentGUID": "3031793979015763961",
+                        "ScriptClassName": "Game.DestructableWall",
                         "Fields": {
-                            "shootingCooldown": 0.10000000149011612
+                            "health": 20.0
                         }
                     }
                 }
@@ -13869,9 +12881,9 @@
                             -78.90375518798828
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -14030,9 +13042,9 @@
                             -78.90375518798828
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -14191,9 +13203,9 @@
                             -81.11088562011719
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -14442,9 +13454,9 @@
                             -111.0728759765625
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -14638,7 +13650,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -14766,7 +13778,7 @@
                             0.0
                         ],
                         "Rotation": [
-                            -4.861003398895264,
+                            -4.861003875732422,
                             -32.99995803833008,
                             89.0831527709961
                         ],
@@ -14823,7 +13835,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -14913,7 +13925,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -15275,7 +14287,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -15831,7 +14843,7 @@
                         "Rotation": [
                             43.99998092651367,
                             52.999996185302734,
-                            -0.000001888245378722786
+                            -0.000002837329020621837
                         ],
                         "Scale": [
                             16.700000762939453,
@@ -15922,7 +14934,7 @@
                         "Rotation": [
                             46.0000114440918,
                             -6.000002384185791,
-                            0.000012886559488833882
+                            0.000012877147128165234
                         ],
                         "Scale": [
                             0.09999998658895493,
@@ -16103,7 +15115,7 @@
                         ],
                         "Rotation": [
                             -130.0,
-                            -15.000005722045898,
+                            -15.000007629394531,
                             71.0
                         ],
                         "Scale": [
@@ -16341,9 +15353,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000137329101563,
+                            -12.00012493133545,
                             85.9989013671875,
-                            -0.9998525977134705
+                            -0.9998416304588318
                         ],
                         "Scale": [
                             1.0,
@@ -16581,9 +15593,9 @@
                             -12.645641326904297
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -16742,9 +15754,9 @@
                             61.67413330078125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -16903,9 +15915,9 @@
                             223.30130004882813
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -17064,9 +16076,9 @@
                             257.2792663574219
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -17225,9 +16237,9 @@
                             211.53709411621094
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -17386,9 +16398,9 @@
                             229.22067260742188
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -20050,9 +19062,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            0.000005009274900658056,
+                            0.000005010181212128373,
                             89.98021697998047,
-                            -3.558803474135175e-9
+                            -2.9478590679588024e-9
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -20506,7 +19518,7 @@
                     "Properties": {
                         "ComponentGUID": "3678702630440617073",
                         "Position": [
-                            377.70001220703125,
+                            1162.800048828125,
                             350.0,
                             0.0
                         ],
@@ -20516,8 +19528,8 @@
                             0.0
                         ],
                         "Scale": [
-                            880.0,
-                            500.0,
+                            104.61000061035156,
+                            88.80000305175781,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -20557,7 +19569,7 @@
                     "Properties": {
                         "ComponentGUID": "3678702630447613055",
                         "Position": [
-                            377.70001220703125,
+                            1166.0,
                             350.0,
                             0.0
                         ],
@@ -20567,8 +19579,8 @@
                             0.0
                         ],
                         "Scale": [
-                            880.0,
-                            500.0,
+                            104.61000061035156,
+                            65.4000015258789,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -20608,7 +19620,7 @@
                     "Properties": {
                         "ComponentGUID": "11172692410393543823",
                         "Position": [
-                            377.70001220703125,
+                            1166.5999755859375,
                             350.0,
                             0.0
                         ],
@@ -20618,8 +19630,8 @@
                             0.0
                         ],
                         "Scale": [
-                            880.0,
-                            500.0,
+                            104.61000061035156,
+                            55.099998474121094,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -20701,7 +19713,7 @@
                     "Properties": {
                         "ComponentGUID": "5984545639665304741",
                         "Position": [
-                            377.70001220703125,
+                            1166.0,
                             350.0,
                             0.0
                         ],
@@ -20711,8 +19723,8 @@
                             0.0
                         ],
                         "Scale": [
-                            880.0,
-                            500.0,
+                            104.61000061035156,
+                            70.29000091552734,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -20908,7 +19920,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -21267,9 +20279,9 @@
                             277.39044189453125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -21428,9 +20440,9 @@
                             303.3914794921875
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -21589,9 +20601,9 @@
                             303.3914794921875
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -21750,9 +20762,9 @@
                             329.8526306152344
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -21911,9 +20923,9 @@
                             211.3333740234375
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -22072,9 +21084,9 @@
                             208.4201202392578
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -22233,9 +21245,9 @@
                             182.12464904785156
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -22394,9 +21406,9 @@
                             332.4649658203125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -22555,9 +21567,9 @@
                             332.4649658203125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -22716,9 +21728,9 @@
                             352.4583435058594
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -22877,9 +21889,9 @@
                             352.4583435058594
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -23038,9 +22050,9 @@
                             308.4962463378906
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -23199,9 +22211,9 @@
                             -54.32884979248047
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -23360,9 +22372,9 @@
                             -54.32884979248047
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -23521,9 +22533,9 @@
                             -154.07302856445313
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -23682,9 +22694,9 @@
                             -185.52374267578125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -23843,9 +22855,9 @@
                             335.7967529296875
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24004,9 +23016,9 @@
                             360.811279296875
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24165,9 +23177,9 @@
                             400.06512451171875
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24326,9 +23338,9 @@
                             586.5515747070313
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24487,9 +23499,9 @@
                             698.6172485351563
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24648,9 +23660,9 @@
                             611.1534423828125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24809,9 +23821,9 @@
                             611.1534423828125
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -24970,9 +23982,9 @@
                             676.9375
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -25131,9 +24143,9 @@
                             676.9375
                         ],
                         "Rotation": [
-                            -0.00010636571096256375,
+                            -0.00010636574006639421,
                             0.42574286460876465,
-                            -0.10387878865003586
+                            -0.10387880355119705
                         ],
                         "Scale": [
                             5.0,
@@ -25758,7 +24770,7 @@
                         ],
                         "Rotation": [
                             180.0,
-                            -1.3240740968922804e-12,
+                            -1.323110783262027e-12,
                             41.213050842285156
                         ],
                         "Scale": [
@@ -26525,52 +25537,19 @@
             ]
         },
         {
-            "ID": 35,
+            "ID": 69,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Enemy_Keylogger",
-                        "Tag": "Enemy_Keylogger"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "17443312786530448833",
-                        "PrefabAssetGuid": "4215616158119325847",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Enemy_Keylogger",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5743796583207895221\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.004999999888241291,0.004999999888241291,0.004999999888241291],\"Parent\":17,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4590875078601048243\",\"Name\":\"Enemy_Keylogger\",\"Tag\":\"Enemy_Keylogger\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13814247115456250039\",\"Mesh\":\"E009_keylogger_v005.fbx\",\"Material\":\"MAT_Enemy_Keylogger.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            }
-                        ]
+                        "Name": "TrenchRunEndManager",
+                        "Tag": "TrenchRunEndManager"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5743796583207895221",
+                        "ComponentGUID": "7418124111935228409",
                         "Position": [
                             0.0,
                             0.0,
@@ -26582,106 +25561,62 @@
                             0.0
                         ],
                         "Scale": [
-                            0.004999999888241291,
-                            0.004999999888241291,
-                            0.004999999888241291
+                            1.0,
+                            1.0,
+                            1.0
                         ],
-                        "Parent": 17,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "13814247115456250039",
-                        "Mesh": "E009_keylogger_v005.fbx",
-                        "Material": "MAT_Enemy_Keylogger.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "ComponentGUID": "13759192387273132539",
+                        "ScriptClassName": "Game.TrenchRunEndTutorial"
                     }
                 }
             ]
         },
         {
-            "ID": 141,
+            "ID": 10486182,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Enemy_Keylogger",
-                        "Tag": "Enemy_Keylogger"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "4184715483556099529",
-                        "PrefabAssetGuid": "4215616158119325847",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Enemy_Keylogger",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5743796583207895221\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.004999999888241291,0.004999999888241291,0.004999999888241291],\"Parent\":3145803,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4590875078601048243\",\"Name\":\"Enemy_Keylogger\",\"Tag\":\"Enemy_Keylogger\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13814247115456250039\",\"Mesh\":\"E009_keylogger_v005.fbx\",\"Material\":\"MAT_Enemy_Keylogger.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            }
-                        ]
+                        "Name": "DestructableWall",
+                        "Tag": "DestructableWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5743796583207895221",
+                        "ComponentGUID": "8219940749746247641",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            -4150.845703125,
+                            -181.8092803955078,
+                            612.88525390625
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            178.78050231933594,
+                            1.0146863460540771,
+                            0.6353124380111694
                         ],
                         "Scale": [
-                            0.004999999888241291,
-                            0.004999999888241291,
-                            0.004999999888241291
+                            1.7999999523162842,
+                            80.0,
+                            80.0
                         ],
-                        "Parent": 3145803,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "13814247115456250039",
-                        "Mesh": "E009_keylogger_v005.fbx",
-                        "Material": "MAT_Enemy_Keylogger.mat",
+                        "ComponentGUID": "1302411722105165789",
+                        "Mesh": "",
+                        "Material": "Mat_DestructibleWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -26692,6 +25627,46 @@
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "149490217498318817",
+                        "Mass": 1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            2.0,
+                            35.0,
+                            35.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8796401502049671141",
+                        "ScriptClassName": "Game.DestructableWall",
+                        "Fields": {
+                            "health": 15.0
+                        }
                     }
                 }
             ]
@@ -26716,7 +25691,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -26750,7 +25725,7 @@
                         ],
                         "Rotation": [
                             1.7302217991677082e-10,
-                            8.587696584933408e-28,
+                            1.4463488326280232e-27,
                             -1.2168483998209467e-8
                         ],
                         "Scale": [
@@ -26783,55 +25758,22 @@
             ]
         },
         {
-            "ID": 143,
+            "ID": 8388648,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Enemy_Keylogger",
-                        "Tag": "Enemy_Keylogger"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "16866852034232448473",
-                        "PrefabAssetGuid": "4215616158119325847",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Enemy_Keylogger",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5743796583207895221\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.004999999888241291,0.004999999888241291,0.004999999888241291],\"Parent\":100,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4590875078601048243\",\"Name\":\"Enemy_Keylogger\",\"Tag\":\"Enemy_Keylogger\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13814247115456250039\",\"Mesh\":\"E009_keylogger_v005.fbx\",\"Material\":\"MAT_Enemy_Keylogger.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            }
-                        ]
+                        "Name": "Paused_MixerFill_4",
+                        "Tag": "Default"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5743796583207895221",
+                        "ComponentGUID": "9627482770114515805",
                         "Position": [
-                            0.0,
-                            0.0,
+                            555.5,
+                            164.60000610351563,
                             0.0
                         ],
                         "Rotation": [
@@ -26840,106 +25782,71 @@
                             0.0
                         ],
                         "Scale": [
-                            0.004999999888241291,
-                            0.004999999888241291,
-                            0.004999999888241291
+                            140.0,
+                            2.5,
+                            1.0
                         ],
-                        "Parent": 100,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
-                    "Type": "MeshRendererComponent",
+                    "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "13814247115456250039",
-                        "Mesh": "E009_keylogger_v005.fbx",
-                        "Material": "MAT_Enemy_Keylogger.mat",
-                        "Texture": "",
-                        "Visible": true,
-                        "GlobalIlluminate": true,
-                        "ShadowReceive": false,
-                        "Billboarding": false,
-                        "MeshType": 0,
-                        "MaterialIdx": 0,
-                        "TextureIdx": 0,
-                        "SubmeshIndex": 0,
-                        "CastType": 0
+                        "Texture": "Paused_MixerFill.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": false
                     }
                 }
             ]
         },
         {
-            "ID": 144,
+            "ID": 5243286,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Enemy_Keylogger",
-                        "Tag": "Enemy_Keylogger"
-                    }
-                },
-                {
-                    "Type": "PrefabComponent",
-                    "Properties": {
-                        "ComponentGUID": "8219940749681522145",
-                        "PrefabAssetGuid": "4215616158119325847",
-                        "isPrefabRoot": true,
-                        "isNestedPrefab": false,
-                        "parentPrefabGuid": "0",
-                        "prefabName": "Enemy_Keylogger",
-                        "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
-                        "componentOverrides": [
-                            {
-                                "componentType": 1,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5743796583207895221\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[0.004999999888241291,0.004999999888241291,0.004999999888241291],\"Parent\":1048594,\"Children\":[]}}"
-                            },
-                            {
-                                "componentType": 101,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"4590875078601048243\",\"Name\":\"Enemy_Keylogger\",\"Tag\":\"Enemy_Keylogger\"}}"
-                            },
-                            {
-                                "componentType": 2,
-                                "isAddedComponent": false,
-                                "isRemovedComponent": false,
-                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"13814247115456250039\",\"Mesh\":\"E009_keylogger_v005.fbx\",\"Material\":\"MAT_Enemy_Keylogger.mat\",\"Texture\":\"\",\"Visible\":true,\"GlobalIlluminate\":true,\"ShadowReceive\":false,\"Billboarding\":false,\"MeshType\":0,\"MaterialIdx\":0,\"TextureIdx\":0,\"SubmeshIndex\":0,\"CastType\":0}}"
-                            }
-                        ]
+                        "Name": "DestructableWall",
+                        "Tag": "DestructableWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5743796583207895221",
+                        "ComponentGUID": "15713930529690228657",
                         "Position": [
-                            0.0,
-                            0.0,
-                            0.0
+                            -4045.7900390625,
+                            -255.45303344726563,
+                            686.3756713867188
                         ],
                         "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
+                            178.78050231933594,
+                            1.0146863460540771,
+                            0.6353124380111694
                         ],
                         "Scale": [
-                            0.004999999888241291,
-                            0.004999999888241291,
-                            0.004999999888241291
+                            1.7999999523162842,
+                            80.0,
+                            80.0
                         ],
-                        "Parent": 1048594,
+                        "Parent": 4294967295,
                         "Children": []
                     }
                 },
                 {
                     "Type": "MeshRendererComponent",
                     "Properties": {
-                        "ComponentGUID": "13814247115456250039",
-                        "Mesh": "E009_keylogger_v005.fbx",
-                        "Material": "MAT_Enemy_Keylogger.mat",
+                        "ComponentGUID": "1302411722104641461",
+                        "Mesh": "",
+                        "Material": "Mat_DestructibleWall.mat",
                         "Texture": "",
                         "Visible": true,
                         "GlobalIlluminate": true,
@@ -26950,6 +25857,46 @@
                         "TextureIdx": 0,
                         "SubmeshIndex": 0,
                         "CastType": 0
+                    }
+                },
+                {
+                    "Type": "RigidbodyComponent",
+                    "Properties": {
+                        "ComponentGUID": "1302411722104641465",
+                        "Mass": 1.0,
+                        "IsKinematic": true,
+                        "IsTrigger": false,
+                        "UseGravity": false,
+                        "Velocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "AngularVelocity": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "LinearDamping": 0.05000000074505806,
+                        "AngularDamping": 0.05000000074505806,
+                        "Restitution": 0.10000000149011612,
+                        "CollideType": 1,
+                        "BoxHalfExtent": [
+                            2.0,
+                            35.0,
+                            35.0
+                        ],
+                        "SphereRadius": 0.5
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "149490217497794493",
+                        "ScriptClassName": "Game.DestructableWall",
+                        "Fields": {
+                            "health": 15.0
+                        }
                     }
                 }
             ]
@@ -26974,7 +25921,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Digipen/Survival_Kit_2.0/build/bin/Debug/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -27777,7 +26724,7 @@
                     "Properties": {
                         "ComponentGUID": "4429185317833935379",
                         "Position": [
-                            1121.0,
+                            1167.4000244140625,
                             350.0,
                             0.0
                         ],
@@ -27787,8 +26734,8 @@
                             0.0
                         ],
                         "Scale": [
-                            150.0,
-                            100.0,
+                            104.61000061035156,
+                            83.5,
                             1.0
                         ],
                         "Parent": 4294967295,
