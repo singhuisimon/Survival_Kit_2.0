@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Audio/COMPUTER-MOUSE_GEN-HDF-08329.wav",
+  "audioSettings": {
+    "outputFormat": "OGG",
+    "compression": "VORBIS",
+    "quality": 0.7,
+    "sampleRate": 44100,
+    "channelMode": "STEREO"
+  }
+}

@@ -68,7 +68,7 @@ namespace Game
             disabled = false;
 
             //Play trench guide the moment we load into the scene. (might need test this out)
-            //PlayTrenchGuide();
+            PlayTrenchGuide();
 
             LogMessage("TrenchAudioVO initialized:");
         }

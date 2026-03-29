@@ -26,7 +26,10 @@ namespace Game
         private uint botnetInfoID;      // UI_BotnetInfo
         private uint wormInfoID;        // UI_WormInfo
         private uint loveletterInfoID;  // UI_LoveletterInfo
-        private uint proceedID;         // UI_E_ToProceed
+        //private uint proceedID;         // UI_E_ToProceed
+        private uint crosshairID;       // Crosshair
+        private uint crosshair2ID;       // Crosshair2
+        
 
         // Entity IDs - Player, camera, and enemies
         private uint playerID;
@@ -43,6 +46,8 @@ namespace Game
         [SerializeField] private string wormInfoName = "UI_WormInfo";
         [SerializeField] private string loveletterInfoName = "UI_LoveletterInfo";
         [SerializeField] private string proceedName = "UI_E_ToProceed";
+        [SerializeField] private string crossHairName = "Crosshair";
+        [SerializeField] private string crossHair2Name = "Crosshair2";
 
         // Events
         private string EVENT_BOTNET_TUTORIAL_SPAWN = "BotnetTutorialSpawn";
@@ -90,14 +95,16 @@ namespace Game
             botnetInfoID = SceneFindEntityByName(botnetInfoName);
             wormInfoID = SceneFindEntityByName(wormInfoName);
             loveletterInfoID = SceneFindEntityByName(loveletterInfoName);
-            proceedID = SceneFindEntityByName(proceedName);
+            //proceedID = SceneFindEntityByName(proceedName);
+            crosshairID = SceneFindEntityByName(crossHairName);
+            crosshair2ID = SceneFindEntityByName(crossHair2Name);
 
-            // Hide all UI
+            // Hide all tutorial UI
             SpriteRenderer.SetIsVisible(instructionID, false); // Delay for a bit, fade it in upon entering level 2
             SpriteRenderer.SetIsVisible(botnetInfoID, false);
             SpriteRenderer.SetIsVisible(wormInfoID, false);
             SpriteRenderer.SetIsVisible(loveletterInfoID, false);
-            SpriteRenderer.SetIsVisible(proceedID, false);
+            //SpriteRenderer.SetIsVisible(proceedID, false);
 
             // Subscribe to the events
             Subscribe(EVENT_GAMELOSE, OnGameEnd);
@@ -108,7 +115,7 @@ namespace Game
 
             // Start the game paused for tutorial
             pauseForTutorial = true;
-
+     
         }
 
         public override void OnUpdate(float deltaTime)
@@ -121,8 +128,8 @@ namespace Game
                 // Return to tutorial from pause menu
                 if (escapeJustPressed) {
                     playerPauseOnTutorial = false;
-                    Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
-                    Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
                 }
                 return;
             }
@@ -136,12 +143,13 @@ namespace Game
                 if (escapeJustPressed) {
                     // Inform subscribers pause is user-induced
                     playerPauseOnTutorial = true;
-                    Publish("Level2TutorialPause", false.ToString());
+                    Publish("TutorialPauseAudio", false.ToString());
                     return;
                 } else {
                     // Inform subscribers pause is tutorial-induced
-                    Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
-                    Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                    CrosshairVisibility(false);
                 }
 
                 // Most updated player position
@@ -159,14 +167,14 @@ namespace Game
                             }
                         } else {
                             // End with cam flying back to player
-                            if(FlyCamBackToPlayer(deltaTime)) {
+                            //if(FlyCamBackToPlayer(deltaTime)) {
                                 // Set up next state
                                 currentState = TutorialState.WormInfo;
                                 botnetSeen = false;
-                                pauseForTutorial = false;
-                                GameState.IsPaused = false;
+                                //pauseForTutorial = false;
+                                //GameState.IsPaused = false;
                                 tutorialEnd = false;
-                            }
+                            //}
                         }
                         break;
                     case TutorialState.WormInfo:
@@ -178,14 +186,14 @@ namespace Game
                             }
                         } else {
                             // End with cam flying back to player
-                            if (FlyCamBackToPlayer(deltaTime)) {
+                            //if (FlyCamBackToPlayer(deltaTime)) {
                                 // Set up next state
                                 currentState = TutorialState.LoveletterInfo;
                                 wormSeen = false;
-                                pauseForTutorial = false;
-                                GameState.IsPaused = false;
+                                //pauseForTutorial = false;
+                                //GameState.IsPaused = false;
                                 tutorialEnd = false;
-                            }
+                            //}
                         }
                         break;
                     case TutorialState.LoveletterInfo:
@@ -224,8 +232,9 @@ namespace Game
             }
 
             // Ensure subscribers know level 2 pause is not tutorial-induced
-            Publish("Level2TutorialPause", pauseForTutorial.ToString());        // Audio
-            Publish("Level2TutorialPauseMenu", pauseForTutorial.ToString());    // Pause menu
+            Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+            Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+            CrosshairVisibility(true);
 
             // Check for enemy spawning events if tutorial is ongoing
             if (currentState != TutorialState.Done)
@@ -324,7 +333,7 @@ namespace Game
 
         private void HandleInstructionState(Vector3 currentPos, float dt)
         {
-            // Show UI when state begins (Botnet spawns)
+            // Show UI when state begins 
             ShowUI(instructionID, true, dt);
 
             // Ensure UI fades in fully before pausing state and waiting for interaction
@@ -359,6 +368,7 @@ namespace Game
                         currentState = TutorialState.BotnetInfo;
                         pauseForTutorial = false;
                         GameState.IsPaused = false;
+                        Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
                     }
                 //}
             }
@@ -531,6 +541,12 @@ namespace Game
             return justPressed;
         }
 
+        private void CrosshairVisibility(bool value)
+        {
+            SpriteRenderer.SetIsVisible(crosshairID, value);
+            SpriteRenderer.SetIsVisible(crosshair2ID, value);
+        }
+
         private void OnGameEnd(string eventName, string payload){
             LogMessage("[TutorialUIManagerLevel2] Detect game end, hiding all tooltip");
 
@@ -541,7 +557,7 @@ namespace Game
             SpriteRenderer.SetIsVisible(botnetInfoID, false);
             SpriteRenderer.SetIsVisible(wormInfoID, false);
             SpriteRenderer.SetIsVisible(loveletterInfoID, false);
-            SpriteRenderer.SetIsVisible(proceedID, false);
+            //SpriteRenderer.SetIsVisible(proceedID, false);
             gameEnd = true;
             return;
         }

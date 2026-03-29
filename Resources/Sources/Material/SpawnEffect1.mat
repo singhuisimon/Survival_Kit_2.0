@@ -12,9 +12,9 @@
         1.0
     ],
     "emissionColor": [
-        1.0,
-        0.0,
-        0.0
+        0.7288135290145874,
+        0.27858468890190125,
+        0.005294027738273144
     ],
     "metallic": 0.0,
     "roughness": 0.6000000238418579,
@@ -33,7 +33,7 @@
     "enableEmission": true,
     "alphaTest": false,
     "doubleSided": false,
-    "receiveShadows": true,
-    "castShadows": true,
+    "receiveShadows": false,
+    "castShadows": false,
     "treatBlacksAsTransparent": true
 }

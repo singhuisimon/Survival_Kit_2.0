@@ -23,12 +23,12 @@
     "alphaThreshold": 0.5,
     "ambientOcclusion": 0.5,
     "tiling": [
-        1.0,
-        1.0
+        4.900000095367432,
+        6.5
     ],
     "offset": [
-        -0.10913734138011932,
-        -0.10913734138011932
+        -0.16899999976158142,
+        -0.21899999678134918
     ],
     "enableEmission": false,
     "alphaTest": false,

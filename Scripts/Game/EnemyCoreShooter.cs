@@ -9,6 +9,7 @@ using static Engine.Rigidbody;
 using static Engine.Audio;
 using static Engine.Tag;
 using static Engine.Transform;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -22,7 +23,9 @@ namespace Game
         private const string TAG_PLAYER = "Player";
 
         // Events
-        private const string COREDEAD = "CoreDeadTriggerPostTrenchRun";
+        private string subscribedEvent = "";
+        private const string COREDEAD = "EnemyCoreDeath";
+        private const string TRENCHEND = "CoreDeadTriggerPostTrenchRun";
 
         // Shooting
         [SerializeField] private float shootingCooldown = 0.1f;
@@ -43,8 +46,17 @@ namespace Game
 
             inRange = false;
             shootingTimer = 0.0f;
-            Subscribe(COREDEAD, OnGameOver);
-         
+
+            if (ProgressTracker.SkipTutorialLevel1)
+            {
+                subscribedEvent = COREDEAD;
+            }
+            else
+            {
+                subscribedEvent = TRENCHEND;
+            }
+
+            Subscribe(subscribedEvent, OnGameOver);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -85,7 +97,10 @@ namespace Game
 
         public override void OnDestroy()
         {
-            Unsubscribe(COREDEAD, OnGameOver);
+            if (!string.IsNullOrEmpty(subscribedEvent))
+            {
+                Unsubscribe(subscribedEvent, OnGameOver);
+            }
         }
 
         public void ShootAtTarget()
