@@ -18,7 +18,6 @@ namespace Game
         private float startingTime = 240.0f;  // 2 minutes = 120 seconds
 
         private float timePassed = 0.0f;
-        private float time4min = 240.0f;
         private float time2min = 120.0f;
         private float time1min = 60.0f;
         private float time10sec = 10.0f;
@@ -41,8 +40,6 @@ namespace Game
         private bool gameOver = false;
         private float remainingTime = 0.0f;
 
-        //private bool event1_5min = false;
-        private bool event4min = false;
         private bool event2min = false;
         private bool event1min = false;
         private bool event10sec = false;
@@ -148,7 +145,7 @@ namespace Game
             // Update the text display
             SetText((uint)EntityID, timeText);
 
-            if(!event2min || !event4min || !event1min || !event10sec){
+            if(!event2min || !event1min || !event10sec){
                 CheckTimeForEvent();
             }
 
@@ -167,13 +164,6 @@ namespace Game
         }
 
         private void CheckTimeForEvent(){
-
-            if(remainingTime <= time4min && !event4min)
-            {
-                //publish event here
-                event4min = true;
-                return;
-            }
 
             if(remainingTime <= time2min && !event2min){
                 Publish(EVENT_2MIN, "");

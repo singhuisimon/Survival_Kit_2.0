@@ -8,6 +8,7 @@ using static Engine.Audio;
 using static Engine.AudioManager;
 using static Engine.Transform;
 using static Engine.Prefab;
+using System.Security.Cryptography;
 
 namespace Game
 {
@@ -26,12 +27,17 @@ namespace Game
         private const string core = "SEMICONDUCTOR";
         private const string LOSE_SCREEN_SHOW = "LoseScreenShow";
         private const string GameOverVOPrefab = "Sources/Prefabs/Audio_Lose_VO.prefab";
+        private const string ScreamVOBasePath = "Lose Screen Yell reverb/Office Worker_Reverb_";
 
-        private const float countdowntimer = 0.5f;
+        private const float countdowntimer = 1.5f;
+        private const float screamdelay = 0.3f;
+
+        private float screamcountdown = 0.0f;
         private float countdown = 0.0f;
 
         private bool countdownstart = false;
         private bool voInstantiated = false;
+        private bool screamPlayed = false;
 
         private uint playerdeadID = 0;
         private uint coredestructionID = 0;
@@ -74,6 +80,7 @@ namespace Game
             SetIsVisible((uint)EntityID, false);
 
             initialized = true;
+            screamcountdown = screamdelay;
             LogMessage("[GameOverScreen] Initialized - waiting for lose condition");
 
             Vector3 corepos = GetPosition(coreID);
@@ -111,11 +118,25 @@ namespace Game
                     LogMessage("[GameOverScreen] core destruction audio is playing");
                 }
                 playaudio = false;
+                StopGroup(AudioType.MASTER);
+                countdownstart = true;
+                countdown = countdowntimer;
+                screamcountdown = screamdelay;
             }
 
             // VO countdown
             if (countdownstart)
             {
+                if (!screamPlayed)
+                {
+                    screamcountdown -= deltaTime;
+                    if(screamcountdown <= 0.0f && !screamPlayed)
+                    {
+                        RandomizeAudioPath();
+                        AudioPlay((uint)EntityID);
+                        screamPlayed = true;
+                    }
+                }
                 countdown -= deltaTime;
                 if (countdown <= 0.0f && !voInstantiated)
                 {
@@ -150,9 +171,9 @@ namespace Game
             
             LogMessage("[GameOverScreen] Game Over triggered by: " + eventName);
 
-            StopGroup(AudioType.MASTER);
-            countdownstart = true;
-            countdown = countdowntimer;
+            //StopGroup(AudioType.MASTER);
+            //countdownstart = true;
+            //countdown = countdowntimer;
 
             // Reset alpha to 0 before fading in
             SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
@@ -171,6 +192,14 @@ namespace Game
             // Start 2 second delay before fading in buttons
             pendingShow = true;
             showDelayTimer = showDelay;
+        }
+
+        private void RandomizeAudioPath()
+        {
+            int randomint = RNG.RandInt(1,5);
+            string filepath = ScreamVOBasePath + randomint.ToString() + ".wav";
+            AudioSetFile((uint)EntityID, filepath);
+            LogMessage("[GameOverScreen] Setting audio filepath to be: " + filepath);
         }
 
         public override void OnDestroy()
