@@ -3,19 +3,19 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 18,
+            "ID": 17,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Audio_Spam_Skip_Click",
+                        "Name": "Audio_Smack_Impact",
                         "Tag": "Audio"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16643554439604748585",
+                        "ComponentGUID": "12222734843621441825",
                         "Position": [
                             0.0,
                             0.0,
@@ -38,641 +38,8 @@
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "2232035632019472683",
-                        "FilePath": "COMPUTER-MOUSE_GEN-HDF-08329.wav",
-                        "Type": 5,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "17796475944212480301",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 16,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_Com_Chime",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "10247923999195365659",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "17741913779140444445",
-                        "FilePath": "Computer Reboot Chime.wav",
-                        "Type": 5,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "9671463246893121823",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 15,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_TrenchWin",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "11457439565704659319",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "9151596556491342201",
-                        "FilePath": "System AI_VO_Trench Run Win.wav",
-                        "Type": 4,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "5692832042671096187",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 14,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_Lvl3_Win",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "16069125584131031407",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "11457439565703872881",
-                        "FilePath": "System AI_VO_Lvl 3 Win.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "1081146024242643315",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime",
-                        "Fields": {
-                            "Lifetime": 5.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 13,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_Mid_Trench",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "13763282574916157799",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "5116371290365067625",
-                        "FilePath": "System AI_VO_Mid Trench Run.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "4539910538062233963",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime",
-                        "Fields": {
-                            "Lifetime": 6.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 12,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_CorruptCore_Warning",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "5692832042667278687",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "3386989033453879649",
-                        "FilePath": "System AI_VO_Corrupted Core Warning.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "9728057308791734627",
-                        "ScriptClassName": "Game.GameDelaySoundPrefab",
-                        "Fields": {
-                            "Lifetime": 8.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 11,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_Upgrade_Module_Drop",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "6269292794969588055",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "18374968593341727065",
-                        "FilePath": "System AI_VO_Upgrade Module Drop.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "5116371290363298139",
-                        "ScriptClassName": "Game.GameDelaySoundPrefab",
-                        "Fields": {
-                            "Lifetime": 8.0,
-                            "delayedTime": 1.0
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 10,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_Corrupted_Core_Destroyed",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "17798507841037173071",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "14339743327216894289",
-                        "FilePath": "System AI_VO_Corrupted Core Destroyed.wav",
-                        "Type": 4,
-                        "State": 2,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "13763282574913716563",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 9,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_Beginning_Wave_Defense",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3386989033450602823",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "9728057308788638025",
-                        "FilePath": "System AI_VO_Beginning Wave Defence.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "14916204079519744331",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 3,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_CorruptCoreDestroyed",
-                        "Tag": "Audio_CorruptCoreDestroyed"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "14013487430020415665",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "754890127042330803",
-                        "FilePath": "Corrupted Core Destroy.wav",
-                        "Type": 5,
-                        "State": 0,
-                        "Volume": 0.5019999742507935,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "15742869686932881589",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 0,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_Tick_Damage",
-                        "Tag": "Audio_Tick_Damage"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "10531369277471621273",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "5343222506741170331",
-                        "FilePath": "Player Collide Damage.wav",
+                        "ComponentGUID": "2422902054464782627",
+                        "FilePath": "Computer Smack Impact.wav",
                         "Type": 5,
                         "State": 2,
                         "Volume": 1.0,
@@ -691,26 +58,26 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "12837212286685986973",
+                        "ComponentGUID": "15681499357443784997",
                         "ScriptClassName": "Game.GameDelaySoundPrefab"
                     }
                 }
             ]
         },
         {
-            "ID": 1,
+            "ID": 8,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Audio_PrimaryFire",
-                        "Tag": "Audio_PrimaryFire"
+                        "Name": "Audio_VO_5sec_2",
+                        "Tag": "Audio"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "15185355717120606371",
+                        "ComponentGUID": "16069125584123412697",
                         "Position": [
                             0.0,
                             0.0,
@@ -733,78 +100,16 @@
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "1926758414142439589",
-                        "FilePath": "Player Primary Fire 4.wav",
-                        "Type": 5,
-                        "State": 2,
-                        "Volume": 0.7099999785423279,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": true,
-                        "MinDistance": 201.9600067138672,
-                        "MaxDistance": 610.239013671875,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "12879512707907649703",
-                        "ScriptClassName": "Game.AudioPrimaryBullet"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 2,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_DestructableWall",
-                        "Tag": "Audio_DestructableWall"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "3959597086063100103",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "17218194389042200777",
-                        "FilePath": "Destructible Wall Destroyed.wav",
-                        "Type": 5,
+                        "ComponentGUID": "17222047088730489051",
+                        "FilePath": "System AI_VO_5sec Warning2.wav",
+                        "Type": 4,
                         "State": 0,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": true,
+                        "Is3D": false,
                         "MinDistance": 1.0,
                         "MaxDistance": 100.0,
                         "RolloffMode": 0,
@@ -815,8 +120,194 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "13182969122918334667",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
+                        "ComponentGUID": "1657606776538579165",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 7,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_5sec_1",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17222047088728998097",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "3963449785750667475",
+                        "FilePath": "System AI_VO_5sec Warning.wav",
+                        "Type": 4,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8575135804178530517",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 6,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_1Min",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "18374968593334698185",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "9728057308783542475",
+                        "FilePath": "System AI_VO_1min Warning.wav",
+                        "Type": 4,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "13763282574907949261",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 5,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_2Min",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5116371290354794689",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "10304518061085819075",
+                        "FilePath": "System AI_VO_2min Warning.wav",
+                        "Type": 4,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "1657606776534827205",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
                     }
                 }
             ]
@@ -888,19 +379,19 @@
             ]
         },
         {
-            "ID": 5,
+            "ID": 2,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Audio_VO_2Min",
-                        "Tag": "Audio"
+                        "Name": "Audio_DestructableWall",
+                        "Tag": "Audio_DestructableWall"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "5116371290354794689",
+                        "ComponentGUID": "3959597086063100103",
                         "Position": [
                             0.0,
                             0.0,
@@ -923,16 +414,16 @@
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "10304518061085819075",
-                        "FilePath": "System AI_VO_2min Warning.wav",
-                        "Type": 4,
+                        "ComponentGUID": "17218194389042200777",
+                        "FilePath": "Destructible Wall Destroyed.wav",
+                        "Type": 5,
                         "State": 0,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": false,
+                        "Is3D": true,
                         "MinDistance": 1.0,
                         "MaxDistance": 100.0,
                         "RolloffMode": 0,
@@ -943,26 +434,26 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "1657606776534827205",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                        "ComponentGUID": "13182969122918334667",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
                     }
                 }
             ]
         },
         {
-            "ID": 6,
+            "ID": 1,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Audio_VO_1Min",
-                        "Tag": "Audio"
+                        "Name": "Audio_PrimaryFire",
+                        "Tag": "Audio_PrimaryFire"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "18374968593334698185",
+                        "ComponentGUID": "15185355717120606371",
                         "Position": [
                             0.0,
                             0.0,
@@ -985,80 +476,18 @@
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "9728057308783542475",
-                        "FilePath": "System AI_VO_1min Warning.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "13763282574907949261",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 7,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_VO_5sec_1",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "17222047088728998097",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "3963449785750667475",
-                        "FilePath": "System AI_VO_5sec Warning.wav",
-                        "Type": 4,
+                        "ComponentGUID": "1926758414142439589",
+                        "FilePath": "Player Primary Fire 4.wav",
+                        "Type": 5,
                         "State": 2,
-                        "Volume": 1.0,
+                        "Volume": 0.7099999785423279,
                         "Pitch": 1.0,
                         "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
+                        "Is3D": true,
+                        "MinDistance": 201.9600067138672,
+                        "MaxDistance": 610.239013671875,
                         "RolloffMode": 0,
                         "DopplerLevel": 1.0,
                         "Pan2D": 0.0
@@ -1067,26 +496,26 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "8575135804178530517",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                        "ComponentGUID": "12879512707907649703",
+                        "ScriptClassName": "Game.AudioPrimaryBullet"
                     }
                 }
             ]
         },
         {
-            "ID": 8,
+            "ID": 0,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "Audio_VO_5sec_2",
-                        "Tag": "Audio"
+                        "Name": "Audio_Tick_Damage",
+                        "Tag": "Audio_Tick_Damage"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "16069125584123412697",
+                        "ComponentGUID": "10531369277471621273",
                         "Position": [
                             0.0,
                             0.0,
@@ -1109,70 +538,8 @@
                 {
                     "Type": "AudioComponent",
                     "Properties": {
-                        "ComponentGUID": "17222047088730489051",
-                        "FilePath": "System AI_VO_5sec Warning2.wav",
-                        "Type": 4,
-                        "State": 0,
-                        "Volume": 1.0,
-                        "Pitch": 1.0,
-                        "Loop": false,
-                        "Mute": false,
-                        "ReverbProperties": 1.0,
-                        "Is3D": false,
-                        "MinDistance": 1.0,
-                        "MaxDistance": 100.0,
-                        "RolloffMode": 0,
-                        "DopplerLevel": 1.0,
-                        "Pan2D": 0.0
-                    }
-                },
-                {
-                    "Type": "ScriptComponent",
-                    "Properties": {
-                        "ComponentGUID": "1657606776538579165",
-                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 17,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "Audio_Smack_Impact",
-                        "Tag": "Audio"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "12222734843621441825",
-                        "Position": [
-                            0.0,
-                            0.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "AudioComponent",
-                    "Properties": {
-                        "ComponentGUID": "2422902054464782627",
-                        "FilePath": "Computer Smack Impact.wav",
+                        "ComponentGUID": "5343222506741170331",
+                        "FilePath": "Player Collide Damage.wav",
                         "Type": 5,
                         "State": 2,
                         "Volume": 1.0,
@@ -1191,8 +558,635 @@
                 {
                     "Type": "ScriptComponent",
                     "Properties": {
-                        "ComponentGUID": "15681499357443784997",
+                        "ComponentGUID": "12837212286685986973",
                         "ScriptClassName": "Game.GameDelaySoundPrefab"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 3,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_CorruptCoreDestroyed",
+                        "Tag": "Audio_CorruptCoreDestroyed"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "14013487430020415665",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "754890127042330803",
+                        "FilePath": "Corrupted Core Destroy.wav",
+                        "Type": 5,
+                        "State": 0,
+                        "Volume": 0.5019999742507935,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15742869686932881589",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 9,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_Beginning_Wave_Defense",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "3386989033450602823",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "9728057308788638025",
+                        "FilePath": "System AI_VO_Beginning Wave Defence.wav",
+                        "Type": 4,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "14916204079519744331",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 10,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_Corrupted_Core_Destroyed",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "17798507841037173071",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "14339743327216894289",
+                        "FilePath": "System AI_VO_Corrupted Core Destroyed.wav",
+                        "Type": 4,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "13763282574913716563",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 11,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_Upgrade_Module_Drop",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "6269292794969588055",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "18374968593341727065",
+                        "FilePath": "System AI_VO_Upgrade Module Drop.wav",
+                        "Type": 4,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "5116371290363298139",
+                        "ScriptClassName": "Game.GameDelaySoundPrefab",
+                        "Fields": {
+                            "Lifetime": 8.0,
+                            "delayedTime": 1.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 12,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_CorruptCore_Warning",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5692832042667278687",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "3386989033453879649",
+                        "FilePath": "System AI_VO_Corrupted Core Warning.wav",
+                        "Type": 4,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9728057308791734627",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 13,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_Mid_Trench",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13763282574916157799",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "5116371290365067625",
+                        "FilePath": "System AI_VO_Mid Trench Run.wav",
+                        "Type": 4,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "4539910538062233963",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 14,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_Lvl3_Win",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16069125584131031407",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "11457439565703872881",
+                        "FilePath": "System AI_VO_Lvl 3 Win.wav",
+                        "Type": 4,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "1081146024242643315",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                        "Fields": {
+                            "Lifetime": 5.0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 15,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_VO_TrenchWin",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "11457439565704659319",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "9151596556491342201",
+                        "FilePath": "System AI_VO_Trench Run Win.wav",
+                        "Type": 4,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "5692832042671096187",
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 16,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_Com_Chime",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10247923999195365659",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "17741913779140444445",
+                        "FilePath": "Computer Reboot Chime.wav",
+                        "Type": 5,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9671463246893121823",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 18,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_Spam_Skip_Click",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16643554439604748585",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "2232035632019472683",
+                        "FilePath": "COMPUTER-MOUSE_GEN-HDF-08329.wav",
+                        "Type": 5,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "17796475944212480301",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
                     }
                 }
             ]

@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Audio_VO_Mid_Trench",
+    "Prefab GUID": 3378034612528551183,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Audio_VO_Mid_Trench",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13763282574916157799",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6260338374044325009",
+                            "Name": "Audio_VO_Mid_Trench",
+                            "Tag": "Audio"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5116371290365067625",
+                            "FilePath": "System AI_VO_Mid Trench Run.wav",
+                            "Type": 4,
+                            "State": 2,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4539910538062233963",
+                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "Started": false,
+                            "GCHandle": 307
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
