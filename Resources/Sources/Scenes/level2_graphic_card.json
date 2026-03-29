@@ -7864,7 +7864,10 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "8993671477349598809",
-                        "ScriptClassName": "Game.AudioPause"
+                        "ScriptClassName": "Game.AudioPause",
+                        "Fields": {
+                            "startaudio": 5.0
+                        }
                     }
                 }
             ]

@@ -6240,8 +6240,8 @@
                         ],
                         "Rotation": [
                             0.04088059440255165,
-                            -0.029375232756137848,
-                            7.707173441118265e-12
+                            -0.0293752271682024,
+                            8.52139539486707e-12
                         ],
                         "Scale": [
                             1.0,
@@ -11312,7 +11312,10 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "8993671477349598809",
-                        "ScriptClassName": "Game.AudioPause"
+                        "ScriptClassName": "Game.AudioPause",
+                        "Fields": {
+                            "startaudio": 1.0
+                        }
                     }
                 }
             ]
