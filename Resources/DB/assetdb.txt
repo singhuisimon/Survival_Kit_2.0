@@ -753,7 +753,7 @@ ee3b988e429cc1c7|0|/Resources/Sources/Textures/vfx/Impact36.png|.png||1772781757
 de3b988e429cc1d3|0|/Resources/Sources/Textures/vfx/Impact40.png|.png||1772781757|1|0|0|0
 6e3b988e429cc1d5|0|/Resources/Sources/Textures/vfx/Impact41.png|.png||1772781757|1|0|0|0
 1e3b988e429cc1d7|0|/Resources/Sources/Textures/vfx/Impact42.png|.png||1772781757|1|0|0|0
-9e74a094eb7bc001|6|/Resources/Sources/Scenes/trench_run_updated_tooltips.json|.json||1774726049|1|0|0|0
+9e74a094eb7bc001|6|/Resources/Sources/Scenes/trench_run_updated_tooltips.json|.json||1774799159|1|0|0|0
 163b988e429cc1db|0|/Resources/Sources/Textures/vfx/Impact5.png|.png||1772781757|1|0|0|0
 4e3b988e429cc1dd|0|/Resources/Sources/Textures/vfx/Impact6.png|.png||1772781757|1|0|0|0
 463b988e429cc1df|0|/Resources/Sources/Textures/vfx/Impact7.png|.png||1772781757|1|0|0|0

@@ -214,8 +214,11 @@ namespace Game
 
         private void HandleMoveState(Vector3 currentPos, float dt)
         {
-            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A))){
-                movedWASD = true;
+            // if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A))){
+            //     movedWASD = true;
+            //}
+            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A) || IsKeyPressed(KeyCode.E))){
+            movedWASD = true;
             }
 
             if (!movedSpacebar && IsKeyPressed(KeyCode.Space)){
@@ -258,7 +261,7 @@ namespace Game
             if (tooltipElapsed > tooltipMinTime) {
 
                 // Display assistance message: "Press "E" to proceed"
-                ShowProceedText(true);
+                //ShowProceedText(true);
 
                 // Check for 'E' input
                 if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -302,6 +305,9 @@ namespace Game
                 ShowUI(pressShootID, false, dt);
             }
 
+            // Press E to dismiss tooltip
+            if (IsKeyPressed(KeyCode.E)) ShowUI(pressShootID, false, dt);
+
             // Fade up destroy turret UI
             if (fadeOutElapsed > switchTime) ShowUI(destroyTurretID, true, dt);
 
@@ -329,7 +335,7 @@ namespace Game
 
                 // Display assistance message: "Press "E" to proceed"
                 //SetProceedTextPosition(1107.1f, 475.8f);
-                ShowProceedText(true);
+                //ShowProceedText(true);
 
                 // Check for 'E' input
                 if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -364,7 +370,10 @@ namespace Game
             altUsed = false;
 
             // Fade out destroy enemies UIs
-            if (turretsDestroyed) ShowUI(destroyEnemiesID, false, dt);
+            //if (turretsDestroyed) ShowUI(destroyEnemiesID, false, dt);
+
+            // fade out destroy enemies UIs and/or press E to dismiss tooltip
+            if (turretsDestroyed || IsKeyPressed(KeyCode.E)) ShowUI(destroyEnemiesID, false, dt);
 
             // Ensure fading out effect are completed before moving on
             if (fadeOutElapsed > fadeOutTime) {
@@ -398,7 +407,8 @@ namespace Game
 
         private void HandleAltFire(float dt)
         {
-            if (altUsed) ShowUI(altFireID, false, dt);
+            //if (altUsed) ShowUI(altFireID, false, dt);
+            if (altUsed || IsKeyPressed(KeyCode.E)) ShowUI(altFireID, false, dt);
 
             // Ensure fading out effect are completed before moving on
             if (fadeUpElapsed > fadeUpTime) {
@@ -411,7 +421,8 @@ namespace Game
 
         private void HandleCollectUpgradeModuleState(float dt)
         {
-            if (hasCollectedUpgrade)
+            //if (hasCollectedUpgrade)
+            if (hasCollectedUpgrade || IsKeyPressed(KeyCode.E))
             {
                 ShowCollectUpgradeUI(false, dt);
 
