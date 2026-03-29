@@ -20,12 +20,19 @@ namespace Game
         private const string EVENT_GAINULT = "GainUlt";
         // Normal state
         // Normal state
+        // Normal state — shown while filling, restored after firing
         private const float NORMAL_POS_X = 599.200f;
         private const float NORMAL_POS_Y = 360.000f;
         private const float NORMAL_SCALE_X = 639.000f;
         private const float NORMAL_SCALE_Y = 360.000f;
 
-        // Enlarged state (editor-confirmed values)
+        // Small state — pulse lerp start (alt fire ready)
+        private const float SMALL_POS_X = 641.900f;
+        private const float SMALL_POS_Y = 392.800f;
+        private const float SMALL_SCALE_X = 589.000f;
+        private const float SMALL_SCALE_Y = 310.000f;
+
+        // Enlarged state — pulse lerp end (alt fire ready)
         private const float ENLARGED_POS_X = 555.800f;
         private const float ENLARGED_POS_Y = 328.500f;
         private const float ENLARGED_SCALE_X = 689.000f;
@@ -81,10 +88,11 @@ namespace Game
             t = SineEaseInOut(t);
 
             // Lerp position and scale
-            float posX = Lerp(NORMAL_POS_X, ENLARGED_POS_X, t);
-            float posY = Lerp(NORMAL_POS_Y, ENLARGED_POS_Y, t);
-            float scaleX = Lerp(NORMAL_SCALE_X, ENLARGED_SCALE_X, t);
-            float scaleY = Lerp(NORMAL_SCALE_Y, ENLARGED_SCALE_Y, t);
+            float posX = Lerp(SMALL_POS_X, ENLARGED_POS_X, t);
+            float posY = Lerp(SMALL_POS_Y, ENLARGED_POS_Y, t);
+            float scaleX = Lerp(SMALL_SCALE_X, ENLARGED_SCALE_X, t);
+            float scaleY = Lerp(SMALL_SCALE_Y, ENLARGED_SCALE_Y, t);
+
 
             Vector3 newPos = new Vector3(posX, posY, 0.0f);
             Vector3 newScale = new Vector3(scaleX, scaleY, 1.0f);
