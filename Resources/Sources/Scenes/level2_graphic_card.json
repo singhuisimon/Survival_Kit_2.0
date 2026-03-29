@@ -10296,6 +10296,48 @@
                     }
                 }
             ]
+        },
+        {
+            "ID": 128,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "TimerVO",
+                        "Tag": "Audio_VO"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16217674004699235787",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "8723684224754976205",
+                        "ScriptClassName": "Game.AudioVOTimer"
+                    }
+                }
+            ]
         }
     ],
     "Settings": [
