@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Audio_Win_Trench_VO",
-    "Prefab GUID": 17127515452790019809,
+    "Prefab Name": "Prefab: Audio_VO_TrenchWin.prefab",
+    "Prefab GUID": 11837413193427730605,
     "version": 1,
     "entities": [
         {
-            "Name": "Audio_Win_Trench_VO",
+            "Name": "Audio_VO_TrenchWin",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "12515829434344702921",
+                            "ComponentGUID": "11457439565704659319",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,9 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "15398133195876357831",
-                            "Name": "Audio_Win_Trench_VO",
-                            "Tag": "Audio_Win_Trench_VO"
+                            "ComponentGUID": "17822723486416339121",
+                            "Name": "Audio_VO_TrenchWin",
+                            "Tag": "Audio"
                         }
                     }
                 },
@@ -50,10 +50,10 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "10209986425132139471",
-                            "FilePath": "System AI_VO_Trench Run Success.wav",
+                            "ComponentGUID": "9151596556491342201",
+                            "FilePath": "System AI_VO_Trench Run Win.wav",
                             "Type": 4,
-                            "State": 0,
+                            "State": 2,
                             "Volume": 1.0,
                             "Pitch": 1.0,
                             "Loop": false,
@@ -73,10 +73,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "3868918149794972627",
-                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "ComponentGUID": "5692832042671096187",
+                            "ScriptClassName": "Game.GameVODelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 1251
+                            "GCHandle": 19
                         }
                     }
                 }

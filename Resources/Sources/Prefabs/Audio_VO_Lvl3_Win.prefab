@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Audio_Win_Level2_VO.prefab",
-    "Prefab GUID": 8955109431910842555,
+    "Prefab Name": "Prefab: Audio_VO_Lvl3_Win.prefab",
+    "Prefab GUID": 3665869163427856547,
     "version": 1,
     "entities": [
         {
-            "Name": "Audio_Win_Level2_VO",
+            "Name": "Audio_VO_Lvl3_Win",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16551054700468913101",
+                            "ComponentGUID": "16069125584131031407",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,9 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "10209986425145546431",
-                            "Name": "Audio_Win_Level2_VO",
-                            "Tag": "Audio_Win_Level2_VO"
+                            "ComponentGUID": "14214803622590169359",
+                            "Name": "Audio_VO_Lvl3_Win",
+                            "Tag": "Audio"
                         }
                     }
                 },
@@ -50,8 +50,8 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "7327682663615693781",
-                            "FilePath": "System AI_VO_Defence Success.wav",
+                            "ComponentGUID": "11457439565703872881",
+                            "FilePath": "System AI_VO_Lvl 3 Win.wav",
                             "Type": 4,
                             "State": 2,
                             "Volume": 1.0,
@@ -73,7 +73,7 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2139535892885128151",
+                            "ComponentGUID": "1081146024242643315",
                             "ScriptClassName": "Game.GameVODelaySoundPrefab",
                             "Started": false,
                             "GCHandle": 19

@@ -1,5 +1,5 @@
 {
-  "sourcePath": "/Resources/Sources/Audio/System AI_VO_Trench Run Success.wav",
+  "sourcePath": "/Resources/Sources/Audio/Computer Explode.wav",
   "audioSettings": {
     "outputFormat": "OGG",
     "compression": "VORBIS",

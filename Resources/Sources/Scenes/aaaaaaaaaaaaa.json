@@ -3,6 +3,68 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 17,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_Smack_Impact",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "12222734843621441825",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "2422902054464782627",
+                        "FilePath": "Computer Smack Impact.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "15681499357443784997",
+                        "ScriptClassName": "Game.GameDelaySoundPrefab"
+                    }
+                }
+            ]
+        },
+        {
             "ID": 8,
             "Components": [
                 {
@@ -1001,7 +1063,7 @@
                         "ComponentGUID": "9151596556491342201",
                         "FilePath": "System AI_VO_Trench Run Win.wav",
                         "Type": 4,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
@@ -1019,10 +1081,131 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "5692832042671096187",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime",
-                        "Fields": {
-                            "Lifetime": 4.0
-                        }
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 16,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_Com_Chime",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "10247923999195365659",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "17741913779140444445",
+                        "FilePath": "Computer Reboot Chime.wav",
+                        "Type": 5,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "9671463246893121823",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 18,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "Audio_Spam_Skip_Click",
+                        "Tag": "Audio"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "16643554439604748585",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "2232035632019472683",
+                        "FilePath": "COMPUTER-MOUSE_GEN-HDF-08329.wav",
+                        "Type": 5,
+                        "State": 0,
+                        "Volume": 1.0,
+                        "Pitch": 1.0,
+                        "Loop": false,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": true,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "17796475944212480301",
+                        "ScriptClassName": "Game.GameSoundPrefabLifetime"
                     }
                 }
             ]

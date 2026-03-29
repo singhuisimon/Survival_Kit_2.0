@@ -6,6 +6,7 @@ using Engine;
 using System;
 using static Engine.Scene;
 using static Engine.Event;
+using static Engine.Prefab;
 using static Engine.Logger;
 using static Engine.Transform;
 using static Engine.SpriteRenderer;
@@ -36,6 +37,13 @@ namespace Game
         // private string mainMenuscenePath = "Resources/Sources/Scenes/MainMenu.json";
         // private string level2Path = "Resources/Sources/Scenes/level2_graphic_card.json";
 
+        // Prefab Audio Path
+        private const string audiosmack = "Sources/Prefabs/Audio_Smack_Impact.prefab";
+        private const string audiochime = "Sources/Prefabs/Audio_Com_Chime.prefab";
+        private const string audiowin3 = "Sources/Prefabs/Audio_VO_Lvl3_Win.prefab";
+        private const string audiowin2 = "Sources/Prefabs/Audio_Win_Level2_VO.prefab";
+        private const string audiowinTrench = "Sources/Prefabs/Audio_VO_TrenchWin.prefab";
+        private const string audioskip = "Sources/Prefabs/Audio_Spam_Skip_Click.prefab";
 
         // Frame sequence
         private uint[] frameSequence = new uint[8];
@@ -194,6 +202,8 @@ namespace Game
                 if (Collision2D.IsMouseCollidingWithEntity(CutSceneSkipButtonID))
                 {
                     LogMessage("WinCutScenePopUp: Skip pressed");
+                    //Instantiate Audio
+                    PrefabInstantiate(audioskip);
                     SkipToLastFrame();
                     return;
                 }
@@ -222,6 +232,9 @@ namespace Game
 
             currentFrame++;
             ShowFrame(currentFrame);
+
+            PlayAudio();
+
             frameTimer = 0.0f;
 
             LogMessage("WinCutScenePopUp: Frame " + (currentFrame + 1));
@@ -255,6 +268,9 @@ namespace Game
                 SetIsVisible(WinPopUpID, false);
                 SetIsVisible(WinPopUpFinalID, true);
                 SetIsVisible(CreditEndButtonID, true);
+
+                //Instantiate the win VO for level 3
+                PrefabInstantiate(audiowin3);
             }
             else
             {
@@ -264,6 +280,20 @@ namespace Game
                 SetIsVisible(WinPopUpID, true);
                 SetIsVisible(MainMenuButtonID,      true);
                 SetIsVisible(CreditEndButtonID, false);
+
+                //Checking if it was trench run prev
+                if(WinCutSceneContext.NextScene == WinCutSceneContext.LEVEL2_SCENE)
+                {
+                    //Instantiate win VO for trench
+                    PrefabInstantiate(audiowinTrench);
+                } 
+                //Checking if it was level2 prev
+                else if (WinCutSceneContext.NextScene == WinCutSceneContext.LEVEL3_SCENE)
+                {
+                    //Instantiate win VO for level2
+                    PrefabInstantiate(audiowin2);
+                }
+
             }
             //LogMessage("WinCutScenePopUp: Cutscene complete – hook up win popup here");
             popupVisible = true;
@@ -301,6 +331,22 @@ namespace Game
                     HideFrame(i);
             }
         }
+
+        private void PlayAudio()
+        {
+            if(currentFrame == 1 || currentFrame == 3)
+            {
+                //instantiate the sound
+                PrefabInstantiate(audiosmack);
+            }
+
+            if(currentFrame == 6)
+            {
+                //instantiate the sound
+                PrefabInstantiate(audiochime);
+            }
+        }
+
         public override void OnDestroy()
         {
             LogMessage("WinCutScenePopUp: Destroyed");

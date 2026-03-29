@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Audio_Win_Level2_VO.prefab",
-    "Prefab GUID": 8955109431910842555,
+    "Prefab Name": "Audio_Com_Chime",
+    "Prefab GUID": 3575823559088226855,
     "version": 1,
     "entities": [
         {
-            "Name": "Audio_Win_Level2_VO",
+            "Name": "Audio_Com_Chime",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16551054700468913101",
+                            "ComponentGUID": "10247923999195365659",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,9 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "10209986425145546431",
-                            "Name": "Audio_Win_Level2_VO",
-                            "Tag": "Audio_Win_Level2_VO"
+                            "ComponentGUID": "12222734843639530013",
+                            "Name": "Audio_Com_Chime",
+                            "Tag": "Audio"
                         }
                     }
                 },
@@ -50,10 +50,10 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "7327682663615693781",
-                            "FilePath": "System AI_VO_Defence Success.wav",
-                            "Type": 4,
-                            "State": 2,
+                            "ComponentGUID": "17741913779140444445",
+                            "FilePath": "Computer Reboot Chime.wav",
+                            "Type": 5,
+                            "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
                             "Loop": false,
@@ -73,10 +73,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2139535892885128151",
-                            "ScriptClassName": "Game.GameVODelaySoundPrefab",
+                            "ComponentGUID": "9671463246893121823",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 155
                         }
                     }
                 }

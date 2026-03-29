@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Audio_Win_Level2_VO.prefab",
-    "Prefab GUID": 8955109431910842555,
+    "Prefab Name": "Audio_Smack_Impact",
+    "Prefab GUID": 693519797571207723,
     "version": 1,
     "entities": [
         {
-            "Name": "Audio_Win_Level2_VO",
+            "Name": "Audio_Smack_Impact",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16551054700468913101",
+                            "ComponentGUID": "12222734843621441825",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,9 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "10209986425145546431",
-                            "Name": "Audio_Win_Level2_VO",
-                            "Tag": "Audio_Win_Level2_VO"
+                            "ComponentGUID": "3575823559088177557",
+                            "Name": "Audio_Smack_Impact",
+                            "Tag": "Audio"
                         }
                     }
                 },
@@ -50,9 +50,9 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "7327682663615693781",
-                            "FilePath": "System AI_VO_Defence Success.wav",
-                            "Type": 4,
+                            "ComponentGUID": "2422902054464782627",
+                            "FilePath": "Computer Smack Impact.wav",
+                            "Type": 5,
                             "State": 2,
                             "Volume": 1.0,
                             "Pitch": 1.0,
@@ -73,10 +73,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2139535892885128151",
-                            "ScriptClassName": "Game.GameVODelaySoundPrefab",
+                            "ComponentGUID": "15681499357443784997",
+                            "ScriptClassName": "Game.GameDelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 43
                         }
                     }
                 }

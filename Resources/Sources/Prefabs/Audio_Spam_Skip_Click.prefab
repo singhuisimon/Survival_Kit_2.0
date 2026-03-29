@@ -1,10 +1,10 @@
 {
-    "Prefab Name": "Prefab: Audio_Win_Level2_VO.prefab",
-    "Prefab GUID": 8955109431910842555,
+    "Prefab Name": "Prefab: Audio_Spam_Skip_Click.prefab",
+    "Prefab GUID": 6043901708059099299,
     "version": 1,
     "entities": [
         {
-            "Name": "Audio_Win_Level2_VO",
+            "Name": "Audio_Spam_Skip_Click",
             "LocalID": 1,
             "ParentLocalID": 0,
             "components": [
@@ -13,7 +13,7 @@
                     "typeName": "TransformComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "16551054700468913101",
+                            "ComponentGUID": "16643554439604748585",
                             "Position": [
                                 0.0,
                                 0.0,
@@ -39,9 +39,9 @@
                     "typeName": "TagComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "10209986425145546431",
-                            "Name": "Audio_Win_Level2_VO",
-                            "Tag": "Audio_Win_Level2_VO"
+                            "ComponentGUID": "13184789925784207655",
+                            "Name": "Audio_Spam_Skip_Click",
+                            "Tag": "Audio"
                         }
                     }
                 },
@@ -50,10 +50,10 @@
                     "typeName": "AudioComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "7327682663615693781",
-                            "FilePath": "System AI_VO_Defence Success.wav",
-                            "Type": 4,
-                            "State": 2,
+                            "ComponentGUID": "2232035632019472683",
+                            "FilePath": "COMPUTER-MOUSE_GEN-HDF-08329.wav",
+                            "Type": 5,
+                            "State": 0,
                             "Volume": 1.0,
                             "Pitch": 1.0,
                             "Loop": false,
@@ -73,10 +73,10 @@
                     "typeName": "ScriptComponent",
                     "data": {
                         "Properties": {
-                            "ComponentGUID": "2139535892885128151",
-                            "ScriptClassName": "Game.GameVODelaySoundPrefab",
+                            "ComponentGUID": "17796475944212480301",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 0
                         }
                     }
                 }
