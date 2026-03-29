@@ -266,7 +266,7 @@ namespace Game
                 // Begin fade out
                 if (EPressed) {
                     ShowUI(pressFlyTunnelID, false, dt);
-                    ShowProceedText(false);  // Remove assistance message
+                    //ShowProceedText(false);  // Remove assistance message
                 }
 
                 // Begin fade up for next 
@@ -337,7 +337,7 @@ namespace Game
                 // Begin fade out
                 if (EPressed) {
                     ShowUI(destroyTurretID, false, dt);
-                    ShowProceedText(false);  // Remove assistance message
+                    //ShowProceedText(false);  // Remove assistance message
                 }
 
                 // Begin fade up for next 
