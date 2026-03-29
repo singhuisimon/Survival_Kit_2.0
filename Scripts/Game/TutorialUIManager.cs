@@ -98,6 +98,17 @@ namespace Game
         private bool wallDestroyedPublished = false;
         private bool skipTutorial = false;
 
+        private bool pauseForTutorial  = false;
+        private bool playerPauseOnTutorial = false;
+        private bool prevEscapePressed = false;
+        
+        /*private uint cameraID;
+        private float camFlySpeed = 100.0f;
+        private Vector3 lastCamPos = Vector3.Zero;
+        private bool camPosSaved = false;
+        private bool returningCam = false;
+        [SerializeField] private string cameraName = "PlayerCam";*/
+
         public override void OnStart()
         {
             pressWASDID = SceneFindEntityByName(pressWASDName);
@@ -153,8 +164,27 @@ namespace Game
                 return;
             }
 
-            if (GameState.IsPaused)
+            bool escapeJustPressed = IsEscapeJustPressed();
+
+            // Player paused during tutorial pause
+            if (pauseForTutorial && playerPauseOnTutorial) {
+                if (escapeJustPressed)
+                    playerPauseOnTutorial = false;
                 return;
+            }
+
+            // Tutorial is pausing the game
+            if (pauseForTutorial) {
+                GameState.IsPaused = true;
+                if (escapeJustPressed) {
+                    playerPauseOnTutorial = true;
+                    return;
+                }
+            } else
+            {
+                if (GameState.IsPaused)
+                    return;   
+            }
 
             Vector3 currentPos = Transform.GetPosition(playerID);
 
@@ -251,6 +281,8 @@ namespace Game
 
         private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos, float dt)
         {
+            pauseForTutorial = true;
+
             // Update tooltip elapsed time
             tooltipElapsed += dt;
 
@@ -270,7 +302,7 @@ namespace Game
                 }
 
                 // Begin fade up for next 
-                if (currentPos.X < (wallPos.X + 40) && EPressed && (fadeOutElapsed > switchTime)) {
+                if (EPressed && (fadeOutElapsed > switchTime)) {
                     //ShowShootUI(true, dt);
                     ShowUI(pressShootID, true, dt);
                 }
@@ -283,6 +315,8 @@ namespace Game
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
+                    pauseForTutorial = false;
+                    GameState.IsPaused = false;
                     currentState = TutorialState.ShootWall;
                 }
             }
@@ -321,6 +355,8 @@ namespace Game
         {
             altUsed = false;
 
+            pauseForTutorial = true;
+
             // Update tooltip elapsed time
             tooltipElapsed += dt;
 
@@ -353,6 +389,8 @@ namespace Game
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
+                    pauseForTutorial = false;  
+                    GameState.IsPaused = false;
                     currentState = TutorialState.DestroyEnemies;
                 }
 
@@ -619,5 +657,60 @@ namespace Game
                     SpriteRenderer.SetIsVisible(sentrySummonID, false);
             }
         }
+
+        private bool IsEscapeJustPressed() {
+            bool pressed = IsKeyPressed(KeyCode.Escape);
+            bool justPressed = pressed && !prevEscapePressed;
+            prevEscapePressed = pressed;
+            return justPressed;
+        }
+
+        // private bool FlyCamToTarget(float dt, uint targetID, float distToTarget)
+        // {
+        //     Vector3 camPos = Transform.GetPosition(cameraID);
+        //     Vector3 targetPos = Transform.GetPosition(targetID);
+
+        //     SetTarget(cameraID, ref targetPos);
+
+        //     Vector3 toTarget = targetPos - camPos;
+        //     float currentDist = toTarget.Magnitude;
+
+        //     if (currentDist <= distToTarget) return true;
+
+        //     Vector3 dirToTarget = toTarget / currentDist;
+        //     float moveStep = camFlySpeed * dt;
+        //     float allowedMove = currentDist - distToTarget;
+        //     float actualMove = SimpleMath.Min(moveStep, allowedMove);
+
+        //     Vector3 newCamPos = camPos + dirToTarget * actualMove;
+        //     Transform.SetPosition(cameraID, ref newCamPos);
+
+        //     return false;
+        // }
+
+        // private bool FlyCamBackToPlayer(float dt)
+        // {
+        //     Vector3 currCamPos = Transform.GetPosition(cameraID);
+        //     Vector3 toTarget = lastCamPos - currCamPos;
+        //     float currentDist = toTarget.Magnitude;
+
+        //     float allowedMove = 1000.0f;
+        //     if (currentDist <= 1000.0f) {
+        //         allowedMove = 100.0f;
+        //         if (currentDist <= 50.0f) {
+        //             Transform.SetPosition(cameraID, ref lastCamPos);
+        //             return true;
+        //         }
+        //     }
+
+        //     Vector3 dirToTarget = toTarget / currentDist;
+        //     float moveStep = camFlySpeed * dt;
+        //     float actualMove = SimpleMath.Min(moveStep, allowedMove);
+
+        //     Vector3 newCamPos = currCamPos + dirToTarget * actualMove;
+        //     Transform.SetPosition(cameraID, ref newCamPos);
+
+        //     return false;
+        // }
     }
 }
