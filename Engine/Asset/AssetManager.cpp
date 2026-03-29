@@ -14,6 +14,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 #include "../Utility/AssetPath.h"
 #include "../Utility/Logger.h"
 
@@ -21,7 +22,33 @@ namespace fs = std::filesystem;
 
 namespace Engine {
 
+	
+	// FNV-1a 64-bit hash over file contents.
+	// Fast, no dependencies, deterministic across machines.
+	std::string AssetManager::ComputeFileHash(const std::string& path)
+	{
+		std::ifstream f(path, std::ios::binary);
+		if (!f.is_open()) return "";
 
+		constexpr uint64_t FNV_OFFSET = 14695981039346656037ULL;
+		constexpr uint64_t FNV_PRIME  = 1099511628211ULL;
+
+		uint64_t hash = FNV_OFFSET;
+		char buf[4096];
+		while (f.read(buf, sizeof(buf)) || f.gcount() > 0)
+		{
+			for (std::streamsize i = 0; i < f.gcount(); ++i)
+			{
+				hash ^= static_cast<uint8_t>(buf[i]);
+				hash *= FNV_PRIME;
+			}
+		}
+
+		// Convert to hex string
+		std::ostringstream oss;
+		oss << std::hex << std::setw(16) << std::setfill('0') << hash;
+		return oss.str();
+	}
 
 	AssetManager& AssetManager::getInstance() {
 		static AssetManager instance;
@@ -115,6 +142,18 @@ namespace Engine {
 			LOG_ERROR("Failed to create/find record for: ", src);
 			return;
 		}
+
+		// Content hash check - skip reprocessing if file bytes haven't changed.
+		// This prevents false Modified triggers caused by timestamp differences
+		// across machines (e.g. after a git pull).
+		std::string newHash = ComputeFileHash(src);
+		if (!newHash.empty() && newHash == rec->contentHash)
+		{
+			LOG_DEBUG("Asset unchanged (hash match), skipping: ", src);
+			return;
+		}
+		// Store the new hash for future comparisons
+		rec->contentHash = newHash;
 
 		//detect the resource type from file extension
 		rec->type = detectResourceTypeFromPath(src);
