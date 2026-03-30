@@ -112,12 +112,23 @@ namespace Game
                 }
                 uint vfxDestroyedID = 0;
                 vfxDestroyedID = PrefabInstantiate(destroyedVFXPrefab);
-                if(vfxDestroyedID != 0)
+                Vector3 currScale = GetScale((uint)EntityID);
+                currScale.X = currScale.Y * 0.1f;
+                currScale.Y = currScale.Z * 0.1f;
+                currScale.Z = 1.0f;
+
+                if (vfxDestroyedID != 0)
                 {
                     Vector3 currPos = GetPosition((uint)EntityID);
                     Quat currRot = GetRotation((uint)EntityID);
+
+                    // 90 degree rotation around Y-axis
+                    Quat yRot90 = new Quat(0.7071068f, 0, 0.7071068f, 0);  // (W, X, Y, Z)
+                    Quat finalRot = currRot * yRot90;
+
                     SetPosition(vfxDestroyedID, ref currPos);
-                    SetRotation(vfxDestroyedID, ref currRot);
+                    SetRotation(vfxDestroyedID, ref finalRot);
+                    SetScale(vfxDestroyedID, ref currScale);
                 }
                 Publish("DestructableWallDestroyed", EntityID.ToString());
                 SceneDestroyEntity(EntityID);
