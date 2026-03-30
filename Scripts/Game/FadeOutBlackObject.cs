@@ -17,7 +17,7 @@ namespace Game
         public override void OnStart()
         {
             playerCamID = SceneFindEntityByName(playerCamName);
-            SetOpacity(EntityID, 100.0f);
+            SetOpacity(EntityID, 1.0f);
         }
 
         public override void OnFixedUpdate(float deltaTime)
@@ -36,7 +36,7 @@ namespace Game
             if (t < 0.0f) t = 0.0f;
             if (t > 1.0f) t = 1.0f;
 
-            SetOpacity(Entity.EntityID, 100.0f * (1.0f - t));
+            SetOpacity(Entity.EntityID, (1.0f - t));
         }
     }
 }
