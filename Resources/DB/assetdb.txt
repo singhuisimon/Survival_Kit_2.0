@@ -1002,3 +1002,4 @@ f6869894e47a00df|2|/Resources/Sources/Material/VFX_WallExplosion.mat|.mat|60420f
 16e130951d8d4005|0|/Resources/Sources/Textures/trench_run_v007_v008_Emissive.png|.png|23f468544c445fda|1774811706|1|0|0|0
 6e130951d8d4007|0|/Resources/Sources/Textures/trench_run_v007_v008_Metallic.png|.png|fc955f73e11bb204|1774811706|1|0|0|0
 17e0b095789c4001|11|/Resources/Sources/Meshes/desktop.ini|.ini|c1a256a4e523e4d3|0|0|0|0|0
+88c428957d404001|3|/Resources/Sources/Audio/Trench Run BGM.wav|.wav|4cfd0a8ba6498fe7|1774873658|1|0|0|0
