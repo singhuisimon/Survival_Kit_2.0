@@ -18,9 +18,9 @@ namespace Game
         private float startingTime = 240.0f;  // 2 minutes = 120 seconds
 
         private float timePassed = 0.0f;
-        private float time2min = 120.0f;
-        private float time1min = 60.0f;
-        private float time10sec = 10.0f;
+        private float time2min = 120.5f;
+        private float time1min = 60.5f;
+        private float time10sec = 10.5f;
 
         // ===== Events =====
         private const string EVENT_PLAYER_DEAD = "PlayerDead";
@@ -29,8 +29,9 @@ namespace Game
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
         private const string GAMEWIN = "GameWin";
         private const string EVENT_DEBUG_SET_TIMER = "DebugSetTimer";
-        //private const string EVENT_1_5MIN = "1_5MIN";
         private const string EVENT_2MIN = "2MIN";
+        private const string EVENT_1MIN = "1MIN";
+        private const string EVENT_10s = "10SEC";
         private const string EVENT_BOTSPAWN = "BOTSPAWN";
         private const string EVENT_WORMSPAWN = "WORMSPAWN";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
@@ -174,13 +175,17 @@ namespace Game
             if(remainingTime <= time1min && !event1min)
             {
                 //publish event here
+                Publish(EVENT_1MIN, "");
                 event1min = true;
                 return;
             }
 
+            //need redo i think due to the fact that all i want to do is ensure while the normal 10s will work 
+            //the debug 10s will work too (also this would mean i need stop prev vo also which i forgot about it)
             if(timePassed >= (startingTime - time10sec) && !event10sec)
             {
                 //publish event here
+                Publish(EVENT_10s, "");
                 event10sec = true;
                 return;
             }

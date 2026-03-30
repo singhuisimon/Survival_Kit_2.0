@@ -98,19 +98,6 @@ namespace Game
         private bool wallDestroyedPublished = false;
         private bool skipTutorial = false;
 
-        private bool pauseForTutorial  = false;
-        private bool playerPauseOnTutorial = false;
-        private bool prevEscapePressed = false;
-        private bool shootUIShown = false;
-        private bool destroyEnemyShown = false;
-        
-        /*private uint cameraID;
-        private float camFlySpeed = 100.0f;
-        private Vector3 lastCamPos = Vector3.Zero;
-        private bool camPosSaved = false;
-        private bool returningCam = false;
-        [SerializeField] private string cameraName = "PlayerCam";*/
-
         public override void OnStart()
         {
             pressWASDID = SceneFindEntityByName(pressWASDName);
@@ -166,23 +153,8 @@ namespace Game
                 return;
             }
 
-            bool escapeJustPressed = IsEscapeJustPressed();
-
-            // Player paused during tutorial pause
-            if (pauseForTutorial && playerPauseOnTutorial) {
-                if (escapeJustPressed)
-                    playerPauseOnTutorial = false;
+            if (GameState.IsPaused)
                 return;
-            }
-
-            // Tutorial is pausing the game
-            if (pauseForTutorial) {
-                GameState.IsPaused = true;
-                if (escapeJustPressed) {
-                    playerPauseOnTutorial = true;
-                    return;
-                }
-            }
 
             Vector3 currentPos = Transform.GetPosition(playerID);
 
@@ -242,8 +214,11 @@ namespace Game
 
         private void HandleMoveState(Vector3 currentPos, float dt)
         {
-            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A))){
-                movedWASD = true;
+            // if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A))){
+            //     movedWASD = true;
+            //}
+            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A) || IsKeyPressed(KeyCode.E))){
+            movedWASD = true;
             }
 
             if (!movedSpacebar && IsKeyPressed(KeyCode.Space)){
@@ -279,8 +254,6 @@ namespace Game
 
         private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos, float dt)
         {
-            pauseForTutorial = true;
-
             // Update tooltip elapsed time
             tooltipElapsed += dt;
 
@@ -288,7 +261,7 @@ namespace Game
             if (tooltipElapsed > tooltipMinTime) {
 
                 // Display assistance message: "Press "E" to proceed"
-                ShowProceedText(true);
+                //ShowProceedText(true);
 
                 // Check for 'E' input
                 if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -296,19 +269,23 @@ namespace Game
                 // Begin fade out
                 if (EPressed) {
                     ShowUI(pressFlyTunnelID, false, dt);
-                    ShowProceedText(false);  // Remove assistance message
+                    //ShowProceedText(false);  // Remove assistance message
+                }
+
+                // Begin fade up for next 
+                if (currentPos.X < (wallPos.X + 40) && EPressed && (fadeOutElapsed > switchTime)) {
+                    //ShowShootUI(true, dt);
+                    ShowUI(pressShootID, true, dt);
                 }
 
                 // Ensure all fading effects are completed before moving on
-                if (EPressed && fadeOutElapsed > fadeOutTime) {
+                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
 
                     // Reset all elapsed time, 'E' pressed state, and set up for next state
                     EPressed = false;
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
                     currentState = TutorialState.ShootWall;
                 }
             }
@@ -318,53 +295,37 @@ namespace Game
         {
             altUsed = false;
 
-            float distToWall = currentPos.X - wallPos.X;
-            if (distToWall < 70.0f && !wallDestroyedPublished && !shootUIShown)
-            {
-                ShowUI(pressShootID, true, dt);
-                ShowProceedText(true);
-                if (fadeUpElapsed >= fadeUpTime) shootUIShown = true;
-                pauseForTutorial = true;
-            }        
-            
-            if (shootUIShown) {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-                if (EPressed) {
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
-                    ShowUI(pressShootID, false, dt);
-                    ShowProceedText(false);
-                    if (fadeOutElapsed > fadeOutTime) {
-                        EPressed = false;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                    }
-                }
-            }
-
+            // Fade out shoot UI after destroying wall
             if (currentPos.X < (wallPos.X - 2) && !wallDestroyedPublished) {
                 LogMessage("[TutorialUIManager] Detect wall is destroyed");
                 wallDestroyedPublished = true;
                 Publish("DestructableWallDestroyed", true.ToString());
+                ShowUI(pressShootID, false, dt);
+            } else if(wallDestroyedPublished){
+                ShowUI(pressShootID, false, dt);
             }
 
-            if (wallDestroyedPublished) {
-                ShowUI(destroyTurretID, true, dt);
+            // Press E to dismiss tooltip
+            if (IsKeyPressed(KeyCode.E)) ShowUI(pressShootID, false, dt);
 
-                // Transition once faded in
-                if (fadeUpElapsed > fadeUpTime) {
-                    fadeOutElapsed = 0.0f;
-                    fadeUpElapsed = 0.0f;
-                    currentState = TutorialState.DestroyTurret;
-                }
+            // Fade up destroy turret UI
+            if (fadeOutElapsed > switchTime) ShowUI(destroyTurretID, true, dt);
+
+            // Ensure all fading effects are completed before moving on
+            if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
+
+                // Reset all elapsed time, 'E' pressed state, and set up for next state
+                EPressed = false;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                currentState = TutorialState.DestroyTurret;
             }
         }
 
         private void HandleDestroyTurretState(float dt)
         {
             altUsed = false;
-
-            pauseForTutorial = true;
 
             // Update tooltip elapsed time
             tooltipElapsed += dt;
@@ -374,7 +335,7 @@ namespace Game
 
                 // Display assistance message: "Press "E" to proceed"
                 //SetProceedTextPosition(1107.1f, 475.8f);
-                ShowProceedText(true);
+                //ShowProceedText(true);
 
                 // Check for 'E' input
                 if (IsKeyPressed(KeyCode.E)) EPressed = true;
@@ -382,24 +343,22 @@ namespace Game
                 // Begin fade out
                 if (EPressed) {
                     ShowUI(destroyTurretID, false, dt);
-                    ShowProceedText(false);  // Remove assistance message
+                    //ShowProceedText(false);  // Remove assistance message
                 }
 
                 // Begin fade up for next 
-                // if (EPressed && (fadeOutElapsed > switchTime)) {
-                //     ShowUI(destroyEnemiesID, true, dt);
-                // }
+                if (EPressed && (fadeOutElapsed > switchTime)) {
+                    ShowUI(destroyEnemiesID, true, dt);
+                }
 
                 // Ensure all fading effects are completed before moving on
-                if (fadeOutElapsed > fadeOutTime) {
+                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
 
                     // Reset all elapsed time, 'E' pressed state, and set up for next state
                     EPressed = false;
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
-                    pauseForTutorial = false;  
-                    GameState.IsPaused = false;
                     currentState = TutorialState.DestroyEnemies;
                 }
 
@@ -410,65 +369,60 @@ namespace Game
         {
             altUsed = false;
 
-            if (oneturretDestroyed && !turretsDestroyed && !destroyEnemyShown)
-            {
-                ShowUI(destroyEnemiesID, true, dt);
-                if (fadeUpElapsed >= fadeUpTime) destroyEnemyShown = true;
-                pauseForTutorial = true;
-            }       
-            
-            if (destroyEnemyShown) {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-                if (EPressed) {
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
-                    ShowUI(destroyEnemiesID, false, dt);
-                    ShowProceedText(false);
-                    if (fadeOutElapsed > fadeOutTime) {
-                        EPressed = false;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                        currentState = TutorialState.AltFire;
-                    }
-                }
+            // Fade out destroy enemies UIs
+            //if (turretsDestroyed) ShowUI(destroyEnemiesID, false, dt);
+
+            // fade out destroy enemies UIs and/or press E to dismiss tooltip
+            if (turretsDestroyed || IsKeyPressed(KeyCode.E)) ShowUI(destroyEnemiesID, false, dt);
+
+            // Ensure fading out effect are completed before moving on
+            if (fadeOutElapsed > fadeOutTime) {
+
+                // Reset fade out elapsed time and set up for the next state
+                fadeOutElapsed = 0.0f;
+                currentState = TutorialState.Wait;
             }
         }
 
         private void HandleWaitState(float dt)
         {
-            ;
+            if (ultCharged && !altFireShown && !altUsed) {
+                ShowUI(altFireID, true, dt);
+            }
+
+            // Ensure fading out effect are completed before moving on
+            if (fadeUpElapsed > fadeUpTime) {
+
+                // Reset fade up elapsed time and set up for the next state
+                fadeUpElapsed = 0.0f;
+                altFireShown = true;
+                currentState = TutorialState.AltFire;
+            } else if (altUsed && !altFireShown){
+                //Alt was used before tooltip finished fading in - Skip to altfire to clean up
+                fadeUpElapsed = 0.0f;
+                altFireShown = true;
+                currentState = TutorialState.AltFire;
+            }
         }
 
         private void HandleAltFire(float dt)
         {
-            if (turretsDestroyed && ultCharged && !altFireShown && !altUsed) {
-                ShowUI(altFireID, true, dt);
-                ShowProceedText(true);
+            //if (altUsed) ShowUI(altFireID, false, dt);
+            if (altUsed || IsKeyPressed(KeyCode.E)) ShowUI(altFireID, false, dt);
 
-                if (fadeUpElapsed >= fadeUpTime) altFireShown = true;
-                pauseForTutorial = true;
-            }
-                
-            if (altFireShown) {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-                if (EPressed) {
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
-                    ShowUI(altFireID, false, dt);
-                    ShowProceedText(false);
-                    if (fadeOutElapsed > fadeOutTime) {
-                        EPressed = false;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                        currentState = TutorialState.Wait;
-                    }
-                }
+            // Ensure fading out effect are completed before moving on
+            if (fadeUpElapsed > fadeUpTime) {
+
+                // Reset fade up elapsed time and set up for the next state
+                fadeUpElapsed = 0.0f;
+                currentState = TutorialState.Wait;
             }
         }
 
         private void HandleCollectUpgradeModuleState(float dt)
         {
-            if (hasCollectedUpgrade)
+            //if (hasCollectedUpgrade)
+            if (hasCollectedUpgrade || IsKeyPressed(KeyCode.E))
             {
                 ShowCollectUpgradeUI(false, dt);
 
@@ -676,60 +630,5 @@ namespace Game
                     SpriteRenderer.SetIsVisible(sentrySummonID, false);
             }
         }
-
-        private bool IsEscapeJustPressed() {
-            bool pressed = IsKeyPressed(KeyCode.Escape);
-            bool justPressed = pressed && !prevEscapePressed;
-            prevEscapePressed = pressed;
-            return justPressed;
-        }
-
-        // private bool FlyCamToTarget(float dt, uint targetID, float distToTarget)
-        // {
-        //     Vector3 camPos = Transform.GetPosition(cameraID);
-        //     Vector3 targetPos = Transform.GetPosition(targetID);
-
-        //     SetTarget(cameraID, ref targetPos);
-
-        //     Vector3 toTarget = targetPos - camPos;
-        //     float currentDist = toTarget.Magnitude;
-
-        //     if (currentDist <= distToTarget) return true;
-
-        //     Vector3 dirToTarget = toTarget / currentDist;
-        //     float moveStep = camFlySpeed * dt;
-        //     float allowedMove = currentDist - distToTarget;
-        //     float actualMove = SimpleMath.Min(moveStep, allowedMove);
-
-        //     Vector3 newCamPos = camPos + dirToTarget * actualMove;
-        //     Transform.SetPosition(cameraID, ref newCamPos);
-
-        //     return false;
-        // }
-
-        // private bool FlyCamBackToPlayer(float dt)
-        // {
-        //     Vector3 currCamPos = Transform.GetPosition(cameraID);
-        //     Vector3 toTarget = lastCamPos - currCamPos;
-        //     float currentDist = toTarget.Magnitude;
-
-        //     float allowedMove = 1000.0f;
-        //     if (currentDist <= 1000.0f) {
-        //         allowedMove = 100.0f;
-        //         if (currentDist <= 50.0f) {
-        //             Transform.SetPosition(cameraID, ref lastCamPos);
-        //             return true;
-        //         }
-        //     }
-
-        //     Vector3 dirToTarget = toTarget / currentDist;
-        //     float moveStep = camFlySpeed * dt;
-        //     float actualMove = SimpleMath.Min(moveStep, allowedMove);
-
-        //     Vector3 newCamPos = currCamPos + dirToTarget * actualMove;
-        //     Transform.SetPosition(cameraID, ref newCamPos);
-
-        //     return false;
-        // }
     }
 }

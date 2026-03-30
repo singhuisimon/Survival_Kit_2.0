@@ -3,22 +3,22 @@
     "Version": "1.0",
     "Entities": [
         {
-            "ID": 22020381,
+            "ID": 1048740,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "UI_InstructionLevel3",
-                        "Tag": "UI_InstructionLevel3"
+                        "Name": "TimerVO",
+                        "Tag": "Audio_VO"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "15852987986573314607",
+                        "ComponentGUID": "16217674004699235787",
                         "Position": [
-                            950.0,
-                            260.0,
+                            0.0,
+                            0.0,
                             0.0
                         ],
                         "Rotation": [
@@ -27,8 +27,8 @@
                             0.0
                         ],
                         "Scale": [
-                            104.61000061035156,
-                            70.29000091552734,
+                            1.0,
+                            1.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -36,19 +36,10 @@
                     }
                 },
                 {
-                    "Type": "SpriteRendererComponent",
+                    "Type": "ScriptComponent",
                     "Properties": {
-                        "Texture": "Tooltip_InstructionsLvl3.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 1,
-                        "IsActive": true,
-                        "IsVisible": false
+                        "ComponentGUID": "8723684224754976205",
+                        "ScriptClassName": "Game.AudioVOTimer"
                     }
                 }
             ]
@@ -6240,8 +6231,8 @@
                         ],
                         "Rotation": [
                             0.04088059440255165,
-                            -0.0293752271682024,
-                            8.52139539486707e-12
+                            -0.029375193640589714,
+                            1.2592507765696315e-11
                         ],
                         "Scale": [
                             1.0,
@@ -6264,7 +6255,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.9190404415130615,
+                        "Aspect": 1.7777777910232544,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -13084,6 +13075,57 @@
                         ],
                         "Quad": 3,
                         "Sprite Layer": 4,
+                        "IsActive": true,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 22020381,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UI_InstructionLevel3",
+                        "Tag": "UI_InstructionLevel3"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "15852987986573314607",
+                        "Position": [
+                            950.0,
+                            260.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            104.61000061035156,
+                            70.29000091552734,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "Tooltip_InstructionsLvl3.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": false
                     }
