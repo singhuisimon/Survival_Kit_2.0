@@ -870,7 +870,7 @@ c034308e67100005|0|/Resources/Sources/Textures/MainMenu_CreditsResources.png|.pn
 b6b550953d8d4001|6|/Resources/Sources/Scenes/trench_run_updated_tooltips.json|.json|9f85c0ef037c3bc2|1774804901|1|0|0|0
 c1c0d08ed8090009|3|/Resources/Sources/Audio/System AI_VO_Core Damage 1.wav|.wav|597da46f1e2af6a7|1773160592|1|0|0|0
 d9c0d08ed809000b|3|/Resources/Sources/Audio/System AI_VO_Core Damage 2.wav|.wav|72cb22cc682c3401|1773160592|1|0|0|0
-811e509325494007|6|/Resources/Sources/Scenes/level3_motherboard.json|.json|355e2c7fc3c44870|1774881766|1|0|0|0
+811e509325494007|6|/Resources/Sources/Scenes/level3_motherboard.json|.json|910b6606a9a81b64|1774881891|1|0|0|0
 51c0d08ed809000d|3|/Resources/Sources/Audio/System AI_VO_Core Damage 3.wav|.wav|5acc5fee40487f8e|1773160592|1|0|0|0
 21c0d08ed8090011|3|/Resources/Sources/Audio/System AI_VO_Defence Success.wav|.wav|b48222e6bd78a8ad|1773160592|1|0|0|0
 71c0d08ed8090013|3|/Resources/Sources/Audio/System AI_VO_Game Failure.wav|.wav|a6b18a6d429adf75|1773160592|1|0|0|0
