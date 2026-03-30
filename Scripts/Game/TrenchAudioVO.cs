@@ -86,6 +86,8 @@ namespace Game
             //Play trench guide the moment we load into the scene. (might need test this out)
             PlayTrenchGuide();
 
+            initialized = true;
+
             LogMessage("TrenchAudioVO initialized:");
         }
 
