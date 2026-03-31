@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/UI_DetectionRange_Pickup_UpgradeModule.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}
