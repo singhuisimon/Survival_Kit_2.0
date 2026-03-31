@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Audio/System AI_VO_Lvl 3 Win.wav",
+  "audioSettings": {
+    "outputFormat": "OGG",
+    "compression": "VORBIS",
+    "quality": 0.7,
+    "sampleRate": 44100,
+    "channelMode": "STEREO"
+  }
+}
