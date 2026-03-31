@@ -5,9 +5,9 @@
 231ce095ca284227|0|/Resources/Sources/Textures/Level2_Graphics_Card/lvl2redesign_level_design_v003_v001_Opacity.png|.png|3a422feddd4bd3cc|1774385900|1|0|0|0
 31ce095ca280009|6|/Resources/Sources/Scenes/EpilepsyWarning.json|.json|cfa5d1e4d6064d25|1774811706|1|0|0|0
 a31ce095ca280069|6|/Resources/Sources/Scenes/trench_run _updated_ending_test.json|.json|cdb7c00491425d87|1774507654|1|0|0|0
-31ce095ca284425|0|/Resources/Sources/Textures/vfx/FireEmbers6.png|.png|fd2b9f0a9a69c176|1772781757|1|0|0|0
 3b1ce095ca280031|6|/Resources/Sources/Scenes/level2_player_old.json|.json|22ebfb19076747ca|1773160592|1|0|0|0
 e31ce095ca2842e7|0|/Resources/Sources/Textures/PauseMenu_ButtonDefault_Hovered.png|.png|c5f78b2d3fbecffa|1774254393|1|0|0|0
+31ce095ca284425|0|/Resources/Sources/Textures/vfx/FireEmbers6.png|.png|fd2b9f0a9a69c176|1772781757|1|0|0|0
 c31ce095ca280049|6|/Resources/Sources/Scenes/MainGameScene.json|.json|38884f0997426298|1773160592|1|0|0|0
 2b1ce095ca2842df|0|/Resources/Sources/Textures/Paused_RestartButton_Hovered.png|.png|3afcb6ccd829d0a0|1774254393|1|0|0|0
 ab1ce095ca280021|6|/Resources/Sources/Scenes/Level1_test.json|.json|65f06b78ce75cd1f|1773160592|1|0|0|0
@@ -135,7 +135,7 @@ ab1ce095ca2800a9|1|/Resources/Sources/Meshes/A9005_gunship_v001.fbx|.fbx|ea95ced
 6b1ce095ca2842a7|0|/Resources/Sources/Textures/Non Destructable wall/Non destructible wall_v001_v001_Emissive.png|.png|627708a7ed545a93|1772902340|1|0|0|0
 db1ce095ca280059|6|/Resources/Sources/Scenes/Test.json|.json|c5ab1e1a79fbe7b8|1773160592|1|0|0|0
 d31ce095ca280091|4|/Resources/Sources/Shaders/shadow_depth.vert|.vert|82ddff3df786a01a|1772781756|1|0|0|0
-cb1ce095ca28006b|6|/Resources/Sources/Scenes/trench_run.json|.json|c0dd72a6acb2f1e6|1774967403|1|0|0|0
+cb1ce095ca28006b|6|/Resources/Sources/Scenes/trench_run.json|.json|a588a05abd48aea2|1774969725|1|0|0|0
 131ce095ca280093|4|/Resources/Sources/Shaders/skybox.frag|.frag|2366f93af9396d0f|1772781756|1|0|0|0
 cb1ce095ca28423d|0|/Resources/Sources/Textures/lvl1_level_design_v004_BaseColor.png|.png|a2e029082697c815|1772781756|1|0|0|0
 d31ce095ca288649|11|/Resources/Sources/Audio/Audio VO placeholder.mp4|.mp4|22fba78fdbbf0af0|0|0|0|0|0
