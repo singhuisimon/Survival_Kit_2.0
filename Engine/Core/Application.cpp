@@ -189,7 +189,7 @@ namespace Engine
 
 				// Update input system (after events are polled)
 				m_Input->Update();
-				if (m_Input->IsKeyJustPressed(GLFW_KEY_ENTER))
+				if (m_Input->IsKeyJustPressed(GLFW_KEY_F11))
 				{
 					ToggleFullscreen();
 				}
