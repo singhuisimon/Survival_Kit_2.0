@@ -72,7 +72,7 @@ namespace Game
         [SerializeField] private float fadeOutTime = 0.2f;
         private float fadeUpElapsed = 0.0f;
         [SerializeField] private float fadeUpTime = 1.0f;
-        [SerializeField] private float uiStartFadePos = 360.0f;
+        [SerializeField] private float uiStartFadePos = 260.0f;
         [SerializeField] private float switchTime = 0.5f;
         [SerializeField] private float sentrySummonFadeOutTime = 1.0f;
 
@@ -409,14 +409,23 @@ namespace Game
 
         private void HandleAltFire(float dt)
         {
+            // Press 'E' to dismiss tooltip
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
             //if (altUsed) ShowUI(altFireID, false, dt);
             if (altUsed || IsKeyPressed(KeyCode.E)) ShowUI(altFireID, false, dt);
 
             // Ensure fading out effect are completed before moving on
-            if (fadeUpElapsed > fadeUpTime) {
+            //if (fadeUpElapsed > fadeUpTime) {
 
                 // Reset fade up elapsed time and set up for the next state
-                fadeUpElapsed = 0.0f;
+                //fadeUpElapsed = 0.0f;
+                //currentState = TutorialState.Wait;
+            //}
+
+            if (fadeOutElapsed > fadeOutTime)
+            {
+                fadeOutElapsed = 0.0f;
+                EPressed = false;
                 currentState = TutorialState.Wait;
             }
         }
