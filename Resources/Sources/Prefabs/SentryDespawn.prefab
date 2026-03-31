@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "SentryDespawn",
+    "Prefab GUID": 377581691619098785,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "SentryDespawn",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11906796737683456153",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8448032223862915223",
+                            "Name": "SentryDespawn",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7871571471559721115",
+                            "FilePath": "Sentry Despawn.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0509999990463257,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 0.0,
+                            "Is3D": true,
+                            "MinDistance": 50.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11906796737687191709",
+                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "Started": false,
+                            "GCHandle": 19
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,459 @@
+{
+    "Prefab Name": "Prefab: RootWormVFX.prefab",
+    "Prefab GUID": 12272124905125200063,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "RootWormVFX",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8159493991009648879",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13347640761740460269",
+                            "Name": "RootWormVFX",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "SpawnEffect1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.009999999776482582,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                150.0,
+                                0.0,
+                                150.0
+                            ],
+                            "End Size": [
+                                250.0,
+                                0.0,
+                                250.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 1,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.30000001192092896,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.4000000059604645,
+                            "Shrink Phase Start": 0.6000000238418579,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": true,
+                            "Burst Mode": false
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Ring2",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13922852497680957599",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                90.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16228695506894651549",
+                            "Name": "Ring2",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "SpawnEffect1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                150.0,
+                                0.5,
+                                150.0
+                            ],
+                            "End Size": [
+                                250.0,
+                                0.0,
+                                250.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 0,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.30000001192092896,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.4000000059604645,
+                            "Shrink Phase Start": 0.6000000238418579,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 0.0,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": false
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Sparks",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8734705726954389673",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4123019708527001767",
+                            "Name": "Sparks",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "",
+                            "Initial Velocity": [
+                                0.0,
+                                12.300000190734863,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                5.5,
+                                0.5,
+                                5.5
+                            ],
+                            "End Size": [
+                                5.699999809265137,
+                                0.0,
+                                6.599999904632568
+                            ],
+                            "Emission Box Size": [
+                                75.0,
+                                30.200000762939453,
+                                30.0
+                            ],
+                            "Color Min": [
+                                0.9612590670585632,
+                                0.8405613899230957,
+                                0.116375133395195
+                            ],
+                            "Color Max": [
+                                1.0,
+                                0.4503631591796875,
+                                0.0
+                            ],
+                            "Emitter Shape": 1,
+                            "Max Particles": 255,
+                            "Particle Type": 1,
+                            "Emission Rate": 20.100000381469727,
+                            "Particle Lifetime": 0.4000000059604645,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.699999988079071,
+                            "Shrink Phase Start": 0.8999999761581421,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 140.5,
+                            "Min Speed": 10.0,
+                            "Max Speed": 10.0,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 1.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Ring",
+            "LocalID": 4,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "166449106751389879",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11119203400516436149",
+                            "Name": "Ring",
+                            "Tag": "Default"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "RootWormRingVFX.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                200.0,
+                                200.0,
+                                200.0
+                            ],
+                            "End Size": [
+                                250.0,
+                                250.0,
+                                250.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 1,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.20000000298023224,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.6000000238418579,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.0,
+                            "Max Speed": 0.0,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": false
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

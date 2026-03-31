@@ -1,0 +1,18 @@
+{
+  "trench_run_won": true,
+  "level2_won": true,
+  "level3_won": false,
+  "skip_tutorial_1": false,
+  "skip_tutorial_2": false,
+  "skip_tutorial_3": false,
+  "cumulative_score": 4500,
+  "skin1_purchased": false,
+  "skin2_purchased": false,
+  "skin3_purchased": false,
+  "equipped_skin": 0,
+  "byte_chips": 0,
+  "byte_pack1_bought": false,
+  "byte_pack2_bought": false,
+  "byte_pack3_bought": false,
+  "byte_pack4_bought": false
+}

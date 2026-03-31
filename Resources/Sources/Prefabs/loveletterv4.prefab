@@ -1,0 +1,155 @@
+{
+    "Prefab Name": "Prefab: loveletterv4.prefab",
+    "Prefab GUID": 1115010978735588589,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "loveletter",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17262482649571999985",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                92.83399200439452,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.007000000216066837,
+                                0.007000000216066837,
+                                0.007000000216066837
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6309728355806953711",
+                            "Name": "loveletter",
+                            "Tag": "loveletter"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15533100392661991667",
+                            "Mesh": "E005_loveletterCombined_v004.fbx",
+                            "Material": "loveletterv4.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16597761899937005763",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                100.0,
+                                100.0,
+                                100.0
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13584545890048394049",
+                            "FilePath": "Loveletter_Ambient.wav",
+                            "Type": 5,
+                            "State": 0,
+                            "Volume": 1.2200000286102295,
+                            "Pitch": 1.0,
+                            "Loop": true,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 50.2130012512207,
+                            "MaxDistance": 365.46099853515625,
+                            "RolloffMode": 1,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "43180580602823207",
+                            "ScriptClassName": "Game.LoveLetterScript",
+                            "Started": false,
+                            "GCHandle": 515
+                        }
+                    }
+                },
+                {
+                    "type": 11,
+                    "typeName": "AnimatorComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "playing": true,
+                            "respectClipLoop": true,
+                            "controller": 0,
+                            "currentClipIndex": 0,
+                            "currentTime": 2.5787220001220703,
+                            "playbackSpeed": 1.0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

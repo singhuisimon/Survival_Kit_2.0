@@ -1,0 +1,572 @@
+{
+    "Prefab Name": "Prefab: MainExplosion1.prefab",
+    "Prefab GUID": 11554838671612100799,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "MainExplosion1",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16355535078436733131",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6015015257463881935",
+                            "Name": "MainExplosion1",
+                            "Tag": "MainExplosion1"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "Explosion1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.0010000000474974513,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.800000011920929,
+                                0.0,
+                                0.0
+                            ],
+                            "End Size": [
+                                2.0999999046325684,
+                                2.0999999046325684,
+                                2.0999999046325684
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 0,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.15000000596046448,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.0,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 10.0,
+                            "Max Speed": 10.0,
+                            "Rotation Speed": 276.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 172.82562255859375,
+                            "Randomize Rotation": true,
+                            "Loop": true,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "SubExplosion2",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16355535078436733131",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3132711495946764473",
+                            "Name": "SubExplosion2",
+                            "Tag": "SubExplosion2"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "Explosion2.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.10000000149011612,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.800000011920929,
+                                0.0,
+                                0.0
+                            ],
+                            "End Size": [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 1,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.30000001192092896,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.0,
+                            "Shrink Phase Start": 0.0,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.0,
+                            "Max Speed": 0.0,
+                            "Rotation Speed": 90.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 193.5823974609375,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "SubExplosion1",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16355535078436733131",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11203162028194693311",
+                            "Name": "SubExplosion1",
+                            "Tag": "SubExplosion1"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "Explosion3.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.0010000000474974513,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.800000011920929,
+                                0.0,
+                                0.0
+                            ],
+                            "End Size": [
+                                4.0,
+                                4.0,
+                                4.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.9852941036224364,
+                                0.9852941036224364,
+                                0.9852941036224364
+                            ],
+                            "Color Max": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 0,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.30000001192092896,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.0,
+                            "Shrink Phase Start": 0.0,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.0,
+                            "Max Speed": 0.0,
+                            "Rotation Speed": 90.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 193.5823974609375,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "SubExplosion3",
+            "LocalID": 4,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8925783224269422763",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11808086985786540201",
+                            "Name": "SubExplosion3",
+                            "Tag": "SubExplosion3"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "SubExplosion3.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                5.5,
+                                0.05000000074505806,
+                                0.05000000074505806
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.0,
+                                0.0,
+                                0.699999988079071
+                            ],
+                            "Color Max": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                1.0
+                            ],
+                            "Emitter Shape": 2,
+                            "Max Particles": 17,
+                            "Particle Type": 0,
+                            "Emission Rate": 5.0,
+                            "Particle Lifetime": 0.6000000238418579,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 0.5,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 15.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 193.5823974609375,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "SubExplosion4",
+            "LocalID": 5,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9825456414697636017",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5790231148573671599",
+                            "Name": "SubExplosion4",
+                            "Tag": "SubExplosion4"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "SubExplosion3.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.10000000149011612,
+                                0.5,
+                                0.5
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Max": [
+                                0.9152542352676392,
+                                0.3856034278869629,
+                                0.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 30,
+                            "Particle Type": 0,
+                            "Emission Rate": 5.0,
+                            "Particle Lifetime": 0.800000011920929,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 1.399999976158142,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 180.0,
+                            "Min Speed": 4.679999828338623,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 36.8277587890625,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

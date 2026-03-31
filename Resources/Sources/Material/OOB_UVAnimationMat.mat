@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "Bounds2.png",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
+    "baseColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "emissionColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "metallic": 0.0,
+    "roughness": 0.0,
+    "opacity": 1.0,
+    "emissionStrength": 1.0,
+    "alphaThreshold": 0.5,
+    "ambientOcclusion": 0.5,
+    "tiling": [
+        4.900000095367432,
+        6.5
+    ],
+    "offset": [
+        -0.16899999976158142,
+        -0.21899999678134918
+    ],
+    "enableEmission": false,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": true,
+    "castShadows": true,
+    "treatBlacksAsTransparent": true
+}

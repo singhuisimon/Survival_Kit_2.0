@@ -1,0 +1,72 @@
+{
+    "Prefab Name": "ENVIRONMENT_LevelDesign",
+    "Prefab GUID": 5366488163369682033,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "ENVIRONMENT_LevelDesign",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4947609348173578587",
+                            "Position": [
+                                -14.4000244140625,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                -0.000010021541129390243,
+                                -89.98021697998047,
+                                -5.895718135917605e-9
+                            ],
+                            "Scale": [
+                                1.5,
+                                1.5,
+                                1.5
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5942948915668828465",
+                            "Name": "ENVIRONMENT_LevelDesign",
+                            "Tag": "ENVIRONMENT_LevelDesign"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6100530852782408029",
+                            "Mesh": "trench_run_v002.fbx",
+                            "Material": "Mat_Level2_LevelDesign.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

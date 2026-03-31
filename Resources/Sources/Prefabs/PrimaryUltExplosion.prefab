@@ -1,0 +1,138 @@
+{
+    "Prefab Name": "Prefab: PrimaryUltExplosion.prefab",
+    "Prefab GUID": 14796867413070711117,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "PrimaryUltExplosion",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3927728767552913651",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                10.0,
+                                10.0,
+                                10.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "11421718547497418993",
+                            "Tag": "PrimaryUltExplosion"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2198346510642921717",
+                            "Mesh": "",
+                            "Material": "",
+                            "Texture": "",
+                            "Visible": false,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18339247575138861303",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                150.0,
+                                150.0,
+                                150.0
+                            ],
+                            "SphereRadius": 2.5
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2198346510643265785",
+                            "FilePath": "Player_Secondary_Fire_Impact_Explosion.wav",
+                            "Type": 1,
+                            "State": 0,
+                            "Volume": 1.0,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 51.00699996948242,
+                            "MaxDistance": 307.89300537109375,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14304022309015339259",
+                            "ScriptClassName": "Game.PrimaryUltAOEDamage",
+                            "Started": false,
+                            "GCHandle": 907
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

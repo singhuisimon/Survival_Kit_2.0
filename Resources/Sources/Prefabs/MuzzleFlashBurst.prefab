@@ -1,0 +1,233 @@
+{
+    "Prefab Name": "Prefab: MuzzleFlashBurst.prefab",
+    "Prefab GUID": 15590063937738577367,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "MuzzleFlashBurst",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3310445395773931751",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                90.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16569042698752671973",
+                            "Name": "MuzzleFlashBurst",
+                            "Tag": "MuzzleFlashBurst"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "MuzzleFlashBurst.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                45.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.25,
+                                0.5,
+                                0.25
+                            ],
+                            "Default Size": [
+                                4.349999904632568,
+                                0.800000011920929,
+                                0.25
+                            ],
+                            "End Size": [
+                                0.25,
+                                0.5,
+                                0.25
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                1.0,
+                                0.9843137264251708,
+                                0.0
+                            ],
+                            "Color Max": [
+                                1.0,
+                                0.4980392158031464,
+                                0.0117647061124444
+                            ],
+                            "Emitter Shape": 2,
+                            "Max Particles": 21,
+                            "Particle Type": 1,
+                            "Emission Rate": 1.0,
+                            "Particle Lifetime": 0.10000000149011612,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.0,
+                            "Shrink Phase Start": 0.0,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 180.0,
+                            "Min Speed": 0.5,
+                            "Max Speed": 1.5,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": false,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "VFX_SubMuzzleFlashBurst",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "3481239136955383967",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                90.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15010454183023853725",
+                            "Name": "VFX_SubMuzzleFlashBurst",
+                            "Tag": "VFX_SubMuzzleFlashBurst"
+                        }
+                    }
+                },
+                {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "",
+                            "Material Type": "VFX_MuzzleFlash1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                1.0,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                8.0,
+                                8.0,
+                                8.0
+                            ],
+                            "End Size": [
+                                8.0,
+                                8.0,
+                                8.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                0.4639999866485596,
+                                1.0,
+                                0.0
+                            ],
+                            "Color Max": [
+                                0.5119999647140503,
+                                1.0,
+                                0.0
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 1,
+                            "Particle Type": 1,
+                            "Emission Rate": 0.30000001192092896,
+                            "Particle Lifetime": 0.10000000149011612,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.30000001192092896,
+                            "Shrink Phase Start": 0.699999988079071,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 1.0,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 0.0,
+                            "Min Speed": 0.0,
+                            "Max Speed": 0.0,
+                            "Rotation Speed": 0.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": true,
+                            "Loop": false,
+                            "Active": true,
+                            "World Space": false,
+                            "Burst Mode": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,86 @@
+{
+    "Prefab Name": "Prefab: audio_hitmarker.prefab",
+    "Prefab GUID": 12281422340409461601,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "audio_hitmarker",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "49927187906053511",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9849759977066599205",
+                            "Name": "audio_hitmarker",
+                            "Tag": "audio_hitmarker"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "6967456215547659657",
+                            "FilePath": "Player_Hitmarker.wav",
+                            "Type": 1,
+                            "State": 2,
+                            "Volume": 0.8320000171661377,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "4661613206334752139",
+                            "ScriptClassName": "Game.GameDelaySoundPrefab",
+                            "Started": false,
+                            "GCHandle": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

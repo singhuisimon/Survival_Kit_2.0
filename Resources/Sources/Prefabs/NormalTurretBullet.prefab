@@ -1,0 +1,182 @@
+{
+    "Prefab Name": "Prefab: NormalTurretBullet.prefab",
+    "Prefab GUID": 14094086019144251855,
+    "version": 2,
+    "entities": [
+        {
+            "Name": "NormalTurretBullet",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8204732253400765361",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.15000000596046448,
+                                0.15000000596046448,
+                                0.15000000596046448
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18004565042558964655",
+                            "Name": "NormalTurretBullet",
+                            "Tag": "NormalTurretBullet"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7051810748794426311",
+                            "Mesh": "Temp_PrimarySecondaryBullet.fbx",
+                            "Material": "NormalTurretBullet.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "Billboarding": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "710742473456669635",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                0.5,
+                                0.5,
+                                0.5
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8204732253401207749",
+                            "FilePath": "Turret Normal Fire.wav",
+                            "Type": 5,
+                            "State": 0,
+                            "Volume": 0.9509999752044678,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": true,
+                            "MinDistance": 1.062999963760376,
+                            "MaxDistance": 10.885000228881836,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 0.996999979019165,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15122261281046205391",
+                            "ScriptClassName": "Game.NormalTurretBullet",
+                            "Started": false,
+                            "GCHandle": 7043
+                        }
+                    }
+                },
+                {
+                    "type": 16,
+                    "typeName": "TrailComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7628271501097948105",
+                            "Material Type": "",
+                            "Max Segments": 50,
+                            "Segment Lifetime": 1.0,
+                            "Min Distance": 0.10000000149011612,
+                            "Sample Interval": 0.01600000075995922,
+                            "Sample Accumulator": 0.0,
+                            "Start Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                0.5882353186607361
+                            ],
+                            "End Color": [
+                                0.5714285373687744,
+                                1.0,
+                                0.6357661485671997,
+                                0.0
+                            ],
+                            "Start Width": 0.10000000149011612,
+                            "End Width": 0.05000000074505806,
+                            "Last Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Local Offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Has Last Position": false,
+                            "Active": true,
+                            "Emit Trail": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

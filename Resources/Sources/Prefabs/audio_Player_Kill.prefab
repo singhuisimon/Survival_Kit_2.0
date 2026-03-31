@@ -1,0 +1,85 @@
+{
+    "Prefab Name": "Prefab: audio_Player_Kill.prefab",
+    "Prefab GUID": 8132525126384961077,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "audio_Player_Kill",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "5169754705885119297",
+                            "Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "10934362228919354175",
+                            "Tag": "audio_Player_Kill"
+                        }
+                    }
+                },
+                {
+                    "type": 9,
+                    "typeName": "AudioComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15546048247346987843",
+                            "FilePath": "Player_Kill.wav",
+                            "Type": 1,
+                            "State": 2,
+                            "Volume": 0.8190000057220459,
+                            "Pitch": 1.0,
+                            "Loop": false,
+                            "Mute": false,
+                            "ReverbProperties": 1.0,
+                            "Is3D": false,
+                            "MinDistance": 1.0,
+                            "MaxDistance": 100.0,
+                            "RolloffMode": 0,
+                            "DopplerLevel": 1.0,
+                            "Pan2D": 0.0
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16698969751954162501",
+                            "ScriptClassName": "Game.GameDelaySoundPrefab",
+                            "Started": false,
+                            "GCHandle": 467
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

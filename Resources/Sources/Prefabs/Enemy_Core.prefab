@@ -1,0 +1,493 @@
+{
+    "Prefab Name": "Enemy_Core",
+    "Prefab GUID": 18098938321172459255,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "Enemy_Core",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15974154088651932187",
+                            "Position": [
+                                -5504.39404296875,
+                                -438.72662353515625,
+                                643.2869873046875
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                30.0,
+                                30.0,
+                                30.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8875566284284242183",
+                            "Tag": "Enemy_Core"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15397693336348852765",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                },
+                {
+                    "type": 6,
+                    "typeName": "RigidBodyComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16550614840955896351",
+                            "Mass": 1.0,
+                            "IsKinematic": false,
+                            "IsTrigger": true,
+                            "UseGravity": false,
+                            "Velocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "AngularVelocity": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "LinearDamping": 0.05000000074505806,
+                            "AngularDamping": 0.05000000074505806,
+                            "Restitution": 0.10000000149011612,
+                            "CollideType": 1,
+                            "BoxHalfExtent": [
+                                75.0,
+                                75.0,
+                                75.0
+                            ],
+                            "SphereRadius": 0.5
+                        }
+                    }
+                },
+                {
+                    "type": 8,
+                    "typeName": "ScriptComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7622061454111801539",
+                            "ScriptClassName": "Game.EnemyCore",
+                            "Started": false,
+                            "GCHandle": 11747
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_Core",
+            "LocalID": 2,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "14063713055015430735",
+                            "Position": [
+                                0.0000152587890625,
+                                0.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                43.99998474121094,
+                                52.999996185302734,
+                                -0.0000028373287932481617
+                            ],
+                            "Scale": [
+                                0.30000001192092896,
+                                0.30000001192092896,
+                                0.30000001192092896
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "16946016816532548173",
+                            "Tag": "Decor_EnemyCore_Core"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "7722644779677936211",
+                            "Mesh": "",
+                            "Material": "EnemyCore_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_CoreLines",
+            "LocalID": 3,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8299105532004626063",
+                            "Position": [
+                                -0.0489959716796875,
+                                -0.004176139831542969,
+                                0.013401031494140623
+                            ],
+                            "Rotation": [
+                                46.00001525878906,
+                                -6.0,
+                                0.000012233290362928528
+                            ],
+                            "Scale": [
+                                0.09999998658895493,
+                                11.899994850158691,
+                                0.10000000149011612
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9452027036611473037",
+                            "Tag": "Decor_EnemyCore_CoreLines"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "17522477568859467411",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_CoreLines2",
+            "LocalID": 4,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15793095311951834775",
+                            "Position": [
+                                -0.071563720703125,
+                                0.11164093017578124,
+                                -0.11291122436523438
+                            ],
+                            "Rotation": [
+                                111.00000762939452,
+                                -57.00007247924805,
+                                37.99999237060547
+                            ],
+                            "Scale": [
+                                -0.30000004172325134,
+                                -16.29999351501465,
+                                -0.05000000074505806
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12910791550434717333",
+                            "Tag": "Decor_EnemyCore_CoreLines2"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9452027036614291099",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_CoreLines3",
+            "LocalID": 5,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1958037256671112863",
+                            "Position": [
+                                0.017486572265625,
+                                -0.0020723342895507813,
+                                0.0
+                            ],
+                            "Rotation": [
+                                -130.0,
+                                -15.000007629394531,
+                                71.0
+                            ],
+                            "Scale": [
+                                0.09999989718198776,
+                                0.10000001639127731,
+                                9.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "10028487788919041693",
+                            "Tag": "Decor_EnemyCore_CoreLines3"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "228654999760940707",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_CoreLines4",
+            "LocalID": 6,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "8299105532010950311",
+                            "Position": [
+                                0.0148162841796875,
+                                0.09799575805664064,
+                                0.0
+                            ],
+                            "Rotation": [
+                                -180.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                -0.09999996423721312,
+                                -0.09999996423721312,
+                                -11.899999618530272
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "12334330798134914725",
+                            "Tag": "Decor_EnemyCore_CoreLines4"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "9452027036617911979",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "Name": "Decor_EnemyCore_CoreLines5",
+            "LocalID": 7,
+            "ParentLocalID": 1,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "10604948541225414319",
+                            "Position": [
+                                0.002166748046875,
+                                0.027998924255371097,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                0.09999996423721312,
+                                25.699995040893555,
+                                0.09999996423721312
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "18098938321169919661",
+                            "Tag": "Decor_EnemyCore_CoreLines5"
+                        }
+                    }
+                },
+                {
+                    "type": 2,
+                    "typeName": "MeshRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13487252302742597299",
+                            "Mesh": "",
+                            "Material": "Enemy_Core.mat",
+                            "Texture": "",
+                            "Visible": true,
+                            "GlobalIlluminate": true,
+                            "ShadowReceive": false,
+                            "MeshType": 0,
+                            "MaterialIdx": 0,
+                            "TextureIdx": 0,
+                            "SubmeshIndex": 0,
+                            "CastType": 0
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

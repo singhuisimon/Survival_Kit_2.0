@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "E004_botnet_v003_Botnet_v001_BaseColor.png",
+    "normalMap": "",
+    "metallicMap": "E004_botnet_v003_Botnet_v001_Metallic.png",
+    "roughnessMap": "E004_botnet_v003_Botnet_v001_Roughness.png",
+    "emissionMap": "E004_botnet_v003_Botnet_v001_Emissive.png",
+    "occlusionMap": "",
+    "baseColor": [
+        0.0,
+        0.0,
+        0.0
+    ],
+    "emissionColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "metallic": 1.0,
+    "roughness": 1.0,
+    "opacity": 1.0,
+    "emissionStrength": 3.1500000953674316,
+    "alphaThreshold": 0.5,
+    "ambientOcclusion": 0.5,
+    "tiling": [
+        1.0,
+        1.0
+    ],
+    "offset": [
+        0.0,
+        0.0
+    ],
+    "enableEmission": true,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": true,
+    "castShadows": true,
+    "treatBlacksAsTransparent": false
+}

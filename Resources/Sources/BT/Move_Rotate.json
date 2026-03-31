@@ -1,0 +1,94 @@
+{
+    "Name": "NewTree",
+    "GUID": "11799756916133331149",
+    "Version": "1.0",
+    "Root": {
+        "Type": "Sequence",
+        "Name": "Node",
+        "GUID": "4305767136188874959",
+        "Children": [
+            {
+                "Type": "SetTargetPosition",
+                "Name": "Node",
+                "GUID": "16987903686864945365",
+                "Properties": {
+                    "TargetX": "100.000000",
+                    "TargetY": "50.000000",
+                    "TargetZ": "0.000000",
+                    "BlackboardKey": "TargetPosition"
+                }
+            },
+            {
+                "Type": "SetBlackboardVec3",
+                "Name": "Node",
+                "GUID": "11799756916135133405",
+                "Properties": {
+                    "Key": "TargetPoint",
+                    "X": "100.000000",
+                    "Y": "50.000000",
+                    "Z": "0.000000"
+                }
+            },
+            {
+                "Type": "LookAtSmooth",
+                "Name": "Node",
+                "GUID": "4305767136190906591",
+                "Properties": {
+                    "TargetKey": "TargetPoint",
+                    "TurnSpeedDeg": "30.000002"
+                }
+            },
+            {
+                "Type": "MoveToTarget",
+                "Name": "Node",
+                "GUID": "18140825191473348833",
+                "Properties": {
+                    "MoveSpeed": "5.000000",
+                    "ArrivalDistance": "0.000000",
+                    "TargetPositionKey": "TargetPosition"
+                }
+            },
+            {
+                "Type": "SetBlackboardVec3",
+                "Name": "Node",
+                "GUID": "7764531650012758243",
+                "Properties": {
+                    "Key": "TargetPoint",
+                    "X": "100.000000",
+                    "Y": "0.000000",
+                    "Z": "50.000000"
+                }
+            },
+            {
+                "Type": "LookAtSmooth",
+                "Name": "Node",
+                "GUID": "1423463374675427557",
+                "Properties": {
+                    "TargetKey": "TargetPoint",
+                    "TurnSpeedDeg": "30.000002"
+                }
+            },
+            {
+                "Type": "SetTargetPosition",
+                "Name": "Node",
+                "GUID": "7764531650013167847",
+                "Properties": {
+                    "TargetX": "100.000000",
+                    "TargetY": "0.000000",
+                    "TargetZ": "50.000000",
+                    "BlackboardKey": "TargetPosition"
+                }
+            },
+            {
+                "Type": "MoveToTarget",
+                "Name": "Node",
+                "GUID": "13529139173048156401",
+                "Properties": {
+                    "MoveSpeed": "5.000000",
+                    "ArrivalDistance": "0.000000",
+                    "TargetPositionKey": "TargetPosition"
+                }
+            }
+        ]
+    }
+}

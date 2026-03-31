@@ -1,0 +1,39 @@
+{
+    "shaderName": "StandardMetallicRoughness",
+    "baseMap": "Spiral11.png",
+    "normalMap": "",
+    "metallicMap": "",
+    "roughnessMap": "",
+    "emissionMap": "",
+    "occlusionMap": "",
+    "baseColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "emissionColor": [
+        1.0,
+        0.0,
+        0.0
+    ],
+    "metallic": 0.0,
+    "roughness": 0.0,
+    "opacity": 0.23000000417232513,
+    "emissionStrength": 5.329999923706055,
+    "alphaThreshold": 0.5120000243186951,
+    "ambientOcclusion": 0.5,
+    "tiling": [
+        1.0,
+        1.0
+    ],
+    "offset": [
+        0.0,
+        0.0
+    ],
+    "enableEmission": true,
+    "alphaTest": false,
+    "doubleSided": false,
+    "receiveShadows": false,
+    "castShadows": false,
+    "treatBlacksAsTransparent": false
+}
