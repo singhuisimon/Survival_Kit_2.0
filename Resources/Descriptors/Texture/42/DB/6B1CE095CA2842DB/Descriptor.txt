@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/Paused_PlusButton_Hovered.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}
