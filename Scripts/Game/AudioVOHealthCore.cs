@@ -35,6 +35,8 @@ namespace Game
 
         private string basepath = "System AI_VO_Core Damage ";
 
+        private const string EVENT_CORE_PLAY = "CorePlaying";
+
         public override void OnStart()
         {
             LogMessage("=== AudioVOHealthCore OnStart ===");
@@ -89,6 +91,7 @@ namespace Game
 
                     RandomizeAudioPath();
                     AudioPlay((uint)EntityID);
+                    Publish(EVENT_CORE_PLAY, "");
                     timerstart = false;
                 }
             }
