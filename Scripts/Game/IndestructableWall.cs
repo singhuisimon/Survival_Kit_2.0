@@ -20,6 +20,7 @@ namespace Game
 
         // Events
         private string EVENT_FIVE_TURRETS_DESTROYED = "FiveTurretsDestroyed";
+        private string EVENT_TUTORIAL_SKIP = "SkipTutorial";
 
         private bool isDestroyed = false;
         private Vector3 wallPos;
@@ -34,6 +35,7 @@ namespace Game
             wallPos = Transform.GetPosition(EntityID);
 
             Subscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
+            Subscribe(EVENT_TUTORIAL_SKIP, OnFiveTurretDestroyed);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -52,6 +54,7 @@ namespace Game
         public override void OnDestroy()
         {
             Unsubscribe(EVENT_FIVE_TURRETS_DESTROYED, OnFiveTurretDestroyed);
+            Unsubscribe(EVENT_TUTORIAL_SKIP, OnFiveTurretDestroyed);
         }
 
         private void OnFiveTurretDestroyed(string eventName, string payload)

@@ -33,6 +33,17 @@ namespace Game
         [SerializeField] private float startaudio = 5.0f;
         [SerializeField] private float elapsedTime = 0.0f;
 
+        // ==== Addition for the usual bgm playing =======
+        private bool firstAudioFinished = false;
+        private bool waitingForFirstAudioEnd = false;
+        [SerializeField] private bool usualBGMReady = false;
+        [SerializeField] private bool usualBGMStarted = false;
+
+        private const string usualBGMFilePath = "System AI_VO_Defence BGM.wav";
+
+        [SerializeField] private float startusualbgmtimer = 0.0f;
+        [SerializeField] private float startusualbgmcountdown = 10.0f;
+
         public override void OnStart()
         {
             LogMessage("=== AudioPause OnStart ===");
@@ -72,7 +83,7 @@ namespace Game
                 }
             }
 
-            if(isPaused && audiostarted){
+            if(isPaused && audiostarted && !GameState.IsPaused){
                 AudioPlay((uint)EntityID);
                 LogMessage("[AudioPause] Resuming audio after unpause");
                 isPaused = false;
@@ -88,11 +99,48 @@ namespace Game
                     LogMessage("[AudioPause] Start playing audio attached to the entity");
                     audiostarted = true;
 
+                    waitingForFirstAudioEnd = true;
+
                     return;
                 }
             }
 
-            if(!AudioIsPlaying((uint)EntityID) && audiostarted){
+            if(waitingForFirstAudioEnd && !firstAudioFinished)
+            {
+                if (!AudioIsPlaying(EntityID))
+                {
+                    firstAudioFinished = true;
+                    waitingForFirstAudioEnd = false;
+
+                    AudioSetMute((uint)EntityID, true); // MUTE audio first
+
+                    // prepare the next bgm clip
+                    SetUpUsualBGM();
+
+                    // play the bgm first
+                    AudioPlay((uint)EntityID);
+
+                    // Start 10s cooldown
+                    startusualbgmtimer = startusualbgmcountdown;
+                    usualBGMReady = true;
+                    usualBGMStarted = true;
+                }
+            }
+
+            if(usualBGMReady)
+            {
+                startusualbgmtimer -= deltaTime;
+
+                if(startusualbgmtimer <= 0.0f)
+                {
+                    //AudioPlay((uint)EntityID);
+                    AudioSetMute((uint)EntityID, false); //unmute after waiting
+                    usualBGMReady = false;
+                }
+            }
+
+            //if(!AudioIsPlaying((uint)EntityID) && audiostarted){
+            if(usualBGMStarted && !AudioIsPlaying((uint)EntityID)){
                 AudioPlay((uint)EntityID);
                 LogMessage("[AudioPause] Playing the audio attached to the entity");
             }
@@ -132,6 +180,14 @@ namespace Game
         private void OnBGMVOStart(string eventName, string payload) {
             waitForTutorial = false;
             LogMessage("[AudioPause] BGMVOStart received, audio countdown begins");
+        }
+
+        private void SetUpUsualBGM()
+        {
+            AudioSetFile((uint)EntityID, usualBGMFilePath);
+            AudioSetLoop((uint)EntityID, true);
+
+            LogMessage("[AudioPause] Usual BGM confirgured with new filepath and loop=true");
         }
     }
 }

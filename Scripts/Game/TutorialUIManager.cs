@@ -97,6 +97,7 @@ namespace Game
 
         private bool wallDestroyedPublished = false;
         private bool skipTutorial = false;
+        private string EVENT_TUTORIAL_SKIP = "SkipTutorial";
 
         public override void OnStart()
         {
@@ -117,6 +118,7 @@ namespace Game
             {
                 skipTutorial = true;
                 SpriteRenderer.SetIsVisible(pressWASDID, false);
+                Publish(EVENT_TUTORIAL_SKIP, "");
 
             } else
             {
