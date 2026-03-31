@@ -4,6 +4,7 @@ using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
 using static Engine.AudioManager;
+using static Engine.Transform;
 using static Engine.Prefab;
 using static Engine.Scene;
 
@@ -53,8 +54,10 @@ namespace Game
         private const string EVENT_SHOW_TIME  = "ShowTimeSurvived";
 
         // BlackScreen
-        private uint blackScreenID = 0;
-        private const string blackScreenName = "BlackScreen";
+        private const string blackscreenprefab  = "Sources/Prefabs/BlackScreen.prefab";
+
+        private float blackx = 640.0f;
+        private float blacky = 360.0f;
 
         public override void OnStart()
         {
@@ -73,12 +76,6 @@ namespace Game
             WinCutSceneContext.FinalTime  = "00 m : 00 s";
 
             SetIsVisible((uint)EntityID, false);
-
-            blackScreenID = SceneFindEntityByName(blackScreenName);
-            if(blackScreenID != 0)
-            {
-                SetIsVisible(blackScreenID, false);
-            }
 
             initialized = true;
             LogMessage("[WinScreen] Initialized - waiting for win condition");
@@ -161,9 +158,12 @@ namespace Game
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
 
-            if(blackScreenID != 0)
+            uint blackscreenID = 0;
+            blackscreenID = PrefabInstantiate(blackscreenprefab);
+            if(blackscreenID != 0)
             {
-                SetIsVisible(blackScreenID, true);
+                Vector3 spawnPosition = new Vector3(blackx, blacky, 0);
+                SetPosition(blackscreenID, ref spawnPosition);
             }
 
             Publish(GAMEWIN, "");
@@ -186,10 +186,13 @@ namespace Game
             fadeElapsed = 0.0f;
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
-            
-            if(blackScreenID != 0)
+
+            uint blackscreenID = 0;
+            blackscreenID = PrefabInstantiate(blackscreenprefab);
+            if(blackscreenID != 0)
             {
-                SetIsVisible(blackScreenID, true);
+                Vector3 spawnPosition = new Vector3(blackx, blacky, 0);
+                SetPosition(blackscreenID, ref spawnPosition);
             }
 
             Publish(GAMEWIN, "");

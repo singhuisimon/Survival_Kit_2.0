@@ -3,6 +3,8 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Audio;
 using static Engine.Prefab;
+using static Engine.Scene;
+using System.Data;
 
 namespace Game
 {
@@ -44,7 +46,7 @@ namespace Game
         private bool hasPlayedUpgradeModPickupWarn = false;
 
         // ===== Timer =====
-        private float audiotimer = 7.0f;
+        private float audiotimer = 7.5f;
         [SerializeField] private float elapsedTime = 0.0f;
 
         // ===== Prefab =====
@@ -59,6 +61,13 @@ namespace Game
         
         // ==== Entity =====
         private uint activeVOID = 0;
+
+        private uint bgmID = 0;
+        private const string bgmName = "BGM";
+
+        private float bgmOGVol = 1.0f;
+
+        private const float bgmdivider = 0.5f;
 
 
         public override void OnStart()
@@ -83,8 +92,16 @@ namespace Game
 
             disabled = false;
 
+            bgmID = SceneFindEntityByName(bgmName);
+            if(bgmID != 0)
+            {
+                bgmOGVol = AudioGetVolume(bgmID);
+            }
+
             //Play trench guide the moment we load into the scene. (might need test this out)
             PlayTrenchGuide();
+
+            initialized = true;
 
             LogMessage("TrenchAudioVO initialized:");
         }
@@ -202,6 +219,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchguideVOPrefab);
             if(activeVOID == 0){
@@ -223,6 +241,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchwallwarnVOPrefab);
             if(activeVOID == 0){
@@ -244,6 +263,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchenemieswarnVOPrefab);
             if(activeVOID == 0){
@@ -265,6 +285,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchenemycorewarnVOPrefab);
             if(activeVOID == 0){
@@ -283,6 +304,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchenemycorewarningVOPrefab);
             if(activeVOID == 0){
@@ -301,6 +323,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchmidrunwarnVOPrefab);
             if(activeVOID == 0){
@@ -319,6 +342,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchenemycoredestroyedVOPrefab);
             if(activeVOID == 0){
@@ -337,6 +361,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchupgrademodpickupVOPrefab);
             if(activeVOID == 0){
@@ -364,6 +389,15 @@ namespace Game
             elapsedTime = 0.0f;
             audiostarted = false;
             isPaused = false;
+
+            //reset bgm back to og volume
+            AudioSetVolume(bgmID, bgmOGVol);
+        }
+
+        private void LowerBGMVol()
+        {
+            float newVol = bgmOGVol * bgmdivider;
+            AudioSetVolume(bgmID, newVol);
         }
     }
 }
