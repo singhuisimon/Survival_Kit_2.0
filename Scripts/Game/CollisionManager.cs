@@ -94,6 +94,8 @@ namespace Game
             { "obstacle_wall_wallofdeath", CollisionCategory.ENVIRONMENT },
             { "destructablewall", CollisionCategory.ENVIRONMENT },
             { "trench_vo_wall_trigger", CollisionCategory.ENVIRONMENT },
+            { "trench_vo_corrupt_core_warn_trigger", CollisionCategory.ENVIRONMENT },
+            { "trench_vo_mid_run_trigger", CollisionCategory.ENVIRONMENT },
             { "trench_vo_core_trigger", CollisionCategory.ENVIRONMENT },
             { "decorindestructiblewall", CollisionCategory.ENVIRONMENT },
             { "environment_leveldesign", CollisionCategory.ENVIRONMENT },

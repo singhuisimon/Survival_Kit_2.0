@@ -16,6 +16,7 @@ namespace Game
     {
         // Entity names
         private const string INSTALL_BUTTON_NAME = "Install Button";
+        private const string INSTALL_BUTTON_HOVERED_NAME = "Install Button Hovered";
         private const string GLITCH_OVERLAY_NAME = "Glitch Overlay";
         private const string START_GAME_POPUP_NAME = "Start Game Popup";
         private const string START_GAME_YES_BUTTON_NAME = "Start Game Yes Button";
@@ -69,6 +70,7 @@ namespace Game
 
         // Entity IDs
         private uint installButtonId;
+        private uint installButtonHoveredId;
         private uint[] errorPopupIds = new uint[NUM_ERROR_POPUPS];
         private uint glitchOverlayId;
         private uint startGamePopupId;
@@ -139,6 +141,17 @@ namespace Game
             {
                 LogError("InstallButtonHandler: Could not find entity: " + INSTALL_BUTTON_NAME);
                 return;
+            }
+
+            // Find install button hovered
+            installButtonHoveredId = SceneFindEntityByName(INSTALL_BUTTON_HOVERED_NAME);
+            if (installButtonHoveredId == 0)
+            {
+                LogMessage("InstallButtonHandler: Hovered button not found (optional): " + INSTALL_BUTTON_HOVERED_NAME);
+            }
+            else
+            {
+                SpriteRenderer.SetIsVisible(installButtonHoveredId, false);
             }
 
             // Find error popups
@@ -312,6 +325,15 @@ namespace Game
             bool isMousePressed = Input.IsMouseButtonPressed(MouseButton.Left);
             bool mouseJustPressed = isMousePressed && !wasMousePressed;
             wasMousePressed = isMousePressed;
+
+            // Update install button hover state
+            if (!sequenceStarted && installButtonHoveredId != 0)
+            {
+                bool isHovered = Collision2D.IsMouseCollidingWithEntity(installButtonId) ||
+                                 Collision2D.IsMouseCollidingWithEntity(installButtonHoveredId);
+                SpriteRenderer.SetIsVisible(installButtonId, !isHovered);
+                SpriteRenderer.SetIsVisible(installButtonHoveredId, isHovered);
+            }
 
             // If sequence not started, check for install button click (blocked when popup is open)
             if (!sequenceStarted && mouseJustPressed && !isPopupOpen)

@@ -26,6 +26,10 @@ namespace Game
         private const string EVENT_SENTRY_WAIT_TRENCH = "WaitingSentryTrench";
         private const string EVENT_SENTRY_SPAWNED_TRENCH = "SentrySpawnedTrench";
         private const string EVENT_TURRET_DESTROYED = "EnemyTurretDestroyed";
+
+        private const string EVENT_TRENCH_ENEMYCORE_DESTROYED_TRIGGERED = "TutorialEnemyCoreDestroyedTriggered";
+        private const string EVENT_TRENCH_UPGRADEMOD_PICKED_TRIGGERED = "TutorialSentryModulePickedTriggered";
+
         [SerializeField] private string payloadPrefab = "Sources/Prefabs/Payload.prefab";
         [SerializeField] private string upgradeModuleLabelPrefab = "Sources/Prefabs/UpgradeModuleLabel.prefab";
         private string sentryPrefab = "Sources/Prefabs/NormalSentry.prefab";
@@ -39,8 +43,8 @@ namespace Game
         private bool hasSpawnedSentry = false;
         private bool hasSpawnedTurret = false;
         private bool postTrenchRun = false;
-        private float postTrenchCountdown = 5.0f;
-        private float turretWaitCountdown = 5.0f;
+        private float postTrenchCountdown = 2.5f;
+        private float turretWaitCountdown = 2.5f;
         private Vector3[] keyloggerPositions = new Vector3[4];
         private List<uint> activeTurrets = new List<uint>();
 
@@ -114,6 +118,8 @@ namespace Game
 
             StringToTransform(payload, out spawnPos, out spawnRot);
 
+            Publish(EVENT_TRENCH_ENEMYCORE_DESTROYED_TRIGGERED, "");
+
             SpawnUpgrade(spawnPos, spawnRot);
         }
 
@@ -177,6 +183,7 @@ namespace Game
             
             hasCollectedUpgrade = true;
             Publish(EVENT_SENTRY_WAIT_TRENCH, EntityID.ToString());
+            Publish(EVENT_TRENCH_UPGRADEMOD_PICKED_TRIGGERED, "");
         }
 
         private void OnSentrySpawned(string eventName, string payload)

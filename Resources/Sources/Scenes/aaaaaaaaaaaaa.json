@@ -292,7 +292,7 @@
                         "ComponentGUID": "5116371290365067625",
                         "FilePath": "System AI_VO_Mid Trench Run.wav",
                         "Type": 4,
-                        "State": 0,
+                        "State": 2,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,
@@ -310,10 +310,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "4539910538062233963",
-                        "ScriptClassName": "Game.GameSoundPrefabLifetime",
-                        "Fields": {
-                            "Lifetime": 6.0
-                        }
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
                     }
                 }
             ]
@@ -375,10 +372,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "9728057308791734627",
-                        "ScriptClassName": "Game.GameDelaySoundPrefab",
-                        "Fields": {
-                            "Lifetime": 8.0
-                        }
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
                     }
                 }
             ]
@@ -440,11 +434,7 @@
                     "Type": "ScriptComponent",
                     "Properties": {
                         "ComponentGUID": "5116371290363298139",
-                        "ScriptClassName": "Game.GameDelaySoundPrefab",
-                        "Fields": {
-                            "Lifetime": 8.0,
-                            "delayedTime": 1.0
-                        }
+                        "ScriptClassName": "Game.GameSoundPrefabLongerLifetime"
                     }
                 }
             ]
@@ -488,7 +478,7 @@
                         "ComponentGUID": "14339743327216894289",
                         "FilePath": "System AI_VO_Corrupted Core Destroyed.wav",
                         "Type": 4,
-                        "State": 2,
+                        "State": 0,
                         "Volume": 1.0,
                         "Pitch": 1.0,
                         "Loop": false,

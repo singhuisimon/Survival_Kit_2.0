@@ -69,7 +69,7 @@ namespace Game
             {
                 skipped = true;
                 cutsceneStarted = true;
-                cutsceneTime = 5.82f;
+                cutsceneTime = 4.82f; // change it to 4.82 instead of 5.82
                 SetIsVisible(SkipButtonID, false);
                 UpdateCutscene();
                 return;
@@ -164,6 +164,7 @@ namespace Game
         {
             if (Input.IsMouseButtonPressed(MouseButton.Left) && Collision2D.IsMouseCollidingWithEntity(SkipButtonID))
             {
+                Audio.AudioPlay(SkipButtonID);
                 return true;
             }
             return false;

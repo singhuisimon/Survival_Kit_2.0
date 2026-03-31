@@ -3,6 +3,2758 @@
     "Version": "1.0",
     "Entities": [
         {
+            "ID": 197,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "FadeBlack",
+                        "Tag": "FadeBlack"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "13630540738341165841",
+                        "Position": [
+                            -0.015386410988867283,
+                            19.97862434387207,
+                            30.014230728149414
+                        ],
+                        "Rotation": [
+                            0.04088059440255165,
+                            -0.029375173151493073,
+                            1.503517449430447e-11
+                        ],
+                        "Scale": [
+                            5.0,
+                            5.0,
+                            5.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "MeshRendererComponent",
+                    "Properties": {
+                        "ComponentGUID": "4983629453790010131",
+                        "Mesh": "",
+                        "Material": "BlackBox.mat",
+                        "Texture": "",
+                        "Visible": true,
+                        "GlobalIlluminate": true,
+                        "ShadowReceive": false,
+                        "Billboarding": false,
+                        "MeshType": 0,
+                        "MaterialIdx": 0,
+                        "TextureIdx": 0,
+                        "SubmeshIndex": 0,
+                        "CastType": 0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "6136550958397086485",
+                        "ScriptClassName": "Game.FadeOutBlackObject",
+                        "Fields": {
+                            "fadeDuration": 2.0,
+                            "startDelay": 0.20000000298023224
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 196,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "10748236976824015629",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 195,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6713011710700051205",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 194,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "17665766004465097469",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 193,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "9595315472217168629",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 192,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "2101325692272663277",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 191,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "7865933215306898149",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 190,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "17089305252161673949",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 189,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "10748236976824015573",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 188,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4983629453789780685",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 187,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15359922995251403461",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 186,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6713011710700051133",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 185,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "18242226756768520885",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 184,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "14783462242947979949",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 183,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15359922995251403429",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 182,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4407168701486357149",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 181,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "UpgradeIndicator",
+                        "Tag": "UpgradeIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "16512844499858250389",
+                        "PrefabAssetGuid": "3637360998843482273",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: UpgradeIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/UpgradeIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"UpgradeIndicator\",\"Tag\":\"UpgradeIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"UI_DetectionRange_Pickup_UpgradeModule.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "UI_DetectionRange_Pickup_UpgradeModule.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 180,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "13054079986037709453",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 179,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "16512844499858250373",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 178,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "18242226756768520829",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 177,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "11901158481430862453",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 176,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "14783462242947979885",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 175,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "3254247196879510117",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 174,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "15936383747554826845",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 173,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "6713011710700051029",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 172,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "4407168701486357069",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 171,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "3254247196879510085",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 170,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "12477619233734285885",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 169,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "18242226756768520757",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 168,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "10748236976824015405",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 167,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "1524864939969239589",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 166,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "3830707949182933533",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 165,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "EnemyIndicator",
+                        "Tag": "EnemyIndicator"
+                    }
+                },
+                {
+                    "Type": "PrefabComponent",
+                    "Properties": {
+                        "ComponentGUID": "18242226756768520725",
+                        "PrefabAssetGuid": "1331517989630066861",
+                        "isPrefabRoot": true,
+                        "isNestedPrefab": false,
+                        "parentPrefabGuid": "0",
+                        "prefabName": "Prefab: EnemyIndicator.prefab",
+                        "prefabVersion": 1,
+                        "prefabFilePath": "C:/Users/Admin/source/repos/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/EnemyIndicator.prefab",
+                        "componentOverrides": [
+                            {
+                                "componentType": 1,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"5232127842281062553\",\"Position\":[0.0,0.0,0.0],\"Rotation\":[0.0,-0.0,0.0],\"Scale\":[15.0,15.0,1.0],\"Parent\":4294967295,\"Children\":[]}}"
+                            },
+                            {
+                                "componentType": 101,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"2926284833067368599\",\"Name\":\"EnemyIndicator\",\"Tag\":\"EnemyIndicator\"}}"
+                            },
+                            {
+                                "componentType": 14,
+                                "isAddedComponent": false,
+                                "isRemovedComponent": false,
+                                "originalComponentJSON": "{\"Properties\":{\"ComponentGUID\":\"15608421383742800027\",\"Texture\":\"ExclamationIcon.png\",\"Color\":[1.0,1.0,1.0,1.0],\"Quad\":3,\"Sprite Layer\":1,\"IsActive\":false,\"IsVisible\":true}}"
+                            }
+                        ]
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "5232127842281062553",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            15.0,
+                            15.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "SpriteRendererComponent",
+                    "Properties": {
+                        "Texture": "ExclamationIcon.png",
+                        "Color": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Quad": 3,
+                        "Sprite Layer": 1,
+                        "IsActive": false,
+                        "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
             "ID": 1048740,
             "Components": [
                 {
@@ -45,22 +2797,22 @@
             ]
         },
         {
-            "ID": 161,
+            "ID": 22020381,
             "Components": [
                 {
                     "Type": "TagComponent",
                     "Properties": {
-                        "Name": "BlackScreen",
-                        "Tag": "BlackScreen"
+                        "Name": "UI_InstructionLevel3",
+                        "Tag": "UI_InstructionLevel3"
                     }
                 },
                 {
                     "Type": "TransformComponent",
                     "Properties": {
-                        "ComponentGUID": "17447693262993033783",
+                        "ComponentGUID": "15852987986573314607",
                         "Position": [
-                            640.0,
-                            360.0,
+                            950.0,
+                            249.99923706054688,
                             0.0
                         ],
                         "Rotation": [
@@ -69,8 +2821,8 @@
                             0.0
                         ],
                         "Scale": [
-                            640.0,
-                            360.0,
+                            104.61000061035156,
+                            70.29000091552734,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -80,7 +2832,7 @@
                 {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
-                        "Texture": "Blackscreen.png",
+                        "Texture": "Tooltip_InstructionsLvl3.png",
                         "Color": [
                             1.0,
                             1.0,
@@ -88,9 +2840,9 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 5,
+                        "Sprite Layer": 1,
                         "IsActive": true,
-                        "IsVisible": false
+                        "IsVisible": true
                     }
                 }
             ]
@@ -4725,9 +7477,9 @@
                             1.0,
                             1.0,
                             1.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -5013,16 +7765,16 @@
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "9988914163104956969",
-                        "text": "03 m : 54 s",
+                        "text": "04 m : 00 s",
                         "fontName": "Quantico-Regular",
                         "fontSize": 21.0,
                         "color": [
                             1.0,
                             1.0,
                             1.0,
-                            1.0
+                            0.0
                         ],
-                        "isVisible": true,
+                        "isVisible": false,
                         "align": 0,
                         "lineSpacing": 1.0,
                         "letterSpacing": 0.0,
@@ -5127,7 +7879,7 @@
                         "respectClipLoop": true,
                         "controller": 1,
                         "currentClipIndex": 0,
-                        "currentTime": 6.982757568359375,
+                        "currentTime": 8.376861572265625,
                         "playbackSpeed": 1.0
                     }
                 }
@@ -5598,7 +8350,7 @@
                         "Particle Type": 0,
                         "Emission Rate": 10.0,
                         "Particle Lifetime": 4.0,
-                        "Emission Accumulator": 0.20947265625,
+                        "Emission Accumulator": 0.1505126953125,
                         "Particle Size": 0.20000000298023224,
                         "Grow Phase End": 0.30000001192092896,
                         "Shrink Phase Start": 0.699999988079071,
@@ -6231,8 +8983,8 @@
                         ],
                         "Rotation": [
                             0.04088059440255165,
-                            -0.029375193640589714,
-                            1.2592507765696315e-11
+                            -0.029375173151493073,
+                            1.503517449430447e-11
                         ],
                         "Scale": [
                             1.0,
@@ -6255,7 +9007,7 @@
                             20.0
                         ],
                         "Depth": 0,
-                        "Aspect": 1.7777777910232544,
+                        "Aspect": 1.9190404415130615,
                         "FOV": 110.80000305175781,
                         "NearPlane": 0.5,
                         "FarPlane": 5000.0,
@@ -6444,7 +9196,7 @@
                         "Quad": 3,
                         "Sprite Layer": 0,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -6787,7 +9539,7 @@
                         "ComponentGUID": "9074577925281760651",
                         "Position": [
                             1153.5999755859375,
-                            589.4000244140625,
+                            611.300048828125,
                             0.0
                         ],
                         "Rotation": [
@@ -6797,7 +9549,7 @@
                         ],
                         "Scale": [
                             36.5,
-                            21.899999618530273,
+                            0.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -6890,7 +9642,7 @@
                             0.0
                         ],
                         "Rotation": [
-                            -108.51527404785156,
+                            -58.32752227783203,
                             -0.0,
                             -0.0
                         ],
@@ -6929,7 +9681,7 @@
                         "respectClipLoop": true,
                         "controller": 0,
                         "currentClipIndex": 0,
-                        "currentTime": 6.985687255859375,
+                        "currentTime": 8.379791259765625,
                         "playbackSpeed": 1.0
                     }
                 }
@@ -7667,7 +10419,7 @@
                     "Type": "TextComponent",
                     "Properties": {
                         "ComponentGUID": "10565374915375432199",
-                        "text": "98/100",
+                        "text": "100/100",
                         "fontName": "Quantico-Regular",
                         "fontSize": 10.0,
                         "color": [
@@ -8242,9 +10994,9 @@
                             -926.7012329101563
                         ],
                         "Rotation": [
-                            -3.778103518925491e-8,
-                            1.0203015804290771,
-                            -3.774811929702082e-8
+                            0.0000014915382280378253,
+                            -57.620487213134766,
+                            0.0000014916549844201654
                         ],
                         "Scale": [
                             1.0,
@@ -8482,9 +11234,9 @@
                             389.2737121582031
                         ],
                         "Rotation": [
-                            -3.778103518925491e-8,
-                            1.0203015804290771,
-                            -3.774811929702082e-8
+                            0.0000014915382280378253,
+                            -57.620487213134766,
+                            0.0000014916549844201654
                         ],
                         "Scale": [
                             1.0,
@@ -8719,12 +11471,12 @@
                         "Position": [
                             -772.031494140625,
                             -104.16666412353516,
-                            -122.16141510009766
+                            -122.16140747070313
                         ],
                         "Rotation": [
-                            -3.778103518925491e-8,
-                            1.0203015804290771,
-                            -3.774811929702082e-8
+                            0.0000014915382280378253,
+                            -57.620487213134766,
+                            0.0000014916549844201654
                         ],
                         "Scale": [
                             1.0,
@@ -8977,12 +11729,12 @@
                         "Position": [
                             -164.99012756347656,
                             -516.703125,
-                            858.3690185546875
+                            858.3689575195313
                         ],
                         "Rotation": [
-                            -3.778103518925491e-8,
-                            1.0203015804290771,
-                            -3.774811929702082e-8
+                            0.0000014915382280378253,
+                            -57.620487213134766,
+                            0.0000014916549844201654
                         ],
                         "Scale": [
                             1.0,
@@ -9220,9 +11972,9 @@
                             -662.1448974609375
                         ],
                         "Rotation": [
-                            -3.778103518925491e-8,
-                            1.0203015804290771,
-                            -3.774811929702082e-8
+                            0.0000014915382280378253,
+                            -57.620487213134766,
+                            0.0000014916549844201654
                         ],
                         "Scale": [
                             1.0,
@@ -9460,9 +12212,9 @@
                             -417.0870666503906
                         ],
                         "Rotation": [
-                            -3.778103518925491e-8,
-                            1.0203015804290771,
-                            -3.774811929702082e-8
+                            0.0000014915382280378253,
+                            -57.620487213134766,
+                            0.0000014916549844201654
                         ],
                         "Scale": [
                             1.0,
@@ -9557,8 +12309,8 @@
                             0.0
                         ],
                         "Scale": [
-                            109.76000213623047,
-                            5.0,
+                            0.0,
+                            0.0,
                             0.0
                         ],
                         "Parent": 4294967295,
@@ -10776,7 +13528,7 @@
                         "Segment Lifetime": 1.1399999856948853,
                         "Min Distance": 0.10000000149011612,
                         "Sample Interval": 0.01600000075995922,
-                        "Sample Accumulator": 0.545623779296875,
+                        "Sample Accumulator": 0.2425537109375,
                         "Start Color": [
                             0.019600000232458115,
                             1.0,
@@ -11288,7 +14040,7 @@
                         "State": 2,
                         "Volume": 0.6439999938011169,
                         "Pitch": 1.0,
-                        "Loop": true,
+                        "Loop": false,
                         "Mute": false,
                         "ReverbProperties": 1.0,
                         "Is3D": false,
@@ -12070,6 +14822,13 @@
                     }
                 },
                 {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "589822659359638999",
+                        "ScriptClassName": "Game.AltFireIconPulse"
+                    }
+                },
+                {
                     "Type": "SpriteRendererComponent",
                     "Properties": {
                         "Texture": "AlternateFire_Icon.png",
@@ -12133,7 +14892,7 @@
                         "Quad": 3,
                         "Sprite Layer": 2,
                         "IsActive": true,
-                        "IsVisible": true
+                        "IsVisible": false
                     }
                 }
             ]
@@ -13075,57 +15834,6 @@
                         ],
                         "Quad": 3,
                         "Sprite Layer": 4,
-                        "IsActive": true,
-                        "IsVisible": false
-                    }
-                }
-            ]
-        },
-        {
-            "ID": 22020381,
-            "Components": [
-                {
-                    "Type": "TagComponent",
-                    "Properties": {
-                        "Name": "UI_InstructionLevel3",
-                        "Tag": "UI_InstructionLevel3"
-                    }
-                },
-                {
-                    "Type": "TransformComponent",
-                    "Properties": {
-                        "ComponentGUID": "15852987986573314607",
-                        "Position": [
-                            950.0,
-                            260.0,
-                            0.0
-                        ],
-                        "Rotation": [
-                            0.0,
-                            -0.0,
-                            0.0
-                        ],
-                        "Scale": [
-                            104.61000061035156,
-                            70.29000091552734,
-                            1.0
-                        ],
-                        "Parent": 4294967295,
-                        "Children": []
-                    }
-                },
-                {
-                    "Type": "SpriteRendererComponent",
-                    "Properties": {
-                        "Texture": "Tooltip_InstructionsLvl3.png",
-                        "Color": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Quad": 3,
-                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": false
                     }
