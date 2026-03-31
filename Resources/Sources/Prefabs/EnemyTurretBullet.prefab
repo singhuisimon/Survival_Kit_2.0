@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: EnemyTurretBullet.prefab",
-    "Prefab GUID": 5206777523836174501,
-    "version": 2,
+    "Prefab GUID": 16724496088942690477,
+    "version": 1,
     "entities": [
         {
             "Name": "EnemyTurretBullet",
@@ -74,7 +74,7 @@
                             "ComponentGUID": "14055312795390967969",
                             "Mass": 1.0,
                             "IsKinematic": false,
-                            "IsTrigger": false,
+                            "IsTrigger": true,
                             "UseGravity": false,
                             "Velocity": [
                                 0.0,
