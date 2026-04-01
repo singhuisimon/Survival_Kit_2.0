@@ -13,23 +13,18 @@ namespace Game
         [SerializeField] private const string wall1Name = "Wall1";
         [SerializeField] private const string wall2Name = "Wall2";
         [SerializeField] private const string wall3Name = "Wall3";
-        //[SerializeField] private const string wall4Name = "Wall4";
-        //[SerializeField] private const string wall5Name = "Wall5";
-        //[SerializeField] private const string wall4Name = "Wall1";
+
         private uint wall1ID = 0;
         private uint wall2ID = 0;
         private uint wall3ID = 0;
-        //private uint wall4ID = 0;
-        //private uint wall5ID = 0;
 
         //================== EVENT NAMES ================================
-        //private const string EVENT_1MIN = "1MIN";
-        //private const string EVENT_1_5MIN = "1_5MIN";
-        //private const string EVENT_3MIN = "3MIN";
         private const string EVENT_2MIN = "2MIN";
         private const string EVENT_WALLENABLED = "WallEnabled";
         private const string EVENT_GAMEOVER = "GameOver";
         private const string EVENT_GAMEWIN = "GameWin";
+        private const string EVENT_DEBUG_SET_TIMER = "DebugSetTimer";
+        
 
         //=================== STATE ============================
         private bool initialized = false;
@@ -44,7 +39,8 @@ namespace Game
             
             //Subscribe(EVENT_1_5MIN, OnOneAndHalfMin);
             //Subscribe(EVENT_3MIN, OnThreeMin);
-            Subscribe(EVENT_2MIN, TwoMin);
+            Subscribe(EVENT_2MIN, EnableWall);
+            Subscribe(EVENT_DEBUG_SET_TIMER, EnableWall);
 
         }
 
@@ -53,13 +49,21 @@ namespace Game
             if(GameState.IsPaused){
                 return;
             }
+
+            if (!initialized)
+            {
+                initialize();
+            }
         }
 
         public override void OnDestroy(){
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
-            Unsubscribe(EVENT_2MIN, TwoMin);
+            Unsubscribe(EVENT_2MIN, EnableWall);
+            Unsubscribe(EVENT_DEBUG_SET_TIMER, EnableWall);
             //Unsubscribe(EVENT_3MIN, OnThreeMin);
+
+            active = false;
         }
 
         private void OnGameEnd(string eventName, string payload){
@@ -67,23 +71,17 @@ namespace Game
             active = false;
         }
 
-        private void TwoMin(string eventName, string payload){
+        private void EnableWall(string eventName, string payload){
             SetWallActive(wall2ID);
             SetWallActive(wall3ID);
         }
-
-        // private void OnThreeMin(string eventName, string payload){
-        //     SetWallActive(wall4ID);
-        //     SetWallActive(wall5ID);
-        // }
 
         private void initialize(){
 
             wall1ID = SceneFindEntityByName(wall1Name);
             wall2ID = SceneFindEntityByName(wall2Name);
             wall3ID = SceneFindEntityByName(wall3Name);
-            // wall4ID = SceneFindEntityByName(wall4Name);
-            // wall5ID = SceneFindEntityByName(wall5Name);
+
 
             if(wall1ID == 0){
                 LogMessage("[WallManaager] Warning Wall1ID not found");
@@ -94,12 +92,6 @@ namespace Game
             if(wall3ID == 0){
                 LogMessage("[WallManaager] Warning Wall3ID not found");
             }
-            // if(wall4ID == 0){
-            //     LogMessage("[WallManaager] Warning Wall4ID not found");
-            // }
-            // if(wall5ID == 0){
-            //     LogMessage("[WallManaager] Warning Wall5ID not found");
-            // }
 
             SetWallActive(wall1ID);
 
@@ -112,8 +104,11 @@ namespace Game
                 return;
             }
 
-            SetVisible(wallID, true); //set the wall to be visible to enable the spawning from that particular wall
-            Publish(EVENT_WALLENABLED, ""); //Publish event for all wall to check themselves
+            if (!GetVisible(wallID))
+            {
+                SetVisible(wallID, true); //set the wall to be visible to enable the spawning from that particular wall
+                Publish(EVENT_WALLENABLED, ""); //Publish event for all wall to check themselves
+            }
         }
     }
 }

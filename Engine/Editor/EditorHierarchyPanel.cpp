@@ -279,7 +279,10 @@ namespace Engine
 		{
 			flags |= ImGuiTreeNodeFlags_Selected;
 		}
-
+		if (hasChildren && IsSubentitySelected(entity))
+		{
+			ImGui::SetNextItemOpen(true, ImGuiCond_Always);
+		}
 		bool openedTree = ImGui::TreeNodeEx((void*)(uint64_t)(uint32_t)entity, flags, "%s", tag.Name.c_str());
 
 		if (ImGui::IsItemClicked())
@@ -294,6 +297,10 @@ namespace Engine
 			LOG_DEBUG("new currSelectedEntity: ", static_cast<uint32_t>(m_Editor->GetSelectedEntity().GetHandle()));
 			//LOG_DEBUG("NEW m_PickedID: ", m_PickedID);
 			LOG_DEBUG("Editor's picked ID: ", m_Editor->GetPickedID());
+			if (ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left))
+			{
+				m_Editor->ViewportClickAndTeleport();
+			}
 		}
 
 		if (ImGui::BeginPopupContextItem())
@@ -348,6 +355,7 @@ namespace Engine
 
 				// STEP 4: Clear selection if this entity was selected
 				if (currentSelectedEntity == entity) {
+					ImGui::SetScrollHereY(0.5f);
 					m_Editor->SetCurrSelectedEntity(Entity{});
 					m_Editor->RetrievePickedID(0xFFFFFFFFu);
 				}
@@ -1103,5 +1111,31 @@ namespace Engine
 		}
 
 		return duplicate;
+	}
+
+	bool EditorHierarchyPanel::IsSubentitySelected(Entity& entity)
+	{
+		Entity selected = m_Editor->GetSelectedEntity();
+		if (!selected) return false;
+
+		Scene* m_Scene = m_Editor->GetActiveScene();
+		if (!m_Scene) return false;
+
+		auto& registry = m_Scene->GetRegistry();
+
+		// Walk up the selected entity's parent chain
+		Entity current = selected;
+		while (current && current.HasComponent<TransformComponent>())
+		{
+			auto& transform = current.GetComponent<TransformComponent>();
+			if (transform.Parent == u32_max) break;
+
+			Entity parent(static_cast<entt::entity>(transform.Parent), &registry);
+			if (!registry.valid(parent.GetHandle())) break;
+
+			if (parent == entity) return true;  // entity is an ancestor
+			current = parent;
+		}
+		return false;
 	}
 }

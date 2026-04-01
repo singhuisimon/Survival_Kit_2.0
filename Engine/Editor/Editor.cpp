@@ -211,6 +211,10 @@ namespace Engine
             glfwMakeContextCurrent(backup_current_context);
         }
     }
+    void Editor::ViewportClickAndTeleport()
+    {
+        m_EditorViewport->ViewportClickAndTeleport();
+    }
 
     Scene* Editor::CreateNewScene(const std::string& name)
     {

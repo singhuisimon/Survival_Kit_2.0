@@ -47,6 +47,9 @@ namespace Game
         // =========== Entity Tracking ===========
         private uint currentVO = 0;
 
+        private const string EVENT_VO_PLAY = "VOPlaying";
+
+
         public override void OnStart()
         {
             LogMessage("=== AudioVOTimer OnStart ===");
@@ -121,12 +124,14 @@ namespace Game
         {
             StopPreviousAudio();
             currentVO = PrefabInstantiate(Audio2minVOPrefab);
+            Publish(EVENT_VO_PLAY, "");
         }
 
         private void On1Min(string eventName, string payload)
         {
             StopPreviousAudio();
             currentVO = PrefabInstantiate(Audio1minVOPrefab);
+            Publish(EVENT_VO_PLAY, "");
         }
 
         private void On10s(string eventName, string payload)
@@ -135,6 +140,7 @@ namespace Game
             currentVO = PrefabInstantiate(Audio10sVOPrefab);
             last10s = true;
             countdowntimer = DelayFor2nd5secWarn;
+            Publish(EVENT_VO_PLAY, "");
         }
 
         private void StopPreviousAudio()

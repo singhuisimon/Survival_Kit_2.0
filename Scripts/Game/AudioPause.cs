@@ -44,6 +44,17 @@ namespace Game
         [SerializeField] private float startusualbgmtimer = 0.0f;
         [SerializeField] private float startusualbgmcountdown = 10.0f;
 
+        // ============== NEW ADDITION TO BGM MIXER ===================
+        private const string EVENT_CORE_PLAY = "CorePlaying";
+        private const string EVENT_VO_PLAY = "VOPlaying";
+        private float VOTimer = 8.0f;
+        private float CoreTimer = 5.0f;
+        private float BGMOGVol = 1.0f;
+        private float bgmdivisor = 0.5f;
+
+        private float countdown = 0.0f;
+        private bool countdownstart = false;
+
         public override void OnStart()
         {
             LogMessage("=== AudioPause OnStart ===");
@@ -53,6 +64,8 @@ namespace Game
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
             Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
             Event.Subscribe(EVENT_BGM_VO_START, OnBGMVOStart);
+            Event.Subscribe(EVENT_CORE_PLAY, OnCoreVOStart);
+            Event.Subscribe(EVENT_VO_PLAY, OnTimerVOStart);
 
             initialized = true;
 
@@ -61,6 +74,8 @@ namespace Game
             isPaused = false;
 
             disabled = false;
+
+            BGMOGVol = AudioGetVolume((uint)EntityID);
 
             LogMessage("AudioPause initialized:");
         }
@@ -144,6 +159,15 @@ namespace Game
                 AudioPlay((uint)EntityID);
                 LogMessage("[AudioPause] Playing the audio attached to the entity");
             }
+
+            if(countdownstart)
+            {
+                countdown -= deltaTime;
+                if(countdown <= 0.0f)
+                {
+                    ResetBGMVol();
+                }
+            }
         }
 
         // ===== EVENT HANDLERS =====
@@ -158,6 +182,8 @@ namespace Game
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameEnd);
             Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
             Event.Unsubscribe(EVENT_BGM_VO_START, OnBGMVOStart);
+            Event.Unsubscribe(EVENT_CORE_PLAY, OnCoreVOStart);
+            Event.Unsubscribe(EVENT_VO_PLAY, OnTimerVOStart);
 
             LogMessage("=== AmmoBar Destroyed ===");
         }
@@ -182,12 +208,37 @@ namespace Game
             LogMessage("[AudioPause] BGMVOStart received, audio countdown begins");
         }
 
+        private void OnCoreVOStart(string eventName, string payload)
+        {
+            countdown = CoreTimer;
+            countdownstart = true;
+            ReduceBGMVol();
+        }
+
+        private void OnTimerVOStart(string eventName, string payload)
+        {
+            countdown = VOTimer;
+            countdownstart = true;
+            ReduceBGMVol();
+        }
+
         private void SetUpUsualBGM()
         {
             AudioSetFile((uint)EntityID, usualBGMFilePath);
             AudioSetLoop((uint)EntityID, true);
 
             LogMessage("[AudioPause] Usual BGM confirgured with new filepath and loop=true");
+        }
+
+        private void ReduceBGMVol()
+        {
+            float newVol = BGMOGVol * bgmdivisor;
+            AudioSetVolume((uint)EntityID, newVol);
+        }
+
+        private void ResetBGMVol()
+        {
+            AudioSetVolume((uint)EntityID, BGMOGVol);
         }
     }
 }
