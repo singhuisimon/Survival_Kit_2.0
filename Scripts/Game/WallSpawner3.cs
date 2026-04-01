@@ -28,11 +28,13 @@ namespace Game
         private int enemiesSpawnPerWave = 3;
 
         // ================== VFX Delay Setting ============================
-        
+
         [SerializeField] private float botnetVFXDelay = 1.0f;
         [SerializeField] private float wormVFXDelay = 1.0f;
-        [SerializeField] private float loveletterVFXDelay = 1.2f; 
+        [SerializeField] private float loveletterVFXDelay = 1.2f;
         private float vfxToEnemyDelay = 0.0f;
+
+        private const float VFX_LIFETIME = 2.0f;
 
         // Struct to hold pending spawn data
         private struct PendingSpawn
@@ -44,7 +46,14 @@ namespace Game
             public int enemyType; // 0=botnet, 1=worm, 2=loveletter
         }
 
+        private struct PendingVFXDelete
+        {
+            public float timer;
+            public uint entityID;
+        }
+
         private List<PendingSpawn> pendingSpawns = new List<PendingSpawn>();
+        private List<PendingVFXDelete> pendingVFXDeletes = new List<PendingVFXDelete>();
 
         // ================== Enemy Spawn Prefab Path ============================
         private const string loveletterPrefabPath = "Sources/Prefabs/loveletterv4.prefab";
@@ -64,6 +73,7 @@ namespace Game
         // ======================== EVENT ================================
         private const string EVENT_GAMEOVER = "GameOver";
         private const string EVENT_GAMEWIN = "GameWin";
+        private const string EVENT_DEBUG_SET_TIMER = "DebugSetTimer";
 
         // ======================  Wall Setting ==============================
         private float smallwall_width = 1000.0f;
@@ -86,6 +96,7 @@ namespace Game
 
             Subscribe(EVENT_GAMEOVER, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
+            Subscribe(EVENT_DEBUG_SET_TIMER, OnDebugTimer);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -104,6 +115,9 @@ namespace Game
 
             // Process pending spawns (VFX delay)
             ProcessPendingSpawns(deltaTime);
+
+            // Process pending VFX deletions
+            ProcessPendingVFXDeletes(deltaTime);
 
             if (!canSpawn)
             {
@@ -143,17 +157,26 @@ namespace Game
         {
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+            Unsubscribe(EVENT_DEBUG_SET_TIMER, OnDebugTimer);
 
             canSpawn = false;
             initialized = false;
             pendingSpawns.Clear();
+            pendingVFXDeletes.Clear();
         }
 
         private void OnGameEnd(string eventName, string payload)
         {
             LogMessage("[WallSpawner3] GameEnd detected disallowing spawning");
             canSpawn = false;
-            pendingSpawns.Clear(); // Clear any pending spawns on game end
+            pendingSpawns.Clear();
+            pendingVFXDeletes.Clear();
+        }
+
+        private void OnDebugTimer(string eventName, string payload)
+        {
+            spawntimer = 0.0f;
+            spawnInterval = minInterval;
         }
 
         private void ProcessPendingSpawns(float deltaTime)
@@ -174,6 +197,25 @@ namespace Game
                 {
                     // Update the timer in the list
                     pendingSpawns[i] = spawn;
+                }
+            }
+        }
+
+        private void ProcessPendingVFXDeletes(float deltaTime)
+        {
+            for (int i = pendingVFXDeletes.Count - 1; i >= 0; i--)
+            {
+                PendingVFXDelete vfx = pendingVFXDeletes[i];
+                vfx.timer -= deltaTime;
+
+                if (vfx.timer <= 0.0f)
+                {
+                    SceneDestroyEntity(vfx.entityID);
+                    pendingVFXDeletes.RemoveAt(i);
+                }
+                else
+                {
+                    pendingVFXDeletes[i] = vfx;
                 }
             }
         }
@@ -256,6 +298,14 @@ namespace Game
             SetPosition(VFXID, ref spawnPos);
             SetRotation(VFXID, ref spawnRot);
 
+            // Queue VFX for deletion after lifetime expires
+            PendingVFXDelete vfxDelete = new PendingVFXDelete
+            {
+                timer = VFX_LIFETIME,
+                entityID = VFXID
+            };
+            pendingVFXDeletes.Add(vfxDelete);
+
             // Queue the enemy spawn with delay
             PendingSpawn pending = new PendingSpawn
             {
@@ -268,7 +318,6 @@ namespace Game
             pendingSpawns.Add(pending);
         }
 
-        // ... rest of your methods remain unchanged ...
         private Vector3 GetRandomPositionOnWall(float wallWidth, float wallHeight, float spawnDistance)
         {
             Quat wallRotation = GetRotation((uint)EntityID);
@@ -291,6 +340,7 @@ namespace Game
             initialized = true;
             decreaseTimer = decreaseInterval;
             pendingSpawns.Clear();
+            pendingVFXDeletes.Clear();
         }
 
         private int GetWeightedRandomEnemy()

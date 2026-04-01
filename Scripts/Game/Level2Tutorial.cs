@@ -34,6 +34,8 @@ namespace Game
         [SerializeField] private float loveletterVFXDelay = 1.2f;
         private float vfxToEnemyDelay = 0.0f;
 
+        private const float VFX_LIFETIME = 2.0f;
+
         // Use a class instead of struct to avoid copy issues
         private class PendingSpawn
         {
@@ -44,7 +46,14 @@ namespace Game
             public int enemyType;
         }
 
+        private class PendingVFXDelete
+        {
+            public float timer;
+            public uint entityID;
+        }
+
         private List<PendingSpawn> pendingSpawns;
+        private List<PendingVFXDelete> pendingVFXDeletes;
 
         // ================== Enemy Spawn Prefab Path ============================
         private const string loveletterPrefabPath = "Sources/Prefabs/loveletterv4.prefab";
@@ -71,6 +80,7 @@ namespace Game
         private const string EVENT_GAMEWIN = "GameWin";
         private const string EVENT_WALLENABLED = "WallEnabled";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
+        private const string EVENT_DEBUG_TIMER = "DebugSetTimer";
 
         // ======================  Wall Setting ==============================
         private float smallwall_width = 1000.0f;
@@ -98,12 +108,14 @@ namespace Game
         public override void OnStart()
         {
             pendingSpawns = new List<PendingSpawn>();
+            pendingVFXDeletes = new List<PendingVFXDelete>();
 
             initialize();
 
             Subscribe(EVENT_GAMEOVER, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
             Subscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Subscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -126,10 +138,21 @@ namespace Game
                 pendingSpawns = new List<PendingSpawn>();
             }
 
+            if (pendingVFXDeletes == null)
+            {
+                pendingVFXDeletes = new List<PendingVFXDelete>();
+            }
+
             // Process pending spawns FIRST (always, regardless of other states)
             if (pendingSpawns.Count > 0)
             {
                 ProcessPendingSpawns(deltaTime);
+            }
+
+            // Process pending VFX deletions
+            if (pendingVFXDeletes.Count > 0)
+            {
+                ProcessPendingVFXDeletes(deltaTime);
             }
 
             // Don't spawn if the wall is not visible / active
@@ -148,7 +171,7 @@ namespace Game
             if (!tutorialover)
             {
                 // Complete tutorial if loveletter is destroyed
-                if (tutorialstate > 2 && 
+                if (tutorialstate > 2 &&
                    SceneFindEntityByName("botnet") == INVALID_ENTITY &&
                    SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
                    SceneFindEntityByName("loveletter") == INVALID_ENTITY)
@@ -210,6 +233,7 @@ namespace Game
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
             Unsubscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Unsubscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
 
             canSpawn = false;
             initialized = false;
@@ -217,6 +241,11 @@ namespace Game
             if (pendingSpawns != null)
             {
                 pendingSpawns.Clear();
+            }
+
+            if (pendingVFXDeletes != null)
+            {
+                pendingVFXDeletes.Clear();
             }
         }
 
@@ -229,12 +258,23 @@ namespace Game
             {
                 pendingSpawns.Clear();
             }
+
+            if (pendingVFXDeletes != null)
+            {
+                pendingVFXDeletes.Clear();
+            }
         }
 
         private void OnWallEnabled(string eventName, string payload)
         {
             LogMessage("[Level2Tutorial] Wall Enabled detected checking if wall is activated");
             active = GetVisible((uint)EntityID);
+        }
+
+        private void OnDebugTimer(string eventName, string payload)
+        {
+            spawnInterval = minInterval;
+            spawntimer = 0;
         }
 
         private void ProcessPendingSpawns(float deltaTime)
@@ -248,6 +288,21 @@ namespace Game
                 {
                     SpawnEnemy(spawn.prefabPath, spawn.position, spawn.rotation, spawn.enemyType);
                     pendingSpawns.RemoveAt(i);
+                }
+            }
+        }
+
+        private void ProcessPendingVFXDeletes(float deltaTime)
+        {
+            for (int i = pendingVFXDeletes.Count - 1; i >= 0; i--)
+            {
+                PendingVFXDelete vfx = pendingVFXDeletes[i];
+                vfx.timer -= deltaTime;
+
+                if (vfx.timer <= 0.0f)
+                {
+                    SceneDestroyEntity(vfx.entityID);
+                    pendingVFXDeletes.RemoveAt(i);
                 }
             }
         }
@@ -329,6 +384,12 @@ namespace Game
 
             SetPosition(VFXID, ref spawnPos);
             SetRotation(VFXID, ref spawnRot);
+
+            // Queue VFX for deletion after lifetime expires
+            PendingVFXDelete vfxDelete = new PendingVFXDelete();
+            vfxDelete.timer = VFX_LIFETIME;
+            vfxDelete.entityID = VFXID;
+            pendingVFXDeletes.Add(vfxDelete);
 
             // Queue enemy spawn with delay
             PendingSpawn pending = new PendingSpawn();
@@ -448,6 +509,15 @@ namespace Game
             else
             {
                 pendingSpawns.Clear();
+            }
+
+            if (pendingVFXDeletes == null)
+            {
+                pendingVFXDeletes = new List<PendingVFXDelete>();
+            }
+            else
+            {
+                pendingVFXDeletes.Clear();
             }
         }
 

@@ -38,6 +38,7 @@ namespace Game
         private bool initialized = false;
         private bool gameOver = false;
         private float remainingTime = 0.0f;
+        private bool debugtimer = false;
         private bool event2min = false;
         private bool event1min = false;
         private bool event10sec = false;
@@ -58,6 +59,7 @@ namespace Game
 
             // Initialize with starting time
             remainingTime = startingTime;
+            debugtimer = false;
             gameOver = false;
 
             // Display initial time
@@ -102,6 +104,7 @@ namespace Game
         private void OnDebugSetTimer(string eventName, string payload)
         {
             float.TryParse(payload, out float newTime);
+            debugtimer = true;
             remainingTime = newTime;
             timePassed = startingTime - remainingTime;
             LogMessage("[TimerUI3] Debug: timer set to " + newTime + " seconds");
@@ -148,14 +151,14 @@ namespace Game
 
         private void CheckTimeForEvent()
         {
-            if (remainingTime <= time2min && !event2min)
+            if (remainingTime <= time2min && !event2min && !debugtimer)
             {
                 Publish(EVENT_2MIN, "");
                 event2min = true;
                 return;
             }
 
-            if (remainingTime <= time1min && !event1min)
+            if (remainingTime <= time1min && !event1min && !debugtimer)
             {
                 Publish(EVENT_1MIN, "");
                 event1min = true;
