@@ -81,6 +81,10 @@ namespace Engine {
 				fs::path dbPath(m_cfg.databaseFile);
 				fs::create_directories(dbPath.parent_path());  // FROM CONFIG!
 			}
+
+			if(!m_cfg.compiledPath.empty()){
+				fs::create_directories(m_cfg.compiledPath);
+			}
 		}
 		catch (const std::exception& e) {
 			LOG_ERROR("Failed to create directories: ", e.what());
@@ -143,18 +147,6 @@ namespace Engine {
 			return;
 		}
 
-		// Content hash check - skip reprocessing if file bytes haven't changed.
-		// This prevents false Modified triggers caused by timestamp differences
-		// across machines (e.g. after a git pull).
-		std::string newHash = ComputeFileHash(src);
-		if (!newHash.empty() && newHash == rec->contentHash)
-		{
-			LOG_DEBUG("Asset unchanged (hash match), skipping: ", src);
-			return;
-		}
-		// Store the new hash for future comparisons
-		rec->contentHash = newHash;
-
 		//detect the resource type from file extension
 		rec->type = detectResourceTypeFromPath(src);
 		if (rec->type == ResourceType::UNKNOWN) {
@@ -166,9 +158,30 @@ namespace Engine {
 		//get the basic extension for metadata
 		rec->ext = AssetDatabase::ExtensionLower(src);
 
+		// Content hash check - skip reprocessing if file bytes haven't changed.
+		// This prevents false Modified triggers caused by timestamp differences
+		// across machines (e.g. after a git pull).
+		//However, this will fall thorough if the Info.txt is missing on the disk
+		//since Info.txt is in .gitignore
+		std::string newHash = ComputeFileHash(src);
+		if (!newHash.empty() && newHash == rec->contentHash)
+		{
+			std::string folderPath = m_descGen.GetDescriptorFolderPath(*rec);
+			std::string infoPath = folderPath + "Info.txt";
+			if(fs::exists(infoPath)){
+				LOG_DEBUG("Asset unchanged (hash match), skipping: ", src);
+				return;
+			}
+			LOG_DEBUG("Hash match but Info.txt missing, regenerating: ", src);
+			
+		}
+		// Store the new hash for future comparisons
+		rec->contentHash = newHash;
+
+
 		//get file timestamp
 		try {
-			if (fs::exists(src)) {
+			if(fs::exists(src)) {
 				auto ftime = fs::last_write_time(src);
 				auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
 					ftime - fs::file_time_type::clock::now() + std::chrono::system_clock::now());
@@ -394,6 +407,35 @@ namespace Engine {
 		LOG_INFO("  Modified: ", modifiedCount);
 		LOG_INFO("  Removed: ", removedCount);
 		LOG_INFO("  Total assets: ", m_db.Count());
+
+		// Info.txt recovery pass - Info.txt is in .gitignore so it won't survive
+		// a git pull even if the asset is otherwise unchanged. Walk all valid
+		// records and regenerate Info.txt for any that are missing on disk.
+		int infoRecoveredCount = 0;
+		for (AssetRecord* rec : m_db.AllMutable())
+		{
+			if (!rec || !rec->valid) continue;
+
+			std::string folderPath = m_descGen.GetDescriptorFolderPath(*rec);
+			std::string infoPath = folderPath + "Info.txt";
+
+			if (!fs::exists(infoPath))
+			{
+				DescriptorExtras extras;
+				extras.displayName = fs::path(rec->sourcePath).filename().string();
+				extras.category = resourceTypeToString(rec->type);
+				extras.lastImported = std::time(nullptr);
+
+				m_descGen.WriteInfoFilePublic(folderPath, *rec, &extras);
+				infoRecoveredCount++;
+				LOG_DEBUG("Recovered missing Info.txt for: ", rec->sourcePath);
+			}
+		}
+
+		if (infoRecoveredCount > 0)
+		{
+			LOG_INFO("  Recovered missing Info.txt files: ", infoRecoveredCount);
+		}
 
 		// Persist after a pass
 		if (!m_cfg.databaseFile.empty()) {
