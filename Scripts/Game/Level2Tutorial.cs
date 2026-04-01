@@ -71,6 +71,7 @@ namespace Game
         private const string EVENT_GAMEWIN = "GameWin";
         private const string EVENT_WALLENABLED = "WallEnabled";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
+        private const string EVENT_DEBUG_TIMER = "DebugSetTimer";
 
         // ======================  Wall Setting ==============================
         private float smallwall_width = 1000.0f;
@@ -104,6 +105,7 @@ namespace Game
             Subscribe(EVENT_GAMEOVER, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
             Subscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Subscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -210,6 +212,7 @@ namespace Game
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
             Unsubscribe(EVENT_WALLENABLED, OnWallEnabled);
+            Unsubscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
 
             canSpawn = false;
             initialized = false;
@@ -235,6 +238,12 @@ namespace Game
         {
             LogMessage("[Level2Tutorial] Wall Enabled detected checking if wall is activated");
             active = GetVisible((uint)EntityID);
+        }
+
+        private void OnDebugTimer(string eventName, string payload)
+        {
+            spawnInterval = minInterval;
+            spawntimer = 0;
         }
 
         private void ProcessPendingSpawns(float deltaTime)

@@ -61,6 +61,7 @@ namespace Engine
         public static void AudioSetVolume(uint entityID, float volume) => Audio_SetVolume(entityID, volume);
         public static float AudioGetVolume(uint entityID) => Audio_GetVolume(entityID);
         public static void AudioSetPitch(uint entityID, float pitch) => Audio_SetPitch(entityID, pitch);
+        public static void AudioSetMute(uint entityID, bool mute) => Audio_SetMute(entityID, mute);
 
         // ===== Instance API (keep whatever you already had) =====
         private uint ID => Entity.EntityID;

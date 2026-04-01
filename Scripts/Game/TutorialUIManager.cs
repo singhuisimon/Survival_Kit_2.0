@@ -72,7 +72,7 @@ namespace Game
         [SerializeField] private float fadeOutTime = 0.2f;
         private float fadeUpElapsed = 0.0f;
         [SerializeField] private float fadeUpTime = 1.0f;
-        [SerializeField] private float uiStartFadePos = 360.0f;
+        [SerializeField] private float uiStartFadePos = 260.0f;
         [SerializeField] private float switchTime = 0.5f;
         [SerializeField] private float sentrySummonFadeOutTime = 1.0f;
 
@@ -97,6 +97,7 @@ namespace Game
 
         private bool wallDestroyedPublished = false;
         private bool skipTutorial = false;
+        private string EVENT_TUTORIAL_SKIP = "SkipTutorial";
 
         public override void OnStart()
         {
@@ -117,6 +118,7 @@ namespace Game
             {
                 skipTutorial = true;
                 SpriteRenderer.SetIsVisible(pressWASDID, false);
+                Publish(EVENT_TUTORIAL_SKIP, "");
 
             } else
             {
@@ -306,7 +308,9 @@ namespace Game
             }
 
             // Press E to dismiss tooltip
-            if (IsKeyPressed(KeyCode.E)) ShowUI(pressShootID, false, dt);
+            //if (IsKeyPressed(KeyCode.E)) ShowUI(pressShootID, false, dt);
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+            if (EPressed) ShowUI(pressShootID, false, dt);
 
             // Fade up destroy turret UI
             if (fadeOutElapsed > switchTime) ShowUI(destroyTurretID, true, dt);
@@ -373,13 +377,16 @@ namespace Game
             //if (turretsDestroyed) ShowUI(destroyEnemiesID, false, dt);
 
             // fade out destroy enemies UIs and/or press E to dismiss tooltip
-            if (turretsDestroyed || IsKeyPressed(KeyCode.E)) ShowUI(destroyEnemiesID, false, dt);
+            //if (turretsDestroyed || IsKeyPressed(KeyCode.E)) ShowUI(destroyEnemiesID, false, dt);
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+            if (turretsDestroyed || EPressed) ShowUI(destroyEnemiesID, false, dt);
 
             // Ensure fading out effect are completed before moving on
             if (fadeOutElapsed > fadeOutTime) {
 
                 // Reset fade out elapsed time and set up for the next state
                 fadeOutElapsed = 0.0f;
+                EPressed = false;
                 currentState = TutorialState.Wait;
             }
         }
@@ -407,14 +414,24 @@ namespace Game
 
         private void HandleAltFire(float dt)
         {
+            // Press 'E' to dismiss tooltip
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
             //if (altUsed) ShowUI(altFireID, false, dt);
-            if (altUsed || IsKeyPressed(KeyCode.E)) ShowUI(altFireID, false, dt);
+            //if (altUsed || IsKeyPressed(KeyCode.E)) ShowUI(altFireID, false, dt);
+            if (altUsed || EPressed) ShowUI(altFireID, false, dt);
 
             // Ensure fading out effect are completed before moving on
-            if (fadeUpElapsed > fadeUpTime) {
+            //if (fadeUpElapsed > fadeUpTime) {
 
                 // Reset fade up elapsed time and set up for the next state
-                fadeUpElapsed = 0.0f;
+                //fadeUpElapsed = 0.0f;
+                //currentState = TutorialState.Wait;
+            //}
+
+            if (fadeOutElapsed > fadeOutTime)
+            {
+                fadeOutElapsed = 0.0f;
+                EPressed = false;
                 currentState = TutorialState.Wait;
             }
         }
@@ -422,21 +439,42 @@ namespace Game
         private void HandleCollectUpgradeModuleState(float dt)
         {
             //if (hasCollectedUpgrade)
-            if (hasCollectedUpgrade || IsKeyPressed(KeyCode.E))
+            // if (IsKeyPressed(KeyCode.E)) EPressed = true;
+            // if (hasCollectedUpgrade || EPressed )
+            // {
+            //     ShowCollectUpgradeUI(false, dt);
+
+            //     if (fadeOutElapsed > fadeOutTime)
+            //     {
+            //         fadeUpElapsed = 0.0f;
+            //         fadeOutElapsed = 0.0f;
+            //         EPressed = false;
+            //         hasCollectedUpgrade = false;
+            //         currentState = TutorialState.SummonSentry;
+            //     }
+            // }
+            // else
+            // {
+            //     ShowCollectUpgradeUI(true, dt);
+            // }
+
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+            if (hasCollectedUpgrade || EPressed)
             {
                 ShowCollectUpgradeUI(false, dt);
-
-                if (fadeOutElapsed > fadeOutTime)
-                {
-                    fadeUpElapsed = 0.0f;
-                    fadeOutElapsed = 0.0f;
-                    hasCollectedUpgrade = false;
-                    currentState = TutorialState.SummonSentry;
-                }
             }
             else
             {
-                ShowCollectUpgradeUI(true, dt);
+                ShowCollectUpgradeUI(true, dt);  // this was missing!
+            }
+
+            if (hasCollectedUpgrade && fadeOutElapsed > fadeOutTime)
+            {
+                fadeUpElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                EPressed = false;
+                hasCollectedUpgrade = false;
+                currentState = TutorialState.SummonSentry;
             }
         }
 
