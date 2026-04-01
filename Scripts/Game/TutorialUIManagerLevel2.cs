@@ -125,8 +125,9 @@ namespace Game
             // Check if skip tutorial
             if(ProgressTracker.SkipTutorialLevel2) {
 
-                // Update spawner and skip level
+                // Update spawner and skip tutorial
                 Publish(EVENT_SKIPTUTORIAL, true.ToString()); // Prevent tutorial enemies from spawning
+                Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
                 return; 
             } else {
                 // Update spawner and continue

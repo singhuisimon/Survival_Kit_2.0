@@ -73,6 +73,7 @@ namespace Game
         {
             // Check if skip tutorial
             if (ProgressTracker.SkipTutorialLevel3) {
+                Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
                 return;
             }
 
