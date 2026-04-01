@@ -5,6 +5,7 @@ using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Camera;
 using static Engine.Input;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -55,6 +56,7 @@ namespace Game
         private string EVENT_LOVELETTER_TUTORIAL_SPAWN = "LoveletterTutorialSpawn";
         private const string EVENT_GAMELOSE = "LoseScreenShow";
         private const string EVENT_GAMEWIN = "GameWin";
+        private const string EVENT_SKIPTUTORIAL = "SkipTutorial";
 
         // Fading
         private bool EPressed = false;
@@ -120,6 +122,19 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Check if skip tutorial
+            if(ProgressTracker.SkipTutorialLevel2) {
+
+                // Update spawner and skip tutorial
+                Publish(EVENT_SKIPTUTORIAL, true.ToString()); // Prevent tutorial enemies from spawning
+                Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
+                return; 
+            } else {
+                // Update spawner and continue
+                Publish(EVENT_SKIPTUTORIAL, false.ToString()); // Prevent tutorial enemies from spawning
+
+            }
+
             // Check for escape press state
             bool escapeJustPressed = IsEscapeJustPressed();
 
