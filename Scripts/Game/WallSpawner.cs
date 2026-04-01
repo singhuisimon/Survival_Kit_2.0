@@ -23,8 +23,8 @@ namespace Game
         [SerializeField] private int currentWormSpawned = 0;
         [SerializeField] private int currentLoveletterSpawned = 0;
         private float minInterval = 4.0f;
-        private float wormbotSpawnDist = 1.5f;
-        private float loveletterSpawnDist = 200.0f;
+        private float wormbotSpawnDist = 10.0f;//1.5f;
+        private float loveletterSpawnDist = 350.0f;///200.0f;
         private int enemiesSpawnPerWave = 5;
 
         // ================== VFX Delay Setting ============================
@@ -66,6 +66,8 @@ namespace Game
         private const string EVENT_GAMEWIN = "GameWin";
         private const string EVENT_WALLENABLED = "WallEnabled";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
+        private const string EVENT_DEBUG_TIMER = "DebugSetTimer";
+
 
         // ======================  Wall Setting ==============================
         private float smallwall_width = 1000.0f;
@@ -92,6 +94,7 @@ namespace Game
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
             Subscribe(EVENT_WALLENABLED, OnWallEnabled);
             Subscribe(EVENT_TUTORIALOVER, OnTutorialEnd);
+            Subscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -165,6 +168,7 @@ namespace Game
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
             Unsubscribe(EVENT_WALLENABLED, OnWallEnabled);
             Unsubscribe(EVENT_TUTORIALOVER, OnTutorialEnd);
+            Unsubscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
 
             canSpawn = false;
             initialized = false;
@@ -188,6 +192,12 @@ namespace Game
         {
             LogMessage("[WallSpawner] Wall detect that tutorial ended proceeding");
             tutorialOver = true;
+        }
+
+        private void OnDebugTimer(string eventName, string payload)
+        {
+            spawntimer = 0;
+            spawnInterval = minInterval;
         }
 
         private void ProcessPendingSpawns(float deltaTime)

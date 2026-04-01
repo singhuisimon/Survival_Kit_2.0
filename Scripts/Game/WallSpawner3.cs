@@ -64,6 +64,7 @@ namespace Game
         // ======================== EVENT ================================
         private const string EVENT_GAMEOVER = "GameOver";
         private const string EVENT_GAMEWIN = "GameWin";
+        private const string EVENT_DEBUG_SET_TIMER = "DebugSetTimer";
 
         // ======================  Wall Setting ==============================
         private float smallwall_width = 1000.0f;
@@ -86,6 +87,7 @@ namespace Game
 
             Subscribe(EVENT_GAMEOVER, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
+            Subscribe(EVENT_DEBUG_SET_TIMER, OnDebugTimer);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -143,6 +145,7 @@ namespace Game
         {
             Unsubscribe(EVENT_GAMEOVER, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+            Unsubscribe(EVENT_DEBUG_SET_TIMER, OnDebugTimer);
 
             canSpawn = false;
             initialized = false;
@@ -154,6 +157,12 @@ namespace Game
             LogMessage("[WallSpawner3] GameEnd detected disallowing spawning");
             canSpawn = false;
             pendingSpawns.Clear(); // Clear any pending spawns on game end
+        }
+
+        private void OnDebugTimer(string eventName, string payload)
+        {
+            spawntimer = 0.0f;
+            spawnInterval = minInterval;
         }
 
         private void ProcessPendingSpawns(float deltaTime)
