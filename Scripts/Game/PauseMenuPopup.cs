@@ -72,7 +72,7 @@ namespace Game
             "PlayerHealth", "PrimaryWeaponFrame", "PrimaryWeaponWindow",
             "SecondayWeaponUI", "AltFireIcon", "WeaponBarReload",
             "CoreHealthBarRefill", "CoreHealthBarFrame", "CoreHealthBarWindow",
-            "Crosshair", "Crosshair2"
+            "Crosshair", "Crosshair2","HealBar","DamageBarFill","timerUp","SentryWindow"
         };
 
         // Scene paths
@@ -82,7 +82,7 @@ namespace Game
 
         private const string EVENT_GAME_PAUSED = "GamePaused";
         private const string EVENT_GAME_RESUMED = "GameResumed";
-        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "Level2TutorialPauseMenu";
+        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "TutorialPauseMenu";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
 
         // Entity IDs

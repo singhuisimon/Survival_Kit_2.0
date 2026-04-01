@@ -39,7 +39,12 @@ namespace Game
         public override void OnFixedUpdate(float deltaTime)
         {
             if (!initialized)
+            {
+                // Start with hit marker hidden
+                SetIsVisible((uint)EntityID, false);
                 return;
+            }
+
 
             // TEST: Press H to manually toggle hit marker for testing
      /*       if (IsKeyPressed(KeyCode.H))

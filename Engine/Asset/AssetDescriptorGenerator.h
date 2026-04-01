@@ -136,6 +136,15 @@ namespace Engine {
 
 		/** @brief Set centralized output root */
 		void SetOutputRoot(const std::string& root);
+		
+		// Public wrapper so AssetManager can recover missing Info.txt files
+		// without triggering a full reprocess of the asset.
+		bool WriteInfoFilePublic(const std::string& folderPath,
+			const AssetRecord& rec,
+			const DescriptorExtras* extras) const
+		{
+			return WriteInfoFile(folderPath, rec, extras);
+		}
 
 		/**
 				 * @brief Generate Info.txt and Descriptor.txt for an asset

@@ -4,7 +4,9 @@ using static Engine.Logger;
 using static Engine.SpriteRenderer;
 using static Engine.Event;
 using static Engine.AudioManager;
+using static Engine.Transform;
 using static Engine.Prefab;
+using static Engine.Scene;
 
 namespace Game
 {
@@ -44,12 +46,18 @@ namespace Game
 
         // Button fade delay
         private bool pendingLoad = false;
-        private float showDelay = 2.0f;
+        private float showDelay = 0.5f; //changed from 2.0 to 0.5 --> TODO: CUT STRAIGHT TO BLACK SCREEN
         private float showDelayTimer = 0.0f;
 
         // Score & Time cached 
         private const string EVENT_SHOW_SCORE = "ShowFinalScore";
         private const string EVENT_SHOW_TIME  = "ShowTimeSurvived";
+
+        // BlackScreen
+        private const string blackscreenprefab  = "Sources/Prefabs/BlackScreen.prefab";
+
+        private float blackx = 640.0f;
+        private float blacky = 360.0f;
 
         public override void OnStart()
         {
@@ -150,6 +158,14 @@ namespace Game
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
 
+            uint blackscreenID = 0;
+            blackscreenID = PrefabInstantiate(blackscreenprefab);
+            if(blackscreenID != 0)
+            {
+                Vector3 spawnPosition = new Vector3(blackx, blacky, 0);
+                SetPosition(blackscreenID, ref spawnPosition);
+            }
+
             Publish(GAMEWIN, "");
 
             pendingLoad = true;
@@ -160,9 +176,9 @@ namespace Game
         {
             LogMessage("[WinScreen] Win! Timer finished!");
             StopGroup(AudioType.MASTER);
-            winVOPrefab = winLevel2VOPrefab;
-            countdownstart = true;
-            countdown = countdownlevel2;
+            //winVOPrefab = winLevel2VOPrefab;
+            //countdownstart = true;
+            //countdown = countdownlevel2;
             Input.SetCursorVisible(true);
 
             SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
@@ -170,6 +186,14 @@ namespace Game
             fadeElapsed = 0.0f;
             fadeDone = false;
             SetIsVisible((uint)EntityID, true);
+
+            uint blackscreenID = 0;
+            blackscreenID = PrefabInstantiate(blackscreenprefab);
+            if(blackscreenID != 0)
+            {
+                Vector3 spawnPosition = new Vector3(blackx, blacky, 0);
+                SetPosition(blackscreenID, ref spawnPosition);
+            }
 
             Publish(GAMEWIN, "");
 

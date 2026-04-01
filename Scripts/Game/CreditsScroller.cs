@@ -29,6 +29,11 @@ namespace Game
 
         private float fadeInElapsed    = 0.0f;
 
+        private float skipcountdown = 0.0f;
+        private const float skiptimer = 1.0f;
+
+        private bool skipped = false;
+
         public override void OnStart()
         {
             LogMessage("CreditScroller: Started");
@@ -60,6 +65,7 @@ namespace Game
             isFadingIn = true;
             fadeInElapsed = 0.0f;
             wasMousePressed = false;
+            skipped = false;
             LogMessage("[CreditsScroller] Initialised – scroll speed: " + scrollSpeed);
         }
 
@@ -69,13 +75,26 @@ namespace Game
             bool mouseJustPressed = mouseDown && !wasMousePressed;
             wasMousePressed       = mouseDown;
 
+            if (skipped)
+            {
+                skipcountdown -= deltaTime;
+                if(skipcountdown <= 0.0f)
+                {
+                    LoadMainMenu();
+                    skipped = true;
+                }
+            }
+
             // if skip button is press 
             if (mouseJustPressed
                 && SkipCreditButtonID != 0
-                && Collision2D.IsMouseCollidingWithEntity(SkipCreditButtonID))
+                && Collision2D.IsMouseCollidingWithEntity(SkipCreditButtonID) && !skipped)
             {
-                LogMessage("[CreditsScroller] Skip clicked – loading Main Menu");
-                LoadMainMenu();
+                LogMessage("[CreditsScroller] Skip clicked, skipping in 1sec");
+                //LoadMainMenu();
+                Audio.AudioPlay(SkipCreditButtonID);
+                skipped = true;
+                skipcountdown = skiptimer;
                 return;
             }
 

@@ -1,0 +1,71 @@
+{
+    "Prefab Name": "BlackScreen",
+    "Prefab GUID": 11774354004446790891,
+    "version": 1,
+    "entities": [
+        {
+            "Name": "BlackScreen",
+            "LocalID": 1,
+            "ParentLocalID": 0,
+            "components": [
+                {
+                    "type": 1,
+                    "typeName": "TransformComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "13100048363787666651",
+                            "Position": [
+                                640.0,
+                                360.0,
+                                0.0
+                            ],
+                            "Rotation": [
+                                0.0,
+                                -0.0,
+                                0.0
+                            ],
+                            "Scale": [
+                                640.0,
+                                360.0,
+                                1.0
+                            ],
+                            "Parent": 4294967295,
+                            "Children": []
+                        }
+                    }
+                },
+                {
+                    "type": 101,
+                    "typeName": "TagComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "15809579270569739477",
+                            "Name": "BlackScreen",
+                            "Tag": "BlackScreen"
+                        }
+                    }
+                },
+                {
+                    "type": 14,
+                    "typeName": "SpriteRendererComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "1974521215287575769",
+                            "Texture": "Blackscreen.png",
+                            "Color": [
+                                1.0,
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Quad": 3,
+                            "Sprite Layer": 5,
+                            "IsActive": true,
+                            "IsVisible": true
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: Enemy_Botnet.prefab",
-    "Prefab GUID": 12657789598961320161,
-    "version": 2,
+    "Prefab GUID": 6660894857024348341,
+    "version": 1,
     "entities": [
         {
             "Name": "botnet",
@@ -123,6 +123,75 @@
                     }
                 },
                 {
+                    "type": 5,
+                    "typeName": "ParticleComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "0",
+                            "Particle Type Advanced": "E004_botnet_v003.fbx",
+                            "Material Type": "VFX_Enemy_Worm_Aura1.mat",
+                            "Initial Velocity": [
+                                0.0,
+                                0.10000000149011612,
+                                0.0
+                            ],
+                            "Start Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Default Size": [
+                                0.009999999776482582,
+                                0.009999999776482582,
+                                0.009999999776482582
+                            ],
+                            "End Size": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Emission Box Size": [
+                                1.0,
+                                1.0,
+                                1.0
+                            ],
+                            "Color Min": [
+                                1.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Color Max": [
+                                1.0,
+                                0.30000001192092896,
+                                0.30000001192092896
+                            ],
+                            "Emitter Shape": 0,
+                            "Max Particles": 123,
+                            "Particle Type": 0,
+                            "Emission Rate": 5.199999809265137,
+                            "Particle Lifetime": 2.0999999046325684,
+                            "Emission Accumulator": 0.0,
+                            "Particle Size": 0.20000000298023224,
+                            "Grow Phase End": 0.20000000298023224,
+                            "Shrink Phase Start": 0.6000000238418579,
+                            "Emission Sphere Radius": 1.0,
+                            "Velocity Randomness": 0.5,
+                            "Lifetime Randomness": 0.20000000298023224,
+                            "Spread Angle": 175.5,
+                            "Min Speed": 0.3799999952316284,
+                            "Max Speed": 1.2899999618530271,
+                            "Rotation Speed": 360.0,
+                            "Play Delay": 0.0,
+                            "Delay Accumulator": 0.0,
+                            "Randomize Rotation": true,
+                            "Loop": true,
+                            "Active": true,
+                            "World Space": true,
+                            "Burst Mode": false
+                        }
+                    }
+                },
+                {
                     "type": 8,
                     "typeName": "ScriptComponent",
                     "data": {
@@ -130,7 +199,49 @@
                             "ComponentGUID": "11007352189747626285",
                             "ScriptClassName": "Game.Botnet",
                             "Started": false,
-                            "GCHandle": 0
+                            "GCHandle": 17595
+                        }
+                    }
+                },
+                {
+                    "type": 16,
+                    "typeName": "TrailComponent",
+                    "data": {
+                        "Properties": {
+                            "ComponentGUID": "2927613076038294541",
+                            "Material Type": "",
+                            "Max Segments": 126,
+                            "Segment Lifetime": 8.0,
+                            "Min Distance": 0.10000000149011612,
+                            "Sample Interval": 0.17000000178813934,
+                            "Sample Accumulator": 0.0,
+                            "Start Color": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                1.0
+                            ],
+                            "End Color": [
+                                1.0,
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Start Width": 2.809999942779541,
+                            "End Width": 0.10000000149011612,
+                            "Last Position": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Local Offset": [
+                                0.0,
+                                0.0,
+                                0.0
+                            ],
+                            "Has Last Position": false,
+                            "Active": true,
+                            "Emit Trail": true
                         }
                     }
                 }

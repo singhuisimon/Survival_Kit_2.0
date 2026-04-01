@@ -6,7 +6,7 @@
  * @date
  * 2025/11/09 (YYYY/MM/DD)
  * @brief
- * Implementation of a Jolt-backed, entity-addressed physics façade:
+ * Implementation of a Jolt-backed, entity-addressed physics faï¿½ade:
  * - Body lookup and activation
  * - Force/impulse/torque and velocity adjustments
  * - Damping, gravity factor, and CCD configuration
@@ -33,6 +33,9 @@
 #include <Jolt/Physics/Body/Body.h>
 #include <Jolt/Physics/Body/BodyLock.h>
 #include <Jolt/Physics/Body/MotionProperties.h>
+#include <Jolt/Physics/Collision/ShapeCast.h>
+#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
+#include <Jolt/Physics/Body/BodyFilter.h>
 
  // ECS components (for RigidbodyComponent)
 #include "ECS/Components.h"
@@ -142,7 +145,7 @@ namespace Engine
 	 * @param e
 	 * Entity handle.
 	 * @param impulse
-	 * Impulse in N·s.
+	 * Impulse in Nï¿½s.
 	 **************************************************************************/
 	void PhysicsAPI::AddImpulse(const Entity &e, const glm::vec3 &impulse)
 	{
@@ -158,7 +161,7 @@ namespace Engine
 	 * @param e
 	 * Entity handle.
 	 * @param torque
-	 * Torque in N·m.
+	 * Torque in Nï¿½m.
 	 **************************************************************************/
 	void PhysicsAPI::AddTorque(const Entity &e, const glm::vec3 &torque)
 	{
@@ -174,7 +177,7 @@ namespace Engine
 	 * @param e
 	 * Entity handle.
 	 * @param angularImpulse
-	 * Angular impulse in N·m·s.
+	 * Angular impulse in Nï¿½mï¿½s.
 	 **************************************************************************/
 	void PhysicsAPI::AddAngularImpulse(const Entity &e, const glm::vec3 &angularImpulse)
 	{
@@ -186,7 +189,7 @@ namespace Engine
 
 	/**************************************************************************
 	 * @brief
-	 * Adds a delta to the body’s linear velocity.
+	 * Adds a delta to the bodyï¿½s linear velocity.
 	 * @param e
 	 * Entity handle.
 	 * @param deltaVelocity
@@ -204,7 +207,7 @@ namespace Engine
 
 	/**************************************************************************
 	 * @brief
-	 * Adds a delta to the body’s angular velocity.
+	 * Adds a delta to the bodyï¿½s angular velocity.
 	 * @param e
 	 * Entity handle.
 	 * @param deltaOmega
@@ -437,12 +440,90 @@ namespace Engine
 
 	/**************************************************************************
 	 * @brief
-	 * Returns the current frame’s contact events without draining.
+	 * Returns the current frameï¿½s contact events without draining.
 	 * @return
 	 * Const reference to the per-frame events buffer.
 	 **************************************************************************/
 	const std::vector<ContactEvent> &PhysicsAPI::GetCollisionEvents()
 	{
 		return s_frame_contacts;
+	}
+
+	/**************************************************************************
+	 * @brief
+	 * Sweeps a sphere through the scene and returns the closest hit.
+	 * @param origin
+	 * World-space start position of the sphere centre.
+	 * @param direction
+	 * World-space cast direction (normalised internally).
+	 * @param radius
+	 * Radius of the sphere (metres, > 0).
+	 * @param maxDistance
+	 * Maximum cast length (metres).
+	 * @param outHit
+	 * Populated on success.
+	 * @return
+	 * True if any body was hit, false otherwise.
+	 **************************************************************************/
+	bool PhysicsAPI::SphereCast(const glm::vec3 &origin, const glm::vec3 &direction,
+	                             float radius, float maxDistance, SphereCastHit &outHit,
+	                             EntityID excludeEntity)
+	{
+		float lenSq = glm::dot(direction, direction);
+		if (lenSq < 1e-12f || radius <= 0.0f || maxDistance <= 0.0f)
+			return false;
+
+		// Build a temporary sphere shape
+		JPH::SphereShapeSettings sphereSettings(radius);
+		auto shapeResult = sphereSettings.Create();
+		if (shapeResult.HasError()) return false;
+		JPH::RefConst<JPH::Shape> sphere = shapeResult.Get();
+
+		// Start transform: identity rotation at origin
+		JPH::RMat44 startTransform = JPH::RMat44::sTranslation(ToJPHRVec3(origin));
+
+		// Displacement = normalised direction * maxDistance
+		glm::vec3 normDir = direction / std::sqrt(lenSq);
+		JPH::Vec3 displacement = ToJPHVec3(normDir * maxDistance);
+
+		JPH::RShapeCast shapeCast(sphere, JPH::Vec3::sReplicate(1.0f), startTransform, displacement);
+		JPH::ShapeCastSettings castSettings;
+		// Detect hits on both front and back faces of triangle meshes so that
+		// environment colliders with outward-facing normals are not skipped.
+		castSettings.SetBackFaceMode(JPH::EBackFaceMode::CollideWithBackFaces);
+
+		// Optionally exclude a single body (e.g. the player's own collider)
+		JPH::ClosestHitCollisionCollector<JPH::CastShapeCollector> collector;
+		auto it = (excludeEntity != entt::null) ? mBodyOf.find(excludeEntity) : mBodyOf.end();
+		if (it != mBodyOf.end())
+		{
+			JPH::IgnoreSingleBodyFilter bodyFilter(it->second);
+			mPhysics.GetNarrowPhaseQuery().CastShape(
+				shapeCast, castSettings, JPH::RVec3::sZero(), collector,
+				{}, {}, bodyFilter);
+		}
+		else
+		{
+			mPhysics.GetNarrowPhaseQuery().CastShape(
+				shapeCast, castSettings, JPH::RVec3::sZero(), collector);
+		}
+
+		if (!collector.HadHit()) return false;
+
+		const JPH::ShapeCastResult &hit = collector.mHit;
+
+		// -mPenetrationAxis.Normalized() = surface normal pointing toward the caster
+		JPH::Vec3 axis = hit.mPenetrationAxis;
+		float axisLen = axis.Length();
+		glm::vec3 normal = (axisLen > 1e-6f)
+			? ToGLM((-axis) / axisLen)
+			: glm::vec3(0.0f, 1.0f, 0.0f);
+
+		outHit.fraction = hit.mFraction;
+		outHit.point    = ToGLM(hit.mContactPointOn2);
+		outHit.normal   = normal;
+		outHit.entity   = BodyIDToEntityID(hit.mBodyID2);
+
+		return true;
 	}
 } // namespace Engine

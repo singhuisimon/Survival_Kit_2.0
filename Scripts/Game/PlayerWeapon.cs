@@ -140,6 +140,9 @@ namespace Game
         private string PrimaryUltChargedPrefab = "Sources/Prefabs/Audio_Primary_Ult_Recharged.prefab";
         private string AudioWeaponReloadName = "Audio_WeaponReload";
 
+        // Spawn input lock + fade-in
+        [SerializeField] private float spawnInputBlockDuration = 5.0f;
+        [SerializeField] private bool fadeInOnSpawn = true;
 
         #endregion
 
@@ -150,6 +153,7 @@ namespace Game
         private float elapsedTime = 0.0f;
 
         private float reloadFinishTime = 0.0f;
+        private float spawnInputUnlockTime = 0.0f;
         private Vector3 bulletDirection;
         private string EVENT_AMMO_CHANGE = "AmmoChange";
 
@@ -167,6 +171,13 @@ namespace Game
             gameEnd = false;
             primaryAmmo = primaryAmmoMax;
             primaryAltCharge = 0;
+            elapsedTime = 0.0f;
+
+            if (spawnInputBlockDuration < 0.0f)
+            {
+                spawnInputBlockDuration = 0.0f;
+            }
+            spawnInputUnlockTime = spawnInputBlockDuration;
 
             firingPointEntityID = SceneFindEntityByName(firingPointName);
             playerEntityID = SceneFindEntityByName(playerName);
@@ -191,6 +202,11 @@ namespace Game
                 lastPlayerPos = GetPosition(playerEntityID);
                 hasLastPlayerPos = true;
                 estimatedPlayerVelocity = Vector3.Zero;
+            }
+
+            if (fadeInOnSpawn)
+            {
+                MeshRenderer.SetOpacity(EntityID, 0.0f);
             }
 
             Subscribe(ULTGAINEVENT, UltCharging);
@@ -243,27 +259,19 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+            // Don't update when game is paused
+            if (GameState.IsPaused)
+                return;
 
             elapsedTime += deltaTime;
-            //primaryAltReady = true;
+
+            UpdateSpawnFade();
 
             if (gameEnd)
             {
                 LogMessage("[CamControl] player isnt allow to shoot as game ended!");
                 return;
             }
-
-            //Cheatcode
-            if (Input.IsKeyPressed(KeyCode.O))
-            {
-                PrimaryAltCharge_Reward();
-            }
-
-            // Don't update when game is paused
-            if (GameState.IsPaused)
-                return;
-
-            elapsedTime += deltaTime;//primaryAltReady = true;
 
             // Check if reload finished
             if (reloadingPrimary && elapsedTime >= reloadFinishTime)
@@ -274,9 +282,8 @@ namespace Game
                 //show reload ui banner
                 reloadingPrimary = false;
                 shootAllowed = true;
-                Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());  // ADD THIS
+                Publish(EVENT_AMMO_CHANGE, primaryAmmo.ToString());
                 Publish(EVENT_RELOAD_END, "");
-
 
                 LogMessage("[PlayerWeapon] Reload complete!");
             }
@@ -290,6 +297,12 @@ namespace Game
             // For muzzle flash VFX
             muzzleTimer -= deltaTime;
 
+            // Cheatcode
+            if (!IsSpawnInputBlocked() && Input.IsKeyPressed(KeyCode.O))
+            {
+                PrimaryAltCharge_Reward();
+            }
+
             //there is only primary and primary alt no secondary
             Primary_ReloadAndCharging();
             PrimaryShoot();
@@ -300,19 +313,51 @@ namespace Game
             //     uint botnet = PrefabInstantiate("Sources/Prefabs/Enemy_Botnet.prefab");
             //     LogMessage("Spawning botnet");
             // }
-
         }
 
         public override void OnDestroy()
         {
+            if (fadeInOnSpawn)
+            {
+                MeshRenderer.SetOpacity(EntityID, 1.0f);
+            }
+
             Unsubscribe(ULTGAINEVENT, UltCharging);
             Unsubscribe(GAMEWIN, OnGameStateChange);
             Unsubscribe(GAMEOVER, OnGameStateChange);
         }
 
+        private bool IsSpawnInputBlocked()
+        {
+            return elapsedTime < spawnInputUnlockTime;
+        }
+
+        private void UpdateSpawnFade()
+        {
+            if (!fadeInOnSpawn)
+                return;
+
+            if (spawnInputBlockDuration <= 0.0f)
+            {
+                MeshRenderer.SetOpacity(EntityID, 1.0f);
+                return;
+            }
+
+            float opacity = elapsedTime / spawnInputBlockDuration;
+
+            if (opacity < 0.0f)
+                opacity = 0.0f;
+            else if (opacity > 1.0f)
+                opacity = 1.0f;
+
+            MeshRenderer.SetOpacity(EntityID, opacity);
+        }
+
         private void PrimaryShoot()
         {
-            if (Input.IsMouseButtonPressed(MouseButton.Left) && primaryAmmo > 0)
+            bool inputBlocked = IsSpawnInputBlocked();
+
+            if (!inputBlocked && Input.IsMouseButtonPressed(MouseButton.Left) && primaryAmmo > 0)
             {
                 primaryShooting = true;
             }
@@ -326,7 +371,7 @@ namespace Game
                 PrimaryFire();
             }
 
-            if (Input.IsMouseButtonPressed(MouseButton.Right) && primaryAltReady)
+            if (!inputBlocked && Input.IsMouseButtonPressed(MouseButton.Right) && primaryAltReady)
             {
                 PrimaryAltFire();
             }
@@ -348,7 +393,21 @@ namespace Game
         #region PRIMARY
         private void Primary_ReloadingAndCharging()
         {
-            if ((Input.IsKeyPressed(KeyCode.R) && !primaryShooting) && !isKeyRPressedPreviously)
+            bool inputBlocked = IsSpawnInputBlocked();
+
+            if (inputBlocked)
+            {
+                // Block only spawn-time input.
+                // Clear the held/buffered reload state so a key held during spawn
+                // does not immediately trigger reload/charge when the lock ends.
+                isKeyRPressedPreviously = false;
+
+                if (!reloadingPrimary)
+                {
+                    primaryAltCharging = false;
+                }
+            }
+            else if ((Input.IsKeyPressed(KeyCode.R) && !primaryShooting) && !isKeyRPressedPreviously)
             {
                 isKeyRPressedPreviously = true;
                 chargeDelayNext = elapsedTime + chargeDelayRate;
@@ -371,12 +430,12 @@ namespace Game
                     //reload
                     PrimaryReload(primaryReloadDelay);
 
-
                     //play sound effects here
-                    if(reloadID != 0){
-                    LogMessage("[PlayerWeapon] Playing audio right now");
-                    AudioPlay(reloadID);
-                }
+                    if (reloadID != 0)
+                    {
+                        LogMessage("[PlayerWeapon] Playing audio right now");
+                        AudioPlay(reloadID);
+                    }
                 }
             }
             else
@@ -397,7 +456,8 @@ namespace Game
                 PrimaryReload(primaryReloadDelay);
 
                 //SFX
-                if(reloadID != 0){
+                if (reloadID != 0)
+                {
                     LogMessage("[PlayerWeapon] Playing audio right now");
                     AudioPlay(reloadID);
                 }
@@ -406,7 +466,8 @@ namespace Game
 
         private void UltCharging(string eventName, string payload)
         {
-            if (primaryAltReady || eventName != ULTGAINEVENT){
+            if (primaryAltReady || eventName != ULTGAINEVENT)
+            {
                 LogMessage("AltCharge is ready returning from charging");
                 return;
             }
@@ -423,7 +484,8 @@ namespace Game
             {
                 //play sfx -> notify player ult is ready
                 //spawn the prefab here
-                if(!primaryAltReady){
+                if (!primaryAltReady)
+                {
                     PrefabInstantiate(PrimaryUltChargedPrefab);
                     Publish("UltCharged", true.ToString());
                 }
@@ -464,7 +526,7 @@ namespace Game
                 }
 
                 // Reset muzzle timer and begin new cycle of muzzle flash
-                if(muzzleTimer < 0.0f)
+                if (muzzleTimer < 0.0f)
                 {
                     muzzleTimer = 0.1f;
                     tempMuzzleFlashID = muzzleFlashID;
@@ -473,8 +535,9 @@ namespace Game
                     isMuzzleFlash = false;
                 }
 
-                // Muzzle flash VFX 
-                if(muzzleFlashID == INVALID_ENTITY && isMuzzleFlash == false) {
+                // Muzzle flash VFX
+                if (muzzleFlashID == INVALID_ENTITY && isMuzzleFlash == false)
+                {
                     muzzleFlashID = PrefabInstantiate(muzzleFlashPrefabPath);
                     isMuzzleFlash = true;
                 }
@@ -517,7 +580,6 @@ namespace Game
             reloadFinishTime = elapsedTime + delay;
             Publish(EVENT_RELOAD_START, "");
 
-
             LogMessage("[PlayerWeapon] Reloading... will finish in " + delay + " seconds");
 
             primaryAltCharging = false;
@@ -552,7 +614,6 @@ namespace Game
             //reset the values here
             primaryAltCharge = 0;
             primaryAltReady = false;
-
 
             // Publish alt fire event for UI
             Publish(EVENT_ALT_FIRED, "");
@@ -672,7 +733,8 @@ namespace Game
             return vel;
         }
 
-        private string RandomizeAudioPath(){
+        private string RandomizeAudioPath()
+        {
             int randomint = RandInt(1, 8);
             string filepath = primarybulletbasepath + randomint.ToString() + ".wav";
             return filepath;

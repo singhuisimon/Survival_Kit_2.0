@@ -3,6 +3,8 @@ using Engine;
 using static Engine.Logger;
 using static Engine.Audio;
 using static Engine.Prefab;
+using static Engine.Scene;
+using System.Data;
 
 namespace Game
 {
@@ -23,6 +25,10 @@ namespace Game
         private const string EVENT_DESTRUCTABLEWALL_DESTROYED = "DestructableWallDestroyed";
         private const string EVENT_TRENCH_WALL_WARNING_TRIGGERED = "TrenchWallWarningTriggered";
         private const string EVENT_TRENCH_CORE_WARNING_TRIGGERED = "TrenchCoreWarningTriggered";
+        private const string EVENT_TRENCH_CORRUPT_CORE_WARNING_TRIGGERED = "TrenchCorruptCoreWarningTriggered";
+        private const string EVENT_TRENCH_MID_RUN_WARNING_TRIGGERED = "TrenchMidRunWarningTriggered";
+        private const string EVENT_TRENCH_ENEMYCORE_DESTROYED_TRIGGERED = "TutorialEnemyCoreDestroyedTriggered";
+        private const string EVENT_TRENCH_UPGRADEMOD_PICKED_TRIGGERED = "TutorialSentryModulePickedTriggered";
 
         // ===== State =====
         private bool initialized = false;
@@ -34,9 +40,13 @@ namespace Game
         private bool hasPlayedWallWarn = false;
         private bool hasPlayedEnemiesWarn = false;
         private bool hasPlayedCoreWarn = false;
+        private bool hasPlayedCorruptCoreWarn = false;
+        private bool hasPlayedMidTrenchWarn = false;
+        private bool hasPlayedEnemyCoreDestroyedWarn = false;
+        private bool hasPlayedUpgradeModPickupWarn = false;
 
         // ===== Timer =====
-        private float audiotimer = 7.0f;
+        private float audiotimer = 7.5f;
         [SerializeField] private float elapsedTime = 0.0f;
 
         // ===== Prefab =====
@@ -44,9 +54,20 @@ namespace Game
         private const string trenchwallwarnVOPrefab = "Sources/Prefabs/Audio_Trench_WallWarn.prefab";
         private const string trenchenemieswarnVOPrefab = "Sources/Prefabs/Audio_Trench_EnemiesWarn.prefab";
         private const string trenchenemycorewarnVOPrefab = "Sources/Prefabs/Audio_Trench_EnemyCoreWarn.prefab";
+        private const string trenchenemycorewarningVOPrefab = "Sources/Prefabs/Audio_VO_CorruptCore_Warning.prefab";
+        private const string trenchmidrunwarnVOPrefab = "Sources/Prefabs/Audio_VO_Mid_Trench.prefab";
+        private const string trenchenemycoredestroyedVOPrefab = "Sources/Prefabs/Audio_VO_Corrupted_Core_Destroyed.prefab";
+        private const string trenchupgrademodpickupVOPrefab = "Sources/Prefabs/Audio_VO_Upgrade_Module_Drop.prefab";
         
         // ==== Entity =====
         private uint activeVOID = 0;
+
+        private uint bgmID = 0;
+        private const string bgmName = "BGM";
+
+        private float bgmOGVol = 1.0f;
+
+        private const float bgmdivider = 0.5f;
 
 
         public override void OnStart()
@@ -59,6 +80,10 @@ namespace Game
             Event.Subscribe(EVENT_DESTRUCTABLEWALL_DESTROYED, OnWallDestroyed);
             Event.Subscribe(EVENT_TRENCH_WALL_WARNING_TRIGGERED, OnWallWarningTriggered);
             Event.Subscribe(EVENT_TRENCH_CORE_WARNING_TRIGGERED, OnCoreWarningTriggered);
+            Event.Subscribe(EVENT_TRENCH_CORRUPT_CORE_WARNING_TRIGGERED, OnCorruptCoreWarningTriggered);
+            Event.Subscribe(EVENT_TRENCH_MID_RUN_WARNING_TRIGGERED, OnMidTrenchWarningTriggered);
+            Event.Subscribe(EVENT_TRENCH_ENEMYCORE_DESTROYED_TRIGGERED, OnEnemyCoreDestroyedTriggered);
+            Event.Subscribe(EVENT_TRENCH_UPGRADEMOD_PICKED_TRIGGERED, OnUpgradeModPickupTriggered);
 
             //initialized = true;
             audiostarted = false;
@@ -67,8 +92,16 @@ namespace Game
 
             disabled = false;
 
+            bgmID = SceneFindEntityByName(bgmName);
+            if(bgmID != 0)
+            {
+                bgmOGVol = AudioGetVolume(bgmID);
+            }
+
             //Play trench guide the moment we load into the scene. (might need test this out)
-            //PlayTrenchGuide();
+            PlayTrenchGuide();
+
+            initialized = true;
 
             LogMessage("TrenchAudioVO initialized:");
         }
@@ -129,6 +162,10 @@ namespace Game
             Event.Unsubscribe(EVENT_DESTRUCTABLEWALL_DESTROYED, OnWallDestroyed);
             Event.Unsubscribe(EVENT_TRENCH_WALL_WARNING_TRIGGERED, OnWallWarningTriggered);
             Event.Unsubscribe(EVENT_TRENCH_CORE_WARNING_TRIGGERED, OnCoreWarningTriggered);
+            Event.Unsubscribe(EVENT_TRENCH_CORRUPT_CORE_WARNING_TRIGGERED, OnCorruptCoreWarningTriggered);
+            Event.Unsubscribe(EVENT_TRENCH_MID_RUN_WARNING_TRIGGERED, OnMidTrenchWarningTriggered);
+            Event.Unsubscribe(EVENT_TRENCH_ENEMYCORE_DESTROYED_TRIGGERED, OnEnemyCoreDestroyedTriggered);
+            Event.Unsubscribe(EVENT_TRENCH_UPGRADEMOD_PICKED_TRIGGERED, OnUpgradeModPickupTriggered);
 
             LogMessage("=== TrenchAudioVO Destroyed ===");
         }
@@ -155,6 +192,26 @@ namespace Game
             PlayCoreWarning();
         }
 
+        private void OnCorruptCoreWarningTriggered(string eventName, string payload)
+        {
+            PlayCorruptCoreWarning();
+        }
+
+        private void OnMidTrenchWarningTriggered(string eventName, string payload)
+        {
+            PlayMidTrenchWarning();
+        }
+
+        private void OnEnemyCoreDestroyedTriggered(string eventName, string payload)
+        {
+            PlayEnemyCoreDestroyed();
+        }
+
+        private void OnUpgradeModPickupTriggered(string eventName, string payload)
+        {
+            PlayUpgradeModPickup();
+        }
+
         private void PlayTrenchGuide(){
 
             if(disabled || hasPlayedSpawnGuide){
@@ -162,6 +219,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchguideVOPrefab);
             if(activeVOID == 0){
@@ -183,6 +241,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchwallwarnVOPrefab);
             if(activeVOID == 0){
@@ -204,6 +263,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchenemieswarnVOPrefab);
             if(activeVOID == 0){
@@ -225,6 +285,7 @@ namespace Game
             }
 
             ResetActiveAudio();
+            LowerBGMVol();
 
             activeVOID = PrefabInstantiate(trenchenemycorewarnVOPrefab);
             if(activeVOID == 0){
@@ -234,6 +295,82 @@ namespace Game
             audiostarted = true;
             elapsedTime = audiotimer;
             hasPlayedCoreWarn = true;
+        }
+
+        private void PlayCorruptCoreWarning(){
+
+            if(disabled || hasPlayedCorruptCoreWarn){
+                return;
+            }
+
+            ResetActiveAudio();
+            LowerBGMVol();
+
+            activeVOID = PrefabInstantiate(trenchenemycorewarningVOPrefab);
+            if(activeVOID == 0){
+                LogMessage("[TrenchAudioVO] Trench corrupt core warning audio failed to instantiate");
+                return;
+            }
+            audiostarted = true;
+            elapsedTime = audiotimer;
+            hasPlayedCorruptCoreWarn = true;
+        }
+
+        private void PlayMidTrenchWarning(){
+
+            if(disabled || hasPlayedMidTrenchWarn){
+                return;
+            }
+
+            ResetActiveAudio();
+            LowerBGMVol();
+
+            activeVOID = PrefabInstantiate(trenchmidrunwarnVOPrefab);
+            if(activeVOID == 0){
+                LogMessage("[TrenchAudioVO] Trench mid trench warning audio failed to instantiate");
+                return;
+            }
+            audiostarted = true;
+            elapsedTime = audiotimer;
+            hasPlayedMidTrenchWarn = true;
+        }
+
+        private void PlayEnemyCoreDestroyed(){
+
+            if(disabled || hasPlayedEnemyCoreDestroyedWarn){
+                return;
+            }
+
+            ResetActiveAudio();
+            LowerBGMVol();
+
+            activeVOID = PrefabInstantiate(trenchenemycoredestroyedVOPrefab);
+            if(activeVOID == 0){
+                LogMessage("[TrenchAudioVO] Trench enemy core destroyed audio failed to instantiate");
+                return;
+            }
+            audiostarted = true;
+            elapsedTime = audiotimer;
+            hasPlayedEnemyCoreDestroyedWarn = true;
+        }
+
+        private void PlayUpgradeModPickup(){
+
+            if(disabled || hasPlayedUpgradeModPickupWarn){
+                return;
+            }
+
+            ResetActiveAudio();
+            LowerBGMVol();
+
+            activeVOID = PrefabInstantiate(trenchupgrademodpickupVOPrefab);
+            if(activeVOID == 0){
+                LogMessage("[TrenchAudioVO] Trench upgrade mod pickup audio failed to instantiate");
+                return;
+            }
+            audiostarted = true;
+            elapsedTime = audiotimer;
+            hasPlayedUpgradeModPickupWarn = true;
         }
 
         private void ResetActiveAudio(){
@@ -252,6 +389,15 @@ namespace Game
             elapsedTime = 0.0f;
             audiostarted = false;
             isPaused = false;
+
+            //reset bgm back to og volume
+            AudioSetVolume(bgmID, bgmOGVol);
+        }
+
+        private void LowerBGMVol()
+        {
+            float newVol = bgmOGVol * bgmdivider;
+            AudioSetVolume(bgmID, newVol);
         }
     }
 }

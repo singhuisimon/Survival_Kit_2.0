@@ -64,6 +64,8 @@ namespace Engine {
         Input& GetInput() { return *m_Input; }
         const Input& GetInput() const { return *m_Input; }
 
+        void ToggleFullscreen();
+
     protected:
         /**
          * @brief Called once at startup
@@ -83,6 +85,8 @@ namespace Engine {
          * @details Override to cleanup your game-specific systems
          */
         virtual void OnShutdown() {}
+
+        
 
 
     protected:
@@ -113,6 +117,13 @@ namespace Engine {
 
         // Editor 
         Camera3D m_Editor_camera;
+
+        // to toggle full screen
+        bool m_IsFullscreen = false;
+        int m_WindowedWidth;
+        int m_WindowedHeight;
+        int m_WindowedX;
+        int m_WindowedY;
 
     };
 
