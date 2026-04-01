@@ -105,12 +105,15 @@ namespace Game
         private bool UIShown = false;
         private bool destroyEnemyShown = false;
 
-        /*private uint cameraID;
+        private uint cameraID;
         private float camFlySpeed = 100.0f;
         private Vector3 lastCamPos = Vector3.Zero;
         private bool camPosSaved = false;
         private bool returningCam = false;
-        [SerializeField] private string cameraName = "PlayerCam";*/
+        [SerializeField] private string cameraName = "PlayerCam";
+
+        private bool camMovedToWall = false;
+        private bool camReturned = false;
 
         public override void OnStart()
         {
@@ -125,7 +128,7 @@ namespace Game
             proceedID = SceneFindEntityByName(proceedName);
             collectUpgradeModuleID = SceneFindEntityByName(collectUpgradeModuleName);
             sentrySummonID = SceneFindEntityByName(sentrySummonName);
-
+            cameraID = SceneFindEntityByName(cameraName);
 
             if (ProgressTracker.SkipTutorialLevel1)
             {
@@ -322,11 +325,34 @@ namespace Game
         {
             altUsed = false;
 
+            // Teleport camera to wall view on first entry
+            if (!camPosSaved)
+            {
+                lastCamPos = Transform.GetPosition(cameraID);
+                
+                Vector3 camViewPos = wallPos;
+                camViewPos.X += 30.0f;   // stand back from wall along X
+                //camViewPos.Y += 30.0f;   // slightly above wall centre
+                //camViewPos.Z += 80.0f;   // pull back on Z (depth/out of screen)
+                Transform.SetPosition(cameraID, ref camViewPos);
+                
+                camPosSaved = true;
+                tooltipElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                
+                EPressed = false;
+                wallDestroyedPublished = false;
+            }
+
+            tooltipElapsed += dt;
+
             // Always show shoot UI until dismissed
             if (tooltipElapsed <= tooltipMinTime && !wallDestroyedPublished)
             {
                 ShowUI(pressShootID, true, dt);
                 pauseForTutorial = true;
+                return;
             }
 
             // Fade out shoot UI after destroying wall
@@ -353,11 +379,17 @@ namespace Game
             // Ensure all fading effects are completed before moving on
             if (wallDestroyedPublished && EPressed && (fadeOutElapsed > switchTime)) {
 
+                Transform.SetPosition(cameraID, ref lastCamPos);
+
                 // Reset all elapsed time, 'E' pressed state, and set up for next state
                 EPressed = false;
                 tooltipElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
+
+                camPosSaved = false;
+                camReturned = false;
+
                 currentState = TutorialState.DestroyTurret;
             }
 
@@ -732,53 +764,5 @@ namespace Game
             prevEscapePressed = pressed;
             return justPressed;
         }
-
-        // private bool FlyCamToTarget(float dt, uint targetID, float distToTarget)
-        // {
-        //     Vector3 camPos = Transform.GetPosition(cameraID);
-        //     Vector3 targetPos = Transform.GetPosition(targetID);
-        
-        //     SetTarget(cameraID, ref targetPos);
-        
-        //     Vector3 toTarget = targetPos - camPos;
-        //     float currentDist = toTarget.Magnitude;
-        
-        //     if (currentDist <= distToTarget) return true;
-        
-        //     Vector3 dirToTarget = toTarget / currentDist;
-        //     float moveStep = camFlySpeed * dt;
-        //     float allowedMove = currentDist - distToTarget;
-        //     float actualMove = SimpleMath.Min(moveStep, allowedMove);
-        
-        //     Vector3 newCamPos = camPos + dirToTarget * actualMove;
-        //     Transform.SetPosition(cameraID, ref newCamPos);
-        
-        //     return false;
-        // }
-
-        // private bool FlyCamBackToPlayer(float dt)
-        // {
-        //     Vector3 currCamPos = Transform.GetPosition(cameraID);
-        //     Vector3 toTarget = lastCamPos - currCamPos;
-        //     float currentDist = toTarget.Magnitude;
-        
-        //     float allowedMove = 1000.0f;
-        //     if (currentDist <= 1000.0f) {
-        //         allowedMove = 100.0f;
-        //         if (currentDist <= 50.0f) {
-        //             Transform.SetPosition(cameraID, ref lastCamPos);
-        //             return true;
-        //         }
-        //     }
-        
-        //     Vector3 dirToTarget = toTarget / currentDist;
-        //     float moveStep = camFlySpeed * dt;
-        //     float actualMove = SimpleMath.Min(moveStep, allowedMove);
-        
-        //     Vector3 newCamPos = currCamPos + dirToTarget * actualMove;
-        //     Transform.SetPosition(cameraID, ref newCamPos);
-        
-        //     return false;
-        // }
     }
 }
