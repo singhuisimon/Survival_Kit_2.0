@@ -209,7 +209,6 @@ namespace Engine
 		}
 		void ViewportClickAndTeleport();
 		bool GetEditorIsPlaying();
-		void ApplyUIScale(float scale);
 		// ================== Helper Function ======================
 		std::vector<AssetEntry> getAssetsInFolder(const std::string& folderPath);
 
@@ -219,6 +218,7 @@ namespace Engine
 		bool& GetPerformanceProfileWindowRef() { return m_PerformanceProfileWindow; }
 		bool& GetLoggerWindowRef() { return m_LoggerWindow; }
 		bool& GetAudioTrackerWindowRef() { return m_AudioTracker; }
+		
 	};
 }
 

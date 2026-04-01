@@ -64,6 +64,7 @@ namespace Engine
 
 		Entity FindPrefabRoot(Entity entity);
 		std::string SerializeEntityForRevert(Entity entity);
+		bool IsSubentitySelected(Entity& entity);
 
 		
 	};
