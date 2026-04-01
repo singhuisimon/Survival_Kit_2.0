@@ -2,21 +2,21 @@
 # guid|type|sourcePath|ext|contentHash|lastWriteTime|valid|descriptorModifiedTime|lastCompiledTime|needsRecompile
 # Version: 1.0
 
-231ce095ca284227|0|/Resources/Sources/Textures/Level2_Graphics_Card/lvl2redesign_level_design_v003_v001_Opacity.png|.png|3a422feddd4bd3cc|1774863505|1|0|0|0
 31ce095ca280009|6|/Resources/Sources/Scenes/EpilepsyWarning.json|.json|cfa5d1e4d6064d25|1774793456|1|0|0|0
+231ce095ca284227|0|/Resources/Sources/Textures/Level2_Graphics_Card/lvl2redesign_level_design_v003_v001_Opacity.png|.png|3a422feddd4bd3cc|1774863505|1|0|0|0
 a31ce095ca280069|6|/Resources/Sources/Scenes/trench_run _updated_ending_test.json|.json|cdb7c00491425d87|1774548154|1|0|0|0
+e31ce095ca2842e7|0|/Resources/Sources/Textures/PauseMenu_ButtonDefault_Hovered.png|.png|c5f78b2d3fbecffa|1774863505|1|0|0|0
 31ce095ca284425|0|/Resources/Sources/Textures/vfx/FireEmbers6.png|.png|fd2b9f0a9a69c176|1774863506|1|0|0|0
 3b1ce095ca280031|6|/Resources/Sources/Scenes/level2_player_old.json|.json|22ebfb19076747ca|1773150050|1|0|0|0
-e31ce095ca2842e7|0|/Resources/Sources/Textures/PauseMenu_ButtonDefault_Hovered.png|.png|c5f78b2d3fbecffa|1774863505|1|0|0|0
-c31ce095ca280049|6|/Resources/Sources/Scenes/MainGameScene.json|.json|38884f0997426298|1773150050|1|0|0|0
 2b1ce095ca2842df|0|/Resources/Sources/Textures/Paused_RestartButton_Hovered.png|.png|3afcb6ccd829d0a0|1774863505|1|0|0|0
+c31ce095ca280049|6|/Resources/Sources/Scenes/MainGameScene.json|.json|38884f0997426298|1773150050|1|0|0|0
 ab1ce095ca280021|6|/Resources/Sources/Scenes/Level1_test.json|.json|65f06b78ce75cd1f|1773150050|1|0|0|0
 6b1ce095ca2842ef|0|/Resources/Sources/Textures/PlayerHPBarRed.png|.png|06b896160b3a2985|1769939466|1|0|0|0
 9b1ce095ca2800c1|1|/Resources/Sources/Meshes/E005_loveletter_separated_v004.fbx|.fbx|43c483ff3b36bdab|1771441106|1|0|0|0
 f31ce095ca284485|0|/Resources/Sources/Textures/vfx/Glow11.png|.png|e6d5319a93874c69|1774863506|1|0|0|0
 5b1ce095ca280001|6|/Resources/Sources/Scenes/aaaaaaaaaaaaa.json|.json|418f3076501b49b3|1774804275|1|0|0|0
 ab1ce095ca2800b1|1|/Resources/Sources/Meshes/E001_worm_host_v004.fbx|.fbx|99491947907f8768|1771441106|1|0|0|0
-731ce095ca280029|6|/Resources/Sources/Scenes/level2_graphic_card.json|.json|97793789a81fcde4|1775054661|1|0|0|0
+731ce095ca280029|6|/Resources/Sources/Scenes/level2_graphic_card.json|.json|99831981e38d42be|1775055264|1|0|0|0
 131ce095ca284235|0|/Resources/Sources/Textures/level_Design_Grid_Texture.png|.png|27736d86d2c1df2e|1769939465|1|0|0|0
 b1ce095ca28009b|4|/Resources/Sources/Shaders/trails.frag|.frag|c566bff5d3d7a74e|1774863505|1|0|0|0
 3b1ce095ca28000b|6|/Resources/Sources/Scenes/FanTest.json|.json|80dca94f91a7221a|1774335052|1|0|0|0
@@ -121,7 +121,7 @@ a31ce095ca2842f9|0|/Resources/Sources/Textures/PlayerModel_Rainbow_v003_Emissive
 d31ce095ca280033|6|/Resources/Sources/Scenes/level2_sentries.json|.json|cf9491b334a2f1ec|1773150050|1|0|0|0
 3b1ce095ca28422d|0|/Resources/Sources/Textures/Level3Button_Selected.png|.png|21f40f52305ac260|1774863505|1|0|0|0
 2b1ce095ca280079|6|/Resources/Sources/Scenes/WinCutScene.json|.json|60ade8d52c0f5518|1774793456|1|0|0|0
-eb1ce095ca280039|6|/Resources/Sources/Scenes/level3_motherboard.json|.json|28425160e9fd37d9|1775054675|1|0|0|0
+eb1ce095ca280039|6|/Resources/Sources/Scenes/level3_motherboard.json|.json|447e21c5e7badd5b|1775055394|1|0|0|0
 d31ce095ca28449d|0|/Resources/Sources/Textures/vfx/GroundCrack3.png|.png|be0b47a80b1f1413|1774863506|1|0|0|0
 631ce095ca28422f|0|/Resources/Sources/Textures/LevelSelectionPopup_Level1.png|.png|b14daa8fabb5d83e|1774863505|1|0|0|0
 d31ce095ca280047|6|/Resources/Sources/Scenes/LX_VFX_TEST_1.json|.json|8d5cb829ae672d7b|1774793456|1|0|0|0
@@ -135,7 +135,7 @@ ab1ce095ca2800a9|1|/Resources/Sources/Meshes/A9005_gunship_v001.fbx|.fbx|ea95ced
 6b1ce095ca2842a7|0|/Resources/Sources/Textures/Non Destructable wall/Non destructible wall_v001_v001_Emissive.png|.png|627708a7ed545a93|1774863505|1|0|0|0
 db1ce095ca280059|6|/Resources/Sources/Scenes/Test.json|.json|c5ab1e1a79fbe7b8|1773150050|1|0|0|0
 d31ce095ca280091|4|/Resources/Sources/Shaders/shadow_depth.vert|.vert|82ddff3df786a01a|1769939465|1|0|0|0
-cb1ce095ca28006b|6|/Resources/Sources/Scenes/trench_run.json|.json|f144727eb8de69e1|1775053179|1|0|0|0
+cb1ce095ca28006b|6|/Resources/Sources/Scenes/trench_run.json|.json|aedbec5ac3b1ce6a|1775055315|1|0|0|0
 131ce095ca280093|4|/Resources/Sources/Shaders/skybox.frag|.frag|2366f93af9396d0f|1770012931|1|0|0|0
 cb1ce095ca28423d|0|/Resources/Sources/Textures/lvl1_level_design_v004_BaseColor.png|.png|a2e029082697c815|1771441106|1|0|0|0
 d31ce095ca288649|11|/Resources/Sources/Audio/Audio VO placeholder.mp4|.mp4|22fba78fdbbf0af0|0|0|0|0|0
