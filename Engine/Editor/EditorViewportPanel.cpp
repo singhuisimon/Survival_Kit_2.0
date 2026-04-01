@@ -1,6 +1,8 @@
 #include "EditorViewportPanel.h"
 #include "Editor.h"
 #include "../Scripting/MonoScriptEngine.h"
+#include "../Transform/TransformSystem.h"
+#include "../Prefab/PrefabHelpers.h"
 #include <algorithm>
 #include <ImGuizmo.h>
 #include <glm/gtc/matrix_inverse.hpp>
@@ -231,6 +233,7 @@ namespace Engine
         //if (m_PlayState != PlayState::STOP) return;
         Entity m_SelectedEntity = m_Editor->GetSelectedEntity();
         u32 m_PickedID = m_Editor->GetPickedID();
+        
         Scene* m_ActiveScene = m_Editor->GetActiveScene();
         static Entity doubleClickCandidate;
         static uint32_t doubleClickCandidateID = 0xFFFFFFFFu;
@@ -263,6 +266,7 @@ namespace Engine
                         Entity newEntity = Entity{ (entt::entity)m_PickedID, &m_ActiveScene->GetRegistry() };
                         m_SelectedEntity = newEntity;
                         m_Editor->SetCurrSelectedEntity(m_SelectedEntity);
+                        m_Editor->RetrievePickedID(m_PickedID);
                         //m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
 
                         doubleClickCandidate = newEntity;
@@ -300,6 +304,53 @@ namespace Engine
             ImGui::Separator();
             if (ImGui::MenuItem("Disable", "Q"))
                 m_Operation = static_cast<ImGuizmo::OPERATION>(-1);
+
+            if (ImGui::MenuItem("Delete", "Del"))
+            {
+                Entity selectedEntity = m_Editor->GetSelectedEntity();
+                Scene* activeScene = m_Editor->GetActiveScene();
+
+                if (selectedEntity && activeScene)
+                {
+                    auto& registry = activeScene->GetRegistry();
+
+                    // Remove from parent's children list if it has a parent
+                    if (selectedEntity.HasComponent<TransformComponent>())
+                    {
+                        auto& transform = selectedEntity.GetComponent<TransformComponent>();
+
+                        if (transform.Parent != u32_max)
+                        {
+                            Entity parentEntity(static_cast<entt::entity>(transform.Parent), &registry);
+                            if (registry.valid(parentEntity.GetHandle()))
+                            {
+                                TransformSystem::UnParent(activeScene, selectedEntity);
+                            }
+                        }
+
+                        // Delete children recursively
+                        std::vector<uint32_t> childrenCopy = transform.Children;
+                        for (uint32_t childID : childrenCopy)
+                        {
+                            Entity childEntity(static_cast<entt::entity>(childID), &registry);
+                            if (registry.valid(childEntity.GetHandle()))
+                            {
+                                PrefabHelpers::CleanupEntityForDeletion(childEntity, activeScene);
+                                activeScene->DestroyEntity(childEntity);
+                            }
+                        }
+                    }
+
+                    PrefabHelpers::CleanupEntityForDeletion(selectedEntity, activeScene);
+                    activeScene->DestroyEntity(selectedEntity);
+
+                    // Clear selection
+                    m_Editor->SetCurrSelectedEntity(Entity{});
+                    m_Editor->RetrievePickedID(0xFFFFFFFFu);
+
+                    LOG_DEBUG("[VIEWPORT] Deleted entity via Delete key");
+                }
+            }
             ImGui::EndPopup();
         }
 
@@ -344,8 +395,16 @@ namespace Engine
         TransformComponent& targetTransform = m_SelectedEntity.GetComponent<TransformComponent>();
         Camera3D& editorCam = m_Renderer->getEditorCamera();
 
-        glm::vec3 entityPos = targetTransform.Position;
-        glm::quat entityRotation = targetTransform.Rotation; // Quaternion
+        //glm::vec3 entityPos = targetTransform.Position;
+        //glm::quat entityRotation = targetTransform.Rotation; // Quaternion
+
+        glm::vec3 entityPos = glm::vec3(targetTransform.WorldTransform[3]);
+
+        glm::mat3 rotationMatrix;
+        rotationMatrix[0] = glm::normalize(glm::vec3(targetTransform.WorldTransform[0]));
+        rotationMatrix[1] = glm::normalize(glm::vec3(targetTransform.WorldTransform[1]));
+        rotationMatrix[2] = glm::normalize(glm::vec3(targetTransform.WorldTransform[2]));
+        glm::quat entityRotation = glm::quat_cast(rotationMatrix);
 
         // Calculate offset distance based on entity size
         float offsetDistance = 5.0f;

@@ -52,7 +52,7 @@ namespace Game
         [SerializeField] private float stopDistanceFromSurface = 0.0f;
 
         // ===== MOVEMENT SETTING =====
-        [SerializeField] private float moveSpeed = 500.0f;
+        [SerializeField] private float moveSpeed = 1000.0f; //adjust speed of loveletter from 500 to 1000
         [SerializeField] private float startDelay = 2.0f;
         // [EDIT 2] Commented out - wait timer replaced by collision detection to trigger OnReachedCore
         //[SerializeField] private float waitTimeAtSurface = 3.0f;
@@ -569,11 +569,12 @@ namespace Game
         {
             if (isDead)
                 return;
+
             isDead = true;
             isMoving = false;
             // [EDIT 10] Commented out - isWaitingAtSurface field removed (see EDIT 3)
             //isWaitingAtSurface = false;
-
+            Publish("LoveLetterDestroyed", loveletterEntityID.ToString());
             if (labelEntityID != 0)              // <-- add this
             {
                 SceneDestroyEntity(labelEntityID);
