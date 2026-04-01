@@ -176,6 +176,8 @@ namespace Game
             if (pauseForTutorial && playerPauseOnTutorial) {
                 if (escapeJustPressed)
                     playerPauseOnTutorial = false;
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                 return;
             }
 
@@ -183,7 +185,11 @@ namespace Game
                 GameState.IsPaused = true;
                 if (escapeJustPressed) {
                     playerPauseOnTutorial = true;
+                    Publish("TutorialPauseAudio", false.ToString());
                     return;
+                } else {
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                 }
             }
 
