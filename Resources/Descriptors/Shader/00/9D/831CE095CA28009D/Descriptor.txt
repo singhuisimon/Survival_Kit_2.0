@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Shaders/trails.vert",
+  "shaderSettings": {
+    "outputFormat": "GLSL",
+    "targetAPI": "OPENGL",
+    "targetVersion": "460",
+    "optimizationLevel": "PERFORMANCE",
+    "stripDebugInfo": true
+  }
+}
