@@ -23,8 +23,8 @@
                         ],
                         "Rotation": [
                             0.04088059440255165,
-                            -0.029375173151493073,
-                            1.503517449430447e-11
+                            -0.02937515266239643,
+                            1.747784035555089e-11
                         ],
                         "Scale": [
                             5.0,
@@ -8983,8 +8983,8 @@
                         ],
                         "Rotation": [
                             0.04088059440255165,
-                            -0.029375173151493073,
-                            1.503517449430447e-11
+                            -0.02937515266239643,
+                            1.747784035555089e-11
                         ],
                         "Scale": [
                             1.0,
@@ -15836,6 +15836,68 @@
                         "Sprite Layer": 4,
                         "IsActive": true,
                         "IsVisible": false
+                    }
+                }
+            ]
+        },
+        {
+            "ID": 161,
+            "Components": [
+                {
+                    "Type": "TagComponent",
+                    "Properties": {
+                        "Name": "BGM_Audio",
+                        "Tag": "BGM"
+                    }
+                },
+                {
+                    "Type": "TransformComponent",
+                    "Properties": {
+                        "ComponentGUID": "2617163774055532253",
+                        "Position": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Rotation": [
+                            0.0,
+                            -0.0,
+                            0.0
+                        ],
+                        "Scale": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Parent": 4294967295,
+                        "Children": []
+                    }
+                },
+                {
+                    "Type": "AudioComponent",
+                    "Properties": {
+                        "ComponentGUID": "11264075058607032031",
+                        "FilePath": "Trench Run BGM.wav",
+                        "Type": 5,
+                        "State": 2,
+                        "Volume": 0.14900000393390656,
+                        "Pitch": 1.0,
+                        "Loop": true,
+                        "Mute": false,
+                        "ReverbProperties": 1.0,
+                        "Is3D": false,
+                        "MinDistance": 1.0,
+                        "MaxDistance": 100.0,
+                        "RolloffMode": 0,
+                        "DopplerLevel": 1.0,
+                        "Pan2D": 0.0
+                    }
+                },
+                {
+                    "Type": "ScriptComponent",
+                    "Properties": {
+                        "ComponentGUID": "12993457315517679329",
+                        "ScriptClassName": "Game.AudioPause"
                     }
                 }
             ]
