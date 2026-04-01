@@ -135,7 +135,8 @@ namespace Game
                 normalizedTag == "enemy_keylogger" ||
                 normalizedTag == "wormhost" ||
                 normalizedTag == "enemyturret" ||
-                normalizedTag == "destructablewall";
+                normalizedTag == "destructablewall" ||;
+                normalizedTag == "keylogger_trenchend"
 
             if (givesUlt)
             {
