@@ -72,6 +72,14 @@ namespace Game {
 
         private void OnTargetHit(uint targetEntityID)
         {
+            string targetTag = TagGetTag(targetEntityID);
+            if (targetTag == "ENVIRONMENT_LevelDesign" ||
+                targetTag == "IndestructibleWall" ||
+                targetTag == "DecorIndestructibleWall" ||
+                targetTag == "obstacle_wall_indestructable")
+            {
+                return;
+            }
             // Deal AOE damage using DamageSystem
             DamageSystem.DealDamage(targetEntityID, aoeDamage, (uint)EntityID);
 

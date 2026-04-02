@@ -98,7 +98,7 @@ namespace Game
                 }
             }
 
-            if(isPaused && audiostarted && !GameState.IsPaused){
+            if(isPaused && audiostarted/* && !GameState.IsPaused*/){
                 AudioPlay((uint)EntityID);
                 LogMessage("[AudioPause] Resuming audio after unpause");
                 isPaused = false;

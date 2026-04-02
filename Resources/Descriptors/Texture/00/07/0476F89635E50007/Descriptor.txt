@@ -1,0 +1,10 @@
+{
+  "sourcePath": "/Resources/Sources/Textures/core pad_v002_v002_Metallic.png",
+  "textureSettings": {
+    "usageType": "COLOR",
+    "compression": "BC7",
+    "quality": 0.8,
+    "generateMipmaps": true,
+    "srgb": true
+  }
+}

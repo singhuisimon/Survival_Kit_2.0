@@ -5,6 +5,7 @@ using static Engine.Event;
 using static Engine.Logger;
 using static Engine.Camera;
 using static Engine.Input;
+using static Engine.ProgressTracker;
 
 namespace Game
 {
@@ -70,6 +71,7 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
+
             // Check for escape press state
             bool escapeJustPressed = IsEscapeJustPressed();
 
