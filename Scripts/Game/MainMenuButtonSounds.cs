@@ -53,7 +53,29 @@ namespace Game
             "GammaDefault",
             "MousePlus",
             "MouseMinus",
-            "MouseDefault"
+            "MouseDefault",
+            // HowToPlay popup buttons
+            "HowToPlayGeneralTabButton",
+            "HowToPlayMovementTabButton",
+            "HowToPlayCombatTabButton",
+            "HowToPlayEnemiesTabButton",
+            "HowToPlayGeneralTabButtonSelected",
+            "HowToPlayMovementTabButtonSelected",
+            "HowToPlayCombatTabButtonSelected",
+            "HowToPlayEnemiesTabButtonSelected",
+            "HowToPlayCrossButton",
+            // Level select buttons
+            "Level1_Button",
+            "Level2_Button",
+            "Level3_Button",
+            "Level1_Button_Selected",
+            "Level2_Button_Selected",
+            "Level3_Button_Selected",
+            // Skip tutorial toggles
+            "SkipTutorial1",
+            "SkipTutorial1Ticked",
+            "SkipTutorial2",
+            "SkipTutorial2Ticked"
         };
 
         // Audio entity IDs
