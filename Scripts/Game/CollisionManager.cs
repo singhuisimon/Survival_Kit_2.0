@@ -39,6 +39,7 @@ namespace Game
             CORE,
             CORE_BARRIER,
             ENVIRONMENT,
+             ENVIRONMENT_INDESTRUCTIBLE,
             PAYLOAD,
             UNKNOWN
         }
@@ -98,7 +99,7 @@ namespace Game
             { "trench_vo_mid_run_trigger", CollisionCategory.ENVIRONMENT },
             { "trench_vo_core_trigger", CollisionCategory.ENVIRONMENT },
             { "decorindestructiblewall", CollisionCategory.ENVIRONMENT },
-            { "environment_leveldesign", CollisionCategory.ENVIRONMENT },
+            { "environment_leveldesign", CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE },
             { "indestructiblewall", CollisionCategory.ENVIRONMENT },
 
             // Payload
@@ -152,7 +153,7 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             // Player projectiles can hit:
             new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENEMY),
             new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENVIRONMENT),
-            
+            new CollisionRule(CollisionCategory.PLAYER_PROJECTILE, CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE),         
             // Enemy projectiles can hit:
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.PLAYER),
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.ALLY),
@@ -164,6 +165,7 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             
             // Player can hit:
             new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.ENVIRONMENT),
+            new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE),
             new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.ENEMY),
             new CollisionRule(CollisionCategory.PLAYER, CollisionCategory.PAYLOAD),
             
@@ -278,7 +280,10 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             // PROJECTILE HITS
             if (catA == CollisionCategory.PLAYER_PROJECTILE)
             {
-                RecordHit(playerProjectileHits, entityA, entityB);
+                if (catB != CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE)
+                {
+                    RecordHit(playerProjectileHits, entityA, entityB);
+                }
                 //record valid collision for hitmarker
                 string targetTagB = TagGetTag(entityB).ToLower();
                 if (catB == CollisionCategory.ENEMY ||
@@ -288,7 +293,10 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             }
             else if (catB == CollisionCategory.PLAYER_PROJECTILE)
             {
-                RecordHit(playerProjectileHits, entityB, entityA);
+                if (catA != CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE)
+                {
+                    RecordHit(playerProjectileHits, entityB, entityA);
+                }
                 //record valid collision for hitmarker
                 string targetTagA = TagGetTag(entityA).ToLower();
                 if (catA == CollisionCategory.ENEMY ||
@@ -390,6 +398,16 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             else if (catB == CollisionCategory.ENVIRONMENT)
             {
                 // entityA hit environment entityB
+                RecordHit(environmentCollisions, entityA, entityB);
+                RecordHit(environmentHitBy, entityB, entityA);
+            }
+            if (catA == CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE)
+            {
+                RecordHit(environmentCollisions, entityB, entityA);
+                RecordHit(environmentHitBy, entityA, entityB);
+            }
+            else if (catB == CollisionCategory.ENVIRONMENT_INDESTRUCTIBLE)
+            {
                 RecordHit(environmentCollisions, entityA, entityB);
                 RecordHit(environmentHitBy, entityB, entityA);
             }
