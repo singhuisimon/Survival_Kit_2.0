@@ -94,10 +94,10 @@ namespace Game
 
         // ========================= TUTORIAL SETTING ======================
         [SerializeField] private bool tutorialover = false;
-        private bool isSkipTutorial = true;
+        private bool isSkipTutorial = false;
         private int tutorialstate = 0;
         private float tutorialSpawnInterval = 0.0f;
-        [SerializeField] private float tutorialCountdown = 0.0f;
+        [SerializeField] private float tutorialCountdown = 1.0f;
         private const uint INVALID_ENTITY = 0xffffffffu;
 
         // ============== RNG Setting =================
@@ -192,6 +192,7 @@ namespace Game
                 //    tutorialCountdown -= deltaTime;
                 //}
 
+                tutorialCountdown -= deltaTime;
                 // Spawn enemy
                 if (tutorialCountdown <= 0.0f)
                 {

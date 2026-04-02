@@ -71,11 +71,6 @@ namespace Game
 
         public override void OnUpdate(float deltaTime)
         {
-            // Check if skip tutorial
-            if (ProgressTracker.SkipTutorialLevel3) {
-                Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
-                return;
-            }
 
             // Check for escape press state
             bool escapeJustPressed = IsEscapeJustPressed();
