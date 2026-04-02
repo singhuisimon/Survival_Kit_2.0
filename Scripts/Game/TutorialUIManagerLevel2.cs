@@ -114,6 +114,7 @@ namespace Game
             Subscribe(EVENT_BOTNET_TUTORIAL_SPAWN, OnBotnetSpawn); 
             Subscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn); 
             Subscribe(EVENT_LOVELETTER_TUTORIAL_SPAWN, OnLoveletterSpawn);
+            Subscribe("GameResumed", OnGameResumed);
 
             // Start the game paused for tutorial
             pauseForTutorial = true;
@@ -274,6 +275,7 @@ namespace Game
             Unsubscribe(EVENT_BOTNET_TUTORIAL_SPAWN, OnBotnetSpawn);
             Unsubscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn); 
             Unsubscribe(EVENT_LOVELETTER_TUTORIAL_SPAWN, OnLoveletterSpawn);
+            Unsubscribe("GameResumed", OnGameResumed);
         }
 
         private bool FlyCamToTarget(float dt, uint targetID, float distToTarget) 
@@ -621,6 +623,12 @@ namespace Game
                 string message = "[TutorialUIManagerLevel2] Loveletter ID for tutorial retrieved: " + tutorialLoveletterID.ToString();
                 LogMessage(message);
             }
+        }
+
+        private void OnGameResumed(string eventName, string payload)
+        {
+            // Reset flag when pause menu is closed via Resume button
+            playerPauseOnTutorial = false;
         }
     }
 }

@@ -161,6 +161,7 @@ namespace Game
             Subscribe(EVENT_CORE_DEAD, OnCoreDeath);
             Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
             Subscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
+            Subscribe("GameResumed", OnGameResumed);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -174,12 +175,15 @@ namespace Game
             bool escapeJustPressed = IsEscapeJustPressed();
 
             if (pauseForTutorial && playerPauseOnTutorial) {
-                if (escapeJustPressed)
+                if (escapeJustPressed) {
                     playerPauseOnTutorial = false;
                     Publish("TutorialPauseAudio", pauseForTutorial.ToString());
                     Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                }
                 return;
             }
+
+            bool wasPausedForTutorial = pauseForTutorial;
 
             if (pauseForTutorial) {
                 GameState.IsPaused = true;
@@ -236,6 +240,12 @@ namespace Game
                 default:
                     break;
             }
+
+            // Notify PauseMenuPopup when tutorial pause ends so it can fully resume
+            if (wasPausedForTutorial && !pauseForTutorial) {
+                Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+            }
         }
 
         public override void OnDestroy()
@@ -247,6 +257,7 @@ namespace Game
             Unsubscribe(EVENT_CORE_DEAD, OnCoreDeath);
             Unsubscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
             Unsubscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
+            Unsubscribe("GameResumed", OnGameResumed);
         }
 
         private void HandleMoveState(Vector3 currentPos, float dt)
@@ -714,6 +725,12 @@ namespace Game
             hasSummonedSentry = true;
             fadeUpElapsed = 0.0f;
             fadeOutElapsed = 0.0f;
+        }
+
+        private void OnGameResumed(string eventName, string payload)
+        {
+            // Reset flag when pause menu is closed via Resume button
+            playerPauseOnTutorial = false;
         }
 
         private void ShowCollectUpgradeUI(bool value, float dt)

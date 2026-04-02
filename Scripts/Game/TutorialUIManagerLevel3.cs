@@ -63,6 +63,7 @@ namespace Game
             // Subscribe to the events
             Subscribe(EVENT_GAMELOSE, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
+            Subscribe("GameResumed", OnGameResumed);
 
             // Start the game paused for tutorial
             pauseForTutorial = true;
@@ -143,6 +144,7 @@ namespace Game
         {
             Unsubscribe(EVENT_GAMELOSE, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+            Unsubscribe("GameResumed", OnGameResumed);
         }
 
         private void HandleInstructionState(float dt)
@@ -220,6 +222,12 @@ namespace Game
         {
             SpriteRenderer.SetIsVisible(crosshairID, value);
             SpriteRenderer.SetIsVisible(crosshair2ID, value);
+        }
+
+        private void OnGameResumed(string eventName, string payload)
+        {
+            // Reset flag when pause menu is closed via Resume button
+            playerPauseOnTutorial = false;
         }
 
         private void OnGameEnd(string eventName, string payload){
