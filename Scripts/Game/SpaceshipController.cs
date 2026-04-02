@@ -82,6 +82,8 @@ namespace Game
         private const string EVENT_LOVELETTER_DEAD = "LoveLetterKilled";
         private const string EVENT_BOTNET_DEAD = "BotnetDeath";
         private const string EVENT_KEYLOGGER_DEAD = "KeyloggerDeath";
+        private const string EVENT_CINEMATIC_PLAY = "PlayCinematic";
+        private const string EVENT_CINEMATIC_STOP = "StopCinematic";
 
         private const float VAMPIRISM_WORMHOST = 2.0f;
         private const float VAMPIRISM_LOVELETTER = 2.0f;
@@ -102,6 +104,7 @@ namespace Game
 
         private float controlLockTimer = 0.0f;
         private bool controlsEnabled = false;
+        private bool cinematicEnabled = false;
         private bool restoreCameraRotationAfterSpawnLock = false;
 
         // ===== STATE OF COLLISION / IN ENVIRONMENT
@@ -220,6 +223,9 @@ namespace Game
             Subscribe(EVENT_PLAYER_HEAL, OnPlayerHeal);
             Subscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
 
+            Subscribe(EVENT_CINEMATIC_PLAY, OnCinematicPlay);
+            Subscribe(EVENT_CINEMATIC_STOP, OnCinematicStop);
+
             SetEmissionRate(healingVFXEntityID, 0.0f);
             mouseSensitivity = (AudioSettings.Instance != null) ? AudioSettings.Instance.GetMouseSensitivity() : mouseSensitivity;
 
@@ -257,7 +263,7 @@ namespace Game
                 }
             }
 
-            if (!IsSpawnInputBlocked())
+            if (!IsSpawnInputBlocked() && !cinematicEnabled)
             {
                 HandleCursorToggle();
 
@@ -316,6 +322,8 @@ namespace Game
 
             Unsubscribe(EVENT_PLAYER_HEAL, OnPlayerHeal);
             Unsubscribe(EVENT_PLAYER_DAMAGE_INBOUND, OnPlayerDamage);
+            Unsubscribe(EVENT_CINEMATIC_PLAY, OnCinematicPlay);
+            Unsubscribe(EVENT_CINEMATIC_STOP, OnCinematicStop);
         }
 
         private bool IsSpawnInputBlocked()
@@ -372,6 +380,9 @@ namespace Game
 
         private void UpdateCameraRotationFromMouse(float deltaTime)
         {
+            if (cinematicEnabled)
+                return;
+
             GetMouseDelta(out float dx, out float dy);
 
             dx *= mouseSensitivity;
@@ -462,6 +473,9 @@ namespace Game
 
         private void UpdateCameraFollow(float deltaTime, Vector3 predictedPlayerPos, Vector3 camFwd, Vector3 camRight, Vector3 camUp, bool inputBlocked)
         {
+            if (cinematicEnabled)
+                return;
+
             float blockedBlendT = 0.0f;
             Vector3 spawnLockAimTarget = predictedPlayerPos + Vector3.Up * spawnLockCameraLookOffset;
             Vector3 gameplayForward = camFwd;
@@ -564,8 +578,6 @@ namespace Game
                     camShakeTimer = camShakeTimerThreshold;
             }
 
-            SetPosition(cameraEntityID, ref smoothCamPos);
-
             if (inputBlocked)
             {
                 Vector3 actualCamPos = GetPosition(cameraEntityID);
@@ -580,7 +592,9 @@ namespace Game
                 camAimTarget = camPos + camForwardNow * cameraLookDistance;
             }
 
+            SetPosition(cameraEntityID, ref smoothCamPos);
             SetTarget(cameraEntityID, ref camAimTarget);
+
         }
 
         private void OnDamageReceived(string eventName, string payload)
@@ -660,6 +674,19 @@ namespace Game
         {
             LogMessage("[Spaceship Controller] Detect game end condition: " + eventName);
             endscene = true;
+        }
+
+        private void OnCinematicPlay(string eventName, string payload)
+        {
+            cinematicEnabled = true;
+        }
+
+        private void OnCinematicStop(string eventName, string payload)
+        {
+            cinematicEnabled = false;
+            InitializeCameraRotationStateFromCurrentTransform();
+            smoothCamPos = GetPosition(cameraEntityID);
+            camFollowInit = true;
         }
 
         private void emitParticles(Vector3 velocity)
