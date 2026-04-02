@@ -214,19 +214,17 @@ namespace Engine {
     }
 
     std::string getRepository() {
-        fs::path currentPath = fs::current_path();
+        fs::path currentPath = GetExecutableDirectory(); //<-anchor to exe
 
-        while (!currentPath.empty()) {
+        while (!currentPath.empty() && currentPath != currentPath.parent_path()) {
             if (fs::exists(currentPath / "CMakeLists.txt")) {
-              //  std::cout << "[DEBUG] Repo root found: " << currentPath << std::endl;
                 return currentPath.string();
             }
             currentPath = currentPath.parent_path();
         }
 
-        std::cout << "[WARN] Could not find repo root, using current path: "
-            << fs::current_path() << std::endl;
-        return fs::current_path().string();
+        LOG_WARNING("Could not find repo root via CMakeLists.txt, falling back to exe dir");
+        return GetExecutableDirectory().string();
     }
 
     std::string getRootResourcesPath() {
