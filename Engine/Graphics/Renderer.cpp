@@ -56,8 +56,9 @@ namespace Engine {
 
 		initFontResources();
 		//build font paths from AM's compiledPath
-		std::string compiledFontPath = Engine::getRootResourcesPath() + "/Compiled/Font/";
-		std::vector<std::pair<std::string, std::string>> fontsToLoad = {
+		std::string compiledFontPath = Engine::getRepository() + "/Resources/Compiled/Font/";
+		LOG_INFO("Font Paths resolved to : ", compiledFontPath);
+			std::vector<std::pair<std::string, std::string>> fontsToLoad = {
 			{"Quantico-Bold",          compiledFontPath + "Quantico-Bold.font"},
 			{"Quantico-BoldItalic",    compiledFontPath + "Quantico-BoldItalic.font"},
 			{"Quantico-Regular",       compiledFontPath + "Quantico-Regular.font"},
