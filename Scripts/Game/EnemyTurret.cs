@@ -307,7 +307,7 @@ namespace Game
 
                 // Add visuals and script - Using WormBullet
                 EntityAddMeshRenderer(enemyTurretBulletID);
-                EntityAddScript(enemyTurretBulletID, "Game.WormBullet");
+                EntityAddScript(enemyTurretBulletID, "Game.EnemyTurretBullet");
 
                 LogMessage("Turret fired bullet at player!");
             }
