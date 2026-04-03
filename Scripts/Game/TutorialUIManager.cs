@@ -82,6 +82,7 @@ namespace Game
         private const string EVENT_FADE_BLACK_OUT = "FadeBlackFadeOut";
         private const string EVENT_FADE_BLACK_IN_DONE = "FadeBlackFadeInDone";
         private const string EVENT_FADE_BLACK_OUT_DONE = "FadeBlackFadeOutDone";
+        private const string EVENT_TRENCH_WALL_WARNING_TRIGGERED = "TrenchWallWarningTriggered";
 
         // Fading
         private bool EPressed = false;
@@ -423,6 +424,7 @@ namespace Game
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
                 currentState = TutorialState.ShootWall;
+                Publish(EVENT_TRENCH_WALL_WARNING_TRIGGERED, "");
             }
         }
 
