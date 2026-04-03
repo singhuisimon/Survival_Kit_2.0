@@ -159,6 +159,7 @@ private Dictionary<uint, List<uint>> environmentHitBy = new Dictionary<uint, Lis
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.ALLY),
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.CORE),
             new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.CORE_BARRIER),
+            new CollisionRule(CollisionCategory.ENEMY_PROJECTILE, CollisionCategory.ENVIRONMENT),
             
             // Ally projectiles can hit:
             new CollisionRule(CollisionCategory.ALLY_PROJECTILE, CollisionCategory.ENEMY),

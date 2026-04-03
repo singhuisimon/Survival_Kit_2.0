@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_VO_CorruptCore_Warning",
-    "Prefab GUID": 14330788906293122315,
+    "Prefab Name": "Prefab: Audio_VO_CorruptCore_Warning.prefab",
+    "Prefab GUID": 17730258963235946717,
     "version": 1,
     "entities": [
         {
@@ -74,9 +74,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "9728057308791734627",
-                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 315
+                            "GCHandle": 19
                         }
                     }
                 }
