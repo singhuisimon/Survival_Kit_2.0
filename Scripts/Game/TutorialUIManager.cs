@@ -372,7 +372,8 @@ namespace Game
                     UIShown = false;
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
-                    fadeUpElapsed = 0.0f;
+                    //fadeUpElapsed = 0.0f;
+                    fadeUpElapsed = fadeUpTime;
                     currentState = TutorialState.FlyThrough;
                 }
             }
@@ -591,11 +592,10 @@ namespace Game
                     GameState.IsPaused = true;
                 }
 
-                if (oneturretDestroyed &&
-                    EPressed &&
-                    destroyTurretReturnStarted &&
-                    IsTutorialCameraMoveFinished() &&
-                    fadeOutElapsed > switchTime)
+                if ((oneturretDestroyed || EPressed) && 
+                    destroyTurretReturnStarted && 
+                    IsTutorialCameraMoveFinished() && 
+                    fadeOutElapsed > switchTime) 
                 {
                     EPressed = false;
                     tooltipElapsed = 0.0f;
@@ -642,31 +642,38 @@ namespace Game
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
                 EPressed = false;
+                Publish("ForceAltCharge", ""); //Ult Fire ready When UltFire tooltip shows up
                 currentState = TutorialState.AltFire;
             }
         }
 
         private void HandleAltFire(float dt)
         {
-            pauseForTutorial = false;
-            GameState.IsPaused = false;
-            EPressed = false;
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+            if (Input.IsMouseButtonPressed(MouseButton.Right)) altUsed = true;
 
-            if (!altUsed)
+            if (!altUsed && !EPressed)
             {
                 ShowUI(altFireID, true, dt);
+                pauseForTutorial = true;
+                GameState.IsPaused = true;
                 return;
             }
 
             ShowUI(altFireID, false, dt);
+            pauseForTutorial = false;
+            GameState.IsPaused = false;
 
             if (fadeOutElapsed > fadeOutTime)
             {
                 tooltipElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
+                EPressed = false;
+                altUsed = false;
                 currentState = TutorialState.Wait;
             }
+
         }
 
         private void HandleCollectUpgradeModuleState(float dt)
@@ -730,9 +737,11 @@ namespace Game
         {
             pauseForTutorial = false;
             GameState.IsPaused = false;
-            EPressed = false;
+            //EPressed = false;
 
-            if (hasSummonedSentry)
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
+            if (hasSummonedSentry || EPressed)
             {
                 ShowSentrySummonUI(false, dt);
 
@@ -742,6 +751,7 @@ namespace Game
                     SpriteRenderer.SetIsVisible(sentrySummonID, false);
                     fadeUpElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
+                    EPressed = false;
                     hasSummonedSentry = false;
                     currentState = TutorialState.Wait;
                 }
