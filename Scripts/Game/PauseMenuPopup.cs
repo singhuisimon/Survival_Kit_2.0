@@ -122,14 +122,27 @@ namespace Game
         private uint crosshairLevel2ID;
         private uint crosshair2Level2ID;
 
-        // State
-        private bool isPaused = false;
+        // -----------------------------------------------------------------------
+        // Pause ownership state
+        //
+        //   userPauseMenuOpen  : user explicitly opened this menu (Escape / P key)
+        //   tutorialForcedPause: tutorial is currently driving game pause
+        //                        (set via TutorialPauseMenu event)
+        //
+        // KEY FIX: HidePauseMenu() ALWAYS clears GameState.IsPaused.
+        // If the tutorial is still active it re-asserts IsPaused on its next
+        // OnUpdate, so there is no permanent soft-lock possible.
+        // The old guard  "if (!pauseForTutorial) GameState.IsPaused = false"
+        // was the root cause: tutorialForcedPause stayed latched while the popup
+        // was open, so IsPaused could never be cleared by the Resume button.
+        // -----------------------------------------------------------------------
+        private bool userPauseMenuOpen = false;   // old: isPaused
+        private bool tutorialForcedPause = false; // old: pauseForTutorial
         private bool entitiesFound = false;
         private bool wasPauseKeyPressed = false;
         private bool wasMousePressed = false;
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
-        private bool pauseForTutorial = false;
         private bool isTutorialOver = false;
 
         // Mixer initial X scales and positions
@@ -144,15 +157,13 @@ namespace Game
         private Vector3 mixerFill4InitialPosition;
         private Vector3 mixerFill5InitialPosition;
 
-        // Audio track
+        // Audio
         private uint _lastHoveredButton = 0;
         private uint hoverSoundId;
         private uint clickSoundId;
 
         private const string HOVER_AUDIO_NAME = "UI Pause Hover";
         private const string PRESS_AUDIO_NAME = "UI Pause Press";
-
-
 
         private static void SafeSetVisible(uint id, bool visible)
         {
@@ -218,13 +229,13 @@ namespace Game
             checkboxSFXUntickedId = SceneFindEntityByName(CHECKBOX_SFX_UNTICKED_NAME);
             checkboxSFXTickedId = SceneFindEntityByName(CHECKBOX_SFX_TICKED_NAME);
 
-            //Audio
+            // Audio
             hoverSoundId = SceneFindEntityByName(HOVER_AUDIO_NAME);
             clickSoundId = SceneFindEntityByName(PRESS_AUDIO_NAME);
 
             HidePauseMenu();
 
-            // Read initial X scales and positions for mixer fills
+            // Read initial mixer fill scales/positions
             if (mixerFillId != 0)
             {
                 mixerFill1InitialWidth = GetScale(mixerFillId).X;
@@ -267,7 +278,7 @@ namespace Game
             if (bgId == 0) LogError("PauseMenuPopup: Could not find: " + BG_NAME);
 
             entitiesFound = (bgId != 0);
-            isPaused = false;
+            userPauseMenuOpen = false;
             gameEnded = false;
 
             uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
@@ -285,10 +296,12 @@ namespace Game
             Event.Subscribe("GameOver", OnGameEnded);
             Event.Subscribe("GameWin", OnGameEnded);
             Event.Subscribe("GameRestart", OnGameRestart);
-            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnTutorialPauseChanged);
             Event.Subscribe(EVENT_TUTORIALOVER, OnTutorialOver);
+            // TogglePauseMenu lets PauseMenuController (P key) forward to this inline popup
+            Event.Subscribe("TogglePauseMenu", OnTogglePauseMenu);
 
-            // Save timer and crosshair UI ID in level 2
+            // Save timer and crosshair UI IDs for Level 2 HUD exception
             timerUILevel2ID = SceneFindEntityByName("TImer");
             crosshairLevel2ID = SceneFindEntityByName("Crosshair");
             crosshair2Level2ID = SceneFindEntityByName("Crosshair2");
@@ -315,12 +328,19 @@ namespace Game
 
             if (pauseKeyJustPressed)
             {
-                LogMessage("PauseMenuPopup: Escape pressed! isPaused=" + isPaused);
-                if (isPaused) HidePauseMenu();
-                else ShowPauseMenu();
+                if (userPauseMenuOpen)
+                {
+                    LogMessage("PauseMenuPopup: Escape pressed, closing menu (userPauseMenuOpen=true, tutorialForcedPause=" + tutorialForcedPause + ")");
+                    HidePauseMenu();
+                }
+                else
+                {
+                    LogMessage("PauseMenuPopup: Escape pressed, opening menu");
+                    ShowPauseMenu();
+                }
             }
 
-            if (isPaused)
+            if (userPauseMenuOpen)
             {
                 HandleHoverStates();
                 HandleMouseClick();
@@ -332,12 +352,14 @@ namespace Game
         // =====================================================================
         private void ShowPauseMenu()
         {
-            if (isPaused) return;
+            if (userPauseMenuOpen) return;
 
-            isPaused = true;
+            userPauseMenuOpen = true;
             GameState.IsPaused = true;
             Input.SetCursorVisible(true);
             Event.Publish(EVENT_GAME_PAUSED, "");
+
+            LogMessage("PauseMenuPopup: PAUSE-OWNER: userPauseMenuOpen=true, GameState.IsPaused=true (tutorialForcedPause=" + tutorialForcedPause + ")");
 
             SafeSetVisible(bgId, true);
             SafeSetVisible(resumeButtonId, true);
@@ -384,7 +406,7 @@ namespace Game
             SafeSetVisible(minusButtonHoveredId5, false);
             SafeSetVisible(defaultButtonHoveredId5, false);
 
-            // Update all mixer fills
+            // Update mixer fills to current audio settings
             if (Instance != null)
             {
                 UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
@@ -404,15 +426,24 @@ namespace Game
                     SafeSetVisible(hudElementIds[i], false);
 
             UpdateCheckboxVisuals();
-            LogMessage("PauseMenuPopup: Menu shown");
         }
 
         // =====================================================================
         // HIDE PAUSE MENU
+        //
+        // KEY FIX: Always clear GameState.IsPaused unconditionally.
+        //
+        // The old code had:  if (!pauseForTutorial) GameState.IsPaused = false;
+        // This caused a soft-lock because tutorialForcedPause stayed latched true
+        // while the user menu was open, so IsPaused could never be cleared here.
+        //
+        // Now: the popup always clears IsPaused. If the tutorial is still active
+        // it will re-set IsPaused=true on its very next OnUpdate. This gives a
+        // clean one-frame handoff with no permanent soft-lock possible.
         // =====================================================================
         private void HidePauseMenu()
         {
-            isPaused = false;
+            userPauseMenuOpen = false;
 
             SafeSetVisible(bgId, false);
             SafeSetVisible(resumeButtonId, false);
@@ -464,20 +495,21 @@ namespace Game
             SafeSetVisible(checkboxSFXUntickedId, false);
             SafeSetVisible(checkboxSFXTickedId, false);
 
+            // Restore HUD elements, respecting Level 2 tutorial timer/crosshair exception
             if (hudElementIds != null)
-                for (int i = 0; i < hudElementIds.Length; i++) {
-
-                    // Exception to hide timer UI & crosshair in Level 2
+                for (int i = 0; i < hudElementIds.Length; i++)
+                {
                     bool isLevel2TutorialElement =
                         currentGameScenePath == LEVEL2_SCENE_PATH &&
                         (hudElementIds[i] == timerUILevel2ID ||
-                        hudElementIds[i] == crosshairLevel2ID ||
-                        hudElementIds[i] == crosshair2Level2ID);
+                         hudElementIds[i] == crosshairLevel2ID ||
+                         hudElementIds[i] == crosshair2Level2ID);
 
                     if (isLevel2TutorialElement)
                     {
                         if (isTutorialOver)
                             SafeSetVisible(hudElementIds[i], true);
+                        // else: keep hidden until tutorial ends
                     }
                     else
                     {
@@ -487,8 +519,13 @@ namespace Game
 
             if (entitiesFound)
             {
-                // Game state resumes fully only if tutorial pause is not ongoing
-                if(!pauseForTutorial) GameState.IsPaused = false;
+                // FIX: Always clear IsPaused. If a tutorial is still active it will
+                // re-assert IsPaused=true on its next OnUpdate. This eliminates the
+                // soft-lock that occurred when tutorialForcedPause was still latched.
+                GameState.IsPaused = false;
+                LogMessage("PauseMenuPopup: PAUSE-OWNER: userPauseMenuOpen=false, GameState.IsPaused=false"
+                           + " (tutorialForcedPause=" + tutorialForcedPause + "; tutorial re-asserts if still active)");
+
                 Event.Publish(EVENT_GAME_RESUMED, "");
                 Input.SetCursorVisible(false);
             }
@@ -518,10 +555,8 @@ namespace Game
             newHovered = UpdateButtonHover(minusButtonId5, minusButtonHoveredId5) ? minusButtonId5 : newHovered;
             newHovered = UpdateButtonHover(defaultButtonId5, defaultButtonHoveredId5) ? defaultButtonId5 : newHovered;
 
-            if(newHovered != 0 && newHovered != _lastHoveredButton)
-            {
-                Audio.AudioPlay(hoverSoundId); //fires once on enter
-            }
+            if (newHovered != 0 && newHovered != _lastHoveredButton)
+                Audio.AudioPlay(hoverSoundId);
 
             _lastHoveredButton = newHovered;
         }
@@ -533,7 +568,6 @@ namespace Game
                              Collision2D.IsMouseCollidingWithEntity(hoveredId);
             SpriteRenderer.SetIsVisible(normalId, !isHovered);
             SpriteRenderer.SetIsVisible(hoveredId, isHovered);
-
             return isHovered;
         }
 
@@ -548,13 +582,11 @@ namespace Game
             if (!mouseJustPressed) return;
 
             bool overCheckbox = IsCheckboxClicked(checkboxMasterUntickedId, checkboxMasterTickedId) ||
-                        IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId) ||
-                        IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId);
+                                IsCheckboxClicked(checkboxBGMUntickedId, checkboxBGMTickedId) ||
+                                IsCheckboxClicked(checkboxSFXUntickedId, checkboxSFXTickedId);
 
-            if(_lastHoveredButton != 0 || overCheckbox)
-            {
+            if (_lastHoveredButton != 0 || overCheckbox)
                 Audio.AudioPlay(clickSoundId);
-            }
 
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
             {
@@ -569,7 +601,7 @@ namespace Game
                 StopGroup(AudioType.BGM);
                 StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
-                isPaused = false;
+                userPauseMenuOpen = false;
                 GameState.IsPaused = false;
                 Scene.SceneLoadFromFile(currentGameScenePath);
                 return;
@@ -580,7 +612,7 @@ namespace Game
                 LogMessage("PauseMenuPopup: Main Menu clicked");
                 StopGroup(AudioType.BGM);
                 StopGroup(AudioType.SFX);
-                isPaused = false;
+                userPauseMenuOpen = false;
                 GameState.IsPaused = false;
                 Input.SetCursorVisible(true);
                 Event.Publish(EVENT_GAME_RESUMED, "");
@@ -796,8 +828,7 @@ namespace Game
         }
 
         // =====================================================================
-        // MIXER FILL - matches SettingsPopup logic
-        // Shrinks X scale, shifts X by full widthDiff to anchor right edge
+        // MIXER FILL
         // =====================================================================
         private void UpdateMixerFill(uint fillId, float volume, float initialWidth, Vector3 initialPosition)
         {
@@ -826,7 +857,7 @@ namespace Game
         {
             LogMessage("PauseMenuPopup: Game ended (" + eventName + ")");
             gameEnded = true;
-            if (isPaused) HidePauseMenu();
+            if (userPauseMenuOpen) HidePauseMenu();
         }
 
         private void OnGameRestart(string eventName, string payload)
@@ -835,21 +866,42 @@ namespace Game
             gameEnded = false;
         }
 
-        private void OnLevel2Pause(string eventName, string payload)
+        // TutorialPauseMenu event: tutorial tells us whether it is actively forcing
+        // a pause. When playerPauseOnTutorial==true in the tutorial script, it now
+        // publishes false here, so tutorialForcedPause correctly reflects the
+        // current ownership rather than staying latched at true.
+        private void OnTutorialPauseChanged(string eventName, string payload)
         {
             if (bool.TryParse(payload, out bool state))
             {
-                // Update state for pause during tutorial
-                pauseForTutorial = state;
-
-                LogMessage("[PauseMenuPopup] Level 2 pause for tutorial");
+                bool prev = tutorialForcedPause;
+                tutorialForcedPause = state;
+                if (prev != state)
+                    LogMessage("PauseMenuPopup: PAUSE-OWNER: tutorialForcedPause=" + state
+                               + " (userPauseMenuOpen=" + userPauseMenuOpen + ")");
             }
         }
 
         private void OnTutorialOver(string eventName, string payload)
         {
             isTutorialOver = true;
-            LogMessage("[PauseMenuPopup] Level 2 tutorial is over, allow to show timer UI");
+            LogMessage("PauseMenuPopup: Tutorial over - timer/crosshair now allowed to show");
+        }
+
+        // Forwarded from PauseMenuController (P key) so the inline popup handles it
+        private void OnTogglePauseMenu(string eventName, string payload)
+        {
+            if (!entitiesFound || gameEnded) return;
+            if (userPauseMenuOpen)
+            {
+                LogMessage("PauseMenuPopup: TogglePauseMenu received, closing menu");
+                HidePauseMenu();
+            }
+            else
+            {
+                LogMessage("PauseMenuPopup: TogglePauseMenu received, opening menu");
+                ShowPauseMenu();
+            }
         }
 
         public override void OnDestroy()
@@ -857,8 +909,9 @@ namespace Game
             Event.Unsubscribe("GameOver", OnGameEnded);
             Event.Unsubscribe("GameWin", OnGameEnded);
             Event.Unsubscribe("GameRestart", OnGameRestart);
-            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnTutorialPauseChanged);
             Event.Unsubscribe(EVENT_TUTORIALOVER, OnTutorialOver);
+            Event.Unsubscribe("TogglePauseMenu", OnTogglePauseMenu);
             LogMessage("PauseMenuPopup: Destroyed");
         }
     }

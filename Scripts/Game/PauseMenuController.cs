@@ -7,24 +7,18 @@ using static Engine.AudioManager;
 namespace Game
 {
     /// <summary>
-    /// Attach this to an entity in your GAME SCENES (trench_run.json, level2.json)
-    /// Detects P key press and loads the separate pause menu scene.
+    /// Attach this to an entity in your GAME SCENES (trench_run.json, level2.json, level3.json).
+    /// Detects P key press and forwards it to the inline PauseMenuPopup / PauseMenuPopup3
+    /// via the "TogglePauseMenu" event.  Does NOT load a separate pause scene.
     /// </summary>
     public class PauseMenuController : ScriptBehaviour
     {
-        // Scene paths
-        private const string PAUSE_MENU_PATH = "Resources/Sources/Scenes/PauseMenuScene.json";
-        private const string GAME_SCENE_PATH = "Resources/Sources/Scenes/trench_run.json";
-        private const string LEVEL2_SCENE_PATH = "Resources/Sources/Scenes/level2.json";
-
         // Pause events
-        private const string EVENT_GAME_PAUSED = "GamePaused";
-        private const string EVENT_GAME_RESUMED = "GameResumed";
+        private const string EVENT_TOGGLE_PAUSE_MENU = "TogglePauseMenu";
 
         // State
         private bool wasPauseKeyPressed = false;
         private bool gameEnded = false;
-        private string currentGameScenePath = GAME_SCENE_PATH;
 
         public override void OnStart()
         {
@@ -32,20 +26,7 @@ namespace Game
 
             gameEnded = false;
 
-            // Detect which level we're in
-            uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
-            if (turrets != null && turrets.Length > 0)
-            {
-                currentGameScenePath = LEVEL2_SCENE_PATH;
-                LogMessage("PauseMenuController: Detected Level 2");
-            }
-            else
-            {
-                currentGameScenePath = GAME_SCENE_PATH;
-                LogMessage("PauseMenuController: Detected Level 1");
-            }
-
-            // Subscribe to win/lose events to block pause menu
+            // Subscribe to win/lose events to block the P-key toggle
             Event.Subscribe("GameOver", OnGameEnded);
             Event.Subscribe("GameWin", OnGameEnded);
             Event.Subscribe("GameRestart", OnGameRestart);
@@ -62,55 +43,27 @@ namespace Game
                 return;
             }
 
-            // Handle P key to toggle pause
+            // Handle P key to toggle pause — delegate to the inline popup
             bool pauseKeyPressed = Input.IsKeyPressed(KeyCode.P);
             bool pauseKeyJustPressed = pauseKeyPressed && !wasPauseKeyPressed;
             wasPauseKeyPressed = pauseKeyPressed;
 
             if (pauseKeyJustPressed)
             {
-                LogMessage("PauseMenuController: P key pressed - loading pause menu");
-                ShowPauseMenu();
-            }
-        }
-
-        private void ShowPauseMenu()
-        {
-            LogMessage("PauseMenuController: Loading pause menu scene");
-
-            // Set global pause state BEFORE loading scene
-            GameState.IsPaused = true;
-
-            // Show cursor for menu
-            Input.SetCursorVisible(true);
-
-            // Publish event with current scene path so pause menu knows where to return
-            Event.Publish(EVENT_GAME_PAUSED, currentGameScenePath);
-
-            // Load pause menu scene
-            bool success = Scene.SceneLoadFromFile(PAUSE_MENU_PATH);
-            if (success)
-            {
-                LogMessage("PauseMenuController: Pause menu loaded successfully");
-            }
-            else
-            {
-                LogError("PauseMenuController: Failed to load pause menu scene");
-                // Reset state if loading failed
-                GameState.IsPaused = false;
-                Input.SetCursorVisible(false);
+                LogMessage("PauseMenuController: P key pressed - forwarding TogglePauseMenu");
+                Event.Publish(EVENT_TOGGLE_PAUSE_MENU, "");
             }
         }
 
         private void OnGameEnded(string eventName, string payload)
         {
-            LogMessage("PauseMenuController: Game ended (" + eventName + ") - disabling pause menu");
+            LogMessage("PauseMenuController: Game ended (" + eventName + ") - disabling P-key pause");
             gameEnded = true;
         }
 
         private void OnGameRestart(string eventName, string payload)
         {
-            LogMessage("PauseMenuController: Game restarted - re-enabling pause menu");
+            LogMessage("PauseMenuController: Game restarted - re-enabling P-key pause");
             gameEnded = false;
         }
 

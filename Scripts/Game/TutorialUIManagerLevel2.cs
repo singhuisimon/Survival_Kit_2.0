@@ -27,10 +27,8 @@ namespace Game
         private uint botnetInfoID;      // UI_BotnetInfo
         private uint wormInfoID;        // UI_WormInfo
         private uint loveletterInfoID;  // UI_LoveletterInfo
-        //private uint proceedID;         // UI_E_ToProceed
         private uint crosshairID;       // Crosshair
-        private uint crosshair2ID;       // Crosshair2
-        
+        private uint crosshair2ID;      // Crosshair2
 
         // Entity IDs - Player, camera, and enemies
         private uint playerID;
@@ -69,7 +67,6 @@ namespace Game
         [SerializeField] private float uiStartFadePos = 260.0f;
         [SerializeField] private float switchTime = 0.5f;
         private float camFlySpeed = 30000.0f;
-        //private float camRotateSpeed = 1.0f;
         private float distToBotnet = 100.0f;
         private float distToWorm = 150.0f;
         private float distToLoveletter = 1000.0f;
@@ -77,14 +74,22 @@ namespace Game
         // Flying Cam
         private Vector3 lastCamPos = Vector3.Zero;
 
-        // Toggles/States
+        // -----------------------------------------------------------------------
+        // Pause ownership model
+        //   pauseForTutorial    : tutorial is actively driving the game pause
+        //   playerPauseOnTutorial: user opened their pause menu OVER a tutorial pause
+        //
+        // While playerPauseOnTutorial == true, we publish TutorialPauseMenu=false
+        // so the popup knows the tutorial is NOT the current pause owner, and can
+        // unconditionally clear GameState.IsPaused when the user resumes.
+        // -----------------------------------------------------------------------
         private bool instructionsRead = false;
         private bool gameEnd = false;
         private bool botnetSeen = false;
         private bool wormSeen = false;
         private bool loveletterSeen = false;
-        private bool pauseForTutorial = false;
-        private bool playerPauseOnTutorial = false;
+        private bool pauseForTutorial = false;       // tutorialForcedPause
+        private bool playerPauseOnTutorial = false;  // userPauseMenuOpen (over tutorial)
         private bool tutorialEnd = false;
         private bool prevEscapePressed = false;
 
@@ -97,170 +102,180 @@ namespace Game
             botnetInfoID = SceneFindEntityByName(botnetInfoName);
             wormInfoID = SceneFindEntityByName(wormInfoName);
             loveletterInfoID = SceneFindEntityByName(loveletterInfoName);
-            //proceedID = SceneFindEntityByName(proceedName);
             crosshairID = SceneFindEntityByName(crossHairName);
             crosshair2ID = SceneFindEntityByName(crossHair2Name);
 
             // Hide all tutorial UI
-            SpriteRenderer.SetIsVisible(instructionID, false); // Delay for a bit, fade it in upon entering level 2
+            SpriteRenderer.SetIsVisible(instructionID, false);
             SpriteRenderer.SetIsVisible(botnetInfoID, false);
             SpriteRenderer.SetIsVisible(wormInfoID, false);
             SpriteRenderer.SetIsVisible(loveletterInfoID, false);
-            //SpriteRenderer.SetIsVisible(proceedID, false);
 
-            // Subscribe to the events
+            // Subscribe to events
             Subscribe(EVENT_GAMELOSE, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
-            Subscribe(EVENT_BOTNET_TUTORIAL_SPAWN, OnBotnetSpawn); 
-            Subscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn); 
+            Subscribe(EVENT_BOTNET_TUTORIAL_SPAWN, OnBotnetSpawn);
+            Subscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn);
             Subscribe(EVENT_LOVELETTER_TUTORIAL_SPAWN, OnLoveletterSpawn);
+
+            // Subscribe to GameResumed so we detect when the user closed the popup
+            // via the Resume button (not just Escape). Clears playerPauseOnTutorial
+            // so the tutorial reclaims pause ownership next frame.
+            Subscribe("GameResumed", OnGameResumed);
 
             // Start the game paused for tutorial
             pauseForTutorial = true;
-     
+            LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: tutorialForcedPause=true at start");
         }
 
         public override void OnUpdate(float deltaTime)
         {
             // Check if skip tutorial
-            if(ProgressTracker.SkipTutorialLevel2) {
-
-                // Update spawner and skip tutorial
-                Publish(EVENT_SKIPTUTORIAL, true.ToString());   // Prevent tutorial enemies from spawning
-                if(currentState == TutorialState.Done) return; 
-            } else {
-                // Update spawner and continue
-                Publish(EVENT_SKIPTUTORIAL, false.ToString()); // Prevent tutorial enemies from spawning
+            if (ProgressTracker.SkipTutorialLevel2)
+            {
+                Publish(EVENT_SKIPTUTORIAL, true.ToString());
+                if (currentState == TutorialState.Done) return;
+            }
+            else
+            {
+                Publish(EVENT_SKIPTUTORIAL, false.ToString());
             }
 
-            // Check for escape press state
             bool escapeJustPressed = IsEscapeJustPressed();
 
-            // State when pausing during tutorial pause
-            if(pauseForTutorial && playerPauseOnTutorial) {
-                // Return to tutorial from pause menu
-                if (escapeJustPressed) {
+            // ---------------------------------------------------------------
+            // BRANCH: user's pause menu is open on top of a tutorial pause.
+            //
+            // FIX: Publish TutorialPauseMenu=false while in this branch.
+            //      The popup sees tutorial is NOT the pause owner and can
+            //      cleanly clear GameState.IsPaused when Resume is pressed,
+            //      without soft-locking.
+            //
+            //      On Escape, user is closing their menu → tutorial resumes
+            //      control next frame.
+            // ---------------------------------------------------------------
+            if (pauseForTutorial && playerPauseOnTutorial)
+            {
+                // Tutorial yields ownership; user menu is active
+                Publish("TutorialPauseAudio", false.ToString());
+                Publish("TutorialPauseMenu", false.ToString());
+
+                if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = false;
-                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                    LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: user closed menu via Escape; tutorial resumes control next frame");
                 }
                 return;
             }
 
-            // Main tutorial logic
-            if (pauseForTutorial) {
-
+            // ---------------------------------------------------------------
+            // BRANCH: tutorial is actively forcing a pause.
+            //
+            // If Escape is pressed, user wants to open the pause menu.
+            // Set playerPauseOnTutorial=true and return; the popup detects
+            // Escape independently and opens the menu.
+            // ---------------------------------------------------------------
+            if (pauseForTutorial)
+            {
                 GameState.IsPaused = true;
 
-                // Ensure game is pausable in-game
-                if (escapeJustPressed) {
-                    // Inform subscribers pause is user-induced
+                if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = true;
                     Publish("TutorialPauseAudio", false.ToString());
+                    LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: user pressed Escape during tutorial pause; yielding to user menu");
                     return;
-                } else {
-                    // Inform subscribers pause is tutorial-induced
-                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                }
+                else
+                {
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                     CrosshairVisibility(false);
                 }
 
                 // Most updated player position
                 Vector3 currentPos = Transform.GetPosition(playerID);
-                switch (currentState) {
+                switch (currentState)
+                {
                     case TutorialState.Instruction:
                         HandleInstructionState(currentPos, deltaTime);
                         break;
                     case TutorialState.BotnetInfo:
-                        if(!tutorialEnd) {
-                            // Begin flying cam to botnet
-                            if(FlyCamToTarget(deltaTime, tutorialBotnetID, distToBotnet)) {
-                                // Display botnet tooltip
+                        if (!tutorialEnd)
+                        {
+                            if (FlyCamToTarget(deltaTime, tutorialBotnetID, distToBotnet))
                                 HandleBotnetInfoState(currentPos, deltaTime);
-                            }
-                        } else {
-                            // End with cam flying back to player
-                            //if(FlyCamBackToPlayer(deltaTime)) {
-                                // Set up next state
-                                currentState = TutorialState.WormInfo;
-                                botnetSeen = false;
-                                //pauseForTutorial = false;
-                                //GameState.IsPaused = false;
-                                tutorialEnd = false;
-                            //}
+                        }
+                        else
+                        {
+                            currentState = TutorialState.WormInfo;
+                            botnetSeen = false;
+                            tutorialEnd = false;
                         }
                         break;
                     case TutorialState.WormInfo:
-                        if (!tutorialEnd) {
-                            // Begin flying cam to worm
-                            if (FlyCamToTarget(deltaTime, tutorialWormID, distToWorm)) {
-                                // Display worm tooltip
+                        if (!tutorialEnd)
+                        {
+                            if (FlyCamToTarget(deltaTime, tutorialWormID, distToWorm))
                                 HandleWormInfoState(currentPos, deltaTime);
-                            }
-                        } else {
-                            // End with cam flying back to player
-                            //if (FlyCamBackToPlayer(deltaTime)) {
-                                // Set up next state
-                                currentState = TutorialState.LoveletterInfo;
-                                wormSeen = false;
-                                //pauseForTutorial = false;
-                                //GameState.IsPaused = false;
-                                tutorialEnd = false;
-                            //}
+                        }
+                        else
+                        {
+                            currentState = TutorialState.LoveletterInfo;
+                            wormSeen = false;
+                            tutorialEnd = false;
                         }
                         break;
                     case TutorialState.LoveletterInfo:
-                        if (!tutorialEnd) {
-                            // Begin flying cam to loveletter
-                            if (FlyCamToTarget(deltaTime, tutorialLoveletterID, distToLoveletter)) {
-                                // Display loveletter tooltip
+                        if (!tutorialEnd)
+                        {
+                            if (FlyCamToTarget(deltaTime, tutorialLoveletterID, distToLoveletter))
                                 HandleLoveletterInfoState(currentPos, deltaTime);
-                            }
-                        } else {
-                            // End with cam flying back to player
-                            if (FlyCamBackToPlayer(deltaTime)) {
-                                // Set up next state
+                        }
+                        else
+                        {
+                            if (FlyCamBackToPlayer(deltaTime))
+                            {
                                 currentState = TutorialState.Done;
                                 loveletterSeen = false;
                                 pauseForTutorial = false;
                                 GameState.IsPaused = false;
                                 tutorialEnd = false;
+                                LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: tutorialForcedPause=false, tutorial complete");
                             }
                         }
                         break;
                     case TutorialState.Done:
-                        // Do nothing, tutorial is done
                         break;
                 }
-                
+
                 return;
             }
 
-            // Non-tutorial pause from user
+            // ---------------------------------------------------------------
+            // BRANCH: tutorial is not forcing a pause (normal gameplay).
+            // ---------------------------------------------------------------
             if (GameState.IsPaused)
                 return;
 
-            if (gameEnd){
+            if (gameEnd)
                 return;
-            }
 
-            // Ensure subscribers know level 2 pause is not tutorial-induced
-            Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-            Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+            // Signal that tutorial is not pausing right now
+            Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+            Publish("TutorialPauseMenu", pauseForTutorial.ToString());
             CrosshairVisibility(true);
 
             // Check for enemy spawning events if tutorial is ongoing
             if (currentState != TutorialState.Done)
             {
-                // Check if either enemy is seen
-                if(botnetSeen || wormSeen || loveletterSeen)
+                if (botnetSeen || wormSeen || loveletterSeen)
                 {
                     pauseForTutorial = true;
                     GameState.IsPaused = true;
                     playerPauseOnTutorial = false;
-
-                    // Save camera last position
                     lastCamPos = Transform.GetPosition(cameraID);
+                    LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: enemy seen, tutorialForcedPause=true");
                 }
             }
         }
@@ -270,36 +285,26 @@ namespace Game
             Unsubscribe(EVENT_GAMELOSE, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
             Unsubscribe(EVENT_BOTNET_TUTORIAL_SPAWN, OnBotnetSpawn);
-            Unsubscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn); 
+            Unsubscribe(EVENT_WORM_TUTORIAL_SPAWN, OnWormSpawn);
             Unsubscribe(EVENT_LOVELETTER_TUTORIAL_SPAWN, OnLoveletterSpawn);
+            Unsubscribe("GameResumed", OnGameResumed);
         }
 
-        private bool FlyCamToTarget(float dt, uint targetID, float distToTarget) 
+        private bool FlyCamToTarget(float dt, uint targetID, float distToTarget)
         {
-            // Get camera and target world positions
             Vector3 camPos = Transform.GetPosition(cameraID);
             Vector3 targetPos = Transform.GetPosition(targetID);
 
-            // Set camera target to the target enemy
             SetTarget(cameraID, ref targetPos);
 
-            // Current distance from camera to target
             Vector3 toTarget = targetPos - camPos;
             float currentDist = toTarget.Magnitude;
 
-            //string debugMessage = "[TutorialUIManagerLevel2] Camera is distance from enemy: ";
-            //debugMessage += currentDist.ToString();
-            //LogMessage(debugMessage);
-
-            // Already close enough / desired distance already satisfied
             if (currentDist <= distToTarget) return true;
 
             Vector3 dirToTarget = toTarget / currentDist;
 
-            // How much closer we are allowed to move this frame
             float moveStep = camFlySpeed * dt;
-
-            // Never move past the desired stopping distance
             float allowedMove = currentDist - distToTarget;
             float actualMove = SimpleMath.Min(moveStep, allowedMove);
 
@@ -311,19 +316,14 @@ namespace Game
 
         private bool FlyCamBackToPlayer(float dt)
         {
-            // Get camera current world positions
             Vector3 currCamPos = Transform.GetPosition(cameraID);
 
-            // Current distance from current camera to pre-tutorial camera position
             Vector3 toTarget = lastCamPos - currCamPos;
             float currentDist = toTarget.Magnitude;
 
-            //LogMessage("[TutorialUIManagerLevel2] Camera distance from pre-tutorial position: " + currentDist.ToString());
-
-            // Already close enough / desired distance already satisfied
             float allowedMove = 1000.0f;
-            if (currentDist <= 1000.0f) {
-                // Cap movement step when close
+            if (currentDist <= 1000.0f)
+            {
                 allowedMove = 100.0f;
                 if (currentDist <= 50.0f)
                 {
@@ -334,7 +334,6 @@ namespace Game
 
             Vector3 dirToTarget = toTarget / currentDist;
 
-            // How much closer we are allowed to move this frame
             float moveStep = camFlySpeed * dt;
             float actualMove = SimpleMath.Min(moveStep, allowedMove);
 
@@ -346,181 +345,105 @@ namespace Game
 
         private void HandleInstructionState(Vector3 currentPos, float dt)
         {
-            // Show UI when state begins 
             ShowUI(instructionID, true, dt);
 
-            // Ensure UI fades in fully before pausing state and waiting for interaction
-            if (fadeUpElapsed > fadeUpTime) {
+            if (fadeUpElapsed > fadeUpTime)
+            {
+                if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
-                // Update tooltip elapsed time
-                //tooltipElapsed += dt;
+                if (EPressed)
+                    ShowUI(instructionID, false, dt);
 
-                // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                //if (tooltipElapsed > tooltipMinTime) {
-
-                    // Display assistance message: "Press "E" to proceed"
-                    //ShowProceedText(true);
-
-                    // Check for 'E' input
-                    if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                    // Begin fade out
-                    if (EPressed) {
-                        ShowUI(instructionID, false, dt);
-                        //ShowProceedText(false);  // Remove assistance message
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    if (ProgressTracker.SkipTutorialLevel2)
+                    {
+                        currentState = TutorialState.Done;
+                        tutorialEnd = false;
+                    }
+                    else
+                    {
+                        currentState = TutorialState.BotnetInfo;
                     }
 
-                    // Ensure all fading effects are completed before moving on
-                    if (fadeOutElapsed > fadeOutTime) {
-
-                        // To skip tutorial or proceed with botnet
-                        if(ProgressTracker.SkipTutorialLevel2) {
-                            currentState = TutorialState.Done;
-                            tutorialEnd = false;
-                        } else {
-                            currentState = TutorialState.BotnetInfo;
-                        }
-
-                        // Reset all elapsed time, 'E' pressed state, and set up for next state
-                        EPressed = false;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                        pauseForTutorial = false;
-                        GameState.IsPaused = false;
-                        Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
-                    }
-                //}
+                    EPressed = false;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    pauseForTutorial = false;
+                    GameState.IsPaused = false;
+                    Publish("BGMVOStart", "");
+                    LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: instruction done, tutorialForcedPause=false");
+                }
             }
         }
 
         private void HandleBotnetInfoState(Vector3 currentPos, float dt)
         {
-
-            // Show UI when state begins (Botnet spawns)
             ShowUI(botnetInfoID, true, dt);
 
-            // Ensure UI fades in fully before pausing state and waiting for interaction
-            if (fadeUpElapsed > fadeUpTime) {
+            if (fadeUpElapsed > fadeUpTime)
+            {
+                if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
-                // Update tooltip elapsed time
-                //tooltipElapsed += dt;
+                if (EPressed)
+                    ShowUI(botnetInfoID, false, dt);
 
-                // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                //if (tooltipElapsed > tooltipMinTime) {
-
-                    // Display assistance message: "Press "E" to proceed"
-                    //ShowProceedText(true);
-
-                    // Check for 'E' input
-                    if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                    // Begin fade out
-                    if (EPressed) {
-                        ShowUI(botnetInfoID, false, dt);
-                        //ShowProceedText(false);  // Remove assistance message
-                    }
-
-                    // Ensure all fading effects are completed before moving on
-                    if (fadeOutElapsed > fadeOutTime) {
-
-                        // Reset all elapsed time, 'E' pressed state, and set up for next state
-                        EPressed = false;
-                        //tooltipElapsed = 0.0f;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                        tutorialEnd = true;
-                    }
-                //}
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    EPressed = false;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    tutorialEnd = true;
+                }
             }
         }
 
         private void HandleWormInfoState(Vector3 currentPos, float dt)
         {
-            // Show UI when state begins (Worm spawns)
             ShowUI(wormInfoID, true, dt);
 
-            if (fadeUpElapsed > fadeUpTime) {
+            if (fadeUpElapsed > fadeUpTime)
+            {
+                if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
-                // Update tooltip elapsed time
-                //tooltipElapsed += dt;
+                if (EPressed)
+                    ShowUI(wormInfoID, false, dt);
 
-                // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                //if (tooltipElapsed > tooltipMinTime) {
-
-                    // Display assistance message: "Press "E" to proceed"
-                    //ShowProceedText(true);
-
-                    // Check for 'E' input
-                    if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                    // Begin fade out
-                    if (EPressed) {
-                        ShowUI(wormInfoID, false, dt);
-                        //ShowProceedText(false);  // Remove assistance message
-                    }
-
-                    // Ensure all fading effects are completed before moving on
-                    if (fadeOutElapsed > fadeOutTime) {
-
-                        // Reset all elapsed time, 'E' pressed state, and set up for next state
-                        EPressed = false;
-                        //tooltipElapsed = 0.0f;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                        tutorialEnd = true;
-
-                    }
-                //}
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    EPressed = false;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    tutorialEnd = true;
+                }
             }
         }
 
         private void HandleLoveletterInfoState(Vector3 currentPos, float dt)
         {
-            // Show UI when state begins (Loveletter spawns)
             ShowUI(loveletterInfoID, true, dt);
 
-            if (fadeUpElapsed > fadeUpTime) {
+            if (fadeUpElapsed > fadeUpTime)
+            {
+                if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
-                // Update tooltip elapsed time
-                //tooltipElapsed += dt;
+                if (EPressed)
+                    ShowUI(loveletterInfoID, false, dt);
 
-                // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-                //if (tooltipElapsed > tooltipMinTime) {
-
-                    // Display assistance message: "Press "E" to proceed"
-                    //ShowProceedText(true);
-
-                    // Check for 'E' input
-                    if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                    // Begin fade out
-                    if (EPressed) {
-                        ShowUI(loveletterInfoID, false, dt);
-                        //ShowProceedText(false);  // Remove assistance message
-                    }
-
-                    // Ensure all fading effects are completed before moving on
-                    if (fadeOutElapsed > fadeOutTime) {
-
-                        // Reset all elapsed time, 'E' pressed state, and set up for next state
-                        EPressed = false;
-                        //tooltipElapsed = 0.0f;
-                        fadeOutElapsed = 0.0f;
-                        fadeUpElapsed = 0.0f;
-                        tutorialEnd = true;
-
-                    }
-                //}
+                if (fadeOutElapsed > fadeOutTime)
+                {
+                    EPressed = false;
+                    fadeOutElapsed = 0.0f;
+                    fadeUpElapsed = 0.0f;
+                    tutorialEnd = true;
+                }
             }
         }
 
-        // UI Functions
         private void ShowUI(uint entityID, bool value, float dt)
         {
-            // Fade Up if true
-            if (value == true) {
-
-                // Fade up
+            if (value == true)
+            {
                 if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
                 SpriteRenderer.FadeIn(entityID, fadeUpElapsed, fadeUpTime);
 
@@ -528,32 +451,19 @@ namespace Game
                 newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
                 Transform.SetPosition(entityID, ref newPos);
 
-                // Set sprite to be true if not visible
                 if (SpriteRenderer.GetIsVisible(entityID) != value) SpriteRenderer.SetIsVisible(entityID, value);
-
-            } else { // Fade out if false
-
-                // Fade out
+            }
+            else
+            {
                 fadeOutElapsed += dt;
                 SpriteRenderer.FadeOut(entityID, fadeOutElapsed, fadeOutTime);
 
-                // Ensure sprite is not visible once it faded out
                 if (fadeOutElapsed > fadeOutTime) SpriteRenderer.SetIsVisible(entityID, value);
             }
         }
 
-        //private void ShowProceedText(bool value)
-        //{
-        //    Engine.SpriteRenderer.SetIsVisible(proceedID, value);
-        //}
-
-        //private void SetProceedTextPosition(float x, float y)
-        //{
-        //    Vector3 newPos = new Vector3(x, y, 0.0f);
-        //    Transform.SetPosition(proceedID, ref newPos);
-        //}
-
-        private bool IsEscapeJustPressed() {
+        private bool IsEscapeJustPressed()
+        {
             bool pressed = IsKeyPressed(KeyCode.Escape);
             bool justPressed = pressed && !prevEscapePressed;
             prevEscapePressed = pressed;
@@ -566,64 +476,64 @@ namespace Game
             SpriteRenderer.SetIsVisible(crosshair2ID, value);
         }
 
-        private void OnGameEnd(string eventName, string payload){
-            LogMessage("[TutorialUIManagerLevel2] Detect game end, hiding all tooltip");
+        // -----------------------------------------------------------------------
+        // Called when the popup closes (Resume button or Escape).
+        // Clears playerPauseOnTutorial so the tutorial reclaims pause ownership
+        // next frame. Handles the Resume-button case where no second Escape fires.
+        // -----------------------------------------------------------------------
+        private void OnGameResumed(string eventName, string payload)
+        {
+            if (playerPauseOnTutorial)
+            {
+                playerPauseOnTutorial = false;
+                LogMessage("[TutorialUIManagerLevel2] PAUSE-OWNER: GameResumed received; tutorial reclaims pause control next frame");
+            }
+        }
 
-            //Hide all the Tooltip UI
-            //ShowProceedText(false);
+        private void OnGameEnd(string eventName, string payload)
+        {
+            LogMessage("[TutorialUIManagerLevel2] Detect game end, hiding all tooltip");
 
             SpriteRenderer.SetIsVisible(instructionID, false);
             SpriteRenderer.SetIsVisible(botnetInfoID, false);
             SpriteRenderer.SetIsVisible(wormInfoID, false);
             SpriteRenderer.SetIsVisible(loveletterInfoID, false);
-            //SpriteRenderer.SetIsVisible(proceedID, false);
             gameEnd = true;
-            return;
         }
 
-        private void OnBotnetSpawn(string eventName, string payload) {
-            // Ensure tutorial know which enemy is seen
+        private void OnBotnetSpawn(string eventName, string payload)
+        {
             botnetSeen = true;
             LogMessage("[TutorialUIManagerLevel2] Botnet spawned for tutorial, pause to show tooltip");
 
-            // Extract enemy id from payload
-            if (uint.TryParse(payload, out uint botnetID)) {
-                // Save enemy ID to local script
+            if (uint.TryParse(payload, out uint botnetID))
+            {
                 tutorialBotnetID = botnetID;
-
-                string message = "[TutorialUIManagerLevel2] Botnet ID for tutorial retrieved: " + tutorialBotnetID.ToString();
-                LogMessage(message);
+                LogMessage("[TutorialUIManagerLevel2] Botnet ID for tutorial retrieved: " + tutorialBotnetID.ToString());
             }
         }
 
-        private void OnWormSpawn(string eventName, string payload) {
-            // Ensure tutorial know which enemy is seen
+        private void OnWormSpawn(string eventName, string payload)
+        {
             wormSeen = true;
             LogMessage("[TutorialUIManagerLevel2] Worm spawned for tutorial, pause to show tooltip");
 
-            // Extract enemy id from payload
-            if (uint.TryParse(payload, out uint wormID)) {
-                // Save enemy ID to local script
+            if (uint.TryParse(payload, out uint wormID))
+            {
                 tutorialWormID = wormID;
-
-                string message = "[TutorialUIManagerLevel2] Worm ID for tutorial retrieved: " + tutorialWormID.ToString();
-                LogMessage(message);
+                LogMessage("[TutorialUIManagerLevel2] Worm ID for tutorial retrieved: " + tutorialWormID.ToString());
             }
         }
 
         private void OnLoveletterSpawn(string eventName, string payload)
         {
-            // Ensure tutorial know which enemy is seen
             loveletterSeen = true;
             LogMessage("[TutorialUIManagerLevel2] Loveletter spawned for tutorial, pause to show tooltip");
 
-            // Extract enemy id from payload
-            if (uint.TryParse(payload, out uint loveletterID)) {
-                // Save enemy ID to local script
+            if (uint.TryParse(payload, out uint loveletterID))
+            {
                 tutorialLoveletterID = loveletterID;
-
-                string message = "[TutorialUIManagerLevel2] Loveletter ID for tutorial retrieved: " + tutorialLoveletterID.ToString();
-                LogMessage(message);
+                LogMessage("[TutorialUIManagerLevel2] Loveletter ID for tutorial retrieved: " + tutorialLoveletterID.ToString());
             }
         }
     }

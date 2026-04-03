@@ -22,7 +22,7 @@ namespace Game
         // Entity IDs - UI
         private uint instructionID;     // UI_InstructionLevel3
         private uint crosshairID;       // Crosshair
-        private uint crosshair2ID;       // Crosshair2
+        private uint crosshair2ID;      // Crosshair2
 
         // Entity Names
         [SerializeField] private string instructionsName = "UI_InstructionLevel3";
@@ -41,95 +41,121 @@ namespace Game
         [SerializeField] private float fadeUpTime = 1.0f;
         [SerializeField] private float uiStartFadePos = 260.0f;
 
-        // Flying Cam
-        private Vector3 lastCamPos = Vector3.Zero;
-
-        // Toggles/States
+        // -----------------------------------------------------------------------
+        // Pause ownership model
+        //   pauseForTutorial    : tutorial is actively driving the game pause
+        //   playerPauseOnTutorial: user opened their pause menu OVER a tutorial pause
+        //
+        // While playerPauseOnTutorial == true, we publish TutorialPauseMenu=false
+        // so the popup knows the tutorial is NOT the current pause owner, and can
+        // unconditionally clear GameState.IsPaused when the user resumes.
+        // -----------------------------------------------------------------------
         private bool gameEnd = false;
-        private bool pauseForTutorial = false;
-        private bool playerPauseOnTutorial = false;
+        private bool pauseForTutorial = false;       // tutorialForcedPause
+        private bool playerPauseOnTutorial = false;  // userPauseMenuOpen (over tutorial)
         private bool prevEscapePressed = false;
 
         public override void OnStart()
         {
-            // Find all entities' id
             instructionID = SceneFindEntityByName(instructionsName);
             crosshairID = SceneFindEntityByName(crossHairName);
             crosshair2ID = SceneFindEntityByName(crossHair2Name);
 
-            // Hide all tutorial UI
-            SpriteRenderer.SetIsVisible(instructionID, false); 
+            SpriteRenderer.SetIsVisible(instructionID, false);
 
-            // Subscribe to the events
             Subscribe(EVENT_GAMELOSE, OnGameEnd);
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
 
+            // Subscribe to GameResumed so we detect when the user closed the popup
+            // via the Resume button (not just Escape). Clears playerPauseOnTutorial
+            // so the tutorial reclaims pause ownership next frame.
+            Subscribe("GameResumed", OnGameResumed);
+
             // Start the game paused for tutorial
             pauseForTutorial = true;
-     
+            LogMessage("[TutorialUIManagerLevel3] PAUSE-OWNER: tutorialForcedPause=true at start");
         }
 
         public override void OnUpdate(float deltaTime)
         {
-
-            // Check for escape press state
             bool escapeJustPressed = IsEscapeJustPressed();
 
-            // State when pausing during tutorial pause
-            if(pauseForTutorial && playerPauseOnTutorial) {
-                // Return to tutorial from pause menu
-                if (escapeJustPressed) {
+            // ---------------------------------------------------------------
+            // BRANCH: user's pause menu is open on top of a tutorial pause.
+            //
+            // FIX: Publish TutorialPauseMenu=false while in this branch.
+            //      The popup sees tutorial is NOT the pause owner and can
+            //      cleanly clear GameState.IsPaused when Resume is pressed,
+            //      without soft-locking.
+            //
+            //      On Escape, user is closing their menu → tutorial resumes
+            //      control next frame.
+            // ---------------------------------------------------------------
+            if (pauseForTutorial && playerPauseOnTutorial)
+            {
+                // Tutorial yields ownership; user menu is active
+                Publish("TutorialPauseAudio", false.ToString());
+                Publish("TutorialPauseMenu", false.ToString());
+
+                if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = false;
-                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                    LogMessage("[TutorialUIManagerLevel3] PAUSE-OWNER: user closed menu via Escape; tutorial resumes control next frame");
                 }
                 return;
             }
 
-            // Main tutorial logic
-            if (pauseForTutorial) {
-
+            // ---------------------------------------------------------------
+            // BRANCH: tutorial is actively forcing a pause.
+            //
+            // If Escape is pressed, user wants to open the pause menu.
+            // Set playerPauseOnTutorial=true and return; the popup detects
+            // Escape independently and opens the menu.
+            // ---------------------------------------------------------------
+            if (pauseForTutorial)
+            {
                 GameState.IsPaused = true;
 
-                // Ensure game is pausable in-game
-                if (escapeJustPressed) {
-                    // Inform subscribers pause is user-induced
+                if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = true;
                     Publish("TutorialPauseAudio", false.ToString());
+                    LogMessage("[TutorialUIManagerLevel3] PAUSE-OWNER: user pressed Escape during tutorial pause; yielding to user menu");
                     return;
-                } else {
-                    // Inform subscribers pause is tutorial-induced
-                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                }
+                else
+                {
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                     CrosshairVisibility(false);
                 }
 
-                // Most updated player position
-                switch (currentState) {
+                switch (currentState)
+                {
                     case TutorialState.Instruction:
                         HandleInstructionState(deltaTime);
                         break;
                     case TutorialState.Done:
-                        // Do nothing, tutorial is done
                         break;
                 }
-                
+
                 return;
             }
 
-            // Non-tutorial pause from user
+            // ---------------------------------------------------------------
+            // BRANCH: tutorial is not forcing a pause (normal gameplay).
+            // ---------------------------------------------------------------
             if (GameState.IsPaused)
                 return;
 
-            if (gameEnd){
+            if (gameEnd)
                 return;
-            }
 
-            // Ensure subscribers know level 3 pause is not tutorial-induced
-            if(currentState != TutorialState.Done)
+            // Signal subscribers that Level 3 tutorial pause is not active
+            if (currentState != TutorialState.Done)
             {
-                Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-                Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                 CrosshairVisibility(true);
             }
         }
@@ -138,51 +164,42 @@ namespace Game
         {
             Unsubscribe(EVENT_GAMELOSE, OnGameEnd);
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
+            Unsubscribe("GameResumed", OnGameResumed);
         }
 
         private void HandleInstructionState(float dt)
         {
-            // Show UI when state begins 
             ShowUI(instructionID, true, dt);
 
-            // Ensure UI fades in fully before pausing state and waiting for interaction
-            if (fadeUpElapsed > fadeUpTime) {
-
-                // Check for 'E' input
+            if (fadeUpElapsed > fadeUpTime)
+            {
                 if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
-                // Begin fade out
-                if (EPressed) {
+                if (EPressed)
                     ShowUI(instructionID, false, dt);
-                    //ShowProceedText(false);  // Remove assistance message
-                }
 
-                // Ensure all fading effects are completed before moving on
-                if (fadeOutElapsed > fadeOutTime) {
-
-                    // Reset all elapsed time, 'E' pressed state, and set up for next state
+                if (fadeOutElapsed > fadeOutTime)
+                {
                     EPressed = false;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
                     currentState = TutorialState.Done;
                     pauseForTutorial = false;
                     GameState.IsPaused = false;
-                    Publish("BGMVOStart", ""); // Signal BGM_VO to begin playing
-                    Publish("TUTORIALOVER", ""); // Signal timer and other systems to start
-                    Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
-                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+                    Publish("BGMVOStart", "");
+                    Publish("TUTORIALOVER", "");
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                     CrosshairVisibility(true);
+                    LogMessage("[TutorialUIManagerLevel3] PAUSE-OWNER: tutorialForcedPause=false, tutorial complete");
                 }
             }
         }
 
-        // UI Functions
         private void ShowUI(uint entityID, bool value, float dt)
         {
-            // Fade Up if true
-            if (value == true) {
-
-                // Fade up
+            if (value == true)
+            {
                 if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
                 SpriteRenderer.FadeIn(entityID, fadeUpElapsed, fadeUpTime);
 
@@ -190,21 +207,19 @@ namespace Game
                 newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
                 Transform.SetPosition(entityID, ref newPos);
 
-                // Set sprite to be true if not visible
                 if (SpriteRenderer.GetIsVisible(entityID) != value) SpriteRenderer.SetIsVisible(entityID, value);
-
-            } else { // Fade out if false
-
-                // Fade out
+            }
+            else
+            {
                 fadeOutElapsed += dt;
                 SpriteRenderer.FadeOut(entityID, fadeOutElapsed, fadeOutTime);
 
-                // Ensure sprite is not visible once it faded out
                 if (fadeOutElapsed > fadeOutTime) SpriteRenderer.SetIsVisible(entityID, value);
             }
         }
 
-        private bool IsEscapeJustPressed() {
+        private bool IsEscapeJustPressed()
+        {
             bool pressed = IsKeyPressed(KeyCode.Escape);
             bool justPressed = pressed && !prevEscapePressed;
             prevEscapePressed = pressed;
@@ -217,13 +232,25 @@ namespace Game
             SpriteRenderer.SetIsVisible(crosshair2ID, value);
         }
 
-        private void OnGameEnd(string eventName, string payload){
-            LogMessage("[TutorialUIManagerLevel3] Detect game end, hiding all tooltip");
+        // -----------------------------------------------------------------------
+        // Called when the popup closes (Resume button or Escape).
+        // Clears playerPauseOnTutorial so the tutorial reclaims pause ownership
+        // next frame. Handles the Resume-button case where no second Escape fires.
+        // -----------------------------------------------------------------------
+        private void OnGameResumed(string eventName, string payload)
+        {
+            if (playerPauseOnTutorial)
+            {
+                playerPauseOnTutorial = false;
+                LogMessage("[TutorialUIManagerLevel3] PAUSE-OWNER: GameResumed received; tutorial reclaims pause control next frame");
+            }
+        }
 
-            //Hide all the Tooltip UI
+        private void OnGameEnd(string eventName, string payload)
+        {
+            LogMessage("[TutorialUIManagerLevel3] Detect game end, hiding all tooltip");
             SpriteRenderer.SetIsVisible(instructionID, false);
             gameEnd = true;
-            return;
         }
     }
 }

@@ -122,14 +122,21 @@ namespace Game
         private uint crosshairLevel2ID;
         private uint crosshair2Level2ID;
 
-        // State
-        private bool isPaused = false;
+        // -----------------------------------------------------------------------
+        // Pause ownership model (mirrors TutorialUIManagerLevel3)
+        //   tutorialForcedPause : tutorial is actively driving the game pause
+        //   userPauseMenuOpen   : this popup is currently shown to the user
+        //
+        // HidePauseMenu() ALWAYS clears GameState.IsPaused.
+        // If a tutorial is still active, its next OnUpdate re-asserts IsPaused=true.
+        // -----------------------------------------------------------------------
+        private bool userPauseMenuOpen = false;
         private bool entitiesFound = false;
         private bool wasPauseKeyPressed = false;
         private bool wasMousePressed = false;
         private bool gameEnded = false;
         private string currentGameScenePath = GAME_SCENE_PATH;
-        private bool pauseForTutorial = false;
+        private bool tutorialForcedPause = false;
         private bool isTutorialOver = false;
 
         // Mixer initial X scales and positions
@@ -166,7 +173,7 @@ namespace Game
         // =====================================================================
         public override void OnStart()
         {
-            LogMessage("PauseMenuPopup: Initializing...");
+            LogMessage("PauseMenuPopup3: Initializing...");
 
             bgId = SceneFindEntityByName(BG_NAME);
             resumeButtonId = SceneFindEntityByName(RESUME_BUTTON_NAME);
@@ -229,31 +236,31 @@ namespace Game
             {
                 mixerFill1InitialWidth = GetScale(mixerFillId).X;
                 mixerFill1InitialPosition = GetPosition(mixerFillId);
-                LogMessage("PauseMenuPopup: Mixer 1 initial width = " + mixerFill1InitialWidth);
+                LogMessage("PauseMenuPopup3: Mixer 1 initial width = " + mixerFill1InitialWidth);
             }
             if (mixerFillId2 != 0)
             {
                 mixerFill2InitialWidth = GetScale(mixerFillId2).X;
                 mixerFill2InitialPosition = GetPosition(mixerFillId2);
-                LogMessage("PauseMenuPopup: Mixer 2 initial width = " + mixerFill2InitialWidth);
+                LogMessage("PauseMenuPopup3: Mixer 2 initial width = " + mixerFill2InitialWidth);
             }
             if (mixerFillId3 != 0)
             {
                 mixerFill3InitialWidth = GetScale(mixerFillId3).X;
                 mixerFill3InitialPosition = GetPosition(mixerFillId3);
-                LogMessage("PauseMenuPopup: Mixer 3 initial width = " + mixerFill3InitialWidth);
+                LogMessage("PauseMenuPopup3: Mixer 3 initial width = " + mixerFill3InitialWidth);
             }
             if (mixerFillId4 != 0)
             {
                 mixerFill4InitialWidth = GetScale(mixerFillId4).X;
                 mixerFill4InitialPosition = GetPosition(mixerFillId4);
-                LogMessage("PauseMenuPopup: Mixer 4 (Gamma) initial width = " + mixerFill4InitialWidth);
+                LogMessage("PauseMenuPopup3: Mixer 4 (Gamma) initial width = " + mixerFill4InitialWidth);
             }
             if (mixerFillId5 != 0)
             {
                 mixerFill5InitialWidth = GetScale(mixerFillId5).X;
                 mixerFill5InitialPosition = GetPosition(mixerFillId5);
-                LogMessage("PauseMenuPopup: Mixer 5 (MouseSens) initial width = " + mixerFill5InitialWidth);
+                LogMessage("PauseMenuPopup3: Mixer 5 (MouseSens) initial width = " + mixerFill5InitialWidth);
             }
 
             hudElementIds = new uint[HUD_ELEMENT_NAMES.Length];
@@ -261,39 +268,42 @@ namespace Game
             {
                 hudElementIds[i] = SceneFindEntityByName(HUD_ELEMENT_NAMES[i]);
                 if (hudElementIds[i] == 0)
-                    LogMessage("PauseMenuPopup: HUD element not found: " + HUD_ELEMENT_NAMES[i]);
+                    LogMessage("PauseMenuPopup3: HUD element not found: " + HUD_ELEMENT_NAMES[i]);
             }
 
-            if (bgId == 0) LogError("PauseMenuPopup: Could not find: " + BG_NAME);
+            if (bgId == 0) LogError("PauseMenuPopup3: Could not find: " + BG_NAME);
 
             entitiesFound = (bgId != 0);
-            isPaused = false;
+            userPauseMenuOpen = false;
             gameEnded = false;
 
             uint[] turrets = SceneFindEntitiesByTag("EnemyTurret");
             if (turrets != null && turrets.Length > 0)
             {
                 currentGameScenePath = GAME_SCENE_PATH;
-                LogMessage("PauseMenuPopup: Detected Level 1");
+                LogMessage("PauseMenuPopup3: Detected Level 1");
             }
             else
             {
                 currentGameScenePath = LEVEL2_SCENE_PATH;
-                LogMessage("PauseMenuPopup: Detected Level 2");
+                LogMessage("PauseMenuPopup3: Detected Level 3");
             }
 
             Event.Subscribe("GameOver", OnGameEnded);
             Event.Subscribe("GameWin", OnGameEnded);
             Event.Subscribe("GameRestart", OnGameRestart);
-            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnTutorialPauseChanged);
             Event.Subscribe(EVENT_TUTORIALOVER, OnTutorialOver);
+            Event.Subscribe("GameResumed", OnGameResumed);
+            // Forward P-key toggle from PauseMenuController
+            Event.Subscribe("TogglePauseMenu", OnTogglePauseMenu);
 
-            // Save timer and crosshair UI ID in level 2
+            // Save timer and crosshair UI ID in level 3
             timerUILevel2ID = SceneFindEntityByName("TImer");
             crosshairLevel2ID = SceneFindEntityByName("Crosshair");
             crosshair2Level2ID = SceneFindEntityByName("Crosshair2");
 
-            LogMessage("PauseMenuPopup: Ready!");
+            LogMessage("PauseMenuPopup3: Ready!");
         }
 
         // =====================================================================
@@ -315,12 +325,12 @@ namespace Game
 
             if (pauseKeyJustPressed)
             {
-                LogMessage("PauseMenuPopup: Escape pressed! isPaused=" + isPaused);
-                if (isPaused) HidePauseMenu();
+                LogMessage("PauseMenuPopup3: Escape pressed! userPauseMenuOpen=" + userPauseMenuOpen);
+                if (userPauseMenuOpen) HidePauseMenu();
                 else ShowPauseMenu();
             }
 
-            if (isPaused)
+            if (userPauseMenuOpen)
             {
                 HandleHoverStates();
                 HandleMouseClick();
@@ -332,9 +342,9 @@ namespace Game
         // =====================================================================
         private void ShowPauseMenu()
         {
-            if (isPaused) return;
+            if (userPauseMenuOpen) return;
 
-            isPaused = true;
+            userPauseMenuOpen = true;
             GameState.IsPaused = true;
             Input.SetCursorVisible(true);
             Event.Publish(EVENT_GAME_PAUSED, "");
@@ -404,7 +414,7 @@ namespace Game
                     SafeSetVisible(hudElementIds[i], false);
 
             UpdateCheckboxVisuals();
-            LogMessage("PauseMenuPopup: Menu shown");
+            LogMessage("PauseMenuPopup3: Menu shown");
         }
 
         // =====================================================================
@@ -412,7 +422,7 @@ namespace Game
         // =====================================================================
         private void HidePauseMenu()
         {
-            isPaused = false;
+            userPauseMenuOpen = false;
 
             SafeSetVisible(bgId, false);
             SafeSetVisible(resumeButtonId, false);
@@ -467,23 +477,28 @@ namespace Game
             if (hudElementIds != null)
                 for (int i = 0; i < hudElementIds.Length; i++)
                 {
-
-                    // Exception to hide timer UI & crosshair in Level 2
+                    // Exception: hide timer UI & crosshair while Level 3 tutorial is running
                     if (hudElementIds[i] == timerUILevel2ID ||
                         hudElementIds[i] == crosshairLevel2ID ||
-                        hudElementIds[i] == crosshair2Level2ID) {
-                        if (isTutorialOver) {
+                        hudElementIds[i] == crosshair2Level2ID)
+                    {
+                        if (isTutorialOver)
                             SafeSetVisible(hudElementIds[i], true);
-                        }
-                    } else {
+                    }
+                    else
+                    {
                         SafeSetVisible(hudElementIds[i], true);
                     }
                 }
 
             if (entitiesFound)
             {
-                // Game state resumes fully only if tutorial pause is not ongoing
-                if (!pauseForTutorial) GameState.IsPaused = false;
+                // FIX: Always clear IsPaused. If a tutorial is still active it will
+                // re-assert IsPaused=true on its next OnUpdate.
+                // Old: if(!pauseForTutorial) GameState.IsPaused = false; ← soft-lock gate
+                GameState.IsPaused = false;
+                LogMessage("PauseMenuPopup3: PAUSE-OWNER: userPauseMenuOpen=false, GameState.IsPaused=false"
+                           + " (tutorialForcedPause=" + tutorialForcedPause + "; tutorial re-asserts if still active)");
                 Event.Publish(EVENT_GAME_RESUMED, "");
                 Input.SetCursorVisible(false);
             }
@@ -553,18 +568,18 @@ namespace Game
 
             if (IsButtonClicked(resumeButtonId, resumeButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Resume clicked");
+                LogMessage("PauseMenuPopup3: Resume clicked");
                 HidePauseMenu();
                 return;
             }
 
             if (IsButtonClicked(restartButtonId, restartButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Restart clicked");
+                LogMessage("PauseMenuPopup3: Restart clicked");
                 StopGroup(AudioType.BGM);
                 StopGroup(AudioType.SFX);
                 Input.SetCursorVisible(false);
-                isPaused = false;
+                userPauseMenuOpen = false;
                 GameState.IsPaused = false;
                 Scene.SceneLoadFromFile(currentGameScenePath);
                 return;
@@ -572,10 +587,10 @@ namespace Game
 
             if (IsButtonClicked(mainMenuButtonId, mainMenuButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: Main Menu clicked");
+                LogMessage("PauseMenuPopup3: Main Menu clicked");
                 StopGroup(AudioType.BGM);
                 StopGroup(AudioType.SFX);
-                isPaused = false;
+                userPauseMenuOpen = false;
                 GameState.IsPaused = false;
                 Input.SetCursorVisible(true);
                 Event.Publish(EVENT_GAME_RESUMED, "");
@@ -585,7 +600,7 @@ namespace Game
 
             if (IsButtonClicked(howToPlayButtonId, howToPlayButtonHoveredId))
             {
-                LogMessage("PauseMenuPopup: How To Play clicked");
+                LogMessage("PauseMenuPopup3: How To Play clicked");
                 return;
             }
 
@@ -599,7 +614,7 @@ namespace Game
                     Instance.SetMasterVolume(v);
                     UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
                                     mixerFill1InitialWidth, mixerFill1InitialPosition);
-                    LogMessage("PauseMenuPopup: Master Volume = " + Instance.GetMasterVolume().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: Master Volume = " + Instance.GetMasterVolume().ToString("F2"));
                 }
                 return;
             }
@@ -612,7 +627,7 @@ namespace Game
                     Instance.SetMasterVolume(v);
                     UpdateMixerFill(mixerFillId, Instance.GetMasterVolume(),
                                     mixerFill1InitialWidth, mixerFill1InitialPosition);
-                    LogMessage("PauseMenuPopup: Master Volume = " + Instance.GetMasterVolume().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: Master Volume = " + Instance.GetMasterVolume().ToString("F2"));
                 }
                 return;
             }
@@ -627,7 +642,7 @@ namespace Game
                     Instance.SetBGMVolume(v);
                     UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
                                     mixerFill2InitialWidth, mixerFill2InitialPosition);
-                    LogMessage("PauseMenuPopup: BGM Volume = " + Instance.GetBGMVolume().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: BGM Volume = " + Instance.GetBGMVolume().ToString("F2"));
                 }
                 return;
             }
@@ -640,7 +655,7 @@ namespace Game
                     Instance.SetBGMVolume(v);
                     UpdateMixerFill(mixerFillId2, Instance.GetBGMVolume(),
                                     mixerFill2InitialWidth, mixerFill2InitialPosition);
-                    LogMessage("PauseMenuPopup: BGM Volume = " + Instance.GetBGMVolume().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: BGM Volume = " + Instance.GetBGMVolume().ToString("F2"));
                 }
                 return;
             }
@@ -655,7 +670,7 @@ namespace Game
                     Instance.SetSFXVolume(v);
                     UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
                                     mixerFill3InitialWidth, mixerFill3InitialPosition);
-                    LogMessage("PauseMenuPopup: SFX Volume = " + Instance.GetSFXVolume().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: SFX Volume = " + Instance.GetSFXVolume().ToString("F2"));
                 }
                 return;
             }
@@ -668,7 +683,7 @@ namespace Game
                     Instance.SetSFXVolume(v);
                     UpdateMixerFill(mixerFillId3, Instance.GetSFXVolume(),
                                     mixerFill3InitialWidth, mixerFill3InitialPosition);
-                    LogMessage("PauseMenuPopup: SFX Volume = " + Instance.GetSFXVolume().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: SFX Volume = " + Instance.GetSFXVolume().ToString("F2"));
                 }
                 return;
             }
@@ -681,7 +696,7 @@ namespace Game
                     Instance.IncrementGamma();
                     UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
                                     mixerFill4InitialWidth, mixerFill4InitialPosition);
-                    LogMessage("PauseMenuPopup: Gamma = " + Instance.GetGamma().ToString("F1"));
+                    LogMessage("PauseMenuPopup3: Gamma = " + Instance.GetGamma().ToString("F1"));
                 }
                 return;
             }
@@ -692,7 +707,7 @@ namespace Game
                     Instance.DecrementGamma();
                     UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
                                     mixerFill4InitialWidth, mixerFill4InitialPosition);
-                    LogMessage("PauseMenuPopup: Gamma = " + Instance.GetGamma().ToString("F1"));
+                    LogMessage("PauseMenuPopup3: Gamma = " + Instance.GetGamma().ToString("F1"));
                 }
                 return;
             }
@@ -703,7 +718,7 @@ namespace Game
                     Instance.ResetGamma();
                     UpdateMixerFill(mixerFillId4, Instance.GetGammaNormalized(),
                                     mixerFill4InitialWidth, mixerFill4InitialPosition);
-                    LogMessage("PauseMenuPopup: Gamma reset to default");
+                    LogMessage("PauseMenuPopup3: Gamma reset to default");
                 }
                 return;
             }
@@ -716,7 +731,7 @@ namespace Game
                     Instance.SetMouseSensitivityUp();
                     UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
                                     mixerFill5InitialWidth, mixerFill5InitialPosition);
-                    LogMessage("PauseMenuPopup: MouseSens = " + Instance.GetMouseSensitivity().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: MouseSens = " + Instance.GetMouseSensitivity().ToString("F2"));
                 }
                 return;
             }
@@ -727,7 +742,7 @@ namespace Game
                     Instance.SetMouseSensitivityDown();
                     UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
                                     mixerFill5InitialWidth, mixerFill5InitialPosition);
-                    LogMessage("PauseMenuPopup: MouseSens = " + Instance.GetMouseSensitivity().ToString("F2"));
+                    LogMessage("PauseMenuPopup3: MouseSens = " + Instance.GetMouseSensitivity().ToString("F2"));
                 }
                 return;
             }
@@ -738,7 +753,7 @@ namespace Game
                     Instance.ResetMouseSensitivity();
                     UpdateMixerFill(mixerFillId5, Instance.GetMouseSensitivityNormalized(),
                                     mixerFill5InitialWidth, mixerFill5InitialPosition);
-                    LogMessage("PauseMenuPopup: Mouse sensitivity reset to default");
+                    LogMessage("PauseMenuPopup3: Mouse sensitivity reset to default");
                 }
                 return;
             }
@@ -810,7 +825,7 @@ namespace Game
             Vector3 newPos = new Vector3(initialPosition.X - widthDiff, initialPosition.Y, initialPosition.Z);
             SetPosition(fillId, ref newPos);
 
-            LogMessage("PauseMenuPopup MixerFill: volume=" + volume.ToString("F2") +
+            LogMessage("PauseMenuPopup3 MixerFill: volume=" + volume.ToString("F2") +
                        " width=" + newWidth.ToString("F1") + " posX=" + newPos.X.ToString("F1"));
         }
 
@@ -819,32 +834,61 @@ namespace Game
         // =====================================================================
         private void OnGameEnded(string eventName, string payload)
         {
-            LogMessage("PauseMenuPopup: Game ended (" + eventName + ")");
+            LogMessage("PauseMenuPopup3: Game ended (" + eventName + ")");
             gameEnded = true;
-            if (isPaused) HidePauseMenu();
+            if (userPauseMenuOpen) HidePauseMenu();
         }
 
         private void OnGameRestart(string eventName, string payload)
         {
-            LogMessage("PauseMenuPopup: Game restarted");
+            LogMessage("PauseMenuPopup3: Game restarted");
             gameEnded = false;
         }
 
-        private void OnLevel2Pause(string eventName, string payload)
+        // -----------------------------------------------------------------------
+        // Called by TutorialUIManagerLevel3 every frame it owns the pause.
+        // Tracks whether tutorial is the current pause owner so HidePauseMenu()
+        // knows it can unconditionally clear GameState.IsPaused.
+        // -----------------------------------------------------------------------
+        private void OnTutorialPauseChanged(string eventName, string payload)
         {
             if (bool.TryParse(payload, out bool state))
             {
-                // Update state for pause during tutorial
-                pauseForTutorial = state;
-
-                LogMessage("[PauseMenuPopup] Level 2 pause for tutorial");
+                if (state != tutorialForcedPause)
+                {
+                    tutorialForcedPause = state;
+                    LogMessage("[PauseMenuPopup3] PAUSE-OWNER: tutorialForcedPause=" + tutorialForcedPause);
+                }
             }
         }
 
         private void OnTutorialOver(string eventName, string payload)
         {
             isTutorialOver = true;
-            LogMessage("[PauseMenuPopup] Level 2 tutorial is over, allow to show timer UI");
+            LogMessage("[PauseMenuPopup3] Level 3 tutorial is over, allow to show timer UI");
+        }
+
+        // -----------------------------------------------------------------------
+        // Called when PauseMenuController forwards a P-key press via TogglePauseMenu.
+        // Behaves identically to an Escape press when no menu is open.
+        // -----------------------------------------------------------------------
+        private void OnTogglePauseMenu(string eventName, string payload)
+        {
+            if (gameEnded) return;
+            LogMessage("PauseMenuPopup3: TogglePauseMenu received; userPauseMenuOpen=" + userPauseMenuOpen);
+            if (userPauseMenuOpen) HidePauseMenu();
+            else ShowPauseMenu();
+        }
+
+        // -----------------------------------------------------------------------
+        // Called when another popup (or this one) publishes GameResumed.
+        // Not strictly needed here since HidePauseMenu() handles our own close,
+        // but guards against cross-popup GameResumed echoes.
+        // -----------------------------------------------------------------------
+        private void OnGameResumed(string eventName, string payload)
+        {
+            // Nothing needed: our own HidePauseMenu() already cleared userPauseMenuOpen.
+            // This handler exists so future callers can rely on the subscription.
         }
 
         public override void OnDestroy()
@@ -852,9 +896,11 @@ namespace Game
             Event.Unsubscribe("GameOver", OnGameEnded);
             Event.Unsubscribe("GameWin", OnGameEnded);
             Event.Unsubscribe("GameRestart", OnGameRestart);
-            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
+            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnTutorialPauseChanged);
             Event.Unsubscribe(EVENT_TUTORIALOVER, OnTutorialOver);
-            LogMessage("PauseMenuPopup: Destroyed");
+            Event.Unsubscribe("GameResumed", OnGameResumed);
+            Event.Unsubscribe("TogglePauseMenu", OnTogglePauseMenu);
+            LogMessage("PauseMenuPopup3: Destroyed");
         }
     }
 }

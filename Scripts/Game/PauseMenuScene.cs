@@ -11,10 +11,27 @@ namespace Game
 {
     /// <summary>
     /// Handles the pause menu scene buttons and navigation.
-    /// This script lives in the PauseMenu.json scene.
+    /// This script lives in the PauseMenuScene.json scene.
+    ///
+    /// NOTE: With the current architecture, PauseMenuController no longer loads this
+    /// scene during gameplay. The inline PauseMenuPopup / PauseMenuPopup3 scripts handle
+    /// the pause menu directly. This file is kept for legacy/editor use and as a
+    /// standalone fallback in case the scene is loaded directly.
+    ///
+    /// FIX (event ordering): returnGameScenePath is now read from the static field
+    /// PendingReturnScenePath, which PauseMenuController (or any caller) must set
+    /// BEFORE loading this scene.  The old approach of subscribing to "GamePaused"
+    /// and waiting for the payload was unreliable because the event was published
+    /// before this script's OnStart() ran.
     /// </summary>
     public class PauseMenuScene : ScriptBehaviour
     {
+        // -----------------------------------------------------------------------
+        // Set this BEFORE calling SceneLoadFromFile(PauseMenuScenePath) so that
+        // OnStart() can read it without relying on event timing.
+        // -----------------------------------------------------------------------
+        public static string PendingReturnScenePath = "";
+
         // Button entity names
         private const string RESUME_BUTTON_NAME = "Paused_ResumeButton";
         private const string RESUME_BUTTON_HOVERED_NAME = "Paused_ResumeButton_Hovered";
@@ -62,8 +79,8 @@ namespace Game
         private const float HIDDEN_Y = -500.0f;
 
         // Checkbox positions
-        private Vector3 checkboxMasterVisiblePos = new Vector3(833.8f, 620.0f, 0.0f);  
-        private Vector3 checkboxBGMVisiblePos = new Vector3(987.1f, 620.0f, 0.0f);     
+        private Vector3 checkboxMasterVisiblePos = new Vector3(833.8f, 620.0f, 0.0f);
+        private Vector3 checkboxBGMVisiblePos = new Vector3(987.1f, 620.0f, 0.0f);
         private Vector3 checkboxSFXVisiblePos = new Vector3(1143.5f, 620.0f, 0.0f);
 
         // Entity IDs - Buttons
@@ -120,6 +137,12 @@ namespace Game
         public override void OnStart()
         {
             LogMessage("PauseMenuScene: Initializing...");
+
+            // FIX: Read the return path from the static field set by our caller
+            // BEFORE this scene was loaded — no event-timing race condition.
+            returnGameScenePath = PendingReturnScenePath;
+            PendingReturnScenePath = "";  // consume it
+            LogMessage("PauseMenuScene: returnGameScenePath = '" + returnGameScenePath + "'");
 
             // Find button entities
             resumeButtonId = SceneFindEntityByName(RESUME_BUTTON_NAME);
@@ -185,9 +208,6 @@ namespace Game
                 LogMessage("PauseMenuScene: Mixer 3 initial height = " + mixerFill3InitialWidth);
             }
 
-            // Subscribe to pause event to get the game scene path
-            Event.Subscribe("GamePaused", OnGamePaused);
-
             // Ensure cursor is visible
             Input.SetCursorVisible(true);
 
@@ -204,13 +224,6 @@ namespace Game
             }
 
             LogMessage("PauseMenuScene: Ready!");
-        }
-
-        private void OnGamePaused(string eventName, string payload)
-        {
-            // Store which game scene we came from
-            returnGameScenePath = payload;
-            LogMessage("PauseMenuScene: Received game scene path: " + returnGameScenePath);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -434,39 +447,33 @@ namespace Game
         }
 
         /// <summary>
-        /// Updates the mixer fill bar visual height based on volume (0.0 to 1.0)
-        /// Adjusts height and position to keep bottom edge fixed
+        /// Updates the mixer fill bar visual height based on volume (0.0 to 1.0).
+        /// Adjusts height and position to keep bottom edge fixed.
         /// </summary>
-        private void UpdateMixerFillVisual(uint mixerFillId, float volume, float initialWidth, Vector3 initialPosition)
+        private void UpdateMixerFillVisual(uint fillId, float volume, float initialWidth, Vector3 initialPosition)
         {
-            if (mixerFillId == 0) return;
+            if (fillId == 0) return;
 
-            // Clamp volume to 0-1 range
             if (volume < 0.0f) volume = 0.0f;
             if (volume > 1.0f) volume = 1.0f;
 
-            // Calculate new height based on volume
             float newHeight = initialWidth * volume;
 
-            // Get current scale
-            Vector3 currentScale = GetScale(mixerFillId);
-
-            // Update scale with new height
+            Vector3 currentScale = GetScale(fillId);
             Vector3 newScale = new Vector3(
-                currentScale.X,     // Keep width
-                newHeight,          // Height based on volume
-                currentScale.Z      // Keep depth
+                currentScale.X,
+                newHeight,
+                currentScale.Z
             );
-            SetScale(mixerFillId, ref newScale);
+            SetScale(fillId, ref newScale);
 
-            // Adjust position to keep BOTTOM edge fixed
             float heightDifference = initialWidth - newHeight;
             Vector3 newPosition = new Vector3(
                 initialPosition.X,
                 initialPosition.Y + heightDifference,
                 initialPosition.Z
             );
-            SetPosition(mixerFillId, ref newPosition);
+            SetPosition(fillId, ref newPosition);
         }
 
         private void UpdateCheckboxVisuals()
@@ -523,17 +530,24 @@ namespace Game
             // Hide cursor for gameplay
             Input.SetCursorVisible(false);
 
-            // Publish event to resume game
-            Event.Publish("ResumeGame", returnGameScenePath);
+            // FIX: publish "GameResumed" (not "ResumeGame") so tutorial scripts and
+            // other subscribers that depend on the canonical resume event get notified.
+            Event.Publish("GameResumed", returnGameScenePath);
 
-            // Load game scene
+            // Reload the game scene (unavoidable: the gameplay scene was replaced when
+            // this pause scene was loaded).
             if (!string.IsNullOrEmpty(returnGameScenePath))
             {
                 bool success = Scene.SceneLoadFromFile(returnGameScenePath);
                 if (success)
-                {
                     LogMessage("PauseMenuScene: Returned to game successfully");
-                }
+                else
+                    LogError("PauseMenuScene: Failed to load return scene: " + returnGameScenePath);
+            }
+            else
+            {
+                LogError("PauseMenuScene: returnGameScenePath is empty — cannot resume. "
+                         + "Set PauseMenuScene.PendingReturnScenePath before loading this scene.");
             }
         }
 
@@ -554,9 +568,7 @@ namespace Game
             {
                 bool success = Scene.SceneLoadFromFile(returnGameScenePath);
                 if (success)
-                {
                     LogMessage("PauseMenuScene: Game restarted successfully");
-                }
             }
         }
 
@@ -575,14 +587,11 @@ namespace Game
             // Load main menu
             bool success = Scene.SceneLoadFromFile(MAIN_MENU_SCENE_PATH);
             if (success)
-            {
                 LogMessage("PauseMenuScene: Returned to main menu successfully");
-            }
         }
 
         public override void OnDestroy()
         {
-            Event.Unsubscribe("GamePaused", OnGamePaused);
             LogMessage("PauseMenuScene: Destroyed");
         }
     }
