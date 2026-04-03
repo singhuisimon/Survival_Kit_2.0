@@ -246,9 +246,12 @@ namespace Game
             if (pauseForTutorial && playerPauseOnTutorial)
             {
                 if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = false;
-                Publish("TutorialPauseAudio", pauseForTutorial.ToString());
-                Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                }
+
                 return;
             }
 
