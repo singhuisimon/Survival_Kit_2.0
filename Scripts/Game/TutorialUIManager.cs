@@ -454,6 +454,8 @@ namespace Game
 
             tooltipElapsed += dt;
 
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (tooltipElapsed <= tooltipMinTime && !wallDestroyedPublished)
             {
                 ShowUI(pressShootID, true, dt);
@@ -475,7 +477,6 @@ namespace Game
 
             if (fadeUpElapsed >= fadeUpTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
                 if (EPressed)
                 {
                     ShowUI(pressShootID, false, dt);
@@ -504,6 +505,8 @@ namespace Game
         {
             altUsed = false;
 
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (tooltipElapsed <= tooltipMinTime)
             {
                 ShowUI(destroyTurretID, true, dt);
@@ -514,8 +517,6 @@ namespace Game
 
             if (tooltipElapsed > tooltipMinTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
                 if (EPressed)
                 {
                     ShowUI(destroyTurretID, false, dt);
@@ -539,6 +540,8 @@ namespace Game
             altUsed = false;
             tooltipElapsed += dt;
 
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (!EPressed && !turretsDestroyed && tooltipElapsed <= tooltipMinTime)
             {
                 ShowUI(destroyEnemiesID, true, dt);
@@ -547,8 +550,6 @@ namespace Game
 
             if (tooltipElapsed > tooltipMinTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
                 if (turretsDestroyed || EPressed)
                 {
                     ShowUI(destroyEnemiesID, false, dt);
@@ -581,6 +582,8 @@ namespace Game
         {
             tooltipElapsed += dt;
 
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (!EPressed && tooltipElapsed <= tooltipMinTime)
             {
                 ShowUI(altFireID, true, dt);
@@ -589,7 +592,6 @@ namespace Game
 
             if (tooltipElapsed > tooltipMinTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
                 if (altUsed || EPressed)
                 {
                     ShowUI(altFireID, false, dt);
@@ -1142,6 +1144,16 @@ namespace Game
                     {
                         blackFadeOutDone = false;
                         flyThroughBlackoutState = FlyThroughBlackoutState.None;
+
+                        if (flyThroughImmediateReturnRequested)
+                        {
+                            flyThroughFinalFadeTriggered = true;
+                            blackFadeInDone = false;
+                            blackFadeOutDone = false;
+                            flyThroughBlackoutState = FlyThroughBlackoutState.FinalFadeIn;
+                            Publish(EVENT_FADE_BLACK_IN, "");
+                            return true;
+                        }
                     }
                     return false;
 
@@ -1298,8 +1310,7 @@ namespace Game
             if (!flyThroughStarted || flyThroughFinished)
                 return;
 
-            if (flyThroughBlackoutState == FlyThroughBlackoutState.FinalFadeIn ||
-                flyThroughBlackoutState == FlyThroughBlackoutState.FinalFadeOut)
+            if (flyThroughBlackoutState != FlyThroughBlackoutState.None)
             {
                 flyThroughImmediateReturnRequested = true;
                 return;
