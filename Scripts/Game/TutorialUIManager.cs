@@ -116,38 +116,51 @@ namespace Game
         private bool playerPauseOnTutorial = false;
         private bool prevEscapePressed = false;
         private bool UIShown = false;
-        private bool destroyEnemyShown = false;
 
-        private float camFlySpeed = 100.0f;
-        private Vector3 lastCamPos = Vector3.Zero;
-        private bool camPosSaved = false;
-        private bool returningCam = false;
-        private bool camMovedToWall = false;
-        private bool camReturned = false;
+        [SerializeField] private float camFlySpeed = 100.0f;
+
+        private bool tutorialCamMoveActive = false;
+        private bool tutorialCamMoveCompleted = false;
+        private bool tutorialCamPoseSaved = false;
+        private Vector3 tutorialCamSavedPos = Vector3.Zero;
+        private Vector3 tutorialCamSavedTarget = Vector3.Zero;
+        private Vector3 tutorialCamMoveStartPos = Vector3.Zero;
+        private Vector3 tutorialCamMoveStartTarget = Vector3.Zero;
+        private Vector3 tutorialCamMoveEndPos = Vector3.Zero;
+        private Vector3 tutorialCamMoveEndTarget = Vector3.Zero;
+        private float tutorialCamMoveElapsed = 0.0f;
+        private float tutorialCamMoveDuration = 0.0f;
+
+        private bool shootWallStateEntered = false;
+        private bool shootWallReturnStarted = false;
+        private bool destroyTurretStateEntered = false;
+        private bool destroyTurretReturnStarted = false;
+        private bool collectUpgradeStateEntered = false;
+        private bool collectUpgradeReturnStarted = false;
+
+        private readonly Vector3 shootWallCamPos = new Vector3(-325.0f, 25.0f, -25.0f);
+        private readonly Vector3 shootWallCamTarget = new Vector3(-400.0f, -25.0f, 45.0f);
+        private readonly Vector3 destroyTurretCamPos = new Vector3(-640.0f, -35.0f, 45.0f);
+        private readonly Vector3 destroyTurretCamTarget = new Vector3(-750.0f, -20.0f, -30.0f);
+        private readonly Vector3 collectUpgradeCamPos = new Vector3(-5570.0f, -400.0f, 630.0f);
+        private readonly Vector3 collectUpgradeCamTarget = new Vector3(-5750.0f, -440.0f, 670.0f);
 
         // ===== Fly-through Cinematic =====
         [SerializeField] private float flyThroughLookAheadStartT = 0.8f;
-        [SerializeField] private float flyThroughReturnDuration = 1.0f;
         [SerializeField] private float flyThroughFinalLookDistance = 250.0f;
 
-        // Teleport cut happens before moving to this waypoint index.
         [SerializeField] private int flyThroughTeleportWaypointIndex = 5;
-
-        // When to start fading while still moving.
         [SerializeField] private float flyThroughTeleportFadeLeadTime = 2.0f;
         [SerializeField] private float flyThroughFinalFadeLeadTime = 1.0f;
 
         private bool flyThroughStarted = false;
         private bool flyThroughFinished = false;
-        private bool flyThroughReturning = false;
         private int flyThroughSegmentIndex = 0;
         private float flyThroughSegmentElapsed = 0.0f;
         private bool flyThroughImmediateReturnRequested = false;
 
         private Vector3 savedFlyThroughCamPos = Vector3.Zero;
         private Vector3 savedFlyThroughCamTarget = Vector3.Zero;
-        private Vector3 returnFlyThroughStartPos = Vector3.Zero;
-        private Vector3 returnFlyThroughStartTarget = Vector3.Zero;
 
         private Vector3 savedFlyThroughPlayerPos = Vector3.Zero;
         private Quat savedFlyThroughPlayerRot;
@@ -173,7 +186,7 @@ namespace Game
 
         private readonly float[] flyThroughWaypointTimes = new float[]
         {
-            1.0f, 1.0f, 1.0f, 0.6f, 1.0f, 0.0f, 5.0f
+            1.0f, 1.0f, 1.0f, 0.6f, 1.0f, 0.0001f, 5.0f
         };
 
         public override void OnStart()
@@ -193,6 +206,7 @@ namespace Game
             fadeBlackID = SceneFindEntityByName(fadeBlackName);
 
             ResetFlyThroughCinematicState();
+            ResetTutorialFocusState();
 
             if (flyThroughWaypoints.Length != flyThroughWaypointTimes.Length)
             {
@@ -247,6 +261,7 @@ namespace Game
             {
                 if (escapeJustPressed)
                     playerPauseOnTutorial = false;
+
                 Publish("TutorialPauseAudio", pauseForTutorial.ToString());
                 Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                 return;
@@ -255,17 +270,16 @@ namespace Game
             if (pauseForTutorial)
             {
                 GameState.IsPaused = true;
+
                 if (escapeJustPressed)
                 {
                     playerPauseOnTutorial = true;
                     Publish("TutorialPauseAudio", false.ToString());
                     return;
                 }
-                else
-                {
-                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
-                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
-                }
+
+                Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                Publish("TutorialPauseMenu", pauseForTutorial.ToString());
             }
 
             Vector3 currentPos = Transform.GetPosition(playerID);
@@ -329,19 +343,13 @@ namespace Game
         private void HandleMoveState(Vector3 currentPos, float dt)
         {
             if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A) || IsKeyPressed(KeyCode.E)))
-            {
                 movedWASD = true;
-            }
 
             if (!movedSpacebar && IsKeyPressed(KeyCode.Space))
-            {
                 movedSpacebar = true;
-            }
 
             if (!movedShift && IsKeyPressed(KeyCode.LeftShift))
-            {
                 movedShift = true;
-            }
 
             if (movedWASD)
             {
@@ -370,30 +378,22 @@ namespace Game
             }
         }
 
-        private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos, float dt)
+        private void HandleFlyThroughState(Vector3 currentPos, Vector3 currentWallPos, float dt)
         {
             tooltipElapsed += dt;
 
             if (!flyThroughStarted)
-            {
                 StartFlyThroughCinematic();
-            }
 
             if (!flyThroughFinished)
             {
                 if (IsKeyPressed(KeyCode.E))
-                {
                     BeginFlyThroughImmediateReturnToPlayer();
-                }
 
                 if (flyThroughImmediateReturnRequested)
-                {
                     ShowUI(pressFlyTunnelID, false, dt);
-                }
                 else if (!EPressed)
-                {
                     ShowUI(pressFlyTunnelID, true, dt);
-                }
 
                 UpdateFlyThroughCinematic(dt);
                 pauseForTutorial = true;
@@ -401,10 +401,7 @@ namespace Game
                 return;
             }
 
-            if (IsKeyPressed(KeyCode.E))
-                EPressed = true;
-
-            bool canExitFlyThroughState = EPressed || flyThroughFinished;
+            bool canExitFlyThroughState = flyThroughFinished;
 
             if (canExitFlyThroughState)
             {
@@ -418,7 +415,7 @@ namespace Game
                 GameState.IsPaused = true;
             }
 
-            if ((currentPos.X - wallPos.X) < 70.0f && canExitFlyThroughState && (fadeOutElapsed > switchTime))
+            if ((currentPos.X - currentWallPos.X) < 70.0f && canExitFlyThroughState && (fadeOutElapsed > switchTime))
             {
                 EPressed = false;
                 tooltipElapsed = 0.0f;
@@ -428,70 +425,112 @@ namespace Game
             }
         }
 
-        private void HandleShootWallState(Vector3 currentPos, Vector3 wallPos, float dt)
+        private void HandleShootWallState(Vector3 currentPos, Vector3 currentWallPos, float dt)
         {
             altUsed = false;
 
-            if (!camPosSaved)
+            bool wallAlreadyDestroyed = IsWallAlreadyDestroyed(currentPos, currentWallPos);
+
+            if (wallAlreadyDestroyed && !wallDestroyedPublished)
             {
-                lastCamPos = Transform.GetPosition(cameraID);
+                wallDestroyedPublished = true;
+                Publish("DestructableWallDestroyed", true.ToString());
+            }
 
-                Vector3 camViewPos = wallPos;
-                camViewPos.X += 30.0f;
-                Transform.SetPosition(cameraID, ref camViewPos);
+            if (wallAlreadyDestroyed && !shootWallStateEntered)
+            {
+                SpriteRenderer.SetIsVisible(pressShootID, false);
+                pauseForTutorial = false;
+                GameState.IsPaused = false;
 
-                camPosSaved = true;
+                shootWallStateEntered = false;
+                shootWallReturnStarted = false;
+                tutorialCamPoseSaved = false;
+                tutorialCamMoveActive = false;
+                tutorialCamMoveCompleted = false;
+                EPressed = false;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+
+                currentState = TutorialState.DestroyTurret;
+                return;
+            }
+
+            if (!shootWallStateEntered)
+            {
+                shootWallStateEntered = true;
+                shootWallReturnStarted = false;
+                tutorialCamPoseSaved = false;
                 tooltipElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
-
                 EPressed = false;
-                wallDestroyedPublished = false;
+                wallDestroyedPublished = wallAlreadyDestroyed;
+
+                BeginTutorialCameraMove(shootWallCamPos, shootWallCamTarget, true);
             }
 
+            UpdateTutorialCameraMove(dt);
             tooltipElapsed += dt;
 
             if (tooltipElapsed <= tooltipMinTime && !wallDestroyedPublished)
             {
                 ShowUI(pressShootID, true, dt);
                 pauseForTutorial = true;
+                GameState.IsPaused = true;
                 return;
             }
 
-            if (currentPos.X < (wallPos.X - 2) && !wallDestroyedPublished)
+            if (IsWallAlreadyDestroyed(currentPos, currentWallPos) && !wallDestroyedPublished)
             {
                 LogMessage("[TutorialUIManager] Detect wall is destroyed");
                 wallDestroyedPublished = true;
                 Publish("DestructableWallDestroyed", true.ToString());
-                ShowUI(pressShootID, false, dt);
-            }
-            else if (wallDestroyedPublished)
-            {
-                ShowUI(pressShootID, false, dt);
             }
 
-            if (fadeUpElapsed >= fadeUpTime)
+            if (wallDestroyedPublished)
+                ShowUI(pressShootID, false, dt);
+            else
+                ShowUI(pressShootID, true, dt);
+
+            if (fadeUpElapsed >= fadeUpTime && IsKeyPressed(KeyCode.E))
+                EPressed = true;
+
+            if (EPressed)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-                if (EPressed)
+                ShowUI(pressShootID, false, dt);
+                pauseForTutorial = false;
+                GameState.IsPaused = false;
+
+                if (!shootWallReturnStarted)
                 {
-                    ShowUI(pressShootID, false, dt);
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
+                    shootWallReturnStarted = true;
+                    BeginReturnTutorialCameraMove();
                 }
+
+                UpdateTutorialCameraMove(dt);
+            }
+            else
+            {
+                pauseForTutorial = true;
+                GameState.IsPaused = true;
             }
 
-            if (wallDestroyedPublished && EPressed && (fadeOutElapsed > switchTime))
+            if (wallDestroyedPublished &&
+                EPressed &&
+                shootWallReturnStarted &&
+                IsTutorialCameraMoveFinished() &&
+                fadeOutElapsed > switchTime)
             {
-                Transform.SetPosition(cameraID, ref lastCamPos);
-
                 EPressed = false;
                 tooltipElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
 
-                camPosSaved = false;
-                camReturned = false;
+                shootWallStateEntered = false;
+                shootWallReturnStarted = false;
+                tutorialCamPoseSaved = false;
 
                 currentState = TutorialState.DestroyTurret;
             }
@@ -501,31 +540,70 @@ namespace Game
         {
             altUsed = false;
 
+            if (!destroyTurretStateEntered)
+            {
+                destroyTurretStateEntered = true;
+                destroyTurretReturnStarted = false;
+                tutorialCamPoseSaved = false;
+                tutorialCamMoveActive = false;
+                tutorialCamMoveCompleted = false;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                EPressed = false;
+
+                BeginTutorialCameraMove(destroyTurretCamPos, destroyTurretCamTarget, true);
+            }
+
+            UpdateTutorialCameraMove(dt);
+
             if (tooltipElapsed <= tooltipMinTime)
             {
                 ShowUI(destroyTurretID, true, dt);
                 pauseForTutorial = true;
+                GameState.IsPaused = true;
             }
 
             tooltipElapsed += dt;
 
             if (tooltipElapsed > tooltipMinTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
+                if (IsKeyPressed(KeyCode.E))
+                    EPressed = true;
 
                 if (EPressed)
                 {
                     ShowUI(destroyTurretID, false, dt);
                     pauseForTutorial = false;
                     GameState.IsPaused = false;
+
+                    if (!destroyTurretReturnStarted)
+                    {
+                        destroyTurretReturnStarted = true;
+                        BeginReturnTutorialCameraMove();
+                    }
+
+                    UpdateTutorialCameraMove(dt);
+                }
+                else
+                {
+                    pauseForTutorial = true;
+                    GameState.IsPaused = true;
                 }
 
-                if (oneturretDestroyed && EPressed && (fadeOutElapsed > switchTime))
+                if (oneturretDestroyed &&
+                    EPressed &&
+                    destroyTurretReturnStarted &&
+                    IsTutorialCameraMoveFinished() &&
+                    fadeOutElapsed > switchTime)
                 {
                     EPressed = false;
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
+                    destroyTurretStateEntered = false;
+                    destroyTurretReturnStarted = false;
+                    tutorialCamPoseSaved = false;
                     currentState = TutorialState.DestroyEnemies;
                 }
             }
@@ -534,34 +612,24 @@ namespace Game
         private void HandleDestroyEnemiesState(float dt)
         {
             altUsed = false;
-            tooltipElapsed += dt;
+            pauseForTutorial = false;
+            GameState.IsPaused = false;
+            EPressed = false;
 
-            if (!EPressed && !turretsDestroyed && tooltipElapsed <= tooltipMinTime)
+            if (!turretsDestroyed)
             {
                 ShowUI(destroyEnemiesID, true, dt);
-                pauseForTutorial = true;
+                return;
             }
 
-            if (tooltipElapsed > tooltipMinTime)
+            ShowUI(destroyEnemiesID, false, dt);
+
+            if (fadeOutElapsed > fadeOutTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                if (turretsDestroyed || EPressed)
-                {
-                    ShowUI(destroyEnemiesID, false, dt);
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
-                }
-
-                if (EPressed && fadeOutElapsed > fadeOutTime)
-                {
-                    EPressed = false;
-                    tooltipElapsed = 0.0f;
-                    fadeOutElapsed = 0.0f;
-                    fadeUpElapsed = 0.0f;
-
-                    currentState = TutorialState.Wait;
-                }
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                currentState = TutorialState.Wait;
             }
         }
 
@@ -570,77 +638,105 @@ namespace Game
             if (turretsDestroyed && ultCharged && !altFireShown && !altUsed)
             {
                 altFireShown = true;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                EPressed = false;
                 currentState = TutorialState.AltFire;
             }
         }
 
         private void HandleAltFire(float dt)
         {
-            tooltipElapsed += dt;
+            pauseForTutorial = false;
+            GameState.IsPaused = false;
+            EPressed = false;
 
-            if (!EPressed && tooltipElapsed <= tooltipMinTime)
+            if (!altUsed)
             {
                 ShowUI(altFireID, true, dt);
-                pauseForTutorial = true;
+                return;
             }
 
-            if (tooltipElapsed > tooltipMinTime)
+            ShowUI(altFireID, false, dt);
+
+            if (fadeOutElapsed > fadeOutTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-                if (altUsed || EPressed)
-                {
-                    ShowUI(altFireID, false, dt);
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
-                }
-
-                if (EPressed && fadeOutElapsed > fadeOutTime)
-                {
-                    EPressed = false;
-                    tooltipElapsed = 0.0f;
-                    fadeOutElapsed = 0.0f;
-
-                    currentState = TutorialState.Wait;
-                }
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                currentState = TutorialState.Wait;
             }
         }
 
         private void HandleCollectUpgradeModuleState(float dt)
         {
-            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+            if (!collectUpgradeStateEntered)
+            {
+                collectUpgradeStateEntered = true;
+                collectUpgradeReturnStarted = false;
+                tutorialCamPoseSaved = false;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                EPressed = false;
+
+                BeginTutorialCameraMove(collectUpgradeCamPos, collectUpgradeCamTarget, true);
+            }
+
+            UpdateTutorialCameraMove(dt);
+
+            if (IsKeyPressed(KeyCode.E))
+                EPressed = true;
+
             if (hasCollectedUpgrade || EPressed)
             {
                 ShowCollectUpgradeUI(false, dt);
                 GameState.IsPaused = false;
                 pauseForTutorial = false;
+
+                if (!collectUpgradeReturnStarted)
+                {
+                    collectUpgradeReturnStarted = true;
+                    BeginReturnTutorialCameraMove();
+                }
+
+                UpdateTutorialCameraMove(dt);
             }
             else
             {
                 ShowCollectUpgradeUI(true, dt);
                 pauseForTutorial = true;
+                GameState.IsPaused = true;
             }
 
-            if (hasCollectedUpgrade && fadeOutElapsed > fadeOutTime)
+            if (hasCollectedUpgrade &&
+                collectUpgradeReturnStarted &&
+                IsTutorialCameraMoveFinished() &&
+                fadeOutElapsed > fadeOutTime)
             {
                 fadeUpElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
                 EPressed = false;
                 hasCollectedUpgrade = false;
+                collectUpgradeStateEntered = false;
+                collectUpgradeReturnStarted = false;
+                tutorialCamPoseSaved = false;
                 currentState = TutorialState.SummonSentry;
             }
         }
 
         private void HandleSummonSentryState(float dt)
         {
-            if (IsKeyPressed(KeyCode.E)) hasSummonedSentry = true;
+            pauseForTutorial = false;
+            GameState.IsPaused = false;
+            EPressed = false;
 
             if (hasSummonedSentry)
             {
                 ShowSentrySummonUI(false, dt);
-                GameState.IsPaused = false;
-                pauseForTutorial = false;
 
-                if (fadeOutElapsed > fadeOutTime)
+                if (fadeOutElapsed > sentrySummonFadeOutTime)
                 {
                     SpriteRenderer.FadeIn(sentrySummonID, 1.0f, 1.0f);
                     SpriteRenderer.SetIsVisible(sentrySummonID, false);
@@ -653,7 +749,6 @@ namespace Game
             else
             {
                 ShowSentrySummonUI(true, dt);
-                pauseForTutorial = true;
             }
         }
 
@@ -661,7 +756,9 @@ namespace Game
         {
             if (value)
             {
-                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                if (fadeUpElapsed < fadeUpTime)
+                    fadeUpElapsed += dt;
+
                 SpriteRenderer.FadeIn(entityID, fadeUpElapsed, fadeUpTime);
 
                 Vector3 newPos = Transform.GetPosition(entityID);
@@ -722,9 +819,12 @@ namespace Game
             SpriteRenderer.SetIsVisible(altFireID, false);
             SpriteRenderer.SetIsVisible(proceedID, false);
 
+            ResetTutorialFocusState();
+
             EPressed = false;
             fadeUpElapsed = 0.0f;
             fadeOutElapsed = 0.0f;
+            tooltipElapsed = 0.0f;
             currentState = TutorialState.CollectUpgradeModule;
         }
 
@@ -756,7 +856,9 @@ namespace Game
         {
             if (value)
             {
-                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                if (fadeUpElapsed < fadeUpTime)
+                    fadeUpElapsed += dt;
+
                 SpriteRenderer.FadeIn(collectUpgradeModuleID, fadeUpElapsed, fadeUpTime);
 
                 Vector3 newPos = Transform.GetPosition(collectUpgradeModuleID);
@@ -780,7 +882,9 @@ namespace Game
         {
             if (value)
             {
-                if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
+                if (fadeUpElapsed < fadeUpTime)
+                    fadeUpElapsed += dt;
+
                 SpriteRenderer.FadeIn(sentrySummonID, fadeUpElapsed, fadeUpTime);
 
                 Vector3 newPos = Transform.GetPosition(sentrySummonID);
@@ -808,6 +912,172 @@ namespace Game
             return justPressed;
         }
 
+        private bool IsWallAlreadyDestroyed(Vector3 currentPos, Vector3 currentWallPos)
+        {
+            return wallDestroyedPublished || currentPos.X < (currentWallPos.X - 2.0f);
+        }
+
+        private Vector3 GetLiveCameraTarget()
+        {
+            if (cameraID == 0)
+                return Vector3.Zero;
+
+            Vector3 camPos = Transform.GetPosition(cameraID);
+            Quat camRot = Transform.GetRotation(cameraID);
+            Vector3 camForward = camRot.Forward;
+
+            if (camForward.SqrMagnitude < 1e-8f)
+                camForward = Vector3.Forward;
+            else
+                camForward = camForward.Normalized;
+
+            return camPos + camForward * flyThroughFinalLookDistance;
+        }
+
+        private void GetLiveCameraPose(out Vector3 camPos, out Vector3 camTarget)
+        {
+            if (cameraID == 0)
+            {
+                camPos = Vector3.Zero;
+                camTarget = Vector3.Zero;
+                return;
+            }
+
+            camPos = Transform.GetPosition(cameraID);
+            camTarget = GetLiveCameraTarget();
+        }
+
+        private void ApplyCameraPose(Vector3 camPos, Vector3 camTarget)
+        {
+            if (cameraID == 0)
+                return;
+
+            Transform.SetPosition(cameraID, ref camPos);
+            SetTarget(cameraID, ref camTarget);
+        }
+
+        private void RefreshTutorialSavedCameraPoseFromLive()
+        {
+            if (cameraID == 0)
+                return;
+
+            Vector3 currentCamPos;
+            Vector3 currentCamTarget;
+            GetLiveCameraPose(out currentCamPos, out currentCamTarget);
+
+            tutorialCamSavedPos = currentCamPos;
+            tutorialCamSavedTarget = currentCamTarget;
+            tutorialCamPoseSaved = true;
+        }
+
+        private void BeginTutorialCameraMove(Vector3 targetPos, Vector3 targetLookAt, bool saveCurrentPose)
+        {
+            if (cameraID == 0)
+            {
+                tutorialCamMoveActive = false;
+                tutorialCamMoveCompleted = true;
+                return;
+            }
+
+            Vector3 currentCamPos;
+            Vector3 currentCamTarget;
+            GetLiveCameraPose(out currentCamPos, out currentCamTarget);
+
+            if (saveCurrentPose || !tutorialCamPoseSaved)
+            {
+                tutorialCamSavedPos = currentCamPos;
+                tutorialCamSavedTarget = currentCamTarget;
+                tutorialCamPoseSaved = true;
+            }
+
+            tutorialCamMoveStartPos = currentCamPos;
+            tutorialCamMoveStartTarget = currentCamTarget;
+            tutorialCamMoveEndPos = targetPos;
+            tutorialCamMoveEndTarget = targetLookAt;
+            tutorialCamMoveElapsed = 0.0f;
+
+            Vector3 posDelta = tutorialCamMoveEndPos - tutorialCamMoveStartPos;
+            Vector3 targetDelta = tutorialCamMoveEndTarget - tutorialCamMoveStartTarget;
+            float posDistance = (float)Math.Sqrt(posDelta.SqrMagnitude);
+            float targetDistance = (float)Math.Sqrt(targetDelta.SqrMagnitude);
+            float travelDistance = posDistance > targetDistance ? posDistance : targetDistance;
+            float safeSpeed = camFlySpeed > 0.01f ? camFlySpeed : 100.0f;
+
+            tutorialCamMoveDuration = travelDistance / safeSpeed;
+            if (tutorialCamMoveDuration < 0.01f)
+                tutorialCamMoveDuration = 0.01f;
+
+            tutorialCamMoveActive = true;
+            tutorialCamMoveCompleted = false;
+        }
+
+        private void BeginReturnTutorialCameraMove()
+        {
+            if (!tutorialCamPoseSaved)
+            {
+                RefreshTutorialSavedCameraPoseFromLive();
+            }
+
+            if (!tutorialCamPoseSaved)
+            {
+                tutorialCamMoveActive = false;
+                tutorialCamMoveCompleted = true;
+                return;
+            }
+
+            BeginTutorialCameraMove(tutorialCamSavedPos, tutorialCamSavedTarget, false);
+        }
+
+        private void UpdateTutorialCameraMove(float dt)
+        {
+            if (!tutorialCamMoveActive || cameraID == 0)
+                return;
+
+            tutorialCamMoveElapsed += dt;
+
+            float t = tutorialCamMoveElapsed / tutorialCamMoveDuration;
+            t = SimpleMath.Clamp(t, 0.0f, 1.0f);
+            t = t * t * (3.0f - 2.0f * t);
+
+            Vector3 camPos = Vector3.Lerp(tutorialCamMoveStartPos, tutorialCamMoveEndPos, t);
+            Vector3 camTarget = Vector3.Lerp(tutorialCamMoveStartTarget, tutorialCamMoveEndTarget, t);
+
+            ApplyCameraPose(camPos, camTarget);
+
+            if (tutorialCamMoveElapsed >= tutorialCamMoveDuration)
+            {
+                tutorialCamMoveActive = false;
+                tutorialCamMoveCompleted = true;
+            }
+        }
+
+        private bool IsTutorialCameraMoveFinished()
+        {
+            return !tutorialCamMoveActive && tutorialCamMoveCompleted;
+        }
+
+        private void ResetTutorialFocusState()
+        {
+            tutorialCamMoveActive = false;
+            tutorialCamMoveCompleted = false;
+            tutorialCamPoseSaved = false;
+            tutorialCamSavedPos = Vector3.Zero;
+            tutorialCamSavedTarget = Vector3.Zero;
+            tutorialCamMoveStartPos = Vector3.Zero;
+            tutorialCamMoveStartTarget = Vector3.Zero;
+            tutorialCamMoveEndPos = Vector3.Zero;
+            tutorialCamMoveEndTarget = Vector3.Zero;
+            tutorialCamMoveElapsed = 0.0f;
+            tutorialCamMoveDuration = 0.0f;
+
+            shootWallStateEntered = false;
+            shootWallReturnStarted = false;
+            destroyTurretStateEntered = false;
+            destroyTurretReturnStarted = false;
+            collectUpgradeStateEntered = false;
+            collectUpgradeReturnStarted = false;
+        }
+
         private void StartFlyThroughCinematic()
         {
             if (flyThroughStarted)
@@ -830,22 +1100,13 @@ namespace Game
             }
 
             savedFlyThroughCamPos = Transform.GetPosition(cameraID);
-
-            Quat camRot = Transform.GetRotation(cameraID);
-            Vector3 camForward = camRot.Forward;
-            if (camForward.SqrMagnitude < 1e-8f)
-                camForward = Vector3.Forward;
-            else
-                camForward = camForward.Normalized;
-
-            savedFlyThroughCamTarget = savedFlyThroughCamPos + camForward * flyThroughFinalLookDistance;
+            savedFlyThroughCamTarget = GetLiveCameraTarget();
 
             savedFlyThroughPlayerPos = Transform.GetPosition(playerID);
             savedFlyThroughPlayerRot = Transform.GetRotation(playerID);
 
             flyThroughStarted = true;
             flyThroughFinished = false;
-            flyThroughReturning = false;
             flyThroughSegmentIndex = 0;
             flyThroughSegmentElapsed = 0.0f;
             flyThroughBlackoutState = FlyThroughBlackoutState.None;
@@ -904,8 +1165,7 @@ namespace Game
             Vector3 camPos = Vector3.Lerp(segmentStart, segmentEnd, rawT);
             Vector3 lookTarget = GetFlyThroughLookTarget(flyThroughSegmentIndex, rawT, segmentStart, segmentEnd);
 
-            Transform.SetPosition(cameraID, ref camPos);
-            SetTarget(cameraID, ref lookTarget);
+            ApplyCameraPose(camPos, lookTarget);
             SaveFlyThroughHoldPose(camPos, lookTarget);
 
             TryBeginTeleportCutDuringMovement(flyThroughSegmentIndex, rawT);
@@ -917,9 +1177,7 @@ namespace Game
                 flyThroughSegmentIndex++;
 
                 if (!flyThroughFinalFadeTriggered && flyThroughSegmentIndex >= flyThroughWaypoints.Length)
-                {
                     BeginFlyThroughFinalCut();
-                }
             }
         }
 
@@ -942,10 +1200,7 @@ namespace Game
 
         private void ApplyFlyThroughHoldPose()
         {
-            Vector3 camPos = flyThroughHoldCamPos;
-            Vector3 camTarget = flyThroughHoldCamTarget;
-            Transform.SetPosition(cameraID, ref camPos);
-            SetTarget(cameraID, ref camTarget);
+            ApplyCameraPose(flyThroughHoldCamPos, flyThroughHoldCamTarget);
         }
 
         private void TryBeginTeleportCutDuringMovement(int segmentIndex, float rawT)
@@ -962,8 +1217,6 @@ namespace Game
             if (flyThroughTeleportWaypointIndex >= flyThroughWaypoints.Length)
                 return;
 
-            // Cut happens before moving to flyThroughTeleportWaypointIndex,
-            // so the last visible segment is teleportWaypointIndex - 1.
             int cutSegmentIndex = flyThroughTeleportWaypointIndex - 1;
 
             if (segmentIndex > cutSegmentIndex)
@@ -971,9 +1224,7 @@ namespace Game
 
             float remainingTime = GetRemainingTimeUntilTeleportCut(segmentIndex, rawT);
             if (remainingTime <= flyThroughTeleportFadeLeadTime)
-            {
                 BeginFlyThroughTeleportCut();
-            }
         }
 
         private void TryBeginFinalCutDuringMovement(int segmentIndex, float rawT)
@@ -994,9 +1245,7 @@ namespace Game
 
             float remainingTime = GetRemainingTimeUntilFinalCut(segmentIndex, rawT);
             if (remainingTime <= flyThroughFinalFadeLeadTime)
-            {
                 BeginFlyThroughFinalCut();
-            }
         }
 
         private float GetSafeFlyThroughSegmentDuration(int segmentIndex)
@@ -1175,9 +1424,7 @@ namespace Game
 
             Vector3 camPos = flyThroughWaypoints[waypointIndex];
             Vector3 lookTarget = GetFlyThroughResumeLookTarget(waypointIndex);
-
-            Transform.SetPosition(cameraID, ref camPos);
-            SetTarget(cameraID, ref lookTarget);
+            ApplyCameraPose(camPos, lookTarget);
         }
 
         private Vector3 GetFlyThroughResumeLookTarget(int waypointIndex)
@@ -1239,10 +1486,7 @@ namespace Game
             Transform.SetRotation(playerID, ref playerRot);
 
             if (cameraID != 0)
-            {
-                Transform.SetPosition(cameraID, ref camPos);
-                SetTarget(cameraID, ref camTarget);
-            }
+                ApplyCameraPose(camPos, camTarget);
 
             SaveFlyThroughHoldPose(camPos, camTarget);
         }
@@ -1250,12 +1494,8 @@ namespace Game
         private void FinishFlyThroughCinematic()
         {
             if (cameraID != 0)
-            {
-                Transform.SetPosition(cameraID, ref savedFlyThroughCamPos);
-                SetTarget(cameraID, ref savedFlyThroughCamTarget);
-            }
+                ApplyCameraPose(savedFlyThroughCamPos, savedFlyThroughCamTarget);
 
-            flyThroughReturning = false;
             flyThroughFinished = true;
             flyThroughBlackoutState = FlyThroughBlackoutState.None;
             flyThroughTeleportFadeTriggered = false;
@@ -1270,14 +1510,11 @@ namespace Game
         {
             flyThroughStarted = false;
             flyThroughFinished = false;
-            flyThroughReturning = false;
             flyThroughSegmentIndex = 0;
             flyThroughSegmentElapsed = 0.0f;
 
             savedFlyThroughCamPos = Vector3.Zero;
             savedFlyThroughCamTarget = Vector3.Zero;
-            returnFlyThroughStartPos = Vector3.Zero;
-            returnFlyThroughStartTarget = Vector3.Zero;
             savedFlyThroughPlayerPos = Vector3.Zero;
 
             flyThroughBlackoutState = FlyThroughBlackoutState.None;

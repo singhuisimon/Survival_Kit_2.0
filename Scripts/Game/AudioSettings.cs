@@ -18,9 +18,9 @@ namespace Game
 
         // ===== Audio Settings =====
         private float masterVolume = 1.0f;
-        private float bgmVolume = 0.7f;
-        private float sfxVolume = 0.8f;
-        private float uiVolume = 0.9f;
+        private float bgmVolume = 1.0f;
+        private float sfxVolume = 1.0f;
+        private float uiVolume = 1.0f;
         private bool masterMuted = false;
         private bool bgmMuted = false;
         private bool sfxMuted = false;

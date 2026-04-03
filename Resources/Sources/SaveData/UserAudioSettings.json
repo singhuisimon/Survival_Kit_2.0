@@ -1,8 +1,8 @@
 {
   "masterVolume": 1,
-  "bgmVolume": 0.7,
-  "sfxVolume": 0.8,
-  "uiVolume": 0.9,
+  "bgmVolume": 1,
+  "sfxVolume": 1,
+  "uiVolume": 1,
   "masterMuted": false,
   "bgmMuted": false,
   "sfxMuted": false,
