@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_Trench_EnemyCoreWarn",
-    "Prefab GUID": 13072718880232253413,
+    "Prefab Name": "Prefab: Audio_Trench_EnemyCoreWarn.prefab",
+    "Prefab GUID": 5048122412558926013,
     "version": 1,
     "entities": [
         {
@@ -74,9 +74,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "6155189852591040481",
-                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 3723
+                            "GCHandle": 19
                         }
                     }
                 }

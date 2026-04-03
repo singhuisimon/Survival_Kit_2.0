@@ -21,7 +21,8 @@ namespace Game
         private const string EVENT_CORE_DESTROYED = "CoreMotherboardDestroyed";
 
         private const string EVENT_TIMER_FINISHED = "TimerFinished";
-
+        private const string EVENT_LEVEL2_TUTORIAL_PAUSE = "TutorialPauseAudio";
+        private const string EVENT_VO_PAUSE_STATE = "GameVOPauseState";
         private const string EVENT_DESTRUCTABLEWALL_DESTROYED = "DestructableWallDestroyed";
         private const string EVENT_TRENCH_WALL_WARNING_TRIGGERED = "TrenchWallWarningTriggered";
         private const string EVENT_TRENCH_CORE_WARNING_TRIGGERED = "TrenchCoreWarningTriggered";
@@ -35,7 +36,7 @@ namespace Game
         [SerializeField] private bool audiostarted = false; //this means that there is an active audio vo playing 
         private bool disabled = false;
         private bool isPaused = false;
-
+        [SerializeField] private bool pauseForTutorial = false;
         private bool hasPlayedSpawnGuide = false;
         private bool hasPlayedWallWarn = false;
         private bool hasPlayedEnemiesWarn = false;
@@ -77,6 +78,7 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnTutorialPause);
             Event.Subscribe(EVENT_DESTRUCTABLEWALL_DESTROYED, OnWallDestroyed);
             Event.Subscribe(EVENT_TRENCH_WALL_WARNING_TRIGGERED, OnWallWarningTriggered);
             Event.Subscribe(EVENT_TRENCH_CORE_WARNING_TRIGGERED, OnCoreWarningTriggered);
@@ -118,21 +120,26 @@ namespace Game
 
             if (GameState.IsPaused){
 
-                //If audio hasn't been paused, and it is started as well as still playing and active VOID isn't 0
-                if (!isPaused && audiostarted && activeVOID != 0 && AudioIsPlaying(activeVOID))
+                if (!pauseForTutorial)
                 {
-                    //pause the audio and set the pause for audio to be true
-                    AudioPause(activeVOID);
-                    isPaused = true;
+                    //If audio hasn't been paused, and it is started as well as still playing and active VOID isn't 0
+                    if (!isPaused && audiostarted && activeVOID != 0 && AudioIsPlaying(activeVOID))
+                    {
+                        //pause the audio and set the pause for audio to be true
+                        AudioPause(activeVOID);
+                        Event.Publish(EVENT_VO_PAUSE_STATE, activeVOID.ToString() + "|true");
+                        isPaused = true;
+                    }
+                    return;
                 }
-                return;
-            } else
+
+            }
+
+            if (isPaused && audiostarted && activeVOID != 0)
             {
-                if (isPaused && audiostarted && activeVOID != 0)
-                {
-                    AudioPlay(activeVOID);
-                    isPaused = false;
-                }
+                AudioPlay(activeVOID);
+                Event.Publish(EVENT_VO_PAUSE_STATE, activeVOID.ToString() + "|false");
+                isPaused = false;
             }
 
             if(!audiostarted){
@@ -159,6 +166,7 @@ namespace Game
             Event.Unsubscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Unsubscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Unsubscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+            Event.Unsubscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnTutorialPause);
             Event.Unsubscribe(EVENT_DESTRUCTABLEWALL_DESTROYED, OnWallDestroyed);
             Event.Unsubscribe(EVENT_TRENCH_WALL_WARNING_TRIGGERED, OnWallWarningTriggered);
             Event.Unsubscribe(EVENT_TRENCH_CORE_WARNING_TRIGGERED, OnCoreWarningTriggered);
@@ -176,6 +184,14 @@ namespace Game
             ResetActiveAudio();
             
             LogMessage("[TrenchAudioVO] Detect game end, stopping audio from playing");
+        }
+
+        private void OnTutorialPause(string eventName, string payload)
+        {
+            if(bool.TryParse(payload, out bool state))
+            {
+                pauseForTutorial = state;
+            }
         }
 
         private void OnWallDestroyed(string eventName, string payload){
@@ -374,6 +390,11 @@ namespace Game
         }
 
         private void ResetActiveAudio(){
+
+            if (activeVOID != 0)
+            {
+                Event.Publish(EVENT_VO_PAUSE_STATE, activeVOID.ToString() + "|false");
+            }
 
             //stop the active entity audio from playing
             if(activeVOID != 0 && AudioIsPlaying(activeVOID)){
