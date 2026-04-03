@@ -614,9 +614,11 @@ namespace Game
             altUsed = false;
             pauseForTutorial = false;
             GameState.IsPaused = false;
-            EPressed = false;
+            //EPressed = false;
 
-            if (!turretsDestroyed)
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
+            if (!turretsDestroyed && !EPressed)
             {
                 ShowUI(destroyEnemiesID, true, dt);
                 return;
@@ -629,6 +631,7 @@ namespace Game
                 tooltipElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
+                EPressed = false;
                 currentState = TutorialState.Wait;
             }
         }
