@@ -13,34 +13,44 @@ namespace Game
     {
         private enum TutorialState
         {
-            Move,           // Show WASD
-            FlyThrough,     // Show fly tunnel
-            ShootWall,      // Show shoot wall
-            DestroyTurret, // Show destroy turret
-            DestroyEnemies, // Show destroy enemies
+            Move,
+            FlyThrough,
+            ShootWall,
+            DestroyTurret,
+            DestroyEnemies,
             Wait,
             AltFire,
-            CollectUpgradeModule, //Show collect upgrade tooltip
-            SummonSentry    // Show sentry summon tooltip
+            CollectUpgradeModule,
+            SummonSentry
+        }
 
+        private enum FlyThroughBlackoutState
+        {
+            None,
+            TeleportFadeIn,
+            TeleportFadeOut,
+            FinalFadeIn,
+            FinalFadeOut
         }
 
         private TutorialState currentState = TutorialState.Move;
 
         // Entity IDs - UI
-        private uint pressWASDID; // UI_PressWASD
-        private uint pressFlyTunnelID; // UI_FlyTunnel
-        private uint pressShootID; // UI_Shoot
-        private uint destroyTurretID;  // UI_DestroyTurret
-        private uint destroyEnemiesID; // UI_DestroyEnemies
-        private uint altFireID; // UI_AltFire
-        private uint proceedID; // UI_E_ToProceed
-        private uint collectUpgradeModuleID; //UI_CollectUpgradeModule
+        private uint pressWASDID;
+        private uint pressFlyTunnelID;
+        private uint pressShootID;
+        private uint destroyTurretID;
+        private uint destroyEnemiesID;
+        private uint altFireID;
+        private uint proceedID;
+        private uint collectUpgradeModuleID;
         private uint sentrySummonID;
 
-        // Entity IDs - Player, Wall
+        // Entity IDs - Player, Wall, Fade
         private uint playerID;
         private uint wallID;
+        private uint fadeBlackID;
+        private uint cameraID;
 
         // Entity Names
         [SerializeField] private string pressWASDName = "UI_PressWASD";
@@ -54,6 +64,8 @@ namespace Game
         [SerializeField] private string proceedName = "UI_E_ToProceed";
         [SerializeField] private string collectUpgradeModuleName = "UI_CollectUpgradeModule";
         [SerializeField] private string sentrySummonName = "UI_CombatAbilitySentry";
+        [SerializeField] private string cameraName = "PlayerCam";
+        [SerializeField] private string fadeBlackName = "FadeBlack";
 
         // Events
         private string EVENT_ONE_TURRET_DESTROYED = "OneTurretDestroyed";
@@ -63,6 +75,13 @@ namespace Game
         private const string EVENT_CORE_DEAD = "CoreDeadTriggerPostTrenchRun";
         private const string EVENT_COLLECT_PAYLOAD = "CollectPayload";
         private const string EVENT_SENTRY_SPAWNED = "SentrySpawnedTrench";
+        private const string EVENT_CINEMATIC_PLAY = "PlayCinematic";
+        private const string EVENT_CINEMATIC_STOP = "StopCinematic";
+
+        private const string EVENT_FADE_BLACK_IN = "FadeBlackFadeIn";
+        private const string EVENT_FADE_BLACK_OUT = "FadeBlackFadeOut";
+        private const string EVENT_FADE_BLACK_IN_DONE = "FadeBlackFadeInDone";
+        private const string EVENT_FADE_BLACK_OUT_DONE = "FadeBlackFadeOutDone";
 
         // Fading
         private bool EPressed = false;
@@ -75,12 +94,6 @@ namespace Game
         [SerializeField] private float uiStartFadePos = 260.0f;
         [SerializeField] private float switchTime = 0.5f;
         [SerializeField] private float sentrySummonFadeOutTime = 1.0f;
-
-        // Collect Upgrade Tooltip fading (dedicated timers to avoid interfering with state machine)
-        //private bool showCollectUI = false;
-        //private bool hideCollectUI = false;
-        //private float collectFadeUpElapsed = 0.0f;
-        //private float collectFadeOutElapsed = 0.0f;
 
         private bool movedWASD = false;
         private bool movedSpacebar = false;
@@ -99,21 +112,69 @@ namespace Game
         private bool skipTutorial = false;
         private string EVENT_TUTORIAL_SKIP = "SkipTutorial";
 
-        private bool pauseForTutorial  = false;
+        private bool pauseForTutorial = false;
         private bool playerPauseOnTutorial = false;
         private bool prevEscapePressed = false;
         private bool UIShown = false;
         private bool destroyEnemyShown = false;
 
-        private uint cameraID;
         private float camFlySpeed = 100.0f;
         private Vector3 lastCamPos = Vector3.Zero;
         private bool camPosSaved = false;
         private bool returningCam = false;
-        [SerializeField] private string cameraName = "PlayerCam";
-
         private bool camMovedToWall = false;
         private bool camReturned = false;
+
+        // ===== Fly-through Cinematic =====
+        [SerializeField] private float flyThroughLookAheadStartT = 0.8f;
+        [SerializeField] private float flyThroughReturnDuration = 1.0f;
+        [SerializeField] private float flyThroughFinalLookDistance = 250.0f;
+
+        // Teleport cut happens before moving to this waypoint index.
+        [SerializeField] private int flyThroughTeleportWaypointIndex = 5;
+
+        // When to start fading while still moving.
+        [SerializeField] private float flyThroughTeleportFadeLeadTime = 2.0f;
+        [SerializeField] private float flyThroughFinalFadeLeadTime = 1.0f;
+
+        private bool flyThroughStarted = false;
+        private bool flyThroughFinished = false;
+        private bool flyThroughReturning = false;
+        private int flyThroughSegmentIndex = 0;
+        private float flyThroughSegmentElapsed = 0.0f;
+        private bool flyThroughImmediateReturnRequested = false;
+
+        private Vector3 savedFlyThroughCamPos = Vector3.Zero;
+        private Vector3 savedFlyThroughCamTarget = Vector3.Zero;
+        private Vector3 returnFlyThroughStartPos = Vector3.Zero;
+        private Vector3 returnFlyThroughStartTarget = Vector3.Zero;
+
+        private Vector3 savedFlyThroughPlayerPos = Vector3.Zero;
+        private Quat savedFlyThroughPlayerRot;
+
+        private FlyThroughBlackoutState flyThroughBlackoutState = FlyThroughBlackoutState.None;
+        private bool blackFadeInDone = false;
+        private bool blackFadeOutDone = false;
+        private bool flyThroughTeleportFadeTriggered = false;
+        private bool flyThroughFinalFadeTriggered = false;
+        private Vector3 flyThroughHoldCamPos = Vector3.Zero;
+        private Vector3 flyThroughHoldCamTarget = Vector3.Zero;
+
+        private readonly Vector3[] flyThroughWaypoints = new Vector3[]
+        {
+            new Vector3(-275.0f,    3.0f,    0.0f),
+            new Vector3(-450.0f,    0.0f,   30.0f),
+            new Vector3(-780.0f,    0.0f,  -90.0f),
+            new Vector3(-850.0f,   10.0f,  -82.5f),
+            new Vector3(-1080.0f,  60.0f,  -82.5f),
+            new Vector3(-5415.0f, -440.0f, 645.0f),
+            new Vector3(-5450.0f, -435.0f, 645.0f)
+        };
+
+        private readonly float[] flyThroughWaypointTimes = new float[]
+        {
+            1.0f, 1.0f, 1.0f, 0.6f, 1.0f, 0.0f, 5.0f
+        };
 
         public override void OnStart()
         {
@@ -129,20 +190,27 @@ namespace Game
             collectUpgradeModuleID = SceneFindEntityByName(collectUpgradeModuleName);
             sentrySummonID = SceneFindEntityByName(sentrySummonName);
             cameraID = SceneFindEntityByName(cameraName);
+            fadeBlackID = SceneFindEntityByName(fadeBlackName);
+
+            ResetFlyThroughCinematicState();
+
+            if (flyThroughWaypoints.Length != flyThroughWaypointTimes.Length)
+            {
+                LogError("[TutorialUIManager] Fly-through waypoint count does not match timing count.");
+            }
 
             if (ProgressTracker.SkipTutorialLevel1)
             {
                 skipTutorial = true;
                 SpriteRenderer.SetIsVisible(pressWASDID, false);
                 Publish(EVENT_TUTORIAL_SKIP, "");
-
-            } else
+            }
+            else
             {
                 skipTutorial = false;
                 SpriteRenderer.SetIsVisible(pressWASDID, true);
             }
 
-            // Show initial UI
             SpriteRenderer.SetIsVisible(pressFlyTunnelID, false);
             SpriteRenderer.SetIsVisible(pressShootID, false);
             SpriteRenderer.SetIsVisible(destroyTurretID, false);
@@ -161,6 +229,8 @@ namespace Game
             Subscribe(EVENT_CORE_DEAD, OnCoreDeath);
             Subscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
             Subscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
+            Subscribe(EVENT_FADE_BLACK_IN_DONE, OnFadeBlackInDone);
+            Subscribe(EVENT_FADE_BLACK_OUT_DONE, OnFadeBlackOutDone);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -173,21 +243,29 @@ namespace Game
 
             bool escapeJustPressed = IsEscapeJustPressed();
 
-            if (pauseForTutorial && playerPauseOnTutorial) {
+            if (pauseForTutorial && playerPauseOnTutorial)
+            {
                 if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = false;
                     Publish("TutorialPauseAudio", pauseForTutorial.ToString());
                     Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                }
+
                 return;
             }
 
-            if (pauseForTutorial) {
+            if (pauseForTutorial)
+            {
                 GameState.IsPaused = true;
-                if (escapeJustPressed) {
+                if (escapeJustPressed)
+                {
                     playerPauseOnTutorial = true;
                     Publish("TutorialPauseAudio", false.ToString());
                     return;
-                } else {
+                }
+                else
+                {
                     Publish("TutorialPauseAudio", pauseForTutorial.ToString());
                     Publish("TutorialPauseMenu", pauseForTutorial.ToString());
                 }
@@ -247,28 +325,31 @@ namespace Game
             Unsubscribe(EVENT_CORE_DEAD, OnCoreDeath);
             Unsubscribe(EVENT_COLLECT_PAYLOAD, OnCollectPayload);
             Unsubscribe(EVENT_SENTRY_SPAWNED, OnSentrySpawned);
+            Unsubscribe(EVENT_FADE_BLACK_IN_DONE, OnFadeBlackInDone);
+            Unsubscribe(EVENT_FADE_BLACK_OUT_DONE, OnFadeBlackOutDone);
         }
 
         private void HandleMoveState(Vector3 currentPos, float dt)
         {
-            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A) || IsKeyPressed(KeyCode.E))){
+            if (!movedWASD && (IsKeyPressed(KeyCode.W) || IsKeyPressed(KeyCode.S) || IsKeyPressed(KeyCode.D) || IsKeyPressed(KeyCode.A) || IsKeyPressed(KeyCode.E)))
+            {
                 movedWASD = true;
             }
 
-            if (!movedSpacebar && IsKeyPressed(KeyCode.Space)){
+            if (!movedSpacebar && IsKeyPressed(KeyCode.Space))
+            {
                 movedSpacebar = true;
             }
 
-            if (!movedShift && IsKeyPressed(KeyCode.LeftShift)){
+            if (!movedShift && IsKeyPressed(KeyCode.LeftShift))
+            {
                 movedShift = true;
             }
 
             if (movedWASD)
             {
-                // Fade out WASD
                 ShowUI(pressWASDID, false, dt);
 
-                // Fade in Fly Tunnel
                 if (fadeOutElapsed > switchTime)
                 {
                     if (!UIShown)
@@ -280,10 +361,8 @@ namespace Game
                     ShowUI(pressFlyTunnelID, true, dt);
                 }
 
-                // Ensure all fading effects are completed before moving on
-                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime) {
-
-                    // Reset all elapsed time, 'E' pressed state, and set up for next state
+                if (fadeOutElapsed > fadeOutTime && fadeUpElapsed > fadeUpTime)
+                {
                     EPressed = false;
                     UIShown = false;
                     tooltipElapsed = 0.0f;
@@ -296,34 +375,59 @@ namespace Game
 
         private void HandleFlyThroughState(Vector3 currentPos, Vector3 wallPos, float dt)
         {
-            // Update tooltip elapsed time
             tooltipElapsed += dt;
 
-            if (tooltipElapsed <= tooltipMinTime) {
-                pauseForTutorial = true;
+            if (!flyThroughStarted)
+            {
+                StartFlyThroughCinematic();
             }
 
-            // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-            if (tooltipElapsed > tooltipMinTime) {
+            if (!flyThroughFinished)
+            {
+                if (IsKeyPressed(KeyCode.E))
+                {
+                    BeginFlyThroughImmediateReturnToPlayer();
+                }
 
-                // Check for 'E' input
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                // Begin fade out
-                if (EPressed) {
+                if (flyThroughImmediateReturnRequested)
+                {
                     ShowUI(pressFlyTunnelID, false, dt);
-                    pauseForTutorial = false;
-                    GameState.IsPaused = false;
+                }
+                else if (!EPressed)
+                {
+                    ShowUI(pressFlyTunnelID, true, dt);
                 }
 
-                // Begin fade up for next 
-                if ((currentPos.X - wallPos.X) < 70.0f && EPressed && (fadeOutElapsed > switchTime)) {
-                    EPressed = false;
-                    tooltipElapsed = 0.0f;
-                    fadeOutElapsed = 0.0f;
-                    fadeUpElapsed = 0.0f;
-                    currentState = TutorialState.ShootWall;
-                }
+                UpdateFlyThroughCinematic(dt);
+                pauseForTutorial = true;
+                GameState.IsPaused = true;
+                return;
+            }
+
+            if (IsKeyPressed(KeyCode.E))
+                EPressed = true;
+
+            bool canExitFlyThroughState = EPressed || flyThroughFinished;
+
+            if (canExitFlyThroughState)
+            {
+                ShowUI(pressFlyTunnelID, false, dt);
+                pauseForTutorial = false;
+                GameState.IsPaused = false;
+            }
+            else
+            {
+                pauseForTutorial = true;
+                GameState.IsPaused = true;
+            }
+
+            if ((currentPos.X - wallPos.X) < 70.0f && canExitFlyThroughState && (fadeOutElapsed > switchTime))
+            {
+                EPressed = false;
+                tooltipElapsed = 0.0f;
+                fadeOutElapsed = 0.0f;
+                fadeUpElapsed = 0.0f;
+                currentState = TutorialState.ShootWall;
             }
         }
 
@@ -331,29 +435,27 @@ namespace Game
         {
             altUsed = false;
 
-            // Teleport camera to wall view on first entry
             if (!camPosSaved)
             {
                 lastCamPos = Transform.GetPosition(cameraID);
-                
+
                 Vector3 camViewPos = wallPos;
-                camViewPos.X += 30.0f;   // stand back from wall along X
-                //camViewPos.Y += 30.0f;   // slightly above wall centre
-                //camViewPos.Z += 80.0f;   // pull back on Z (depth/out of screen)
+                camViewPos.X += 30.0f;
                 Transform.SetPosition(cameraID, ref camViewPos);
-                
+
                 camPosSaved = true;
                 tooltipElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
-                
+
                 EPressed = false;
                 wallDestroyedPublished = false;
             }
 
             tooltipElapsed += dt;
 
-            // Always show shoot UI until dismissed
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (tooltipElapsed <= tooltipMinTime && !wallDestroyedPublished)
             {
                 ShowUI(pressShootID, true, dt);
@@ -361,33 +463,32 @@ namespace Game
                 return;
             }
 
-            // Fade out shoot UI after destroying wall
-            if (currentPos.X < (wallPos.X - 2) && !wallDestroyedPublished) {
+            if (currentPos.X < (wallPos.X - 2) && !wallDestroyedPublished)
+            {
                 LogMessage("[TutorialUIManager] Detect wall is destroyed");
                 wallDestroyedPublished = true;
                 Publish("DestructableWallDestroyed", true.ToString());
                 ShowUI(pressShootID, false, dt);
-            } else if(wallDestroyedPublished){
+            }
+            else if (wallDestroyedPublished)
+            {
                 ShowUI(pressShootID, false, dt);
             }
 
-            // Press E to dismiss tooltip
-            //if (IsKeyPressed(KeyCode.E)) ShowUI(pressShootID, false, dt);
-            if(fadeUpElapsed >= fadeUpTime){
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-                if (EPressed){
+            if (fadeUpElapsed >= fadeUpTime)
+            {
+                if (EPressed)
+                {
                     ShowUI(pressShootID, false, dt);
                     pauseForTutorial = false;
                     GameState.IsPaused = false;
                 }
             }
 
-            // Ensure all fading effects are completed before moving on
-            if (wallDestroyedPublished && EPressed && (fadeOutElapsed > switchTime)) {
-
+            if (wallDestroyedPublished && EPressed && (fadeOutElapsed > switchTime))
+            {
                 Transform.SetPosition(cameraID, ref lastCamPos);
 
-                // Reset all elapsed time, 'E' pressed state, and set up for next state
                 EPressed = false;
                 tooltipElapsed = 0.0f;
                 fadeOutElapsed = 0.0f;
@@ -398,12 +499,13 @@ namespace Game
 
                 currentState = TutorialState.DestroyTurret;
             }
-
         }
 
         private void HandleDestroyTurretState(float dt)
         {
             altUsed = false;
+
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
 
             if (tooltipElapsed <= tooltipMinTime)
             {
@@ -411,59 +513,43 @@ namespace Game
                 pauseForTutorial = true;
             }
 
-            // Update tooltip elapsed time
             tooltipElapsed += dt;
 
-            // Fade out upon pressing E only AFTER tooltip exists beyond min duration
-            if (tooltipElapsed > tooltipMinTime) {
-
-                // Display assistance message: "Press "E" to proceed"
-                //SetProceedTextPosition(1107.1f, 475.8f);
-                //ShowProceedText(true);
-
-                // Check for 'E' input
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
-                // Begin fade out
-                if (EPressed) {
+            if (tooltipElapsed > tooltipMinTime)
+            {
+                if (EPressed)
+                {
                     ShowUI(destroyTurretID, false, dt);
                     pauseForTutorial = false;
                     GameState.IsPaused = false;
                 }
 
-                // Ensure all fading effects are completed before moving on
-                if (oneturretDestroyed && EPressed && (fadeOutElapsed > switchTime)) {
-
-                    // Reset all elapsed time, 'E' pressed state, and set up for next state
+                if (oneturretDestroyed && EPressed && (fadeOutElapsed > switchTime))
+                {
                     EPressed = false;
                     tooltipElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
                     fadeUpElapsed = 0.0f;
                     currentState = TutorialState.DestroyEnemies;
                 }
-
             }
         }
 
         private void HandleDestroyEnemiesState(float dt)
         {
             altUsed = false;
-
-            // Update timer FIRST
             tooltipElapsed += dt;
 
-            // Show UI only if NOT dismissing
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (!EPressed && !turretsDestroyed && tooltipElapsed <= tooltipMinTime)
             {
                 ShowUI(destroyEnemiesID, true, dt);
                 pauseForTutorial = true;
             }
 
-            // After min time → allow dismissal
             if (tooltipElapsed > tooltipMinTime)
             {
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
-
                 if (turretsDestroyed || EPressed)
                 {
                     ShowUI(destroyEnemiesID, false, dt);
@@ -471,7 +557,6 @@ namespace Game
                     GameState.IsPaused = false;
                 }
 
-                // Transition AFTER fade-out completes
                 if (EPressed && fadeOutElapsed > fadeOutTime)
                 {
                     EPressed = false;
@@ -486,7 +571,8 @@ namespace Game
 
         private void HandleWaitState(float dt)
         {
-            if (turretsDestroyed && ultCharged && !altFireShown && !altUsed) {
+            if (turretsDestroyed && ultCharged && !altFireShown && !altUsed)
+            {
                 altFireShown = true;
                 currentState = TutorialState.AltFire;
             }
@@ -496,6 +582,8 @@ namespace Game
         {
             tooltipElapsed += dt;
 
+            if (IsKeyPressed(KeyCode.E)) EPressed = true;
+
             if (!EPressed && tooltipElapsed <= tooltipMinTime)
             {
                 ShowUI(altFireID, true, dt);
@@ -504,8 +592,6 @@ namespace Game
 
             if (tooltipElapsed > tooltipMinTime)
             {
-                // Press 'E' to dismiss tooltip
-                if (IsKeyPressed(KeyCode.E)) EPressed = true;
                 if (altUsed || EPressed)
                 {
                     ShowUI(altFireID, false, dt);
@@ -513,7 +599,6 @@ namespace Game
                     GameState.IsPaused = false;
                 }
 
-                // Transition AFTER fade-out completes
                 if (EPressed && fadeOutElapsed > fadeOutTime)
                 {
                     EPressed = false;
@@ -527,26 +612,6 @@ namespace Game
 
         private void HandleCollectUpgradeModuleState(float dt)
         {
-            //if (hasCollectedUpgrade)
-            // if (IsKeyPressed(KeyCode.E)) EPressed = true;
-            // if (hasCollectedUpgrade || EPressed )
-            // {
-            //     ShowCollectUpgradeUI(false, dt);
-
-            //     if (fadeOutElapsed > fadeOutTime)
-            //     {
-            //         fadeUpElapsed = 0.0f;
-            //         fadeOutElapsed = 0.0f;
-            //         EPressed = false;
-            //         hasCollectedUpgrade = false;
-            //         currentState = TutorialState.SummonSentry;
-            //     }
-            // }
-            // else
-            // {
-            //     ShowCollectUpgradeUI(true, dt);
-            // }
-
             if (IsKeyPressed(KeyCode.E)) EPressed = true;
             if (hasCollectedUpgrade || EPressed)
             {
@@ -556,7 +621,7 @@ namespace Game
             }
             else
             {
-                ShowCollectUpgradeUI(true, dt);  // this was missing!
+                ShowCollectUpgradeUI(true, dt);
                 pauseForTutorial = true;
             }
 
@@ -572,7 +637,7 @@ namespace Game
 
         private void HandleSummonSentryState(float dt)
         {
-            if (IsKeyPressed(KeyCode.E)) hasSummonedSentry = true; // Dismiss this tooltip
+            if (IsKeyPressed(KeyCode.E)) hasSummonedSentry = true;
 
             if (hasSummonedSentry)
             {
@@ -582,7 +647,7 @@ namespace Game
 
                 if (fadeOutElapsed > fadeOutTime)
                 {
-                    SpriteRenderer.FadeIn(sentrySummonID, 1.0f, 1.0f); // Reset alpha
+                    SpriteRenderer.FadeIn(sentrySummonID, 1.0f, 1.0f);
                     SpriteRenderer.SetIsVisible(sentrySummonID, false);
                     fadeUpElapsed = 0.0f;
                     fadeOutElapsed = 0.0f;
@@ -597,13 +662,10 @@ namespace Game
             }
         }
 
-        // UI Functions
         private void ShowUI(uint entityID, bool value, float dt)
         {
-            // Fade Up if true
-            if (value == true) {
-
-                // Fade up
+            if (value)
+            {
                 if (fadeUpElapsed < fadeUpTime) fadeUpElapsed += dt;
                 SpriteRenderer.FadeIn(entityID, fadeUpElapsed, fadeUpTime);
 
@@ -611,49 +673,18 @@ namespace Game
                 newPos.Y = uiStartFadePos - (10.0f * fadeUpElapsed / fadeUpTime);
                 Transform.SetPosition(entityID, ref newPos);
 
-                // Set sprite to be true if not visible
-                if (SpriteRenderer.GetIsVisible(entityID) != value) SpriteRenderer.SetIsVisible(entityID, value);
-
-            } else { // Fade out if false
-
-                // Fade out
+                if (SpriteRenderer.GetIsVisible(entityID) != value)
+                    SpriteRenderer.SetIsVisible(entityID, value);
+            }
+            else
+            {
                 fadeOutElapsed += dt;
                 SpriteRenderer.FadeOut(entityID, fadeOutElapsed, fadeOutTime);
 
-                // Ensure sprite is not visible once it faded out
-                if (fadeOutElapsed > fadeOutTime) SpriteRenderer.SetIsVisible(entityID, value);
+                if (fadeOutElapsed > fadeOutTime)
+                    SpriteRenderer.SetIsVisible(entityID, value);
             }
         }
-
-        //private void ShowWASD(bool value)
-        //{
-        //    SpriteRenderer.SetIsVisible(pressWASDID, value);
-        //}
-
-        //private void ShowFlyTunnel(bool value)
-        //{
-        //    SpriteRenderer.SetIsVisible(pressFlyTunnelID, value);
-        //}
-
-        //private void ShowShootUI(bool value)
-        //{
-        //    SpriteRenderer.SetIsVisible(pressShootID, value);
-        //}
-
-        //private void ShowDestroyTurret(bool value)
-        //{
-        //    SpriteRenderer.SetIsVisible(destroyTurretID, value);
-        //}
-
-        //private void ShowDestroyEnemies(bool value)
-        //{
-        //    SpriteRenderer.SetIsVisible(destroyEnemiesID, value);
-        //}
-
-        //private void ShowAltFire(bool value)
-        //{
-        //    SpriteRenderer.SetIsVisible(altFireID, value);
-        //}
 
         private void ShowProceedText(bool value)
         {
@@ -666,11 +697,13 @@ namespace Game
             Transform.SetPosition(proceedID, ref newPos);
         }
 
-        private void OnTurretDestroyed(string eventName, string payload){
+        private void OnTurretDestroyed(string eventName, string payload)
+        {
             oneturretDestroyed = true;
         }
 
-        private void OnFiveTurretDestroyed(string eventName, string payload){
+        private void OnFiveTurretDestroyed(string eventName, string payload)
+        {
             turretsDestroyed = true;
         }
 
@@ -686,7 +719,6 @@ namespace Game
 
         private void OnCoreDeath(string eventName, string payload)
         {
-            // Force hide all other tooltips in case player never dismissed them
             SpriteRenderer.SetIsVisible(pressWASDID, false);
             SpriteRenderer.SetIsVisible(pressFlyTunnelID, false);
             SpriteRenderer.SetIsVisible(pressShootID, false);
@@ -695,7 +727,6 @@ namespace Game
             SpriteRenderer.SetIsVisible(altFireID, false);
             SpriteRenderer.SetIsVisible(proceedID, false);
 
-            // Reset timers and transition to collect upgrade state
             EPressed = false;
             fadeUpElapsed = 0.0f;
             fadeOutElapsed = 0.0f;
@@ -714,6 +745,16 @@ namespace Game
             hasSummonedSentry = true;
             fadeUpElapsed = 0.0f;
             fadeOutElapsed = 0.0f;
+        }
+
+        private void OnFadeBlackInDone(string eventName, string payload)
+        {
+            blackFadeInDone = true;
+        }
+
+        private void OnFadeBlackOutDone(string eventName, string payload)
+        {
+            blackFadeOutDone = true;
         }
 
         private void ShowCollectUpgradeUI(bool value, float dt)
@@ -764,11 +805,532 @@ namespace Game
             }
         }
 
-        private bool IsEscapeJustPressed() {
+        private bool IsEscapeJustPressed()
+        {
             bool pressed = IsKeyPressed(KeyCode.Escape);
             bool justPressed = pressed && !prevEscapePressed;
             prevEscapePressed = pressed;
             return justPressed;
+        }
+
+        private void StartFlyThroughCinematic()
+        {
+            if (flyThroughStarted)
+                return;
+
+            if (cameraID == 0)
+            {
+                LogError("[TutorialUIManager] Cannot start fly-through. PlayerCam not found.");
+                flyThroughStarted = true;
+                flyThroughFinished = true;
+                return;
+            }
+
+            if (flyThroughWaypoints.Length == 0 || flyThroughWaypoints.Length != flyThroughWaypointTimes.Length)
+            {
+                LogError("[TutorialUIManager] Cannot start fly-through. Waypoint/timing data is invalid.");
+                flyThroughStarted = true;
+                flyThroughFinished = true;
+                return;
+            }
+
+            savedFlyThroughCamPos = Transform.GetPosition(cameraID);
+
+            Quat camRot = Transform.GetRotation(cameraID);
+            Vector3 camForward = camRot.Forward;
+            if (camForward.SqrMagnitude < 1e-8f)
+                camForward = Vector3.Forward;
+            else
+                camForward = camForward.Normalized;
+
+            savedFlyThroughCamTarget = savedFlyThroughCamPos + camForward * flyThroughFinalLookDistance;
+
+            savedFlyThroughPlayerPos = Transform.GetPosition(playerID);
+            savedFlyThroughPlayerRot = Transform.GetRotation(playerID);
+
+            flyThroughStarted = true;
+            flyThroughFinished = false;
+            flyThroughReturning = false;
+            flyThroughSegmentIndex = 0;
+            flyThroughSegmentElapsed = 0.0f;
+            flyThroughBlackoutState = FlyThroughBlackoutState.None;
+            blackFadeInDone = false;
+            blackFadeOutDone = false;
+            flyThroughTeleportFadeTriggered = false;
+            flyThroughFinalFadeTriggered = false;
+            flyThroughImmediateReturnRequested = false;
+            flyThroughHoldCamPos = savedFlyThroughCamPos;
+            flyThroughHoldCamTarget = savedFlyThroughCamTarget;
+
+            Publish(EVENT_CINEMATIC_PLAY, "");
+            LogMessage("[TutorialUIManager] Fly-through cinematic started");
+        }
+
+        private void UpdateFlyThroughCinematic(float dt)
+        {
+            if (!flyThroughStarted || flyThroughFinished || cameraID == 0)
+                return;
+
+            if (UpdateFlyThroughBlackoutTransition())
+                return;
+
+            if (ShouldHoldFlyThroughDuringFadeIn())
+            {
+                ApplyFlyThroughHoldPose();
+                return;
+            }
+
+            if (flyThroughSegmentIndex >= flyThroughWaypoints.Length)
+            {
+                if (flyThroughFinalFadeTriggered)
+                {
+                    ApplyFlyThroughHoldPose();
+                    return;
+                }
+
+                BeginFlyThroughFinalCut();
+                return;
+            }
+
+            Vector3 segmentStart =
+                (flyThroughSegmentIndex == 0)
+                ? savedFlyThroughCamPos
+                : flyThroughWaypoints[flyThroughSegmentIndex - 1];
+
+            Vector3 segmentEnd = flyThroughWaypoints[flyThroughSegmentIndex];
+
+            float segmentDuration = GetSafeFlyThroughSegmentDuration(flyThroughSegmentIndex);
+
+            flyThroughSegmentElapsed += dt;
+
+            float rawT = flyThroughSegmentElapsed / segmentDuration;
+            rawT = SimpleMath.Clamp(rawT, 0.0f, 1.0f);
+
+            Vector3 camPos = Vector3.Lerp(segmentStart, segmentEnd, rawT);
+            Vector3 lookTarget = GetFlyThroughLookTarget(flyThroughSegmentIndex, rawT, segmentStart, segmentEnd);
+
+            Transform.SetPosition(cameraID, ref camPos);
+            SetTarget(cameraID, ref lookTarget);
+            SaveFlyThroughHoldPose(camPos, lookTarget);
+
+            TryBeginTeleportCutDuringMovement(flyThroughSegmentIndex, rawT);
+            TryBeginFinalCutDuringMovement(flyThroughSegmentIndex, rawT);
+
+            if (rawT >= 1.0f)
+            {
+                flyThroughSegmentElapsed = 0.0f;
+                flyThroughSegmentIndex++;
+
+                if (!flyThroughFinalFadeTriggered && flyThroughSegmentIndex >= flyThroughWaypoints.Length)
+                {
+                    BeginFlyThroughFinalCut();
+                }
+            }
+        }
+
+        private bool ShouldHoldFlyThroughDuringFadeIn()
+        {
+            if (flyThroughBlackoutState == FlyThroughBlackoutState.TeleportFadeIn)
+                return flyThroughSegmentIndex >= flyThroughTeleportWaypointIndex;
+
+            if (flyThroughBlackoutState == FlyThroughBlackoutState.FinalFadeIn)
+                return flyThroughSegmentIndex >= flyThroughWaypoints.Length;
+
+            return false;
+        }
+
+        private void SaveFlyThroughHoldPose(Vector3 camPos, Vector3 camTarget)
+        {
+            flyThroughHoldCamPos = camPos;
+            flyThroughHoldCamTarget = camTarget;
+        }
+
+        private void ApplyFlyThroughHoldPose()
+        {
+            Vector3 camPos = flyThroughHoldCamPos;
+            Vector3 camTarget = flyThroughHoldCamTarget;
+            Transform.SetPosition(cameraID, ref camPos);
+            SetTarget(cameraID, ref camTarget);
+        }
+
+        private void TryBeginTeleportCutDuringMovement(int segmentIndex, float rawT)
+        {
+            if (flyThroughTeleportFadeTriggered)
+                return;
+
+            if (flyThroughBlackoutState != FlyThroughBlackoutState.None)
+                return;
+
+            if (flyThroughTeleportWaypointIndex <= 0)
+                return;
+
+            if (flyThroughTeleportWaypointIndex >= flyThroughWaypoints.Length)
+                return;
+
+            // Cut happens before moving to flyThroughTeleportWaypointIndex,
+            // so the last visible segment is teleportWaypointIndex - 1.
+            int cutSegmentIndex = flyThroughTeleportWaypointIndex - 1;
+
+            if (segmentIndex > cutSegmentIndex)
+                return;
+
+            float remainingTime = GetRemainingTimeUntilTeleportCut(segmentIndex, rawT);
+            if (remainingTime <= flyThroughTeleportFadeLeadTime)
+            {
+                BeginFlyThroughTeleportCut();
+            }
+        }
+
+        private void TryBeginFinalCutDuringMovement(int segmentIndex, float rawT)
+        {
+            if (flyThroughFinalFadeTriggered)
+                return;
+
+            if (flyThroughBlackoutState != FlyThroughBlackoutState.None)
+                return;
+
+            if (flyThroughWaypoints.Length == 0)
+                return;
+
+            int finalSegmentIndex = flyThroughWaypoints.Length - 1;
+
+            if (segmentIndex > finalSegmentIndex)
+                return;
+
+            float remainingTime = GetRemainingTimeUntilFinalCut(segmentIndex, rawT);
+            if (remainingTime <= flyThroughFinalFadeLeadTime)
+            {
+                BeginFlyThroughFinalCut();
+            }
+        }
+
+        private float GetSafeFlyThroughSegmentDuration(int segmentIndex)
+        {
+            if (segmentIndex < 0 || segmentIndex >= flyThroughWaypointTimes.Length)
+                return 0.0001f;
+
+            float duration = flyThroughWaypointTimes[segmentIndex];
+            if (duration < 0.0001f)
+                duration = 0.0001f;
+
+            return duration;
+        }
+
+        private float GetRemainingTimeUntilTeleportCut(int segmentIndex, float rawT)
+        {
+            if (flyThroughTeleportWaypointIndex <= 0)
+                return 0.0f;
+
+            int cutSegmentIndex = flyThroughTeleportWaypointIndex - 1;
+            if (segmentIndex > cutSegmentIndex)
+                return 0.0f;
+
+            float clampedT = SimpleMath.Clamp(rawT, 0.0f, 1.0f);
+            float remaining = 0.0f;
+
+            for (int i = segmentIndex; i <= cutSegmentIndex; ++i)
+            {
+                float segmentDuration = GetSafeFlyThroughSegmentDuration(i);
+
+                if (i == segmentIndex)
+                    remaining += segmentDuration * (1.0f - clampedT);
+                else
+                    remaining += segmentDuration;
+            }
+
+            return remaining;
+        }
+
+        private float GetRemainingTimeUntilFinalCut(int segmentIndex, float rawT)
+        {
+            int finalSegmentIndex = flyThroughWaypoints.Length - 1;
+            if (segmentIndex > finalSegmentIndex)
+                return 0.0f;
+
+            float clampedT = SimpleMath.Clamp(rawT, 0.0f, 1.0f);
+            float remaining = 0.0f;
+
+            for (int i = segmentIndex; i <= finalSegmentIndex; ++i)
+            {
+                float segmentDuration = GetSafeFlyThroughSegmentDuration(i);
+
+                if (i == segmentIndex)
+                    remaining += segmentDuration * (1.0f - clampedT);
+                else
+                    remaining += segmentDuration;
+            }
+
+            return remaining;
+        }
+
+        private void BeginFlyThroughTeleportCut()
+        {
+            if (flyThroughTeleportFadeTriggered)
+                return;
+
+            if (flyThroughBlackoutState != FlyThroughBlackoutState.None)
+                return;
+
+            flyThroughTeleportFadeTriggered = true;
+            blackFadeInDone = false;
+            blackFadeOutDone = false;
+
+            if (fadeBlackID == 0)
+            {
+                LogMessage("[TutorialUIManager] FadeBlack not found. Teleporting fly-through without blackout.");
+                PerformFlyThroughTeleportCut();
+                return;
+            }
+
+            flyThroughBlackoutState = FlyThroughBlackoutState.TeleportFadeIn;
+            Publish(EVENT_FADE_BLACK_IN, "");
+        }
+
+        private void PerformFlyThroughTeleportCut()
+        {
+            TeleportCameraToWaypoint(flyThroughTeleportWaypointIndex);
+            flyThroughSegmentIndex = flyThroughTeleportWaypointIndex + 1;
+            flyThroughSegmentElapsed = 0.0f;
+            flyThroughBlackoutState = FlyThroughBlackoutState.None;
+
+            Vector3 camPos = flyThroughWaypoints[flyThroughTeleportWaypointIndex];
+            Vector3 lookTarget = GetFlyThroughResumeLookTarget(flyThroughTeleportWaypointIndex);
+            SaveFlyThroughHoldPose(camPos, lookTarget);
+        }
+
+        private void BeginFlyThroughFinalCut()
+        {
+            if (flyThroughFinalFadeTriggered)
+                return;
+
+            if (flyThroughBlackoutState != FlyThroughBlackoutState.None)
+                return;
+
+            flyThroughFinalFadeTriggered = true;
+            blackFadeInDone = false;
+            blackFadeOutDone = false;
+
+            if (fadeBlackID == 0)
+            {
+                LogMessage("[TutorialUIManager] FadeBlack not found. Finishing fly-through without blackout.");
+                RestorePlayerAndCameraAfterCinematic();
+                FinishFlyThroughCinematic();
+                return;
+            }
+
+            flyThroughBlackoutState = FlyThroughBlackoutState.FinalFadeIn;
+            Publish(EVENT_FADE_BLACK_IN, "");
+        }
+
+        private bool UpdateFlyThroughBlackoutTransition()
+        {
+            switch (flyThroughBlackoutState)
+            {
+                case FlyThroughBlackoutState.None:
+                    return false;
+
+                case FlyThroughBlackoutState.TeleportFadeIn:
+                    if (!blackFadeInDone)
+                        return false;
+
+                    blackFadeInDone = false;
+                    PerformFlyThroughTeleportCut();
+                    Publish(EVENT_FADE_BLACK_OUT, "");
+                    flyThroughBlackoutState = FlyThroughBlackoutState.TeleportFadeOut;
+                    return true;
+
+                case FlyThroughBlackoutState.TeleportFadeOut:
+                    if (blackFadeOutDone)
+                    {
+                        blackFadeOutDone = false;
+                        flyThroughBlackoutState = FlyThroughBlackoutState.None;
+
+                        if (flyThroughImmediateReturnRequested)
+                        {
+                            flyThroughFinalFadeTriggered = true;
+                            blackFadeInDone = false;
+                            blackFadeOutDone = false;
+                            flyThroughBlackoutState = FlyThroughBlackoutState.FinalFadeIn;
+                            Publish(EVENT_FADE_BLACK_IN, "");
+                            return true;
+                        }
+                    }
+                    return false;
+
+                case FlyThroughBlackoutState.FinalFadeIn:
+                    if (!blackFadeInDone)
+                        return false;
+
+                    blackFadeInDone = false;
+                    RestorePlayerAndCameraAfterCinematic();
+                    Publish(EVENT_FADE_BLACK_OUT, "");
+                    flyThroughBlackoutState = FlyThroughBlackoutState.FinalFadeOut;
+                    return true;
+
+                case FlyThroughBlackoutState.FinalFadeOut:
+                    if (!blackFadeOutDone)
+                        return false;
+
+                    blackFadeOutDone = false;
+                    flyThroughBlackoutState = FlyThroughBlackoutState.None;
+                    FinishFlyThroughCinematic();
+                    return true;
+            }
+
+            return false;
+        }
+
+        private void TeleportCameraToWaypoint(int waypointIndex)
+        {
+            if (cameraID == 0)
+                return;
+
+            if (waypointIndex < 0 || waypointIndex >= flyThroughWaypoints.Length)
+                return;
+
+            Vector3 camPos = flyThroughWaypoints[waypointIndex];
+            Vector3 lookTarget = GetFlyThroughResumeLookTarget(waypointIndex);
+
+            Transform.SetPosition(cameraID, ref camPos);
+            SetTarget(cameraID, ref lookTarget);
+        }
+
+        private Vector3 GetFlyThroughResumeLookTarget(int waypointIndex)
+        {
+            int nextIndex = waypointIndex + 1;
+
+            if (nextIndex < flyThroughWaypoints.Length)
+                return flyThroughWaypoints[nextIndex];
+
+            if (waypointIndex > 0)
+            {
+                Vector3 dir = flyThroughWaypoints[waypointIndex] - flyThroughWaypoints[waypointIndex - 1];
+                if (dir.SqrMagnitude < 1e-8f)
+                    dir = Vector3.Forward;
+                else
+                    dir = dir.Normalized;
+
+                return flyThroughWaypoints[waypointIndex] + dir * flyThroughFinalLookDistance;
+            }
+
+            return flyThroughWaypoints[waypointIndex] + Vector3.Forward * flyThroughFinalLookDistance;
+        }
+
+        private Vector3 GetFlyThroughLookTarget(int segmentIndex, float rawT, Vector3 segmentStart, Vector3 segmentEnd)
+        {
+            int nextIndex = segmentIndex + 1;
+
+            if (nextIndex < flyThroughWaypoints.Length)
+            {
+                float blendStart = SimpleMath.Clamp(flyThroughLookAheadStartT, 0.0f, 0.99f);
+
+                if (rawT <= blendStart)
+                    return segmentEnd;
+
+                float lookT = (rawT - blendStart) / (1.0f - blendStart);
+                lookT = SimpleMath.Clamp(lookT, 0.0f, 1.0f);
+                lookT = lookT * lookT * (3.0f - 2.0f * lookT);
+
+                return Vector3.Lerp(segmentEnd, flyThroughWaypoints[nextIndex], lookT);
+            }
+
+            Vector3 dir = segmentEnd - segmentStart;
+            if (dir.SqrMagnitude < 1e-8f)
+                dir = Vector3.Forward;
+            else
+                dir = dir.Normalized;
+
+            return segmentEnd + dir * flyThroughFinalLookDistance;
+        }
+
+        private void RestorePlayerAndCameraAfterCinematic()
+        {
+            Vector3 playerPos = savedFlyThroughPlayerPos;
+            Quat playerRot = savedFlyThroughPlayerRot;
+            Vector3 camPos = savedFlyThroughCamPos;
+            Vector3 camTarget = savedFlyThroughCamTarget;
+
+            Transform.SetPosition(playerID, ref playerPos);
+            Transform.SetRotation(playerID, ref playerRot);
+
+            if (cameraID != 0)
+            {
+                Transform.SetPosition(cameraID, ref camPos);
+                SetTarget(cameraID, ref camTarget);
+            }
+
+            SaveFlyThroughHoldPose(camPos, camTarget);
+        }
+
+        private void FinishFlyThroughCinematic()
+        {
+            if (cameraID != 0)
+            {
+                Transform.SetPosition(cameraID, ref savedFlyThroughCamPos);
+                SetTarget(cameraID, ref savedFlyThroughCamTarget);
+            }
+
+            flyThroughReturning = false;
+            flyThroughFinished = true;
+            flyThroughBlackoutState = FlyThroughBlackoutState.None;
+            flyThroughTeleportFadeTriggered = false;
+            flyThroughFinalFadeTriggered = false;
+            flyThroughImmediateReturnRequested = false;
+
+            Publish(EVENT_CINEMATIC_STOP, "");
+            LogMessage("[TutorialUIManager] Fly-through cinematic finished");
+        }
+
+        private void ResetFlyThroughCinematicState()
+        {
+            flyThroughStarted = false;
+            flyThroughFinished = false;
+            flyThroughReturning = false;
+            flyThroughSegmentIndex = 0;
+            flyThroughSegmentElapsed = 0.0f;
+
+            savedFlyThroughCamPos = Vector3.Zero;
+            savedFlyThroughCamTarget = Vector3.Zero;
+            returnFlyThroughStartPos = Vector3.Zero;
+            returnFlyThroughStartTarget = Vector3.Zero;
+            savedFlyThroughPlayerPos = Vector3.Zero;
+
+            flyThroughBlackoutState = FlyThroughBlackoutState.None;
+            blackFadeInDone = false;
+            blackFadeOutDone = false;
+            flyThroughTeleportFadeTriggered = false;
+            flyThroughFinalFadeTriggered = false;
+            flyThroughImmediateReturnRequested = false;
+            flyThroughHoldCamPos = Vector3.Zero;
+            flyThroughHoldCamTarget = Vector3.Zero;
+        }
+
+        private void BeginFlyThroughImmediateReturnToPlayer()
+        {
+            if (!flyThroughStarted || flyThroughFinished)
+                return;
+
+            if (flyThroughBlackoutState != FlyThroughBlackoutState.None)
+            {
+                flyThroughImmediateReturnRequested = true;
+                return;
+            }
+
+            flyThroughImmediateReturnRequested = true;
+            flyThroughFinalFadeTriggered = true;
+            blackFadeInDone = false;
+            blackFadeOutDone = false;
+
+            if (fadeBlackID == 0)
+            {
+                LogMessage("[TutorialUIManager] FadeBlack not found. Returning to player immediately.");
+                RestorePlayerAndCameraAfterCinematic();
+                FinishFlyThroughCinematic();
+                return;
+            }
+
+            flyThroughBlackoutState = FlyThroughBlackoutState.FinalFadeIn;
+            Publish(EVENT_FADE_BLACK_IN, "");
         }
     }
 }

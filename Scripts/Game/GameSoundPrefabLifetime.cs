@@ -16,6 +16,7 @@ namespace Game
 
         private float savedTime = 0.0f;
         private bool wasPaused = false;
+        private bool wasPlayingBeforePause = false;
 
         public override void OnStart()
         {
@@ -30,7 +31,8 @@ namespace Game
                 if(!wasPaused){
                     savedTime = elapsedTime;
                     wasPaused = true;
-                    if(AudioIsPlaying((uint)EntityID)){
+                    wasPlayingBeforePause = AudioIsPlaying((uint)EntityID);
+                    if(wasPlayingBeforePause){
                         AudioPause((uint)EntityID);
                     }
                 }
@@ -41,7 +43,9 @@ namespace Game
                 // Just unpaused - restore timer
                 elapsedTime = savedTime;
                 wasPaused = false;
-                AudioPlay((uint)EntityID);
+                if(wasPlayingBeforePause){
+                    AudioPlay((uint)EntityID);
+                }
             }
 
 

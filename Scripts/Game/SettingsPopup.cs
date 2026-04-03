@@ -72,7 +72,7 @@ namespace Game
 
         // Visible positions
         private Vector3 popupVisiblePos = new Vector3(640.0f, 375.0f, -0.5f);
-        private Vector3 closeButtonVisiblePos = new Vector3(801.1f, 62.8f, -0.6f);
+        private Vector3 closeButtonVisiblePos = new Vector3(802.0f, 62.8f, -0.6f);
         private Vector3 plusButton1VisiblePos = new Vector3(598.0f, 423.9f, -0.6f);
         private Vector3 plusButton2VisiblePos = new Vector3(598.0f, 495.0f, -0.6f);
         private Vector3 plusButton3VisiblePos = new Vector3(598.0f, 567.3f, -0.6f);
@@ -83,13 +83,13 @@ namespace Game
         private Vector3 volumeFill2VisiblePos = new Vector3(359.4f, 494.0f, -0.6f);
         private Vector3 volumeFill3VisiblePos = new Vector3(359.4f, 565.0f, -0.6f);
         private Vector3 GammaMinus = new Vector3(564.8f, 161.3f, -0.6f);
-        private Vector3 GammaPlus = new Vector3(598.7f, 161.3f, -0.6f);
+        private Vector3 GammaPlus = new Vector3(597.5f, 161.3f, -0.6f);
         private Vector3 GammaVolume = new Vector3(359.4f, 160.5f, -0.6f);
         private Vector3 GammaDefault = new Vector3(225.9f, 199.5f, -0.6f);
         private Vector3 MouseMinus = new Vector3(564.8f, 269.8f, -0.6f);
-        private Vector3 MousePlus = new Vector3(598.2f, 269.3f, -0.6f);
+        private Vector3 MousePlus = new Vector3(597.5f, 269.3f, -0.6f);
         private Vector3 MouseVolume = new Vector3(359.4f, 269.3f, -0.6f);
-        private Vector3 MouseDefault = new Vector3(226.2f, 306.8f, -0.6f);
+        private Vector3 MouseDefault = new Vector3(226.2f, 308.0f, -0.6f);
 
         private const string EVENT_POPUP_OPENED = "MainMenuPopupOpened";
         private const string EVENT_POPUP_CLOSED = "MainMenuPopupClosed";

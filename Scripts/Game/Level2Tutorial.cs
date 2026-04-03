@@ -80,6 +80,7 @@ namespace Game
         private const string EVENT_GAMEWIN = "GameWin";
         private const string EVENT_WALLENABLED = "WallEnabled";
         private const string EVENT_TUTORIALOVER = "TUTORIALOVER";
+        private const string EVENT_SKIPTUTORIAL = "SkipTutorial";
         private const string EVENT_DEBUG_TIMER = "DebugSetTimer";
 
         // ======================  Wall Setting ==============================
@@ -93,9 +94,10 @@ namespace Game
 
         // ========================= TUTORIAL SETTING ======================
         [SerializeField] private bool tutorialover = false;
+        private bool isSkipTutorial = false;
         private int tutorialstate = 0;
         private float tutorialSpawnInterval = 0.0f;
-        [SerializeField] private float tutorialCountdown = 0.0f;
+        [SerializeField] private float tutorialCountdown = 1.0f;
         private const uint INVALID_ENTITY = 0xffffffffu;
 
         // ============== RNG Setting =================
@@ -116,6 +118,7 @@ namespace Game
             Subscribe(EVENT_GAMEWIN, OnGameEnd);
             Subscribe(EVENT_WALLENABLED, OnWallEnabled);
             Subscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
+            Subscribe(EVENT_SKIPTUTORIAL, OnSkipTutorial);
         }
 
         public override void OnUpdate(float deltaTime)
@@ -174,10 +177,11 @@ namespace Game
                 if (tutorialstate > 2 &&
                    SceneFindEntityByName("botnet") == INVALID_ENTITY &&
                    SceneFindEntityByName("WormHost") == INVALID_ENTITY &&
-                   SceneFindEntityByName("loveletter") == INVALID_ENTITY)
+                   SceneFindEntityByName("loveletter") == INVALID_ENTITY || isSkipTutorial)
                 {
                     tutorialover = true;
                     Publish(EVENT_TUTORIALOVER, "");
+                    return;
                 }
 
                 //// Time delay between enemy spawns
@@ -188,6 +192,7 @@ namespace Game
                 //    tutorialCountdown -= deltaTime;
                 //}
 
+                tutorialCountdown -= deltaTime;
                 // Spawn enemy
                 if (tutorialCountdown <= 0.0f)
                 {
@@ -234,6 +239,7 @@ namespace Game
             Unsubscribe(EVENT_GAMEWIN, OnGameEnd);
             Unsubscribe(EVENT_WALLENABLED, OnWallEnabled);
             Unsubscribe(EVENT_DEBUG_TIMER, OnDebugTimer);
+            Unsubscribe(EVENT_SKIPTUTORIAL, OnSkipTutorial);
 
             canSpawn = false;
             initialized = false;
@@ -275,6 +281,15 @@ namespace Game
         {
             spawnInterval = minInterval;
             spawntimer = 0;
+        }
+
+        private void OnSkipTutorial(string eventName, string payload)
+        {
+
+            // Extract skip state from payload
+            if (bool.TryParse(payload, out bool skipState)) {
+                isSkipTutorial = skipState;
+            }
         }
 
         private void ProcessPendingSpawns(float deltaTime)

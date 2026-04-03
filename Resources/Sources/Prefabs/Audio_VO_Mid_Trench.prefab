@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_VO_Mid_Trench.prefab",
-    "Prefab GUID": 13903448319006034801,
+    "Prefab GUID": 15424415954022498539,
     "version": 1,
     "entities": [
         {
@@ -74,9 +74,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4539910538062233963",
-                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 7443
+                            "GCHandle": 19
                         }
                     }
                 }

@@ -119,6 +119,8 @@ namespace Game
 
         private uint[] hudElementIds;
         private uint timerUILevel2ID;
+        private uint crosshairLevel2ID;
+        private uint crosshair2Level2ID;
 
         // State
         private bool isPaused = false;
@@ -286,8 +288,10 @@ namespace Game
             Event.Subscribe(EVENT_LEVEL2_TUTORIAL_PAUSE, OnLevel2Pause);
             Event.Subscribe(EVENT_TUTORIALOVER, OnTutorialOver);
 
-            // Save timer UI ID in level 2
+            // Save timer and crosshair UI ID in level 2
             timerUILevel2ID = SceneFindEntityByName("TImer");
+            crosshairLevel2ID = SceneFindEntityByName("Crosshair");
+            crosshair2Level2ID = SceneFindEntityByName("Crosshair2");
 
             LogMessage("PauseMenuPopup: Ready!");
         }
@@ -463,12 +467,20 @@ namespace Game
             if (hudElementIds != null)
                 for (int i = 0; i < hudElementIds.Length; i++) {
 
-                    // Exception for timer UI in Level 2
-                    if(hudElementIds[i] == timerUILevel2ID) {
-                        if(isTutorialOver) {
+                    // Exception to hide timer UI & crosshair in Level 2
+                    bool isLevel2TutorialElement =
+                        currentGameScenePath == LEVEL2_SCENE_PATH &&
+                        (hudElementIds[i] == timerUILevel2ID ||
+                        hudElementIds[i] == crosshairLevel2ID ||
+                        hudElementIds[i] == crosshair2Level2ID);
+
+                    if (isLevel2TutorialElement)
+                    {
+                        if (isTutorialOver)
                             SafeSetVisible(hudElementIds[i], true);
-                        }
-                    } else {
+                    }
+                    else
+                    {
                         SafeSetVisible(hudElementIds[i], true);
                     }
                 }

@@ -7,6 +7,8 @@ using static Engine.AudioManager;
 using static Engine.Transform;
 using static Engine.Prefab;
 using static Engine.Scene;
+using static Engine.ProgressTracker;
+
 
 namespace Game
 {
@@ -151,7 +153,7 @@ namespace Game
             // countdownstart = true;
             // countdown = countdowntrench;
             Input.SetCursorVisible(true);
-
+            ProgressTracker.MarkLevelWon("trenchrun");
             SpriteRenderer.SetColor((uint)EntityID, 1.0f, 1.0f, 1.0f, 0.0f);
             isFading = true;
             fadeElapsed = 0.0f;

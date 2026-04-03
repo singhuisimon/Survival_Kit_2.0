@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_Trench_WallWarn",
-    "Prefab GUID": 6731650604892661709,
+    "Prefab Name": "Prefab: Audio_Trench_WallWarn.prefab",
+    "Prefab GUID": 16270204278565339311,
     "version": 1,
     "entities": [
         {
@@ -74,9 +74,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "7884572109495723977",
-                            "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
+                            "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 3707
+                            "GCHandle": 19
                         }
                     }
                 }

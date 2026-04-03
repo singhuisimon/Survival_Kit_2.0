@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_UpgradeModulePickUp.prefab",
-    "Prefab GUID": 14108643553270743213,
+    "Prefab GUID": 12542112192503906511,
     "version": 1,
     "entities": [
         {
@@ -74,9 +74,9 @@
                     "data": {
                         "Properties": {
                             "ComponentGUID": "4335805973406417063",
-                            "ScriptClassName": "Game.GameSoundPrefabLifetime",
+                            "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 35
+                            "GCHandle": 19
                         }
                     }
                 }

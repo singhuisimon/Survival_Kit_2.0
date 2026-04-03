@@ -20,6 +20,7 @@ namespace Game
 
         private float savedTime = 0.0f;
         private bool wasPaused = false;
+        private bool wasPlayingBeforePause = false;
 
         private bool played = false;
 
@@ -42,7 +43,8 @@ namespace Game
                 if(!wasPaused){
                     savedTime = elapsedTime;
                     wasPaused = true;
-                    if(AudioIsPlaying((uint)EntityID)){
+                    wasPlayingBeforePause = AudioIsPlaying((uint)EntityID);
+                    if(wasPlayingBeforePause){
                         AudioPause((uint)EntityID);
                     }
                 }
@@ -53,7 +55,7 @@ namespace Game
                 // Just unpaused - restore timer
                 elapsedTime = savedTime;
                 wasPaused = false;
-                if(played){
+                if(played && wasPlayingBeforePause){
                     AudioPlay((uint)EntityID);
                 }
             }
