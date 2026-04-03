@@ -72,7 +72,7 @@ namespace Game
             "PlayerHealth", "PrimaryWeaponFrame", "PrimaryWeaponWindow",
             "SecondayWeaponUI", "AltFireIcon", "WeaponBarReload",
             "CoreHealthBarRefill", "CoreHealthBarFrame", "CoreHealthBarWindow",
-            "Crosshair", "Crosshair2","HealBar","DamageBarFill","timerUp","SentryWindow"
+            "Crosshair", "Crosshair2","HealBar","DamageBarFill","timerUp","SentryWindow","SentryCount"
         };
 
         // Scene paths
