@@ -27,8 +27,8 @@ namespace Game
         // This bullet's own tag
         private string[] BulletTags = { "EnemyTurretBullet" };
 
-        // [FIX: DestructableWall bullet block] - Tags for walls that should block and destroy this bullet (no damage to wall)
-        private string[] DestructableWallTags = { "DestructableWall", "obstacle_wall_destructable" };
+        // [FIX: DestructableWall bullet block] - Tags for environment objects that block and destroy this bullet (no damage dealt)
+        private string[] CollidableNoDamageObjects = { "DestructableWall", "obstacle_wall_destructable", "ENVIRONMENT_LevelDesign" };
         // [END FIX: DestructableWall bullet block]
 
         private float elapsedTime = 0.0f;
@@ -153,7 +153,7 @@ namespace Game
                     return; // Exit after first hit
                 }
                 // [FIX: DestructableWall bullet block] - Bullet hits wall: destroy bullet only, no damage to wall
-                else if (IsDestructableWallTag(otherTag))
+                else if (IsCollidableNoDamageObject(otherTag))
                 {
                     if (enableDebug)
                         LogMessage("EnemyTurretBullet " + self + " hit DestructableWall " + other + ", destroying bullet");
@@ -205,15 +205,15 @@ namespace Game
         }
 
         // [FIX: DestructableWall bullet block] - Returns true if tag belongs to a destructable wall
-        private bool IsDestructableWallTag(string tag)
+        private bool IsCollidableNoDamageObject(string tag)
         {
-            if (string.IsNullOrEmpty(tag) || DestructableWallTags == null)
+            if (string.IsNullOrEmpty(tag) || CollidableNoDamageObjects == null)
                 return false;
 
-            for (int i = 0; i < DestructableWallTags.Length; i++)
+            for (int i = 0; i < CollidableNoDamageObjects.Length; i++)
             {
-                if (!string.IsNullOrEmpty(DestructableWallTags[i]) &&
-                    string.Equals(tag, DestructableWallTags[i], StringComparison.OrdinalIgnoreCase))
+                if (!string.IsNullOrEmpty(CollidableNoDamageObjects[i]) &&
+                    string.Equals(tag, CollidableNoDamageObjects[i], StringComparison.OrdinalIgnoreCase))
                     return true;
             }
             return false;
