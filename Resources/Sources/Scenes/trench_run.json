@@ -428,7 +428,7 @@
                         ],
                         "Rotation": [
                             178.78050231933594,
-                            1.0146925449371338,
+                            1.014693021774292,
                             0.6353133320808411
                         ],
                         "Scale": [
@@ -521,7 +521,7 @@
                         ],
                         "Rotation": [
                             178.78050231933594,
-                            1.0146925449371338,
+                            1.014693021774292,
                             0.6353133320808411
                         ],
                         "Scale": [
@@ -1729,7 +1729,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1815,7 +1815,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1901,7 +1901,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -1987,7 +1987,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2073,7 +2073,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2159,7 +2159,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2245,7 +2245,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2331,7 +2331,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2417,7 +2417,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2503,7 +2503,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2589,7 +2589,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2675,7 +2675,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2761,7 +2761,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2847,7 +2847,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -2933,7 +2933,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3019,7 +3019,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3105,7 +3105,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3191,7 +3191,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3277,7 +3277,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3363,7 +3363,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3449,7 +3449,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3535,7 +3535,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3621,7 +3621,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3707,7 +3707,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3793,7 +3793,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3879,7 +3879,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -3965,7 +3965,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4051,7 +4051,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4137,7 +4137,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4223,7 +4223,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4309,7 +4309,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4395,7 +4395,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4481,7 +4481,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4567,7 +4567,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4653,7 +4653,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4739,7 +4739,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4825,7 +4825,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4911,7 +4911,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -4997,7 +4997,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5083,7 +5083,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5169,7 +5169,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5255,7 +5255,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5341,7 +5341,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5427,7 +5427,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5513,7 +5513,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5599,7 +5599,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5685,7 +5685,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5771,7 +5771,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5857,7 +5857,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -5943,7 +5943,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6029,7 +6029,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6115,7 +6115,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6201,7 +6201,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6287,7 +6287,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6373,7 +6373,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6459,7 +6459,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6545,7 +6545,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6634,7 +6634,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6720,7 +6720,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -6830,7 +6830,7 @@
                             0.5882353186607361
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 2,
+                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": false
                     }
@@ -6859,7 +6859,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7020,7 +7020,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7181,7 +7181,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7342,7 +7342,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7503,7 +7503,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7664,7 +7664,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7825,7 +7825,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -7986,7 +7986,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -8147,7 +8147,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -8308,7 +8308,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -8469,7 +8469,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -8630,7 +8630,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -8977,7 +8977,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -9138,7 +9138,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -9299,7 +9299,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -9894,7 +9894,7 @@
                         ],
                         "Rotation": [
                             178.78050231933594,
-                            1.0146925449371338,
+                            1.014693021774292,
                             0.6353133320808411
                         ],
                         "Scale": [
@@ -9988,7 +9988,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -10191,7 +10191,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -10352,7 +10352,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -10513,7 +10513,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -10764,7 +10764,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -10925,7 +10925,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -11254,7 +11254,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "AltFireIcon",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/AltFireIcon.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -11336,7 +11336,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 3,
+                        "Sprite Layer": 2,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -11422,9 +11422,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -0.000010064656635222491,
+                            -0.000010067435141536407,
                             -89.98021697998047,
-                            5.828239557637005e-10
+                            6.514493944287381e-10
                         ],
                         "Scale": [
                             1.5,
@@ -11667,7 +11667,7 @@
                     "Properties": {
                         "ComponentGUID": "765542126216987139",
                         "Position": [
-                            1151.199951171875,
+                            1146.0,
                             60.5,
                             0.0
                         ],
@@ -11729,7 +11729,7 @@
                     "Properties": {
                         "ComponentGUID": "10315724205064143441",
                         "Position": [
-                            1079.8599853515625,
+                            1078.4000244140625,
                             673.7000122070313,
                             0.0
                         ],
@@ -11739,7 +11739,7 @@
                             0.0
                         ],
                         "Scale": [
-                            109.76000213623047,
+                            111.0,
                             5.0,
                             1.0
                         ],
@@ -12008,7 +12008,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -12397,7 +12397,7 @@
                         ],
                         "Rotation": [
                             179.68756103515625,
-                            88.8286361694336,
+                            88.82997131347656,
                             -180.0
                         ],
                         "Scale": [
@@ -12500,7 +12500,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -12712,7 +12712,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -12873,7 +12873,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -13034,7 +13034,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -13194,7 +13194,7 @@
                         ],
                         "Rotation": [
                             178.78050231933594,
-                            1.0146925449371338,
+                            1.014693021774292,
                             0.6353133320808411
                         ],
                         "Scale": [
@@ -13288,7 +13288,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -13449,7 +13449,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -13610,7 +13610,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -13861,7 +13861,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -14055,7 +14055,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "PrimaryWeaponWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/PrimaryWeaponWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -14240,7 +14240,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "HealthBarWindow",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealthBarWindow.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -14330,7 +14330,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "ICESentryText",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/ICESentryText.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -14426,7 +14426,7 @@
                             1.0
                         ],
                         "Quad": 3,
-                        "Sprite Layer": 2,
+                        "Sprite Layer": 1,
                         "IsActive": true,
                         "IsVisible": true
                     }
@@ -14571,8 +14571,8 @@
                     "Properties": {
                         "ComponentGUID": "16298061428645381225",
                         "Position": [
-                            705.7999877929688,
-                            476.6000061035156,
+                            721.0999755859375,
+                            437.79998779296875,
                             0.0
                         ],
                         "Rotation": [
@@ -14581,8 +14581,8 @@
                             0.0
                         ],
                         "Scale": [
-                            77.30000305175781,
-                            30.0,
+                            76.19999694824219,
+                            24.600000381469727,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -14629,7 +14629,7 @@
                     "Properties": {
                         "ComponentGUID": "2793411025458775131",
                         "Position": [
-                            1079.8599853515625,
+                            1078.4000244140625,
                             673.7000122070313,
                             0.0
                         ],
@@ -14639,8 +14639,8 @@
                             0.0
                         ],
                         "Scale": [
-                            0.0,
-                            0.0,
+                            111.0,
+                            5.0,
                             0.0
                         ],
                         "Parent": 4294967295,
@@ -14692,7 +14692,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "SecondayWeaponUI",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/SecondayWeaponUI.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -15758,9 +15758,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            -12.000144004821777,
-                            85.99884796142578,
-                            -0.9998602867126465
+                            -12.000123977661133,
+                            85.99894714355469,
+                            -0.9998467564582825
                         ],
                         "Scale": [
                             1.0,
@@ -16000,7 +16000,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -16161,7 +16161,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -16322,7 +16322,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -16483,7 +16483,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -16644,7 +16644,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -16805,7 +16805,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -19315,8 +19315,8 @@
                     "Properties": {
                         "ComponentGUID": "5964428938354466947",
                         "Position": [
-                            538.2999877929688,
-                            476.0,
+                            557.5999755859375,
+                            437.79998779296875,
                             0.0
                         ],
                         "Rotation": [
@@ -19325,8 +19325,8 @@
                             0.0
                         ],
                         "Scale": [
-                            77.30000305175781,
-                            30.0,
+                            76.19999694824219,
+                            24.600000381469727,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -19467,9 +19467,9 @@
                             0.0
                         ],
                         "Rotation": [
-                            0.000005014653652324341,
+                            0.000005016372597310692,
                             89.98021697998047,
-                            -4.911717255140502e-9
+                            -5.2069299982804296e-9
                         ],
                         "Scale": [
                             0.05000000074505806,
@@ -20325,7 +20325,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Prefab: HealingVFX.prefab",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/HealingVFX.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -20686,7 +20686,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -20847,7 +20847,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21008,7 +21008,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21169,7 +21169,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21330,7 +21330,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21491,7 +21491,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21652,7 +21652,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21813,7 +21813,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -21974,7 +21974,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -22135,7 +22135,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -22296,7 +22296,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -22457,7 +22457,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -22618,7 +22618,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -22779,7 +22779,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -22940,7 +22940,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -23101,7 +23101,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -23262,7 +23262,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -23423,7 +23423,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -23584,7 +23584,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -23745,7 +23745,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -23906,7 +23906,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -24067,7 +24067,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -24228,7 +24228,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -24389,7 +24389,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -24550,7 +24550,7 @@
                         "Rotation": [
                             -0.00010636646766215563,
                             0.42574286460876465,
-                            -0.10387907922267914
+                            -0.10387910902500153
                         ],
                         "Scale": [
                             5.0,
@@ -25626,8 +25626,8 @@
                     "Properties": {
                         "ComponentGUID": "1210756432622061263",
                         "Position": [
-                            623.4000244140625,
-                            380.3999938964844,
+                            640.0,
+                            360.0,
                             0.0
                         ],
                         "Rotation": [
@@ -25636,8 +25636,8 @@
                             0.0
                         ],
                         "Scale": [
-                            650.0,
-                            450.0,
+                            640.0,
+                            360.0,
                             1.0
                         ],
                         "Parent": 4294967295,
@@ -25846,8 +25846,8 @@
                     "Properties": {
                         "ComponentGUID": "17467968235181592631",
                         "Position": [
-                            644.2999877929688,
-                            301.20001220703125,
+                            662.7000122070313,
+                            328.0,
                             0.0
                         ],
                         "Rotation": [
@@ -25901,8 +25901,8 @@
                     "Properties": {
                         "ComponentGUID": "5362292436810633277",
                         "Position": [
-                            619.9000244140625,
-                            336.70001220703125,
+                            637.7999877929688,
+                            357.0,
                             0.0
                         ],
                         "Rotation": [
@@ -26004,7 +26004,7 @@
                         ],
                         "Rotation": [
                             178.78050231933594,
-                            1.0146925449371338,
+                            1.014693021774292,
                             0.6353133320808411
                         ],
                         "Scale": [
@@ -26096,7 +26096,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
@@ -26234,7 +26234,7 @@
                         ],
                         "Rotation": [
                             178.78050231933594,
-                            1.0146925449371338,
+                            1.014693021774292,
                             0.6353133320808411
                         ],
                         "Scale": [
@@ -26326,7 +26326,7 @@
                         "parentPrefabGuid": "0",
                         "prefabName": "Enemy_Keylogger",
                         "prefabVersion": 1,
-                        "prefabFilePath": "C:/Users/kimkh/DIGIPEN/YEAR3/Tri1/SEP5/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
+                        "prefabFilePath": "C:/Users/kuekw/source/repos/here/Survival_Kit_2.0/build/bin/Release/Resources/Sources/Prefabs/Enemy_Keylogger.prefab",
                         "componentOverrides": [
                             {
                                 "componentType": 1,
