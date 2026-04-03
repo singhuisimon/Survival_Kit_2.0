@@ -468,13 +468,19 @@ namespace Game
                 for (int i = 0; i < hudElementIds.Length; i++) {
 
                     // Exception to hide timer UI & crosshair in Level 2
-                    if (hudElementIds[i] == timerUILevel2ID ||
+                    bool isLevel2TutorialElement =
+                        currentGameScenePath == LEVEL2_SCENE_PATH &&
+                        (hudElementIds[i] == timerUILevel2ID ||
                         hudElementIds[i] == crosshairLevel2ID ||
-                        hudElementIds[i] == crosshair2Level2ID) {
-                        if (isTutorialOver) {
+                        hudElementIds[i] == crosshair2Level2ID);
+
+                    if (isLevel2TutorialElement)
+                    {
+                        if (isTutorialOver)
                             SafeSetVisible(hudElementIds[i], true);
-                        }
-                    } else {
+                    }
+                    else
+                    {
                         SafeSetVisible(hudElementIds[i], true);
                     }
                 }
