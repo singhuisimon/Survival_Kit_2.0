@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_VO_5sec_2",
-    "Prefab GUID": 3032268991765365049,
+    "Prefab Name": "Prefab: Audio_VO_5sec_2.prefab",
+    "Prefab GUID": 12344956564784665567,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_5sec Warning2.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "1657606776538579165",
                             "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
                             "Started": false,
-                            "GCHandle": 187
+                            "GCHandle": 275
                         }
                     }
                 }

@@ -57,6 +57,8 @@ namespace Game
         private bool fadeDone = false;
         private float fadeElapsed = 0.0f;
 
+        private float volume = 0.8f;
+
         [SerializeField] private float fadeUpTime = 1.0f;
 
         private bool gameOverTriggered = false;
@@ -78,6 +80,8 @@ namespace Game
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameOver);
 
             SetIsVisible((uint)EntityID, false);
+
+            AudioSetVolume((uint)EntityID, volume);
 
             initialized = true;
             screamcountdown = screamdelay;

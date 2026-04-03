@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_VO_Corrupted_Core_Destroyed",
-    "Prefab GUID": 7354114949414338877,
+    "Prefab Name": "Prefab: Audio_VO_Corrupted_Core_Destroyed.prefab",
+    "Prefab GUID": 2545123775624942485,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Corrupted Core Destroyed.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "13763282574913716563",
                             "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
                             "Started": false,
-                            "GCHandle": 75
+                            "GCHandle": 275
                         }
                     }
                 }

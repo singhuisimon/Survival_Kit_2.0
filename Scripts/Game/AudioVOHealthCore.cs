@@ -33,6 +33,8 @@ namespace Game
         private float timerCooldown = 5.0f;
         [SerializeField] private float elapsedTimer = 0.0f;
 
+        private float volume = 0.8f;
+
         private string basepath = "System AI_VO_Core Damage ";
 
         private const string EVENT_CORE_PLAY = "CorePlaying";
@@ -47,6 +49,8 @@ namespace Game
             Event.Subscribe(EVENT_PLAYER_DEAD, OnGameEnd);
             Event.Subscribe(EVENT_CORE_DESTROYED, OnGameEnd);
             Event.Subscribe(EVENT_TIMER_FINISHED, OnGameEnd);
+
+            AudioSetVolume((uint)EntityID, volume);
 
             timerstart = false;
             initialized = true;
