@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_TrenchGuide.prefab",
-    "Prefab GUID": 16846665030869057725,
+    "Prefab GUID": 3451622734208092671,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Trench Run Briefing.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.800000011920929,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "9165124923816001693",
                             "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 523
                         }
                     }
                 }

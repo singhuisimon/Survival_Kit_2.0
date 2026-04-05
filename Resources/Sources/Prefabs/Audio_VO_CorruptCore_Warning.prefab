@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: Audio_VO_CorruptCore_Warning.prefab",
-    "Prefab GUID": 17730258963235946717,
-    "version": 1,
+    "Prefab GUID": 815741518716441579,
+    "version": 2,
     "entities": [
         {
             "Name": "Audio_VO_CorruptCore_Warning",
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Corrupted Core Warning.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "9728057308791734627",
                             "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 275
                         }
                     }
                 }

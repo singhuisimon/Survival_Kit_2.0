@@ -138,10 +138,7 @@ namespace Game
                 LogMessage("[EnemyCore] Instantiating EnemyCore_ExplosionPrefab success! ID is: " + explosion.ToString());
             }
 
-            if (!skipTutorial)
-            {
-                Publish("CoreDeadTriggerPostTrenchRun", data);
-            }
+            
 
             //Publish("EnemyCoreDeath", "");
 
@@ -161,6 +158,11 @@ namespace Game
                 LogMessage("[EnemyCore] Failed to instantiate audio after death");
             } else {
                 LogMessage("[EnemyCore] Succeed in intantiating EnemyCore_CorruptAudioPrefab");
+            }
+
+            if (!skipTutorial)
+            {
+                Publish("CoreDeadTriggerPostTrenchRun", data);
             }
 
             if (skipTutorial)

@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_UpgradeModulePickUp.prefab",
-    "Prefab GUID": 12542112192503906511,
+    "Prefab GUID": 5006006720475760505,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "Upgrade Module Pickup.wav",
                             "Type": 5,
                             "State": 0,
-                            "Volume": 2.0,
+                            "Volume": 1.340999960899353,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "4335805973406417063",
                             "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 219
                         }
                     }
                 }

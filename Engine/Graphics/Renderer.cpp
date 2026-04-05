@@ -21,6 +21,7 @@
 #include "../Physics/Collision2D.h"
 
 // Jolt debug draw
+ // Jolt debug draw
 #include <Jolt/Physics/Body/BodyManager.h>
 #include <Jolt/Physics/PhysicsSystem.h>
 
@@ -256,7 +257,7 @@ namespace Engine {
 
 	 		glm::mat4  cam_view = editor_camera.getLookAt(); 
 			glm::mat4  cam_perspective = editor_camera.getPerspective(static_cast<float>(renderEditorVP.size.x / renderEditorVP.size.y));
-			glm::vec3& cam_pos  = editor_camera.getCamPos();
+			glm::vec3& cam_pos = editor_camera.getCamPos();
 
 			bool shadowRenderedForThisFrame = false;
 
@@ -682,7 +683,7 @@ namespace Engine {
 				const auto& submesh = mesh_resource->subMeshes[item.m_submesh_index];
 
 				// Calculate byte offset into the index buffer
-				const void* indexOffset = reinterpret_cast<const void*>( submesh.startIndex * sizeof(unsigned int));
+				const void* indexOffset = reinterpret_cast<const void*>(submesh.startIndex * sizeof(unsigned int));
 
 				glDrawElements(GL_TRIANGLES, submesh.indexCount, GL_UNSIGNED_INT, indexOffset);
 				glBindVertexArray(0);
@@ -716,7 +717,7 @@ namespace Engine {
 	/**
 	 * @brief Sets up the render passes used for multi-pass rendering.
 	 */
-	void Renderer::setupPasses() 
+	void Renderer::setupPasses()
 	{
 		// Create a render pass for that framebuffer
 		RenderPass first_pass
@@ -813,12 +814,12 @@ namespace Engine {
 			.pass_name = "Text Pass",
 			.fbo_handle = static_cast<size_t>(FramebufferIndex::COMPOSITION),
 			.shdpgm_handle = static_cast<size_t>(ShaderIndex::FONT),
-			.auto_aspect = true, 
-			.clear_color = false, 
+			.auto_aspect = true,
+			.clear_color = false,
 			.clear_depth = false,
 			.depth_test = false,
 			.depth_write = false,
-			.blending = true, 
+			.blending = true,
 			.culling = false,
 			.passtype = PassType::FULLSCREEN
 		};
@@ -827,7 +828,7 @@ namespace Engine {
 	/**
 	 * @brief Sets up all the necessary framebuffers for rendering and compositing.
 	 */
-	void Renderer::setupFramebuffers() 
+	void Renderer::setupFramebuffers()
 	{
 		// Create a framebuffer for ImGui editor and configure its settings
 		auto fp_fbo = FrameBuffer::create();
@@ -978,7 +979,7 @@ namespace Engine {
 
 	// Build a small per-draw light list with simple sphere-sphere test and brightness score
 	uint32_t Renderer::buildAndUploadLightsForDraw(const glm::vec3& objCenter, float objRadius,
-												   std::span<const LightCPU> sceneLights) {
+		std::span<const LightCPU> sceneLights) {
 
 		// For scoring the lights to sort subsequently
 		struct Ref { uint32_t idx; float score; };
@@ -1140,12 +1141,12 @@ namespace Engine {
 		glBindTextureUnit(4, m_gl.m_textures[0].handle());
 
 		// Bloom texture is top mip (A')  
-		BloomMip& topMip = m_bloomMips[0]; 
+		BloomMip& topMip = m_bloomMips[0];
 		glBindTextureUnit(5, m_gl.m_textures[topMip.texIndex].handle());
 
 		// Set Uniforms 
 		prog.setUniform("exposure", m_exposure);
-		prog.setUniform("bloomStrength", m_bloomStrength); 
+		prog.setUniform("bloomStrength", m_bloomStrength);
 		prog.setUniform("useBloom", m_bloomOn);
 		prog.setUniform("gamma", m_gamma);
 
@@ -1470,9 +1471,11 @@ namespace Engine {
 		if (res == 0u) res = 1024u;
 		if (m_shadowDepthTex != 0 && m_shadowMapRes == res && m_shadowFBO != 0) return;
 
-		m_shadowMapRes = res;
+		// Fully unbind old resources before replacing them.
+		glActiveTexture(GL_TEXTURE0 + 10);
+		glBindTexture(GL_TEXTURE_2D, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-		// Destroy old
 		if (m_shadowDepthTex) {
 			glDeleteTextures(1, &m_shadowDepthTex);
 			m_shadowDepthTex = 0;
@@ -1482,31 +1485,36 @@ namespace Engine {
 			m_shadowFBO = 0;
 		}
 
-		// Create depth texture
-		glCreateTextures(GL_TEXTURE_2D, 1, &m_shadowDepthTex);
-		glTextureStorage2D(m_shadowDepthTex, 1, GL_DEPTH_COMPONENT24, (GLsizei)res, (GLsizei)res);
+		m_shadowMapRes = res;
 
-		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		// Recreate with conservative bind-to-edit calls.
+		glGenTextures(1, &m_shadowDepthTex);
+		glBindTexture(GL_TEXTURE_2D, m_shadowDepthTex);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, (GLsizei)res, (GLsizei)res, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		const float border[4] = { 1.f, 1.f, 1.f, 1.f };
-		glTextureParameterfv(m_shadowDepthTex, GL_TEXTURE_BORDER_COLOR, border);
+		glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_NONE); 
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		// sampler2DShadow compare mode
-		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
-		glTextureParameteri(m_shadowDepthTex, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+		glGenFramebuffers(1, &m_shadowFBO);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_shadowDepthTex, 0);
+		glDrawBuffer(GL_NONE);
+		glReadBuffer(GL_NONE);
 
-		// Create FBO
-		glCreateFramebuffers(1, &m_shadowFBO);
-		glNamedFramebufferTexture(m_shadowFBO, GL_DEPTH_ATTACHMENT, m_shadowDepthTex, 0);
-		glNamedFramebufferDrawBuffer(m_shadowFBO, GL_NONE);
-		glNamedFramebufferReadBuffer(m_shadowFBO, GL_NONE);
-
-		GLenum status = glCheckNamedFramebufferStatus(m_shadowFBO, GL_FRAMEBUFFER);
+		GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 		if (status != GL_FRAMEBUFFER_COMPLETE) {
-			LOG_ERROR("Renderer::ensureShadowResources() - Shadow FBO incomplete! status=", status);
+			LOG_ERROR("Renderer::ensureShadowResources() - Shadow FBO incomplete after resize! status=", status);
 		}
+
+		glViewport(0, 0, (GLsizei)res, (GLsizei)res);
+		glClearDepth(1.0);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	static glm::mat4 computeLightVP_Directional(const glm::vec3& lightDirWorld,
@@ -1713,12 +1721,20 @@ namespace Engine {
 		// Render depth
 		glBindFramebuffer(GL_FRAMEBUFFER, m_shadowFBO);
 		glViewport(0, 0, (GLsizei)m_shadowMapRes, (GLsizei)m_shadowMapRes);
-		glClearDepth(1.0);
-		glClear(GL_DEPTH_BUFFER_BIT);
 
+		// IMPORTANT: prevent state leakage from editor/UI/other passes
+		glDisable(GL_SCISSOR_TEST);
+		glDisable(GL_STENCIL_TEST);
+		glDisable(GL_BLEND);
+
+		// Depth-only shadow pass
+		glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+		glDepthMask(GL_TRUE);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LESS);
-		glDisable(GL_BLEND);
+
+		glClearDepth(1.0);
+		glClear(GL_DEPTH_BUFFER_BIT);
 
 		// Reduce acne / peter panning
 		glEnable(GL_CULL_FACE);
@@ -1766,25 +1782,29 @@ namespace Engine {
 
 		glDisable(GL_POLYGON_OFFSET_FILL);
 		glCullFace(GL_BACK);
+
+		// Restore color writes for later passes
+		glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void Renderer::initFontResources() {
 
 		//create VAO and VBO
-		glGenVertexArrays(1, &m_fontVAO); 
+		glGenVertexArrays(1, &m_fontVAO);
 		glGenBuffers(1, &m_fontVBO);
 
 		glBindVertexArray(m_fontVAO);
 		glBindBuffer(GL_ARRAY_BUFFER, m_fontVBO);
 
 		//allocate space for dynamic text 
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 8, nullptr, GL_DYNAMIC_DRAW); 
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 6 * 8, nullptr, GL_DYNAMIC_DRAW);
 
 		//add the vertex layouts 
-		glEnableVertexAttribArray(0); 
+		glEnableVertexAttribArray(0);
 		//position 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0); 
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 
 		//text coordinates 
 		glEnableVertexAttribArray(1);
@@ -1823,7 +1843,7 @@ namespace Engine {
 		}
 
 		//filter for text items
-		std::vector<const DrawItem*> textItems; 
+		std::vector<const DrawItem*> textItems;
 		for (const auto& item : items) {
 			if (item.m_drawitem_type == DrawItemType::TEXT) {
 				textItems.push_back(&item);
@@ -1831,7 +1851,7 @@ namespace Engine {
 		}
 
 		//if empty, return
-		if (textItems.empty()) return; 
+		if (textItems.empty()) return;
 
 
 		//group texts by font 
@@ -1840,12 +1860,12 @@ namespace Engine {
 			itemsByFont[item->m_fontName].push_back(item);
 		}
 
-		beginFrame(pass); 
-		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle]; 
+		beginFrame(pass);
+		auto& prog = m_gl.m_shader_storage[pass.shdpgm_handle];
 
 		//enable blending
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		//set uniforms
 		// Use same fixed coordinate system as UI pass (1280x720)
@@ -1863,90 +1883,90 @@ namespace Engine {
 		//}
 		//prog.setUniform("u_FontAtlas", 0); 
 
-		glBindVertexArray(m_fontVAO); 
+		glBindVertexArray(m_fontVAO);
 
 		for (const auto& [fontName, items] : itemsByFont) {
 
-		Font* currentFont = getFont(fontName);
+			Font* currentFont = getFont(fontName);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, currentFont->getAtlasTexture());
-		prog.setUniform("u_FontAtlas", 0);
-		//render each text item 
-		for (const auto* item : items) {
-			
-			if (item->m_drawitem_type != DrawItemType::TEXT) continue; 
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, currentFont->getAtlasTexture());
+			prog.setUniform("u_FontAtlas", 0);
+			//render each text item 
+			for (const auto* item : items) {
 
-			//extract data from Draw item
-			std::string text = item->m_text; 
-			float fontSize = item->m_fontSize; 
-			glm::vec4 color = item->m_color; 
-			glm::vec3 position(item->m_model_to_world_transform[3]);
-			float lineSpacing = item->m_lineSpacing;
-			float letterSpacing = item->m_letterSpacing; 
-			float maxWidth = item->m_maxWidth;
+				if (item->m_drawitem_type != DrawItemType::TEXT) continue;
 
-			float scale = fontSize / currentFont->getBaseSize(); 
+				//extract data from Draw item
+				std::string text = item->m_text;
+				float fontSize = item->m_fontSize;
+				glm::vec4 color = item->m_color;
+				glm::vec3 position(item->m_model_to_world_transform[3]);
+				float lineSpacing = item->m_lineSpacing;
+				float letterSpacing = item->m_letterSpacing;
+				float maxWidth = item->m_maxWidth;
 
-			//compute total width 
-			float totalWidth = 0.0f; 
-			for (char c : text) {
-				const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
-				if (glyph) totalWidth += (glyph->advance + letterSpacing) * scale; 
-			}
-			
-			//apply alignment 
-			float startX = position.x; 
-			if (item->m_textAlignment == TextAlignment::Center) {
-				startX -= totalWidth * 0.5f;
-			}
-			else if (item->m_textAlignment == TextAlignment::Right) {
-				startX -= totalWidth; 
-			}
+				float scale = fontSize / currentFont->getBaseSize();
 
-			float currentX = startX; 
-			float currentY = position.y; 
-
-			//render characters
-			for (char c : text) {
-				const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
-				if (!glyph) continue;
-
-				//handle new line characters for multi line
-				if (c == '\n') {
-					currentX = startX;
-					currentY -= fontSize * lineSpacing;
-					continue;
+				//compute total width 
+				float totalWidth = 0.0f;
+				for (char c : text) {
+					const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
+					if (glyph) totalWidth += (glyph->advance + letterSpacing) * scale;
 				}
 
-				float xpos = currentX + glyph->bearing.x * scale;
-				float ypos = currentY - (glyph->size.y - glyph->bearing.y) * scale;
-				float w = glyph->size.x * scale;
-				float h = glyph->size.y * scale;
+				//apply alignment 
+				float startX = position.x;
+				if (item->m_textAlignment == TextAlignment::Center) {
+					startX -= totalWidth * 0.5f;
+				}
+				else if (item->m_textAlignment == TextAlignment::Right) {
+					startX -= totalWidth;
+				}
 
-				float vertices[6][8] = {
-					{ xpos,     ypos + h, glyph->uvMin.x, glyph->uvMin.y, color.r, color.g, color.b, color.a },
-					{ xpos,     ypos,     glyph->uvMin.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
-					{ xpos + w, ypos,     glyph->uvMax.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+				float currentX = startX;
+				float currentY = position.y;
 
-					{ xpos,     ypos + h, glyph->uvMin.x, glyph->uvMin.y, color.r, color.g, color.b, color.a },
-					{ xpos + w, ypos,     glyph->uvMax.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
-					{ xpos + w, ypos + h, glyph->uvMax.x, glyph->uvMin.y, color.r, color.g, color.b, color.a }
-				};
+				//render characters
+				for (char c : text) {
+					const Glyph* glyph = currentFont->getGlyph(static_cast<uint32_t>(c));
+					if (!glyph) continue;
 
-				glBindBuffer(GL_ARRAY_BUFFER, m_fontVBO);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
-				glDrawArrays(GL_TRIANGLES, 0, 6);
+					//handle new line characters for multi line
+					if (c == '\n') {
+						currentX = startX;
+						currentY -= fontSize * lineSpacing;
+						continue;
+					}
 
-				currentX += (glyph->advance + letterSpacing) * scale;
+					float xpos = currentX + glyph->bearing.x * scale;
+					float ypos = currentY - (glyph->size.y - glyph->bearing.y) * scale;
+					float w = glyph->size.x * scale;
+					float h = glyph->size.y * scale;
+
+					float vertices[6][8] = {
+						{ xpos,     ypos + h, glyph->uvMin.x, glyph->uvMin.y, color.r, color.g, color.b, color.a },
+						{ xpos,     ypos,     glyph->uvMin.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+						{ xpos + w, ypos,     glyph->uvMax.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+
+						{ xpos,     ypos + h, glyph->uvMin.x, glyph->uvMin.y, color.r, color.g, color.b, color.a },
+						{ xpos + w, ypos,     glyph->uvMax.x, glyph->uvMax.y, color.r, color.g, color.b, color.a },
+						{ xpos + w, ypos + h, glyph->uvMax.x, glyph->uvMin.y, color.r, color.g, color.b, color.a }
+					};
+
+					glBindBuffer(GL_ARRAY_BUFFER, m_fontVBO);
+					glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
+					glDrawArrays(GL_TRIANGLES, 0, 6);
+
+					currentX += (glyph->advance + letterSpacing) * scale;
+				}
 			}
-		}
 		}
 
 		glBindVertexArray(0);
-		glBindTexture(GL_TEXTURE_2D, 0); 
-		prog.programFree(); 
-		endFrame(pass); 
+		glBindTexture(GL_TEXTURE_2D, 0);
+		prog.programFree();
+		endFrame(pass);
 
 	}
 
@@ -2034,7 +2054,7 @@ namespace Engine {
 		return true;
 	}
 
-	
+
 	Font* Renderer::getFont(const std::string& fontName) {
 		auto it = m_fonts.find(fontName);
 		if (it != m_fonts.end()) {

@@ -85,6 +85,7 @@ namespace Game
         private string EVENT_RELOAD_START = "ReloadStart";
         private string EVENT_RELOAD_END = "ReloadEnd";
         private string EVENT_ALT_FIRED = "AltFired";
+        private string EVENT_FORCE_ALT_CHARGE = "ForceAltCharge";
 
         //2 audio for primary alt fire
         //not sure what is layermask
@@ -210,6 +211,7 @@ namespace Game
             }
 
             Subscribe(ULTGAINEVENT, UltCharging);
+            Subscribe(EVENT_FORCE_ALT_CHARGE, OnForceAltCharge); // Force Alt Charge 
             Subscribe(GAMEOVER, OnGameStateChange);
             Subscribe(GAMEWIN, OnGameStateChange);
         }
@@ -323,6 +325,7 @@ namespace Game
             }
 
             Unsubscribe(ULTGAINEVENT, UltCharging);
+            Unsubscribe(EVENT_FORCE_ALT_CHARGE, OnForceAltCharge);
             Unsubscribe(GAMEWIN, OnGameStateChange);
             Unsubscribe(GAMEOVER, OnGameStateChange);
         }
@@ -496,6 +499,17 @@ namespace Game
             }
 
             //add in bullet hit audio here i guess - Amanda
+        }
+
+        private void OnForceAltCharge(string eventName, string payload)
+        {
+            primaryAltCharge = primaryAltChargeMax;
+
+            if (!primaryAltReady) 
+            {
+                primaryAltReady = true;
+                Publish("UltCharged", true.ToString());
+            }
         }
 
         private void PrimaryFire()
