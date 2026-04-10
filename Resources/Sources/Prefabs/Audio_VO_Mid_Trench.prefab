@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_VO_Mid_Trench.prefab",
-    "Prefab GUID": 15424415954022498539,
+    "Prefab GUID": 15227260326302438395,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Mid Trench Run.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "4539910538062233963",
                             "ScriptClassName": "Game.GameVOSoundPrefab",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 275
                         }
                     }
                 }

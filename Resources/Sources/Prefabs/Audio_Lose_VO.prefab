@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_Lose_VO",
-    "Prefab GUID": 12215909050635911345,
+    "Prefab Name": "Prefab: Audio_Lose_VO.prefab",
+    "Prefab GUID": 9462652803264203295,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Game Failure.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "11639448298332192941",
                             "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
                             "Started": false,
-                            "GCHandle": 35
+                            "GCHandle": 523
                         }
                     }
                 }

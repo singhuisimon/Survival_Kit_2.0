@@ -1,7 +1,7 @@
 {
     "Prefab Name": "Prefab: Audio_Win_Level2_VO.prefab",
     "Prefab GUID": 8955109431910842555,
-    "version": 1,
+    "version": 2,
     "entities": [
         {
             "Name": "Audio_Win_Level2_VO",
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Defence Success.wav",
                             "Type": 4,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,

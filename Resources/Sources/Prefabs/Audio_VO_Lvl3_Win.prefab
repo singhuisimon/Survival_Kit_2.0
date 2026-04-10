@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_VO_Lvl3_Win.prefab",
-    "Prefab GUID": 3665869163427856547,
+    "Prefab GUID": 18109564087819850761,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Lvl 3 Win.wav",
                             "Type": 4,
                             "State": 2,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "1081146024242643315",
                             "ScriptClassName": "Game.GameVODelaySoundPrefab",
                             "Started": false,
-                            "GCHandle": 19
+                            "GCHandle": 275
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 {
-    "Prefab Name": "Audio_VO_Upgrade_Module_Drop",
-    "Prefab GUID": 11965800967841513785,
+    "Prefab Name": "Prefab: Audio_VO_Upgrade_Module_Drop.prefab",
+    "Prefab GUID": 15227260326300570531,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Upgrade Module Drop.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,
@@ -76,7 +76,7 @@
                             "ComponentGUID": "5116371290363298139",
                             "ScriptClassName": "Game.GameSoundPrefabLongerLifetime",
                             "Started": false,
-                            "GCHandle": 163
+                            "GCHandle": 275
                         }
                     }
                 }

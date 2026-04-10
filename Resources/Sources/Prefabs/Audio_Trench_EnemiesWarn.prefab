@@ -1,6 +1,6 @@
 {
     "Prefab Name": "Prefab: Audio_Trench_EnemiesWarn.prefab",
-    "Prefab GUID": 1282224718677393611,
+    "Prefab GUID": 239280766406508729,
     "version": 1,
     "entities": [
         {
@@ -54,7 +54,7 @@
                             "FilePath": "System AI_VO_Trench Run Enemies.wav",
                             "Type": 4,
                             "State": 0,
-                            "Volume": 1.0,
+                            "Volume": 0.8019999861717224,
                             "Pitch": 1.0,
                             "Loop": false,
                             "Mute": false,

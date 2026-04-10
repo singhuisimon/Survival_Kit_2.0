@@ -82,6 +82,7 @@ namespace Game
         private const string EVENT_FADE_BLACK_OUT = "FadeBlackFadeOut";
         private const string EVENT_FADE_BLACK_IN_DONE = "FadeBlackFadeInDone";
         private const string EVENT_FADE_BLACK_OUT_DONE = "FadeBlackFadeOutDone";
+        private const string EVENT_TRENCH_WALL_WARNING_TRIGGERED = "TrenchWallWarningTriggered";
 
         // Fading
         private bool EPressed = false;
@@ -189,6 +190,8 @@ namespace Game
             1.0f, 1.0f, 1.0f, 0.6f, 1.0f, 0.0001f, 5.0f
         };
 
+        private bool needAction = false;
+
         public override void OnStart()
         {
             pressWASDID = SceneFindEntityByName(pressWASDName);
@@ -259,11 +262,19 @@ namespace Game
 
             if (pauseForTutorial && playerPauseOnTutorial)
             {
-                if (escapeJustPressed)
+                //if (escapeJustPressed)
+                //    playerPauseOnTutorial = false;
+
+                //Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                //Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                //return;
+
+                if (escapeJustPressed) {
                     playerPauseOnTutorial = false;
 
-                Publish("TutorialPauseAudio", pauseForTutorial.ToString());
-                Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                    Publish("TutorialPauseAudio", pauseForTutorial.ToString());
+                    Publish("TutorialPauseMenu", pauseForTutorial.ToString());
+                }
                 return;
             }
 
@@ -282,12 +293,17 @@ namespace Game
                 Publish("TutorialPauseMenu", pauseForTutorial.ToString());
             }
 
+            // Ensure action-based tutorials pauses when game state is pause
+            if (GameState.IsPaused && needAction)
+                return;
+
             Vector3 currentPos = Transform.GetPosition(playerID);
 
             switch (currentState)
             {
                 case TutorialState.Move:
                     HandleMoveState(currentPos, deltaTime);
+                    needAction = true;
                     break;
 
                 case TutorialState.FlyThrough:
@@ -325,6 +341,15 @@ namespace Game
                 default:
                     break;
             }
+
+            //// Non-tutorial pause from user
+            //if (GameState.IsPaused)
+            //    return;
+
+            // Ensure subscribers know level 2 pause is not tutorial-induced
+            Publish("TutorialPauseAudio", pauseForTutorial.ToString()); // Audio
+            Publish("TutorialPauseMenu", pauseForTutorial.ToString());  // Pause menu
+
         }
 
         public override void OnDestroy()
@@ -383,6 +408,10 @@ namespace Game
         {
             tooltipElapsed += dt;
 
+            // By default set state as no action needed for fly thru,
+            // Only set to action needed after completion of fly thru
+            needAction = false;
+
             if (!flyThroughStarted)
                 StartFlyThroughCinematic();
 
@@ -409,6 +438,7 @@ namespace Game
                 ShowUI(pressFlyTunnelID, false, dt);
                 pauseForTutorial = false;
                 GameState.IsPaused = false;
+                needAction = true;
             }
             else
             {
@@ -423,6 +453,7 @@ namespace Game
                 fadeOutElapsed = 0.0f;
                 fadeUpElapsed = 0.0f;
                 currentState = TutorialState.ShootWall;
+                Publish(EVENT_TRENCH_WALL_WARNING_TRIGGERED, "");
             }
         }
 
@@ -431,6 +462,9 @@ namespace Game
             altUsed = false;
 
             bool wallAlreadyDestroyed = IsWallAlreadyDestroyed(currentPos, currentWallPos);
+
+            // No movement at the start if wall is intact, allow showing of camera work
+            if (!wallAlreadyDestroyed) { needAction = false; }
 
             if (wallAlreadyDestroyed && !wallDestroyedPublished)
             {
@@ -504,6 +538,9 @@ namespace Game
                 pauseForTutorial = false;
                 GameState.IsPaused = false;
 
+                // At this stage, wall is not destroyed and player can roam free
+                needAction = true;
+
                 if (!shootWallReturnStarted)
                 {
                     shootWallReturnStarted = true;
@@ -553,6 +590,9 @@ namespace Game
                 fadeUpElapsed = 0.0f;
                 EPressed = false;
 
+                // No movement at the start when introducing turrets
+                needAction = false;
+
                 BeginTutorialCameraMove(destroyTurretCamPos, destroyTurretCamTarget, true);
             }
 
@@ -577,6 +617,9 @@ namespace Game
                     ShowUI(destroyTurretID, false, dt);
                     pauseForTutorial = false;
                     GameState.IsPaused = false;
+
+                    // At this stage, player can roam free to destroy turrets
+                    needAction = true;
 
                     if (!destroyTurretReturnStarted)
                     {
@@ -648,6 +691,9 @@ namespace Game
                 Publish("ForceAltCharge", ""); //Ult Fire ready When UltFire tooltip shows up
                 currentState = TutorialState.AltFire;
             }
+
+            // Wait state is always an action state
+            needAction = true;
         }
 
         private void HandleAltFire(float dt)
@@ -660,6 +706,9 @@ namespace Game
                 ShowUI(altFireID, true, dt);
                 pauseForTutorial = true;
                 GameState.IsPaused = true;
+
+                // No action required, reading tooltip
+                needAction = false;
                 return;
             }
 
@@ -674,7 +723,7 @@ namespace Game
                 fadeUpElapsed = 0.0f;
                 EPressed = false;
                 altUsed = false;
-                currentState = TutorialState.Wait;
+                currentState = TutorialState.Wait; // Handle action state here; allow action after tooltip fades
             }
 
         }
@@ -691,6 +740,9 @@ namespace Game
                 fadeUpElapsed = 0.0f;
                 EPressed = false;
 
+                // No action required, reading tooltip
+                needAction = false;
+
                 BeginTutorialCameraMove(collectUpgradeCamPos, collectUpgradeCamTarget, true);
             }
 
@@ -704,6 +756,9 @@ namespace Game
                 ShowCollectUpgradeUI(false, dt);
                 GameState.IsPaused = false;
                 pauseForTutorial = false;
+
+                // Allow player to collect upgrade module after reading tooltip
+                needAction = true;
 
                 if (!collectUpgradeReturnStarted)
                 {
@@ -740,6 +795,7 @@ namespace Game
         {
             pauseForTutorial = false;
             GameState.IsPaused = false;
+            needAction = true; // Player needs to move to complete this tutorial
             //EPressed = false;
 
             if (IsKeyPressed(KeyCode.E)) EPressed = true;
